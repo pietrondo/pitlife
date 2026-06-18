@@ -99,6 +99,14 @@ public class Game1 : Game
         _creatureRenderer.RegisterSpeciesTexture("Leopard", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/leopard.png"));
         _creatureRenderer.RegisterSpeciesTexture("Crocodile", LoadTexture("Content/assets/creatures/reptiles/crocodilians/crocodile.png"));
         _creatureRenderer.RegisterSpeciesTexture("Butterfly", LoadTexture("Content/assets/creatures/invertebrates/insects/butterfly.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Moss", LoadTexture("Content/assets/creatures/plants/grasses/moss.png"));
+        _creatureRenderer.RegisterSpeciesTexture("BerryBush", LoadTexture("Content/assets/creatures/plants/shrubs/berrybush.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Pine", LoadTexture("Content/assets/creatures/plants/trees/pine.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Toadstool", LoadTexture("Content/assets/creatures/plants/fungi/toadstool.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Snake", LoadTexture("Content/assets/creatures/reptiles/squamates/snake.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Eagle", LoadTexture("Content/assets/creatures/birds/raptors/eagle.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Frog", LoadTexture("Content/assets/creatures/amphibians/anurans/frog.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Beetle", LoadTexture("Content/assets/creatures/invertebrates/insects/beetle.png"));
     }
 
     private Texture2D? LoadTexture(string path)
