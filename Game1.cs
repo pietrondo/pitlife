@@ -60,38 +60,38 @@ public class Game1 : Game
         _creatureRenderer.LoadContent(GraphicsDevice);
 
         _worldRenderer.SetTileTextures(
-            LoadTexture("Content/assets/biome_water.png"),    // DeepOcean
-            LoadTexture("Content/assets/biome_snow.png"),     // ShallowWater (fallback snow/light)
-            LoadTexture("Content/assets/biome_sand.png"),     // Beach
-            LoadTexture("Content/assets/biome_desert.png"),   // Desert
-            LoadTexture("Content/assets/biome_grass.png"),    // Savanna (questo e erba secca!)
-            LoadTexture("Content/assets/biome_swamp.png"),    // Grassland (questo e prato!)
-            LoadTexture("Content/assets/biome_dense.png"),    // Forest
-            LoadTexture("Content/assets/biome_tundra.png"),   // DenseForest
-            LoadTexture("Content/assets/biome_forest.png"),   // Swamp (questo e palude!)
-            LoadTexture("Content/assets/biome_mountain.png"), // Tundra (fallback montagna)
-            LoadTexture("Content/assets/biome_mountain.png"), // Mountain
-            LoadTexture("Content/assets/biome_snow.png"));    // Snow
+            LoadTexture("Content/assets/creatures/biomes/biome_water.png"),    // DeepOcean
+            LoadTexture("Content/assets/creatures/biomes/biome_snow.png"),     // ShallowWater (fallback snow/light)
+            LoadTexture("Content/assets/creatures/biomes/biome_sand.png"),     // Beach
+            LoadTexture("Content/assets/creatures/biomes/biome_desert.png"),   // Desert
+            LoadTexture("Content/assets/creatures/biomes/biome_grass.png"),    // Savanna (questo e erba secca!)
+            LoadTexture("Content/assets/creatures/biomes/biome_swamp.png"),    // Grassland (questo e prato!)
+            LoadTexture("Content/assets/creatures/biomes/biome_dense.png"),    // Forest
+            LoadTexture("Content/assets/creatures/biomes/biome_tundra.png"),   // DenseForest
+            LoadTexture("Content/assets/creatures/biomes/biome_forest.png"),   // Swamp (questo e palude!)
+            LoadTexture("Content/assets/creatures/biomes/biome_mountain.png"), // Tundra (fallback montagna)
+            LoadTexture("Content/assets/creatures/biomes/biome_mountain.png"), // Mountain
+            LoadTexture("Content/assets/creatures/biomes/biome_snow.png"));    // Snow
 
-        _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/plant.png"));
-        _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/herbivore.png"));
-        _creatureRenderer.SetCarnivoreTexture(LoadTexture("Content/assets/carnivore.png"));
-        _creatureRenderer.SetOmnivoreTexture(LoadTexture("Content/assets/omnivore.png"));
+        _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/creatures/creatures/plant.png"));
+        _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/creatures/creatures/herbivore.png"));
+        _creatureRenderer.SetCarnivoreTexture(LoadTexture("Content/assets/creatures/creatures/carnivore.png"));
+        _creatureRenderer.SetOmnivoreTexture(LoadTexture("Content/assets/creatures/creatures/omnivore.png"));
 
-        _creatureRenderer.RegisterSpeciesTexture("Deer", LoadTexture("Content/assets/deer.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Rabbit", LoadTexture("Content/assets/rabbit.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Fox", LoadTexture("Content/assets/fox.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Boar", LoadTexture("Content/assets/boar.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Flowers", LoadTexture("Content/assets/flowers.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Mushroom", LoadTexture("Content/assets/mushroom.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Sheep", LoadTexture("Content/assets/sheep.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Lynx", LoadTexture("Content/assets/lynx.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Raccoon", LoadTexture("Content/assets/raccoon.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/tiger.png"));
-        _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/grasstuft.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/cactus.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Horse", LoadTexture("Content/assets/horse.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Goat", LoadTexture("Content/assets/goat.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Deer", LoadTexture("Content/assets/creatures/deer.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Rabbit", LoadTexture("Content/assets/creatures/rabbit.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Fox", LoadTexture("Content/assets/creatures/fox.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Boar", LoadTexture("Content/assets/creatures/boar.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Flowers", LoadTexture("Content/assets/creatures/flowers.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Mushroom", LoadTexture("Content/assets/creatures/mushroom.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Sheep", LoadTexture("Content/assets/creatures/sheep.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Lynx", LoadTexture("Content/assets/creatures/lynx.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Raccoon", LoadTexture("Content/assets/creatures/raccoon.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/creatures/tiger.png"));
+        _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/creatures/grasstuft.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/creatures/cactus.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Horse", LoadTexture("Content/assets/creatures/horse.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Goat", LoadTexture("Content/assets/creatures/goat.png"));
     }
 
     private Texture2D? LoadTexture(string path)
