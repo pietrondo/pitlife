@@ -22,10 +22,10 @@ public class Ecosystem
     private readonly List<Creature> _pendingRemove = new();
     private readonly object _lock = new();
 
-    private static readonly string[] PlantSpecies = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus"];
-    private static readonly string[] HerbivoreSpecies = ["Gazelle", "Rabbit", "Deer", "Sheep", "Horse", "Goat", "Moose", "Bison", "Antelope"];
-    private static readonly string[] CarnivoreSpecies = ["Wolf", "Fox", "Lynx", "Tiger", "Cougar", "Hyena"];
-    private static readonly string[] OmnivoreSpecies = ["Bear", "Boar", "Raccoon", "Skunk", "Hedgehog"];
+    private static readonly string[] PlantSpecies = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"];
+    private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat"];
+    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile"];
+    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon"];
 
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {

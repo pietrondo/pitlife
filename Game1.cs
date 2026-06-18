@@ -73,25 +73,28 @@ public class Game1 : Game
             LoadTexture("Content/assets/biomes/biome_mountain.png"), // Mountain
             LoadTexture("Content/assets/biomes/biome_snow.png"));    // Snow
 
-        _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/creatures/plants/plant.png"));
-        _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/creatures/herbivores/herbivore.png"));
-        _creatureRenderer.SetCarnivoreTexture(LoadTexture("Content/assets/creatures/carnivores/carnivore.png"));
-        _creatureRenderer.SetOmnivoreTexture(LoadTexture("Content/assets/creatures/omnivores/omnivore.png"));
+        _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/creatures/plants/shrubs/plant.png"));
+        _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/herbivore.png"));
+        _creatureRenderer.SetCarnivoreTexture(LoadTexture("Content/assets/creatures/mammals/carnivores/felids/carnivore.png"));
+        _creatureRenderer.SetOmnivoreTexture(LoadTexture("Content/assets/creatures/mammals/omnivores/suids/omnivore.png"));
 
-        _creatureRenderer.RegisterSpeciesTexture("Deer", LoadTexture("Content/assets/creatures/herbivores/deer.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Rabbit", LoadTexture("Content/assets/creatures/herbivores/rabbit.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Fox", LoadTexture("Content/assets/creatures/carnivores/fox.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Boar", LoadTexture("Content/assets/creatures/omnivores/boar.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Flowers", LoadTexture("Content/assets/creatures/plants/flowers.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Mushroom", LoadTexture("Content/assets/creatures/plants/mushroom.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Sheep", LoadTexture("Content/assets/creatures/herbivores/sheep.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Lynx", LoadTexture("Content/assets/creatures/carnivores/lynx.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Raccoon", LoadTexture("Content/assets/creatures/omnivores/raccoon.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/creatures/carnivores/tiger.png"));
-        _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/creatures/plants/grasstuft.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/creatures/plants/cactus.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Horse", LoadTexture("Content/assets/creatures/herbivores/horse.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Goat", LoadTexture("Content/assets/creatures/herbivores/goat.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Deer", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/deer.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Rabbit", LoadTexture("Content/assets/creatures/mammals/herbivores/lagomorphs/rabbit.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Fox", LoadTexture("Content/assets/creatures/mammals/carnivores/canids/fox.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Boar", LoadTexture("Content/assets/creatures/mammals/omnivores/suids/boar.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Flowers", LoadTexture("Content/assets/creatures/plants/flowers/flowers.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Mushroom", LoadTexture("Content/assets/creatures/plants/fungi/mushroom.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Sheep", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/sheep.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Lynx", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/lynx.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Raccoon", LoadTexture("Content/assets/creatures/mammals/omnivores/procyonids/raccoon.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/tiger.png"));
+        _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/creatures/plants/grasses/grasstuft.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/creatures/plants/succulents/cactus.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Horse", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/horse.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Goat", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/goat.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Lion", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/lion.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Leopard", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/leopard.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Crocodile", LoadTexture("Content/assets/creatures/reptiles/crocodilians/crocodile.png"));
     }
 
     private Texture2D? LoadTexture(string path)
