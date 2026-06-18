@@ -9,121 +9,135 @@ public class WorldRenderer
 {
     private readonly World _world;
     private Texture2D? _pixel;
-    private int _borderWidth = 6;
+    private int _borderWidth = 5;
 
-    private Texture2D? _tileOcean;
-    private Texture2D? _tileSand;
-    private Texture2D? _tileGrass;
-    private Texture2D? _tileForest;
-    private Texture2D? _tileMountain;
-    private Texture2D? _tileDesert;
+    private Texture2D? _texDeepOcean;
+    private Texture2D? _texShallowWater;
+    private Texture2D? _texBeach;
+    private Texture2D? _texDesert;
+    private Texture2D? _texSavanna;
+    private Texture2D? _texGrassland;
+    private Texture2D? _texForest;
+    private Texture2D? _texDenseForest;
+    private Texture2D? _texSwamp;
+    private Texture2D? _texTundra;
+    private Texture2D? _texMountain;
+    private Texture2D? _texSnow;
 
     private static readonly Color[] BiomeColors =
     {
-        new(100, 180, 60),
-        new(40, 120, 30),
-        new(210, 190, 130),
-        new(50, 100, 200),
-        new(140, 130, 120),
+        new(15, 40, 120),    // DeepOcean
+        new(50, 100, 200),   // ShallowWater
+        new(220, 200, 150),  // Beach
+        new(210, 180, 120),  // Desert
+        new(180, 190, 80),   // Savanna
+        new(100, 180, 60),   // Grassland
+        new(40, 130, 40),    // Forest
+        new(20, 90, 30),     // DenseForest
+        new(90, 100, 60),    // Swamp
+        new(140, 130, 110),  // Tundra
+        new(140, 120, 100),  // Mountain
+        new(230, 235, 240),  // Snow
     };
 
     private static readonly Color[] EdgeColors =
     {
-        new(170, 200, 130), // Grassland → edge
-        new(100, 150, 70),  // Forest → edge
-        new(230, 210, 160), // Desert → edge
-        new(80, 120, 210),  // Water → edge
-        new(170, 160, 150), // Mountain → edge
+        new(50, 80, 160),    // DeepOcean edge
+        new(100, 150, 220),  // ShallowWater edge
+        new(235, 220, 180),  // Beach edge
+        new(230, 210, 160),  // Desert edge
+        new(200, 210, 120),  // Savanna edge
+        new(170, 210, 130),  // Grassland edge
+        new(100, 170, 90),   // Forest edge
+        new(70, 130, 70),    // DenseForest edge
+        new(130, 140, 100),  // Swamp edge
+        new(170, 160, 140),  // Tundra edge
+        new(170, 160, 130),  // Mountain edge
+        new(240, 245, 250),  // Snow edge
     };
 
-    public WorldRenderer(World world)
-    {
-        _world = world;
-    }
+    public WorldRenderer(World world) => _world = world;
 
-    public void LoadContent(GraphicsDevice graphicsDevice)
+    public void LoadContent(GraphicsDevice gd)
     {
-        _pixel = new Texture2D(graphicsDevice, 1, 1);
+        _pixel = new Texture2D(gd, 1, 1);
         _pixel.SetData([Color.White]);
     }
 
     public void SetTileTextures(
-        Texture2D? ocean, Texture2D? sand, Texture2D? grass,
-        Texture2D? forest, Texture2D? mountain, Texture2D? desert,
-        Texture2D? dirt)
+        Texture2D? ocean, Texture2D? shallow, Texture2D? beach,
+        Texture2D? desert, Texture2D? savanna, Texture2D? grass,
+        Texture2D? forest, Texture2D? dense, Texture2D? swamp,
+        Texture2D? tundra, Texture2D? mountain, Texture2D? snow)
     {
-        _tileOcean = ocean;
-        _tileSand = sand;
-        _tileGrass = grass;
-        _tileForest = forest;
-        _tileMountain = mountain;
-        _tileDesert = desert;
+        _texDeepOcean = ocean;
+        _texShallowWater = shallow;
+        _texBeach = beach;
+        _texDesert = desert;
+        _texSavanna = savanna;
+        _texGrassland = grass;
+        _texForest = forest;
+        _texDenseForest = dense;
+        _texSwamp = swamp;
+        _texTundra = tundra;
+        _texMountain = mountain;
+        _texSnow = snow;
     }
 
-    private static readonly BiomeType[] EdgeBiomes =
+    private Texture2D? TextureFor(BiomeType b) => b switch
     {
-        BiomeType.Water, BiomeType.Desert, BiomeType.Grassland,
-        BiomeType.Forest, BiomeType.Mountain,
-    };
-
-    private Texture2D? TextureFor(BiomeType biome) => biome switch
-    {
-        BiomeType.Water => _tileOcean,
-        BiomeType.Desert => _tileDesert ?? _tileSand,
-        BiomeType.Grassland => _tileGrass,
-        BiomeType.Forest => _tileForest,
-        BiomeType.Mountain => _tileMountain,
+        BiomeType.DeepOcean => _texDeepOcean,
+        BiomeType.ShallowWater => _texShallowWater,
+        BiomeType.Beach => _texBeach,
+        BiomeType.Desert => _texDesert,
+        BiomeType.Savanna => _texSavanna,
+        BiomeType.Grassland => _texGrassland,
+        BiomeType.Forest => _texForest,
+        BiomeType.DenseForest => _texDenseForest,
+        BiomeType.Swamp => _texSwamp,
+        BiomeType.Tundra => _texTundra,
+        BiomeType.Mountain => _texMountain,
+        BiomeType.Snow => _texSnow,
         _ => null
     };
 
-    public void Draw(SpriteBatch spriteBatch, Camera camera)
+    public void Draw(SpriteBatch sb, Camera camera)
     {
-        Rectangle visible = camera.VisibleArea;
+        Rectangle v = camera.VisibleArea;
         int ts = _world.TileSize;
-        int startX = Math.Max(0, visible.X / ts - 1);
-        int startY = Math.Max(0, visible.Y / ts - 1);
-        int endX = Math.Min(_world.Width, (visible.X + visible.Width) / ts + 2);
-        int endY = Math.Min(_world.Height, (visible.Y + visible.Height) / ts + 2);
+        int sx = Math.Max(0, v.X / ts - 1);
+        int sy = Math.Max(0, v.Y / ts - 1);
+        int ex = Math.Min(_world.Width, (v.X + v.Width) / ts + 2);
+        int ey = Math.Min(_world.Height, (v.Y + v.Height) / ts + 2);
 
-        for (int y = startY; y < endY; y++)
+        for (int y = sy; y < ey; y++)
         {
-            for (int x = startX; x < endX; x++)
+            for (int x = sx; x < ex; x++)
             {
-                var tile = _world.Tiles[x, y];
-                BiomeType b = tile.Biome;
-                Rectangle dest = new(x * ts, y * ts, ts, ts);
+                var t = _world.Tiles[x, y];
+                BiomeType b = t.Biome;
+                var r = new Rectangle(x * ts, y * ts, ts, ts);
 
                 var tex = TextureFor(b);
                 if (tex != null)
-                    spriteBatch.Draw(tex, dest, Color.White);
+                    sb.Draw(tex, r, Color.White);
                 else
-                    spriteBatch.Draw(_pixel, dest, BiomeColors[(int)b]);
+                    sb.Draw(_pixel, r, BiomeColors[(int)b]);
 
-                var nb = GetNeighborBiomes(x, y);
+                var (top, bot, l, r_) = GetNB(x, y);
 
-                if (nb.top != b)
-                    spriteBatch.Draw(_pixel, new Rectangle(x * ts, y * ts, ts, _borderWidth),
-                        EdgeColors[(int)nb.top] * 0.45f);
-                if (nb.bottom != b)
-                    spriteBatch.Draw(_pixel, new Rectangle(x * ts, (y + 1) * ts - _borderWidth, ts, _borderWidth),
-                        EdgeColors[(int)nb.bottom] * 0.45f);
-                if (nb.left != b)
-                    spriteBatch.Draw(_pixel, new Rectangle(x * ts, y * ts, _borderWidth, ts),
-                        EdgeColors[(int)nb.left] * 0.45f);
-                if (nb.right != b)
-                    spriteBatch.Draw(_pixel, new Rectangle((x + 1) * ts - _borderWidth, y * ts, _borderWidth, ts),
-                        EdgeColors[(int)nb.right] * 0.45f);
+                if (top != b) sb.Draw(_pixel, new Rectangle(x * ts, y * ts, ts, _borderWidth), EdgeColors[(int)top] * 0.40f);
+                if (bot != b) sb.Draw(_pixel, new Rectangle(x * ts, (y + 1) * ts - _borderWidth, ts, _borderWidth), EdgeColors[(int)bot] * 0.40f);
+                if (l != b) sb.Draw(_pixel, new Rectangle(x * ts, y * ts, _borderWidth, ts), EdgeColors[(int)l] * 0.40f);
+                if (r_ != b) sb.Draw(_pixel, new Rectangle((x + 1) * ts - _borderWidth, y * ts, _borderWidth, ts), EdgeColors[(int)r_] * 0.40f);
             }
         }
     }
 
-    private (BiomeType top, BiomeType bottom, BiomeType left, BiomeType right)
-        GetNeighborBiomes(int x, int y)
-    {
-        var top = _world.GetTile(x, y - 1).Biome;
-        var bottom = _world.GetTile(x, y + 1).Biome;
-        var left = _world.GetTile(x - 1, y).Biome;
-        var right = _world.GetTile(x + 1, y).Biome;
-        return (top, bottom, left, right);
-    }
+    private (BiomeType t, BiomeType b, BiomeType l, BiomeType r) GetNB(int x, int y) => (
+        _world.GetTile(x, y - 1).Biome,
+        _world.GetTile(x, y + 1).Biome,
+        _world.GetTile(x - 1, y).Biome,
+        _world.GetTile(x + 1, y).Biome
+    );
 }

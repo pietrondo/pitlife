@@ -55,13 +55,21 @@ public class Game1 : Game
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
 
-        var water = LoadTexture("Content/assets/biome_water.png");
-        var grass = LoadTexture("Content/assets/biome_grass.png");
-        var forest = LoadTexture("Content/assets/biome_forest.png");
-        var mountain = LoadTexture("Content/assets/biome_mountain.png");
+        var deepOcean = LoadTexture("Content/assets/biome_deepocean.png") ?? LoadTexture("Content/assets/biome_water.png");
+        var shallowWater = LoadTexture("Content/assets/biome_shallow.png") ?? LoadTexture("Content/assets/biome_sand.png");
+        var beach = LoadTexture("Content/assets/biome_sand.png");
         var desert = LoadTexture("Content/assets/biome_desert.png");
-        var sand = LoadTexture("Content/assets/biome_sand.png");
-        _worldRenderer.SetTileTextures(water, sand, grass, forest, mountain, desert, null);
+        var savanna = LoadTexture("Content/assets/biome_savanna.png");
+        var grassland = LoadTexture("Content/assets/biome_grass.png");
+        var forest = LoadTexture("Content/assets/biome_forest.png");
+        var dense = LoadTexture("Content/assets/biome_dense.png");
+        var swamp = LoadTexture("Content/assets/biome_swamp.png");
+        var tundra = LoadTexture("Content/assets/biome_tundra.png");
+        var mountain = LoadTexture("Content/assets/biome_mountain.png");
+        var snow = LoadTexture("Content/assets/biome_snow.png");
+        _worldRenderer.SetTileTextures(
+            deepOcean, shallowWater, beach, desert, savanna, grassland,
+            forest, dense, swamp, tundra, mountain, snow);
 
         _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/plant.png"));
         _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/herbivore.png"));
@@ -77,6 +85,9 @@ public class Game1 : Game
         _creatureRenderer.RegisterSpeciesTexture("Sheep", LoadTexture("Content/assets/sheep.png"));
         _creatureRenderer.RegisterSpeciesTexture("Lynx", LoadTexture("Content/assets/lynx.png"));
         _creatureRenderer.RegisterSpeciesTexture("Raccoon", LoadTexture("Content/assets/raccoon.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/tiger.png"));
+        _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/grasstuft.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/cactus.png"));
     }
 
     private Texture2D? LoadTexture(string path)

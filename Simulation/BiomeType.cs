@@ -2,9 +2,16 @@ namespace PitLife.Simulation;
 
 public enum BiomeType
 {
+    DeepOcean,
+    ShallowWater,
+    Beach,
+    Desert,
+    Savanna,
     Grassland,
     Forest,
-    Desert,
-    Water,
-    Mountain
+    DenseForest,
+    Swamp,
+    Tundra,
+    Mountain,
+    Snow
 }
