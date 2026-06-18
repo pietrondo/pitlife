@@ -17,6 +17,7 @@ public abstract class Creature
     public float Speed => Genome.Speed * 30f;
     public float VisionPixels => Genome.VisionRange * 32f;
     public float ReproductionThreshold => MaxEnergy * 0.7f;
+    public virtual bool IsAquatic => false;
 
     public Vector2 Facing { get; set; } = new(0, 1);
 
@@ -53,24 +54,30 @@ public abstract class Creature
         IsAlive = false;
     }
 
-    public void MoveToward(Vector2 target, float dt)
+    public void MoveToward(Vector2 target, float dt, World? world = null)
     {
         Vector2 dir = target - Position;
         float dist = dir.Length();
         if (dist < 1f) return;
         if (dist > 0.001f) dir /= dist;
         float moveAmount = Speed * dt;
-        Position += dir * Math.Min(moveAmount, dist);
+        Vector2 newPos = Position + dir * Math.Min(moveAmount, dist);
+        if (world != null && !world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))
+            return;
+        Position = newPos;
         Facing = dir;
     }
 
-    public bool MoveAwayFrom(Vector2 threat, float dt)
+    public bool MoveAwayFrom(Vector2 threat, float dt, World? world = null)
     {
         Vector2 dir = Position - threat;
         float dist = dir.Length();
         if (dist < 1f) return false;
         dir /= dist;
-        Position += dir * Speed * dt;
+        Vector2 newPos = Position + dir * Speed * dt;
+        if (world != null && !world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))
+            return false;
+        Position = newPos;
         Facing = dir;
         return true;
     }

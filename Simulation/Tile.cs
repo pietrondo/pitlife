@@ -8,6 +8,10 @@ public class Tile
                            && Biome != BiomeType.ShallowWater
                            && Biome != BiomeType.Snow;
 
+    public bool IsPassableFor(bool isAquatic) => isAquatic
+        ? Biome != BiomeType.Snow
+        : IsPassable;
+
     public Tile(BiomeType biome)
     {
         Biome = biome;

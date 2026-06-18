@@ -23,9 +23,11 @@ public class Ecosystem
     private readonly object _lock = new();
 
     private static readonly string[] PlantSpecies = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"];
-    private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat"];
-    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle"];
-    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly"];
+    private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle"];
+    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf"];
+    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly", "Bear"];
+
+    private static readonly HashSet<string> AquaticSpecies = ["Fish"];
 
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
@@ -78,7 +80,8 @@ public class Ecosystem
     private void SpawnSpecies<T>(string[] species, string defaultSpecies) where T : Creature
     {
         string name = species[Random.Next(species.Length)];
-        var pos = RandomPassablePosition();
+        bool isAquatic = AquaticSpecies.Contains(name);
+        var pos = RandomPassablePosition(isAquatic);
         var genome = Genome.Random(Random);
         Creature c = typeof(T).Name switch
         {
@@ -91,14 +94,14 @@ public class Ecosystem
         AddCreature(c);
     }
 
-    private Vector2 RandomPassablePosition()
+    private Vector2 RandomPassablePosition(bool isAquatic = false)
     {
         for (int attempt = 0; attempt < 100; attempt++)
         {
             float x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
             float y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
             var tile = World.GetTileAtPosition(x, y);
-            if (tile.IsPassable)
+            if (tile.IsPassableFor(isAquatic))
                 return new Vector2(x, y);
         }
         return new Vector2(World.TileSize, World.TileSize);

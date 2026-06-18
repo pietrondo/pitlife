@@ -7,6 +7,7 @@ public class Herbivore : Creature
 {
     public Herbivore(Vector2 position, Genome genome, string species = "Herbivore")
         : base(position, genome, CreatureType.Herbivore) { Species = species; }
+    public override bool IsAquatic => Species == "Fish";
 
     public override void Update(World world, Ecosystem ecosystem, GameTime gameTime)
     {
@@ -18,7 +19,7 @@ public class Herbivore : Creature
         Creature? threat = ecosystem.FindNearestPredator(this);
         if (threat != null && DistanceTo(threat) < VisionPixels * 0.8f)
         {
-            MoveAwayFrom(threat.Position, dt);
+            MoveAwayFrom(threat.Position, dt, world);
             return;
         }
 
@@ -34,7 +35,7 @@ public class Herbivore : Creature
             }
             else
             {
-                MoveToward(food.Position, dt);
+                MoveToward(food.Position, dt, world);
             }
         }
         else
@@ -50,7 +51,7 @@ public class Herbivore : Creature
         var target = Position + new Vector2(rx, ry);
         target.X = Math.Clamp(target.X, 0, world.PixelWidth - 1);
         target.Y = Math.Clamp(target.Y, 0, world.PixelHeight - 1);
-        MoveToward(target, dt);
+        MoveToward(target, dt, world);
     }
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)

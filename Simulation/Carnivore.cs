@@ -29,7 +29,7 @@ public class Carnivore : Creature
             }
             else
             {
-                MoveToward(prey.Position, dt);
+                MoveToward(prey.Position, dt, world);
             }
         }
         else
@@ -45,7 +45,7 @@ public class Carnivore : Creature
         var target = Position + new Vector2(rx, ry);
         target.X = Math.Clamp(target.X, 0, world.PixelWidth - 1);
         target.Y = Math.Clamp(target.Y, 0, world.PixelHeight - 1);
-        MoveToward(target, dt);
+        MoveToward(target, dt, world);
     }
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)

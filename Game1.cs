@@ -107,6 +107,11 @@ public class Game1 : Game
         _creatureRenderer.RegisterSpeciesTexture("Eagle", LoadTexture("Content/assets/creatures/birds/raptors/eagle.png"));
         _creatureRenderer.RegisterSpeciesTexture("Frog", LoadTexture("Content/assets/creatures/amphibians/anurans/frog.png"));
         _creatureRenderer.RegisterSpeciesTexture("Beetle", LoadTexture("Content/assets/creatures/invertebrates/insects/beetle.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Fish", LoadTexture("Content/assets/creatures/fish/fish.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Lizard", LoadTexture("Content/assets/creatures/reptiles/squamates/lizard.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Wolf", LoadTexture("Content/assets/creatures/mammals/carnivores/canids/wolf.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Bear", LoadTexture("Content/assets/creatures/mammals/omnivores/ursids/bear.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Turtle", LoadTexture("Content/assets/creatures/reptiles/testudines/turtle.png"));
     }
 
     private Texture2D? LoadTexture(string path)

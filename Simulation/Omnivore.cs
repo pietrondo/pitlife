@@ -39,7 +39,7 @@ public class Omnivore : Creature
                 }
                 else
                 {
-                    MoveToward(prey.Position, dt);
+                    MoveToward(prey.Position, dt, world);
                 }
                 return;
             }
@@ -57,7 +57,7 @@ public class Omnivore : Creature
             }
             else
             {
-                MoveToward(food.Position, dt);
+                MoveToward(food.Position, dt, world);
             }
         }
         else
@@ -67,7 +67,7 @@ public class Omnivore : Creature
             var target = Position + new Vector2(rx, ry);
             target.X = Math.Clamp(target.X, 0, world.PixelWidth - 1);
             target.Y = Math.Clamp(target.Y, 0, world.PixelHeight - 1);
-            MoveToward(target, dt);
+            MoveToward(target, dt, world);
         }
     }
 
