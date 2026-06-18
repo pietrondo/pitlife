@@ -55,21 +55,19 @@ public class Game1 : Game
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
 
-        var deepOcean = LoadTexture("Content/assets/biome_deepocean.png") ?? LoadTexture("Content/assets/biome_water.png");
-        var shallowWater = LoadTexture("Content/assets/biome_shallow.png") ?? LoadTexture("Content/assets/biome_sand.png");
-        var beach = LoadTexture("Content/assets/biome_sand.png");
-        var desert = LoadTexture("Content/assets/biome_desert.png");
-        var savanna = LoadTexture("Content/assets/biome_savanna.png");
-        var grassland = LoadTexture("Content/assets/biome_grass.png");
-        var forest = LoadTexture("Content/assets/biome_forest.png");
-        var dense = LoadTexture("Content/assets/biome_dense.png");
-        var swamp = LoadTexture("Content/assets/biome_swamp.png");
-        var tundra = LoadTexture("Content/assets/biome_tundra.png");
-        var mountain = LoadTexture("Content/assets/biome_mountain.png");
-        var snow = LoadTexture("Content/assets/biome_snow.png");
         _worldRenderer.SetTileTextures(
-            deepOcean, shallowWater, beach, desert, savanna, grassland,
-            forest, dense, swamp, tundra, mountain, snow);
+            LoadTexture("Content/assets/biome_water.png"),    // DeepOcean
+            LoadTexture("Content/assets/biome_snow.png"),     // ShallowWater (fallback snow/light)
+            LoadTexture("Content/assets/biome_sand.png"),     // Beach
+            LoadTexture("Content/assets/biome_desert.png"),   // Desert
+            LoadTexture("Content/assets/biome_grass.png"),    // Savanna (questo e erba secca!)
+            LoadTexture("Content/assets/biome_swamp.png"),    // Grassland (questo e prato!)
+            LoadTexture("Content/assets/biome_dense.png"),    // Forest
+            LoadTexture("Content/assets/biome_tundra.png"),   // DenseForest
+            LoadTexture("Content/assets/biome_forest.png"),   // Swamp (questo e palude!)
+            LoadTexture("Content/assets/biome_mountain.png"), // Tundra (fallback montagna)
+            LoadTexture("Content/assets/biome_mountain.png"), // Mountain
+            LoadTexture("Content/assets/biome_snow.png"));    // Snow
 
         _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/plant.png"));
         _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/herbivore.png"));
