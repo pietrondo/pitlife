@@ -24,8 +24,8 @@ public class Ecosystem
 
     private static readonly string[] PlantSpecies = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"];
     private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat"];
-    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile"];
-    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon"];
+    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle"];
+    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly"];
 
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
