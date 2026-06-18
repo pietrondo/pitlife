@@ -1,0 +1,20 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+
+# MonoGame Content
+Content/bin/
+Content/obj/
+
+# IDE
+.vscode/
+.config/
+*.DotSettings
+
+# OS
+Thumbs.db
+.DS_Store
