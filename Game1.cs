@@ -17,6 +17,7 @@ public class Game1 : Game
     private WorldRenderer _worldRenderer = null!;
     private CreatureRenderer _creatureRenderer = null!;
     private SpriteFont _font = null!;
+    private Texture2D? _logo;
 
     private int _displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores;
     private float _displayTime;
@@ -112,6 +113,8 @@ public class Game1 : Game
         _creatureRenderer.RegisterSpeciesTexture("Wolf", LoadTexture("Content/assets/creatures/mammals/carnivores/canids/wolf.png"));
         _creatureRenderer.RegisterSpeciesTexture("Bear", LoadTexture("Content/assets/creatures/mammals/omnivores/ursids/bear.png"));
         _creatureRenderer.RegisterSpeciesTexture("Turtle", LoadTexture("Content/assets/creatures/reptiles/testudines/turtle.png"));
+
+        _logo = LoadTexture("Content/assets/logo.png");
     }
 
     private Texture2D? LoadTexture(string path)
@@ -197,6 +200,14 @@ public class Game1 : Game
         _spriteBatch.DrawString(_font, hud, new Vector2(10, 10), Color.White);
         _spriteBatch.DrawString(_font, "WASD:move  Scroll:zoom  1(1x) 2(2x) 3(4x) Space:pause  Click:select  ESC:quit",
             new Vector2(10, 32), new Color(160, 160, 160));
+
+        if (_logo != null)
+        {
+            const int logoSize = 96;
+            _spriteBatch.Draw(_logo,
+                new Rectangle(_graphics.PreferredBackBufferWidth - logoSize - 10, 10, logoSize, logoSize),
+                Color.White);
+        }
 
         if (_selectedCreature != null && _selectedCreature.IsAlive)
         {
