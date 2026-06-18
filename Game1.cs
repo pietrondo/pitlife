@@ -40,8 +40,12 @@ public class Game1 : Game
         _graphics.ApplyChanges();
 
         _ecosystem = new Ecosystem(200, 150, 42);
-        _ecosystem.Initialize(initialHerbivores: 40, initialCarnivores: 12, initialOmnivores: 10, initialPlants: 100);
-        _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+        _ecosystem.Initialize(60, 20, 15, 150);
+        _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
+        {
+            WorldWidth = _ecosystem.World.PixelWidth,
+            WorldHeight = _ecosystem.World.PixelHeight
+        };
         _worldRenderer = new WorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
 
@@ -86,6 +90,8 @@ public class Game1 : Game
         _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/tiger.png"));
         _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/grasstuft.png"));
         _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/cactus.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Horse", LoadTexture("Content/assets/horse.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Goat", LoadTexture("Content/assets/goat.png"));
     }
 
     private Texture2D? LoadTexture(string path)
