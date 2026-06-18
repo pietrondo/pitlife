@@ -27,9 +27,9 @@ già stabilito per le 5 specie introdotte nel commit `ee0f498` (Fish, Lizard, Wo
 - `Simulation/Ecosystem.cs:25-29` — array `HerbivoreSpecies`/`CarnivoreSpecies`/`OmnivoreSpecies`
 - `Simulation/Ecosystem.cs` (HashSet) — `AquaticSpecies` (estendere da `["Fish"]` a `["Fish", "Shark", "Piranha", "Salmon", "Jellyfish"]`)
 - `Simulation/Ecosystem.cs::SpawnSpecies<T>` — aggiungere 4 case nel switch `typeof(T).Name`
-- `Simulation/Herbivore.cs:6-10` — override `IsAquatic`: aggiungere `|| Species == "Salmon"`
-- `Simulation/Carnivore.cs:6-10` — override `IsAquatic`: aggiungere `|| Species == "Shark" || Species == "Piranha"`
-- `Simulation/Omnivore.cs:6-10` — override `IsAquatic`: aggiungere `|| Species == "Jellyfish"`
+- `Simulation/Herbivore.cs:10` — estendere override `IsAquatic` esistente con `|| Species == "Salmon"`
+- `Simulation/Carnivore.cs` — AGGIUNGERE override `IsAquatic` (non esiste): `Species == "Shark" || Species == "Piranha"`
+- `Simulation/Omnivore.cs` — AGGIUNGERE override `IsAquatic` (non esiste): `Species == "Jellyfish"`
 - `Game1.cs:102-114` — registrare 4 nuove texture via `Texture2D.FromFile`
 
 ### Files to create (assets)
