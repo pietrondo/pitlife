@@ -22,8 +22,9 @@ public class World
     private void Generate(int seed)
     {
         var rng = new Random(seed);
-        float[,] elevation = GenerateNoise(Width, Height, 8, rng);
-        float[,] moisture = GenerateNoise(Width, Height, 6, new Random(rng.Next()));
+
+        float[,] elevation = GenerateFBMNoise(Width, Height, 4, 1f, 0.5f, new Random(rng.Next()));
+        float[,] moisture = GenerateFBMNoise(Width, Height, 4, 0.8f, 0.5f, new Random(rng.Next()));
 
         for (int y = 0; y < Height; y++)
         {
@@ -32,66 +33,93 @@ public class World
                 float e = elevation[x, y];
                 float m = moisture[x, y];
 
-                BiomeType biome;
-                if (e < 0.25f)
-                    biome = BiomeType.Water;
-                else if (e < 0.35f)
-                    biome = BiomeType.Desert;
-                else if (m < 0.3f)
-                    biome = BiomeType.Grassland;
-                else if (m < 0.6f)
-                    biome = BiomeType.Forest;
-                else
-                    biome = BiomeType.Mountain;
+                float distFromCenter = Math.Max(
+                    Math.Abs(x / (float)Width - 0.5f) * 2f,
+                    Math.Abs(y / (float)Height - 0.5f) * 2f
+                );
+                e -= distFromCenter * distFromCenter * 0.3f;
 
+                BiomeType biome = AssignBiome(e, m);
                 Tiles[x, y] = new Tile(biome);
             }
         }
     }
 
-    private static float[,] GenerateNoise(int width, int height, int octaves, Random rng)
+    private static BiomeType AssignBiome(float elevation, float moisture)
     {
-        float[,] noise = new float[width, height];
-        float[,] values = new float[width, height];
-        for (int i = 0; i < width * height; i++)
-            values[i % width, i / width] = (float)rng.NextDouble();
+        if (elevation < 0.25f)
+            return BiomeType.Water;
+        if (elevation < 0.32f)
+            return BiomeType.Desert;
 
-        float amplitude = 1f;
-        float totalAmplitude = 0f;
+        if (elevation > 0.65f)
+            return BiomeType.Mountain;
+
+        if (moisture < 0.25f)
+            return BiomeType.Desert;
+        if (moisture < 0.50f)
+            return BiomeType.Grassland;
+        return BiomeType.Forest;
+    }
+
+    private static float[,] GenerateFBMNoise(int w, int h, int octaves, float scale, float persistence, Random rng)
+    {
+        float[,] grid = new float[2 + (1 << (octaves - 1)), 2 + (1 << (octaves - 1))];
+        for (int i = 0; i < grid.GetLength(0); i++)
+            for (int j = 0; j < grid.GetLength(1); j++)
+                grid[i, j] = (float)rng.NextDouble();
+
+        float[,] result = new float[w, h];
+        float maxVal = 0;
 
         for (int o = 0; o < octaves; o++)
         {
-            int step = 1 << o;
-            for (int y = 0; y < height; y++)
+            int step = 1 << (octaves - 1 - o);
+            float amp = (float)Math.Pow(persistence, o);
+            maxVal += amp;
+
+            for (int y = 0; y < h; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < w; x++)
                 {
-                    int sx = (x / step) * step;
-                    int sy = (y / step) * step;
-                    int ex = Math.Min(sx + step, width - 1);
-                    int ey = Math.Min(sy + step, height - 1);
-                    float fx = (x - sx) / (float)(ex - sx + 1);
-                    float fy = (y - sy) / (float)(ey - sy + 1);
+                    float gx = x / (float)w * scale * (1 << o);
+                    float gy = y / (float)h * scale * (1 << o);
+
+                    int ix0 = (int)gx;
+                    int iy0 = (int)gy;
+                    int ix1 = ix0 + 1;
+                    int iy1 = iy0 + 1;
+
+                    float fx = gx - ix0;
+                    float fy = gy - iy0;
+                    float sx = SmoothStep(fx);
+                    float sy = SmoothStep(fy);
+
+                    ix0 = Mod(ix0, grid.GetLength(0));
+                    ix1 = Mod(ix1, grid.GetLength(0));
+                    iy0 = Mod(iy0, grid.GetLength(1));
+                    iy1 = Mod(iy1, grid.GetLength(1));
+
                     float v = Lerp(
-                        Lerp(values[sx, sy], values[ex, sy], fx),
-                        Lerp(values[sx, ey], values[ex, ey], fx),
-                        fy
+                        Lerp(grid[ix0, iy0], grid[ix1, iy0], sx),
+                        Lerp(grid[ix0, iy1], grid[ix1, iy1], sx),
+                        sy
                     );
-                    noise[x, y] += v * amplitude;
+                    result[x, y] += v * amp;
                 }
             }
-            totalAmplitude += amplitude;
-            amplitude *= 0.5f;
         }
 
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
-                noise[x, y] /= totalAmplitude;
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+                result[x, y] /= maxVal;
 
-        return noise;
+        return result;
     }
 
+    private static float SmoothStep(float t) => t * t * (3f - 2f * t);
     private static float Lerp(float a, float b, float t) => a + (b - a) * t;
+    private static int Mod(int x, int m) => ((x % m) + m) % m;
 
     public Tile GetTile(int x, int y)
     {
