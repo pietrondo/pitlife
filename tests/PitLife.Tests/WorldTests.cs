@@ -75,6 +75,37 @@ public class WorldTests
             $"Expected different continent counts for different seeds, got c0={c0}, c1={c1}, c2={c2}");
     }
 
+    [Fact]
+    public void Constructor_ElevationField_OceanCellsHaveZeroElevation()
+    {
+        var world = new World(64, 48, 42);
+        var hasOcean = false;
+        var hasLand = false;
+        for (int i = 0; i < world.ContinentMask.Length; i++)
+        {
+            if (world.ContinentMask[i] <= 0.5f)
+            {
+                hasOcean = true;
+                Assert.Equal(0f, world.ElevationField[i]);
+            }
+            else
+            {
+                hasLand = true;
+                Assert.True(world.ElevationField[i] > 0f, $"Cella terrestre {i} (mask={world.ContinentMask[i]}) ha elev={world.ElevationField[i]}, atteso > 0");
+            }
+        }
+        Assert.True(hasOcean, "Attesa almeno una cella oceanica con seed=42 64x48");
+        Assert.True(hasLand, "Attesa almeno una cella terrestre con seed=42 64x48 (Pangea variant)");
+    }
+
+    [Fact]
+    public void Constructor_ElevationField_IsDeterministic()
+    {
+        var first = new World(64, 48, 42);
+        var second = new World(64, 48, 42);
+        Assert.Equal(first.ElevationField, second.ElevationField);
+    }
+
     private static int CountContinents(float[] mask, int width, int height)
     {
         var visited = new bool[width * height];

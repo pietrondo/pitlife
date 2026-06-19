@@ -53,6 +53,9 @@ public class World
 
                 if (e < 0.22f && m > 0.3f) e = 0.18f;
 
+                float elev = ContinentMask[y * Width + x] > 0.5f ? ContinentMask[y * Width + x] * _baseHeight + warp[x, y] * ContinentMask[y * Width + x] * 0.25f : 0f;
+                ElevationField[y * Width + x] = elev;
+
                 BiomeType biome = AssignBiome(e, m, t);
                 Tiles[x, y] = new Tile(biome);
             }
