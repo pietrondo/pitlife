@@ -1,7 +1,0 @@
-{
-  "database": "dolt",
-  "backend": "dolt",
-  "dolt_mode": "embedded",
-  "dolt_database": "PitLife",
-  "project_id": "5f35249c-2fd4-451a-b0f0-d124f5b33e21"
-}

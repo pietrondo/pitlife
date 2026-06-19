@@ -20,7 +20,14 @@ Content/obj/
 Thumbs.db
 .DS_Store
 
-# Beads / Dolt files (added by bd init)
+# Local agent tooling
+.agents/
+.claude/
+.beads/
+AGENTS.md
+CLAUDE.md
+
+# Beads / Dolt files
 .dolt/
 *.db
 .beads-credential-key
