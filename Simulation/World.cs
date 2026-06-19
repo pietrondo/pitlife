@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace PitLife.Simulation;
 
@@ -13,6 +14,7 @@ public class World
     internal float[] ContinentMask { get; }
     internal float[] ElevationField { get; }
     internal bool[] RiverMask { get; }
+    private float _baseHeight;
 
     public World(int width, int height, int seed)
     {
@@ -28,6 +30,8 @@ public class World
     private void Generate(int seed)
     {
         var rng = new Random(seed);
+
+        GenerateContinentMask(seed, new Random(rng.Next()));
 
         float[,] warp = GenerateFBM(Width, Height, 2, 2f, 1f, new Random(rng.Next()));
         float[,] elevation = GenerateFBMWarped(Width, Height, 6, 1.4f, 0.55f, warp, 3f, new Random(rng.Next()));
@@ -56,6 +60,91 @@ public class World
 
         CarveRivers(rng.Next());
         SmoothTerrain();
+    }
+
+    private void GenerateContinentMask(int seed, Random rng)
+    {
+        int variant = ((seed % 3) + 3) % 3;
+        int cellCount;
+        float cellRadius;
+        switch (variant)
+        {
+            case 0:
+                cellCount = 1;
+                cellRadius = 0.45f;
+                break;
+            case 1:
+                cellCount = 4;
+                cellRadius = 0.28f;
+                break;
+            default:
+                cellCount = 6;
+                cellRadius = 0.18f;
+                break;
+        }
+
+        _baseHeight = 0.4f + (float)rng.NextDouble() * 0.6f;
+
+        Vector2[] centers = new Vector2[cellCount];
+        if (cellCount == 1)
+        {
+            centers[0] = new Vector2(0.5f, 0.5f);
+        }
+        else if (cellCount == 4)
+        {
+            centers[0] = new Vector2(0.2f, 0.2f);
+            centers[1] = new Vector2(0.8f, 0.2f);
+            centers[2] = new Vector2(0.2f, 0.8f);
+            centers[3] = new Vector2(0.8f, 0.8f);
+        }
+        else
+        {
+            centers[0] = new Vector2(0.3f, 0.2f);
+            centers[1] = new Vector2(0.7f, 0.2f);
+            centers[2] = new Vector2(0.2f, 0.5f);
+            centers[3] = new Vector2(0.8f, 0.5f);
+            centers[4] = new Vector2(0.3f, 0.8f);
+            centers[5] = new Vector2(0.7f, 0.8f);
+        }
+
+        float jitterRange = 0.05f;
+        for (int i = 0; i < cellCount; i++)
+        {
+            centers[i].X += (float)(rng.NextDouble() * 2.0 - 1.0) * jitterRange;
+            centers[i].Y += (float)(rng.NextDouble() * 2.0 - 1.0) * jitterRange;
+            centers[i].X = Math.Clamp(centers[i].X, 0.1f, 0.9f);
+            centers[i].Y = Math.Clamp(centers[i].Y, 0.1f, 0.9f);
+        }
+
+        float warpStrength = 0.6f + (float)rng.NextDouble() * 0.6f;
+        float[,] warpU = GenerateFBM(Width, Height, 2, 16f, 0.5f, new Random(rng.Next()));
+        float[,] warpV = GenerateFBM(Width, Height, 2, 16f, 0.5f, new Random(rng.Next()));
+
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                float nx = x / (float)Width;
+                float ny = y / (float)Height;
+
+                float wu = (warpU[x, y] - 0.5f) * warpStrength;
+                float wv = (warpV[x, y] - 0.5f) * warpStrength;
+                float wx = Math.Clamp(nx + wu, 0f, 1f);
+                float wy = Math.Clamp(ny + wv, 0f, 1f);
+
+                float minDist = float.MaxValue;
+                for (int i = 0; i < cellCount; i++)
+                {
+                    float dx = wx - centers[i].X;
+                    float dy = wy - centers[i].Y;
+                    float d = MathF.Sqrt(dx * dx + dy * dy);
+                    if (d < minDist) minDist = d;
+                }
+
+                float mask = Math.Clamp(1f - minDist / cellRadius, 0f, 1f);
+                ContinentMask[y * Width + x] = mask;
+            }
+        }
     }
 
     private static BiomeType AssignBiome(float e, float m, float t)
