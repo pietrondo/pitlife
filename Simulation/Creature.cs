@@ -41,7 +41,7 @@ public abstract class Creature
             Die();
             return;
         }
-        Position = ClampToWorld(Position);
+        Position = ClampToWorld(Position, world);
     }
 
     protected virtual void ConsumeEnergy(float dt)
@@ -61,7 +61,7 @@ public abstract class Creature
         if (dist < 1f) return;
         if (dist > 0.001f) dir /= dist;
         float moveAmount = Speed * dt;
-        Vector2 newPos = Position + dir * Math.Min(moveAmount, dist);
+        Vector2 newPos = ClampToWorld(Position + dir * Math.Min(moveAmount, dist), world);
         if (world != null && !world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))
             return;
         Position = newPos;
@@ -74,7 +74,7 @@ public abstract class Creature
         float dist = dir.Length();
         if (dist < 1f) return false;
         dir /= dist;
-        Vector2 newPos = Position + dir * Speed * dt;
+        Vector2 newPos = ClampToWorld(Position + dir * Speed * dt, world);
         if (world != null && !world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))
             return false;
         Position = newPos;
@@ -106,10 +106,11 @@ public abstract class Creature
         return Vector2.DistanceSquared(Position, other.Position) <= range * range;
     }
 
-    protected static Vector2 ClampToWorld(Vector2 pos)
+    protected static Vector2 ClampToWorld(Vector2 pos, World? world = null)
     {
-        const float max = 200 * 32f;
-        return new(Math.Clamp(pos.X, 1, max - 1), Math.Clamp(pos.Y, 1, max - 1));
+        float maxX = world?.PixelWidth - 1 ?? float.MaxValue;
+        float maxY = world?.PixelHeight - 1 ?? float.MaxValue;
+        return new(Math.Clamp(pos.X, 1, maxX), Math.Clamp(pos.Y, 1, maxY));
     }
 
     protected abstract Creature CreateChild(Vector2 position, Genome genome, Random rng);

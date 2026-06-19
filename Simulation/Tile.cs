@@ -2,20 +2,32 @@ namespace PitLife.Simulation;
 
 public class Tile
 {
-    public BiomeType Biome { get; set; }
+    private BiomeType _biome;
+
+    public BiomeType Biome
+    {
+        get => _biome;
+        set
+        {
+            _biome = value;
+            Vegetation = VegetationFor(value);
+        }
+    }
     public float Vegetation { get; set; }
     public bool IsPassable => Biome != BiomeType.DeepOcean
                            && Biome != BiomeType.ShallowWater
                            && Biome != BiomeType.Snow;
 
     public bool IsPassableFor(bool isAquatic) => isAquatic
-        ? Biome != BiomeType.Snow
+        ? Biome is BiomeType.DeepOcean or BiomeType.ShallowWater
         : IsPassable;
 
     public Tile(BiomeType biome)
     {
         Biome = biome;
-        Vegetation = biome switch
+    }
+
+    private static float VegetationFor(BiomeType biome) => biome switch
         {
             BiomeType.DenseForest => 1.0f,
             BiomeType.Forest => 0.9f,
@@ -27,5 +39,4 @@ public class Tile
             BiomeType.Beach => 0.1f,
             _ => 0.0f
         };
-    }
 }

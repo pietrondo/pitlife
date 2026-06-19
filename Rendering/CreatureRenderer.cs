@@ -12,6 +12,7 @@ public class CreatureRenderer
     private Texture2D? _pixelTexture;
     private Texture2D? _plantTexture;
     private readonly Dictionary<string, Texture2D> _speciesTextures = new();
+    private readonly HashSet<Creature> _reportedRenderFailures = new();
     private Texture2D? _herbivoreTexture;
     private Texture2D? _carnivoreTexture;
     private Texture2D? _omnivoreTexture;
@@ -43,9 +44,10 @@ public class CreatureRenderer
 
         for (int i = 0; i < creatures.Count; i++)
         {
+            Creature? c = null;
             try
             {
-                var c = creatures[i];
+                c = creatures[i];
                 if (c == null || !c.IsAlive) continue;
 
                 float px = c.Position.X;
@@ -101,9 +103,10 @@ public class CreatureRenderer
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // skip problematic creature
+                if (c != null && _reportedRenderFailures.Add(c))
+                    Console.Error.WriteLine($"Creature render failed for {c.Species}: {ex.Message}");
             }
         }
     }

@@ -18,7 +18,7 @@ dotnet run
 
 Il menu principale supporta mouse, frecce e Invio. La finestra Opzioni permette di attivare o disattivare lo schermo intero.
 
-Durante la simulazione: WASD/frecce per muovere la camera, scroll per zoom, spazio per la pausa ed ESC per tornare al menu.
+Durante la simulazione: WASD/frecce per muovere la camera, scroll per zoom, spazio per la pausa, F2/F3 per le finestre e ESC per chiudere la finestra attiva o tornare al menu.
 
 ## Creature
 

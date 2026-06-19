@@ -1,0 +1,199 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using PitLife.Simulation;
+
+namespace PitLife.UI;
+
+public sealed class InGameUi
+{
+    public const string StatisticsWindowId = "statistics";
+    public const string CreatureWindowId = "creature";
+
+    private readonly UiWindowManager _windowManager = new();
+    private readonly UiButton _statisticsButton = new("STATISTICHE");
+    private readonly UiButton _creatureButton = new("CREATURA");
+
+    public InGameUi()
+    {
+        _windowManager.Add(new UiWindow("STATISTICHE", StatisticsWindowId)
+        {
+            Bounds = new Rectangle(32, 88, 320, 248),
+            IsOpen = true,
+            ShowCloseButton = true
+        });
+        _windowManager.Add(new UiWindow("DETTAGLI CREATURA", CreatureWindowId)
+        {
+            Bounds = new Rectangle(376, 112, 384, 272),
+            ShowCloseButton = true
+        });
+    }
+
+    public void OpenCreatureWindow() => _windowManager.Open(CreatureWindowId);
+
+    public bool CloseTopWindow() => _windowManager.CloseTopWindow();
+
+    public bool Update(
+        MouseState mouse,
+        MouseState previousMouse,
+        KeyboardState keyboard,
+        KeyboardState previousKeyboard,
+        int viewportWidth,
+        int viewportHeight)
+    {
+        LayoutToolbar(viewportHeight);
+
+        if (Pressed(keyboard, previousKeyboard, Keys.F2))
+            _windowManager.Toggle(StatisticsWindowId);
+        if (Pressed(keyboard, previousKeyboard, Keys.F3))
+            _windowManager.Toggle(CreatureWindowId);
+
+        bool toolbarConsumed = false;
+        if (_statisticsButton.WasClicked(mouse, previousMouse))
+        {
+            _windowManager.Toggle(StatisticsWindowId);
+            toolbarConsumed = true;
+        }
+        if (_creatureButton.WasClicked(mouse, previousMouse))
+        {
+            _windowManager.Toggle(CreatureWindowId);
+            toolbarConsumed = true;
+        }
+
+        bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || _creatureButton.Bounds.Contains(mouse.Position);
+        return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
+    }
+
+    public void Draw(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        MouseState mouse,
+        Creature? selectedCreature,
+        int plantCount,
+        int herbivoreCount,
+        int carnivoreCount,
+        int omnivoreCount,
+        float totalTime,
+        bool paused,
+        float speed,
+        int viewportHeight)
+    {
+        LayoutToolbar(viewportHeight);
+        var toolbar = new Rectangle(8, viewportHeight - 60, 304, 52);
+        UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
+        UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
+        _statisticsButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _creatureButton.Draw(spriteBatch, pixel, font, mouse, false);
+
+        foreach (UiWindow window in _windowManager.Windows)
+        {
+            if (!window.IsOpen)
+                continue;
+
+            window.Draw(spriteBatch, pixel, font);
+            if (window.Id == StatisticsWindowId)
+            {
+                DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
+                    plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed);
+            }
+            else if (window.Id == CreatureWindowId)
+            {
+                DrawCreature(spriteBatch, pixel, font, window.ContentBounds, selectedCreature);
+            }
+        }
+    }
+
+    private static void DrawStatistics(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        Rectangle content,
+        int plants,
+        int herbivores,
+        int carnivores,
+        int omnivores,
+        float time,
+        bool paused,
+        float speed)
+    {
+        int total = plants + herbivores + carnivores + omnivores;
+        DrawLine(spriteBatch, font, content.X, content.Y, $"Tempo simulato: {time:F1}s", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 22, $"Stato: {(paused ? "PAUSA" : $"{speed:0.#}x")}", paused ? UiTheme.DangerClay : UiTheme.MossSignal);
+        DrawLine(spriteBatch, font, content.X, content.Y + 54, $"Popolazione totale: {total}", UiTheme.WarmParchment);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 82, "Piante", plants, total, UiTheme.MossSignal);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 112, "Erbivori", herbivores, total, UiTheme.LakeBlue);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 142, "Carnivori", carnivores, total, UiTheme.DangerClay);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 172, "Onnivori", omnivores, total, UiTheme.WarmParchment);
+    }
+
+    private static void DrawPopulationRow(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        Rectangle content,
+        int y,
+        string label,
+        int value,
+        int total,
+        Color color)
+    {
+        DrawLine(spriteBatch, font, content.X, y, $"{label}: {value}", UiTheme.MutedStone);
+        var track = new Rectangle(content.X + 112, y + 3, content.Width - 112, 10);
+        UiPrimitives.Fill(spriteBatch, pixel, track, UiTheme.DeepGrove);
+        int width = total == 0 ? 0 : (int)(track.Width * (value / (float)total));
+        if (width > 0)
+            UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(track.X, track.Y, width, track.Height), color);
+        UiPrimitives.Border(spriteBatch, pixel, track, 1, UiTheme.BarkEdge);
+    }
+
+    private static void DrawCreature(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        Rectangle content,
+        Creature? creature)
+    {
+        if (creature == null || !creature.IsAlive)
+        {
+            DrawLine(spriteBatch, font, content.X, content.Y, "Nessuna creatura selezionata.", UiTheme.MutedStone);
+            DrawLine(spriteBatch, font, content.X, content.Y + 24, "Clicca una creatura nel mondo.", UiTheme.MutedStone);
+            return;
+        }
+
+        DrawLine(spriteBatch, font, content.X, content.Y, $"{creature.Species} - {creature.CreatureType}", UiTheme.MossSignal);
+        DrawLine(spriteBatch, font, content.X, content.Y + 28, $"Energia: {creature.Energy:F1} / {creature.MaxEnergy:F1}", UiTheme.WarmParchment);
+        DrawProgress(spriteBatch, pixel, new Rectangle(content.X, content.Y + 48, content.Width, 14), creature.Energy / creature.MaxEnergy);
+        DrawLine(spriteBatch, font, content.X, content.Y + 78, $"Eta: {creature.Age:F1}s", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 100, $"Velocita: {creature.Genome.Speed:F2}", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 122, $"Dimensione: {creature.Genome.Size:F2}", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 144, $"Metabolismo: {creature.Genome.Metabolism:F2}", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 166, $"Visione: {creature.Genome.VisionRange:F1}", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 188,
+            $"Genoma: #{creature.Genome.Color.R:X2}{creature.Genome.Color.G:X2}{creature.Genome.Color.B:X2}", UiTheme.MutedStone);
+    }
+
+    private static void DrawProgress(SpriteBatch spriteBatch, Texture2D pixel, Rectangle bounds, float value)
+    {
+        UiPrimitives.Fill(spriteBatch, pixel, bounds, UiTheme.DeepGrove);
+        int width = (int)((bounds.Width - 4) * MathHelper.Clamp(value, 0f, 1f));
+        if (width > 0)
+            UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(bounds.X + 2, bounds.Y + 2, width, bounds.Height - 4), UiTheme.MossSignal);
+        UiPrimitives.Border(spriteBatch, pixel, bounds, 2, UiTheme.BarkEdge);
+    }
+
+    private static void DrawLine(SpriteBatch spriteBatch, SpriteFont font, int x, int y, string text, Color color)
+    {
+        spriteBatch.DrawString(font, text, new Vector2(x, y), color);
+    }
+
+    private void LayoutToolbar(int viewportHeight)
+    {
+        int y = viewportHeight - 56;
+        _statisticsButton.Bounds = new Rectangle(12, y, 142, 44);
+        _creatureButton.Bounds = new Rectangle(162, y, 142, 44);
+    }
+
+    private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
+        current.IsKeyDown(key) && previous.IsKeyUp(key);
+}

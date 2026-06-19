@@ -144,36 +144,39 @@ public class Ecosystem
 
     public void Tick(GameTime gameTime)
     {
-        try
+        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
+        TotalTime += dt;
+        _spatialGrid.Rebuild(Creatures);
+
+        int count = Creatures.Count;
+        for (int i = count - 1; i >= 0; i--)
         {
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
-            TotalTime += dt;
-            _spatialGrid.Rebuild(Creatures);
-
-            int count = Creatures.Count;
-            for (int i = count - 1; i >= 0; i--)
+            if (i >= Creatures.Count) continue;
+            var c = Creatures[i];
+            if (c == null) continue;
+            if (c.IsAlive)
             {
-                if (i >= Creatures.Count) continue;
-                var c = Creatures[i];
-                if (c == null) continue;
-                if (c.IsAlive)
+                try
                 {
-                    try { c.Update(World, this, new GameTime(gameTime.TotalGameTime, TimeSpan.FromSeconds(dt))); }
-                    catch { c.Die(); }
-                    _spatialGrid.Update(c);
+                    c.Update(World, this, new GameTime(gameTime.TotalGameTime, TimeSpan.FromSeconds(dt)));
                 }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Creature update failed for {c.Species}: {ex.Message}");
+                    c.Die();
+                }
+                _spatialGrid.Update(c);
             }
-
-            FlushPending();
-            ProcessDeaths();
-            UpdateStats();
         }
-        catch { }
+
+        FlushPending();
+        ProcessDeaths(dt);
+        UpdateStats();
     }
 
-    private void ProcessDeaths()
+    private void ProcessDeaths(float dt)
     {
-        double decomposeChance = 0.05 * SimulationSpeed;
+        double decomposeChance = 1.0 - Math.Exp(-0.05 * dt);
         for (int i = Creatures.Count - 1; i >= 0; i--)
         {
             if (i >= Creatures.Count) continue;

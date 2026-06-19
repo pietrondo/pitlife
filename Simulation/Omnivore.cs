@@ -21,7 +21,7 @@ public class Omnivore : Creature
         Creature? threat = ecosystem.FindNearestPredator(this);
         if (threat != null && DistanceTo(threat) < VisionPixels * 0.6f)
         {
-            MoveAwayFrom(threat.Position, dt);
+            MoveAwayFrom(threat.Position, dt, world);
             return;
         }
 
@@ -29,7 +29,7 @@ public class Omnivore : Creature
         if (isHungry || Energy < ReproductionThreshold * 0.8f)
         {
             Creature? prey = ecosystem.FindNearestPrey(this);
-            if (prey != null && DistanceTo(prey) < VisionPixels && Random.Shared.NextDouble() < 0.4)
+            if (prey != null && DistanceTo(prey) < VisionPixels && ecosystem.Random.NextDouble() < 0.4)
             {
                 if (DistanceTo(prey) < 10f)
                 {
@@ -63,8 +63,8 @@ public class Omnivore : Creature
         }
         else
         {
-            float rx = (float)(Random.Shared.NextDouble() - 0.5) * 70f;
-            float ry = (float)(Random.Shared.NextDouble() - 0.5) * 70f;
+            float rx = (float)(ecosystem.Random.NextDouble() - 0.5) * 70f;
+            float ry = (float)(ecosystem.Random.NextDouble() - 0.5) * 70f;
             var target = Position + new Vector2(rx, ry);
             target.X = Math.Clamp(target.X, 0, world.PixelWidth - 1);
             target.Y = Math.Clamp(target.Y, 0, world.PixelHeight - 1);

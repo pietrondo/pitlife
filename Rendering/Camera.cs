@@ -20,6 +20,7 @@ public class Camera
     {
         ViewportWidth = viewportWidth;
         ViewportHeight = viewportHeight;
+        _lastScroll = Mouse.GetState().ScrollWheelValue;
     }
 
     public int WorldWidth { get; set; } = 6400;
@@ -34,7 +35,7 @@ public class Camera
         if (kbd.IsKeyDown(Keys.S) || kbd.IsKeyDown(Keys.Down)) ny += speed * dt;
         if (kbd.IsKeyDown(Keys.A) || kbd.IsKeyDown(Keys.Left)) nx -= speed * dt;
         if (kbd.IsKeyDown(Keys.D) || kbd.IsKeyDown(Keys.Right)) nx += speed * dt;
-        Position = new(Math.Clamp(nx, 0, WorldWidth), Math.Clamp(ny, 0, WorldHeight));
+        Position = ClampPosition(new Vector2(nx, ny));
 
         var scroll = Mouse.GetState().ScrollWheelValue;
         int diff = scroll - _lastScroll;
@@ -43,10 +44,24 @@ public class Camera
             float delta = diff / 120f;
             Zoom = MathHelper.Clamp(Zoom + delta * 0.1f, 0.25f, 4f);
             _lastScroll = scroll;
+            Position = ClampPosition(Position);
         }
     }
 
     private int _lastScroll;
+
+    private Vector2 ClampPosition(Vector2 position)
+    {
+        float halfWidth = ViewportWidth / (2f * Zoom);
+        float halfHeight = ViewportHeight / (2f * Zoom);
+        float minX = Math.Min(halfWidth, WorldWidth / 2f);
+        float minY = Math.Min(halfHeight, WorldHeight / 2f);
+        float maxX = Math.Max(minX, WorldWidth - halfWidth);
+        float maxY = Math.Max(minY, WorldHeight - halfHeight);
+        return new Vector2(
+            MathHelper.Clamp(position.X, minX, maxX),
+            MathHelper.Clamp(position.Y, minY, maxY));
+    }
 
     public Vector2 ScreenToWorld(int screenX, int screenY)
     {

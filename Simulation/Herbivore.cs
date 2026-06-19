@@ -40,14 +40,14 @@ public class Herbivore : Creature
         }
         else
         {
-            Wander(world, dt);
+            Wander(world, dt, ecosystem.Random);
         }
     }
 
-    private void Wander(World world, float dt)
+    private void Wander(World world, float dt, Random random)
     {
-        float rx = (float)(new Random().NextDouble() - 0.5) * 60f;
-        float ry = (float)(new Random().NextDouble() - 0.5) * 60f;
+        float rx = (float)(random.NextDouble() - 0.5) * 60f;
+        float ry = (float)(random.NextDouble() - 0.5) * 60f;
         var target = Position + new Vector2(rx, ry);
         target.X = Math.Clamp(target.X, 0, world.PixelWidth - 1);
         target.Y = Math.Clamp(target.Y, 0, world.PixelHeight - 1);

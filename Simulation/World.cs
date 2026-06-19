@@ -94,8 +94,8 @@ public class World
         for (int r = 0; r < rivers; r++)
         {
             int x = rng.Next(Width);
-            int y = 0;
             int dir = rng.Next(2) == 0 ? 1 : -1;
+            int y = dir > 0 ? 0 : Height - 1;
 
             for (int i = 0; i < Height * 2 && y >= 0 && y < Height; i++)
             {
@@ -118,6 +118,10 @@ public class World
     private void SmoothTerrain()
     {
         var tmp = new BiomeType[Width, Height];
+        for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                tmp[x, y] = Tiles[x, y].Biome;
+
         for (int y = 1; y < Height - 1; y++)
             for (int x = 1; x < Width - 1; x++)
             {

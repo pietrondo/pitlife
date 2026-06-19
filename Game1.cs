@@ -21,6 +21,7 @@ public class Game1 : Game
     private Texture2D? _logo;
     private Texture2D _uiPixel = null!;
     private readonly MainMenu _mainMenu = new();
+    private readonly InGameUi _inGameUi = new();
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
 
@@ -138,7 +139,10 @@ public class Game1 : Game
     private Texture2D? LoadTexture(string path)
     {
         try { if (File.Exists(path)) return Texture2D.FromFile(GraphicsDevice, path); }
-        catch { }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unable to load texture '{path}': {ex.Message}");
+        }
         return null;
     }
 
@@ -191,6 +195,14 @@ public class Game1 : Game
             return;
         }
 
+        if (escapePressed && _inGameUi.CloseTopWindow())
+        {
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
         if (escapePressed || gamepadBack)
         {
             _screen = GameScreen.MainMenu;
@@ -201,6 +213,14 @@ public class Game1 : Game
             return;
         }
 
+        bool pointerOverUi = _inGameUi.Update(
+            mouse,
+            _prevMouse,
+            kbd,
+            _prevKbd,
+            GraphicsDevice.Viewport.Width,
+            GraphicsDevice.Viewport.Height);
+
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.D1) && !_prevKbd.IsKeyDown(Keys.D1)) { _speedLevel = 1; _paused = false; }
         if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) { _speedLevel = 2; _paused = false; }
@@ -210,7 +230,7 @@ public class Game1 : Game
 
         AdvanceSimulation(dt, _paused ? 0f : SpeedLevels[_speedLevel]);
 
-        if (mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
+        if (!pointerOverUi && mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
             Creature? closest = null;
@@ -222,6 +242,8 @@ public class Game1 : Game
                 if (d < closestDist) { closestDist = d; closest = c; }
             }
             _selectedCreature = closest;
+            if (_selectedCreature != null)
+                _inGameUi.OpenCreatureWindow();
         }
         _prevMouse = mouse;
 
@@ -234,7 +256,7 @@ public class Game1 : Game
         if (speed <= 0f)
             return;
 
-        _timeAccumulator += dt * speed;
+        _timeAccumulator += dt;
         while (_timeAccumulator >= 1f / 10f)
         {
             _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(1f / 10f), TimeSpan.FromSeconds(1f / 10f)));
@@ -256,8 +278,6 @@ public class Game1 : Game
         _creatureRenderer.Draw(_spriteBatch, _camera);
         if (_screen == GameScreen.Playing && _selectedCreature != null && _selectedCreature.IsAlive)
         {
-            float size = _selectedCreature.CreatureType == CreatureType.Plant ? 18f : 28f;
-            float r = size * _selectedCreature.Genome.Size * 0.6f;
             var center = _selectedCreature.Position;
             _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
@@ -290,20 +310,24 @@ public class Game1 : Game
         {
             const int logoSize = 96;
             _spriteBatch.Draw(_logo,
-                new Rectangle(_graphics.PreferredBackBufferWidth - logoSize - 10, 10, logoSize, logoSize),
+                new Rectangle(GraphicsDevice.Viewport.Width - logoSize - 10, 10, logoSize, logoSize),
                 Color.White);
         }
 
-        if (_selectedCreature != null && _selectedCreature.IsAlive)
-        {
-            var c = _selectedCreature;
-            int px = 10, py = 55;
-            _spriteBatch.DrawString(_font, $"[{c.Species}] {c.CreatureType}", new Vector2(px, py), Color.Yellow);
-            _spriteBatch.DrawString(_font, $"Energy: {c.Energy:F1}/{c.MaxEnergy:F1}", new Vector2(px, py + 18), Color.White);
-            _spriteBatch.DrawString(_font, $"Age: {c.Age:F1}s  Speed: {c.Genome.Speed:F2}", new Vector2(px, py + 36), Color.White);
-            _spriteBatch.DrawString(_font, $"Size: {c.Genome.Size:F2}  Metabolism: {c.Genome.Metabolism:F2}", new Vector2(px, py + 54), Color.White);
-            _spriteBatch.DrawString(_font, $"Vision: {c.Genome.VisionRange:F1}  Genome: #{c.Genome.Color.R:X2}{c.Genome.Color.G:X2}{c.Genome.Color.B:X2}", new Vector2(px, py + 72), Color.White);
-        }
+        _inGameUi.Draw(
+            _spriteBatch,
+            _uiPixel,
+            _font,
+            Mouse.GetState(),
+            _selectedCreature,
+            _displayPlants,
+            _displayHerbivores,
+            _displayCarnivores,
+            _displayOmnivores,
+            _displayTime,
+            _paused,
+            SpeedLevels[_speedLevel],
+            GraphicsDevice.Viewport.Height);
         _spriteBatch.End();
 
         base.Draw(gameTime);
