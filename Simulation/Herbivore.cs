@@ -7,7 +7,7 @@ public class Herbivore : Creature
 {
     public Herbivore(Vector2 position, Genome genome, string species = "Herbivore")
         : base(position, genome, CreatureType.Herbivore) { Species = species; }
-    public override bool IsAquatic => Species == "Fish";
+    public override bool IsAquatic => Species is "Fish" or "Salmon";
 
     public override void Update(World world, Ecosystem ecosystem, GameTime gameTime)
     {

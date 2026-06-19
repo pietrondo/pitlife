@@ -24,11 +24,11 @@ public class CreatureRenderer
         _pixelTexture.SetData([Color.White]);
     }
 
-    public void SetPlantTexture(Texture2D t) => _plantTexture = t;
-    public void SetHerbivoreTexture(Texture2D t) => _herbivoreTexture = t;
-    public void SetCarnivoreTexture(Texture2D t) => _carnivoreTexture = t;
-    public void SetOmnivoreTexture(Texture2D t) => _omnivoreTexture = t;
-    public void RegisterSpeciesTexture(string species, Texture2D t)
+    public void SetPlantTexture(Texture2D? t) => _plantTexture = t;
+    public void SetHerbivoreTexture(Texture2D? t) => _herbivoreTexture = t;
+    public void SetCarnivoreTexture(Texture2D? t) => _carnivoreTexture = t;
+    public void SetOmnivoreTexture(Texture2D? t) => _omnivoreTexture = t;
+    public void RegisterSpeciesTexture(string species, Texture2D? t)
     {
         if (t != null)
             _speciesTextures[species] = t;

@@ -9,6 +9,7 @@ public class Carnivore : Creature
 
     public Carnivore(Vector2 position, Genome genome, string species = "Carnivore")
         : base(position, genome, CreatureType.Carnivore) { Species = species; }
+    public override bool IsAquatic => Species is "Shark" or "Piranha";
 
     public override void Update(World world, Ecosystem ecosystem, GameTime gameTime)
     {

@@ -9,6 +9,7 @@ public class Omnivore : Creature
 
     public Omnivore(Vector2 position, Genome genome, string species = "Omnivore")
         : base(position, genome, CreatureType.Omnivore) { Species = species; }
+    public override bool IsAquatic => Species == "Jellyfish";
 
     public override void Update(World world, Ecosystem ecosystem, GameTime gameTime)
     {

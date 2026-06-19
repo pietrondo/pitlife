@@ -21,18 +21,20 @@ public class Ecosystem
     private readonly List<Creature> _pendingAdd = new();
     private readonly List<Creature> _pendingRemove = new();
     private readonly object _lock = new();
+    private readonly SpatialGrid _spatialGrid;
 
     private static readonly string[] PlantSpecies = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"];
-    private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle"];
-    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf"];
-    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly", "Bear"];
+    private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle", "Salmon"];
+    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf", "Shark", "Piranha"];
+    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly", "Bear", "Jellyfish"];
 
-    private static readonly HashSet<string> AquaticSpecies = ["Fish"];
+    private static readonly HashSet<string> AquaticSpecies = ["Fish", "Shark", "Piranha", "Salmon", "Jellyfish"];
 
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
         World = new World(worldWidth, worldHeight, seed);
         Random = new Random(seed);
+        _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -62,6 +64,8 @@ public class Ecosystem
             if (_pendingRemove.Count > 0)
             {
                 var remove = new HashSet<Creature>(_pendingRemove);
+                foreach (var creature in remove)
+                    _spatialGrid.Remove(creature);
                 Creatures.RemoveAll(c => remove.Contains(c));
                 _pendingRemove.Clear();
             }
@@ -70,7 +74,10 @@ public class Ecosystem
                 foreach (var c in _pendingAdd)
                 {
                     if (Creatures.Count < MaxCreatures)
+                    {
                         Creatures.Add(c);
+                        _spatialGrid.Update(c);
+                    }
                 }
                 _pendingAdd.Clear();
             }
@@ -81,8 +88,16 @@ public class Ecosystem
     {
         string name = species[Random.Next(species.Length)];
         bool isAquatic = AquaticSpecies.Contains(name);
-        var pos = RandomPassablePosition(isAquatic);
+        var pos = RandomPassablePosition(isAquatic, name);
         var genome = Genome.Random(Random);
+        genome.Size = name switch
+        {
+            "Shark" => 1.2f,
+            "Piranha" => 0.7f,
+            "Salmon" => 0.9f,
+            "Jellyfish" => 0.6f,
+            _ => genome.Size
+        };
         Creature c = typeof(T).Name switch
         {
             nameof(Plant) => new Plant(pos, genome, name),
@@ -94,18 +109,38 @@ public class Ecosystem
         AddCreature(c);
     }
 
-    private Vector2 RandomPassablePosition(bool isAquatic = false)
+    private Vector2 RandomPassablePosition(bool isAquatic = false, string? species = null)
     {
         for (int attempt = 0; attempt < 100; attempt++)
         {
             float x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
             float y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
             var tile = World.GetTileAtPosition(x, y);
-            if (tile.IsPassableFor(isAquatic))
+            if (tile.IsPassableFor(isAquatic) && IsValidSpawnBiome(species, tile.Biome))
                 return new Vector2(x, y);
         }
+
+        int start = Random.Next(World.Width * World.Height);
+        for (int offset = 0; offset < World.Width * World.Height; offset++)
+        {
+            int index = (start + offset) % (World.Width * World.Height);
+            int tileX = index % World.Width;
+            int tileY = index / World.Width;
+            var tile = World.GetTile(tileX, tileY);
+            if (tile.IsPassableFor(isAquatic) && IsValidSpawnBiome(species, tile.Biome))
+                return new Vector2((tileX + 0.5f) * World.TileSize, (tileY + 0.5f) * World.TileSize);
+        }
+
         return new Vector2(World.TileSize, World.TileSize);
     }
+
+    private static bool IsValidSpawnBiome(string? species, BiomeType biome) => species switch
+    {
+        "Shark" => biome == BiomeType.DeepOcean,
+        "Fish" or "Piranha" or "Salmon" => biome == BiomeType.ShallowWater,
+        "Jellyfish" => biome is BiomeType.DeepOcean or BiomeType.ShallowWater,
+        _ => true
+    };
 
     public void Tick(GameTime gameTime)
     {
@@ -113,6 +148,7 @@ public class Ecosystem
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
             TotalTime += dt;
+            _spatialGrid.Rebuild(Creatures);
 
             int count = Creatures.Count;
             for (int i = count - 1; i >= 0; i--)
@@ -124,6 +160,7 @@ public class Ecosystem
                 {
                     try { c.Update(World, this, new GameTime(gameTime.TotalGameTime, TimeSpan.FromSeconds(dt))); }
                     catch { c.Die(); }
+                    _spatialGrid.Update(c);
                 }
             }
 
@@ -144,6 +181,7 @@ public class Ecosystem
             if (c == null) continue;
             if (!c.IsAlive && Random.NextDouble() < decomposeChance)
             {
+                _spatialGrid.Remove(c);
                 Creatures.RemoveAt(i);
             }
         }
@@ -175,35 +213,15 @@ public class Ecosystem
 
     public Creature? FindNearestPrey(Creature seeker)
     {
-        Creature? best = null;
-        float bestDist = float.MaxValue;
-        foreach (var c in Creatures)
-        {
-            if (c == null || !c.IsAlive || c == seeker) continue;
-            if (c.CreatureType == CreatureType.Carnivore) continue;
-            if (c.CreatureType == seeker.CreatureType) continue;
-            if (c.CreatureType == CreatureType.Plant && (seeker is Herbivore || seeker is Omnivore)) continue;
-            float d = seeker.DistanceTo(c);
-            if (d < bestDist) { bestDist = d; best = c; }
-        }
-        return best;
+        return _spatialGrid.FindNearest(seeker, c =>
+            c.CreatureType != CreatureType.Carnivore &&
+            c.CreatureType != seeker.CreatureType &&
+            (c.CreatureType != CreatureType.Plant || seeker is not Herbivore and not Omnivore));
     }
 
     public Creature? FindNearestPredator(Creature seeker)
     {
-        Creature? best = null;
-        float bestDist = float.MaxValue;
-        foreach (var c in Creatures)
-        {
-            if (c == null || !c.IsAlive || c == seeker) continue;
-            bool isPredator = c.CreatureType == CreatureType.Carnivore;
-            if (isPredator)
-            {
-                float d = seeker.DistanceTo(c);
-                if (d < bestDist) { bestDist = d; best = c; }
-            }
-        }
-        return best;
+        return _spatialGrid.FindNearest(seeker, c => c.CreatureType == CreatureType.Carnivore);
     }
 
     public void TrySpreadPlant(Plant plant)
@@ -231,14 +249,6 @@ public class Ecosystem
 
     private T? FindNearest<T>(Creature seeker) where T : Creature
     {
-        T? best = null;
-        float bestDist = float.MaxValue;
-        foreach (var c in Creatures)
-        {
-            if (c == null || !c.IsAlive || c == seeker || c is not T t) continue;
-            float d = seeker.DistanceTo(c);
-            if (d < bestDist) { bestDist = d; best = t; }
-        }
-        return best;
+        return _spatialGrid.FindNearest(seeker, c => c is T) as T;
     }
 }

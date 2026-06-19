@@ -113,6 +113,10 @@ public class Game1 : Game
         _creatureRenderer.RegisterSpeciesTexture("Wolf", LoadTexture("Content/assets/creatures/mammals/carnivores/canids/wolf.png"));
         _creatureRenderer.RegisterSpeciesTexture("Bear", LoadTexture("Content/assets/creatures/mammals/omnivores/ursids/bear.png"));
         _creatureRenderer.RegisterSpeciesTexture("Turtle", LoadTexture("Content/assets/creatures/reptiles/testudines/turtle.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Shark", LoadTexture("Content/assets/creatures/fish/shark.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Piranha", LoadTexture("Content/assets/creatures/fish/piranha.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Salmon", LoadTexture("Content/assets/creatures/fish/salmon.png"));
+        _creatureRenderer.RegisterSpeciesTexture("Jellyfish", LoadTexture("Content/assets/creatures/fish/jellyfish.png"));
 
         _logo = LoadTexture("Content/assets/logo.png");
     }
