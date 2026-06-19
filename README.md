@@ -20,6 +20,14 @@ Il menu principale supporta mouse, frecce e Invio. La finestra Opzioni permette 
 
 Durante la simulazione: WASD/frecce per muovere la camera, scroll per zoom, spazio per la pausa, F2/F3 per le finestre e ESC per chiudere la finestra attiva o tornare al menu.
 
+## Test
+
+```bash
+dotnet test PitLife.sln
+```
+
+La suite copre la simulazione deterministica, i biomi, lo spatial grid, i limiti della camera e la gestione delle finestre.
+
 ## Creature
 
 | Classe      | Specie                                  |

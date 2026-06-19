@@ -50,6 +50,11 @@ public class Camera
 
     private int _lastScroll;
 
+    public void ClampToWorldBounds()
+    {
+        Position = ClampPosition(Position);
+    }
+
     private Vector2 ClampPosition(Vector2 position)
     {
         float halfWidth = ViewportWidth / (2f * Zoom);
