@@ -16,7 +16,9 @@ Clone di SimLife (Maxis 1992) — simulazione di ecosistema con genetica, mutazi
 dotnet run
 ```
 
-WASD/Arrows per muovere la camera, scroll per zoom, ESC per uscire.
+Il menu principale supporta mouse, frecce e Invio. La finestra Opzioni permette di attivare o disattivare lo schermo intero.
+
+Durante la simulazione: WASD/frecce per muovere la camera, scroll per zoom, spazio per la pausa ed ESC per tornare al menu.
 
 ## Creature
 

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Rendering;
 using PitLife.Simulation;
+using PitLife.UI;
 
 namespace PitLife;
 
@@ -18,6 +19,10 @@ public class Game1 : Game
     private CreatureRenderer _creatureRenderer = null!;
     private SpriteFont _font = null!;
     private Texture2D? _logo;
+    private Texture2D _uiPixel = null!;
+    private readonly MainMenu _mainMenu = new();
+    private GameScreen _screen = GameScreen.MainMenu;
+    private float _menuInputCooldown = 0.75f;
 
     private int _displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores;
     private float _displayTime;
@@ -29,6 +34,12 @@ public class Game1 : Game
     private Creature? _selectedCreature;
     private MouseState _prevMouse;
     private KeyboardState _prevKbd;
+
+    private enum GameScreen
+    {
+        MainMenu,
+        Playing
+    }
 
     public Game1()
     {
@@ -48,7 +59,8 @@ public class Game1 : Game
         _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
         {
             WorldWidth = _ecosystem.World.PixelWidth,
-            WorldHeight = _ecosystem.World.PixelHeight
+            WorldHeight = _ecosystem.World.PixelHeight,
+            Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f)
         };
         _worldRenderer = new WorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
@@ -60,6 +72,8 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _font = Content.Load<SpriteFont>("Font");
+        _uiPixel = new Texture2D(GraphicsDevice, 1, 1);
+        _uiPixel.SetData([Color.White]);
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
 
@@ -130,38 +144,72 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-            Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        _camera.HandleInput(dt);
-
         var kbd = Keyboard.GetState();
+        var mouse = Mouse.GetState();
+        bool escapePressed = kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape);
+        bool gamepadBack = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
+
+        _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
+        _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
+
+        if (_screen == GameScreen.MainMenu)
+        {
+            AdvanceSimulation(dt, 0.35f);
+            _menuInputCooldown = Math.Max(0f, _menuInputCooldown - dt);
+            MenuAction action = _menuInputCooldown > 0f
+                ? MenuAction.None
+                : _mainMenu.Update(
+                    mouse,
+                    _prevMouse,
+                    kbd,
+                    _prevKbd,
+                    GraphicsDevice.Viewport.Width,
+                    GraphicsDevice.Viewport.Height,
+                    _graphics.IsFullScreen);
+
+            switch (action)
+            {
+                case MenuAction.StartGame:
+                    _screen = GameScreen.Playing;
+                    _paused = false;
+                    break;
+                case MenuAction.ToggleFullscreen:
+                    _graphics.ToggleFullScreen();
+                    break;
+                case MenuAction.Exit:
+                    Exit();
+                    break;
+            }
+
+            if (gamepadBack)
+                Exit();
+
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
+        if (escapePressed || gamepadBack)
+        {
+            _screen = GameScreen.MainMenu;
+            _paused = true;
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
+        _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.D1) && !_prevKbd.IsKeyDown(Keys.D1)) { _speedLevel = 1; _paused = false; }
         if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) { _speedLevel = 2; _paused = false; }
         if (kbd.IsKeyDown(Keys.D3) && !_prevKbd.IsKeyDown(Keys.D3)) { _speedLevel = 3; _paused = false; }
         if (kbd.IsKeyDown(Keys.Space) && !_prevKbd.IsKeyDown(Keys.Space)) _paused = !_paused;
         _prevKbd = kbd;
 
-        _ecosystem.SimulationSpeed = _paused ? 0f : SpeedLevels[_speedLevel];
+        AdvanceSimulation(dt, _paused ? 0f : SpeedLevels[_speedLevel]);
 
-        if (!_paused)
-        {
-            _timeAccumulator += dt * _ecosystem.SimulationSpeed;
-            while (_timeAccumulator >= 1f / 10f)
-            {
-                _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(1f / 10f), TimeSpan.FromSeconds(1f / 10f)));
-                _timeAccumulator -= 1f / 10f;
-                _displayPlants = _ecosystem.PlantCount;
-                _displayHerbivores = _ecosystem.HerbivoreCount;
-                _displayCarnivores = _ecosystem.CarnivoreCount;
-                _displayOmnivores = _ecosystem.OmnivoreCount;
-                _displayTime = _ecosystem.TotalTime;
-            }
-        }
-
-        var mouse = Mouse.GetState();
         if (mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
@@ -180,6 +228,25 @@ public class Game1 : Game
         base.Update(gameTime);
     }
 
+    private void AdvanceSimulation(float dt, float speed)
+    {
+        _ecosystem.SimulationSpeed = speed;
+        if (speed <= 0f)
+            return;
+
+        _timeAccumulator += dt * speed;
+        while (_timeAccumulator >= 1f / 10f)
+        {
+            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(1f / 10f), TimeSpan.FromSeconds(1f / 10f)));
+            _timeAccumulator -= 1f / 10f;
+            _displayPlants = _ecosystem.PlantCount;
+            _displayHerbivores = _ecosystem.HerbivoreCount;
+            _displayCarnivores = _ecosystem.CarnivoreCount;
+            _displayOmnivores = _ecosystem.OmnivoreCount;
+            _displayTime = _ecosystem.TotalTime;
+        }
+    }
+
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Black);
@@ -187,7 +254,7 @@ public class Game1 : Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
         _creatureRenderer.Draw(_spriteBatch, _camera);
-        if (_selectedCreature != null && _selectedCreature.IsAlive)
+        if (_screen == GameScreen.Playing && _selectedCreature != null && _selectedCreature.IsAlive)
         {
             float size = _selectedCreature.CreatureType == CreatureType.Plant ? 18f : 28f;
             float r = size * _selectedCreature.Genome.Size * 0.6f;
@@ -197,12 +264,26 @@ public class Game1 : Game
         _spriteBatch.End();
 
         _spriteBatch.Begin();
+        if (_screen == GameScreen.MainMenu)
+        {
+            _mainMenu.Draw(
+                _spriteBatch,
+                _uiPixel,
+                _font,
+                _logo,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height);
+            _spriteBatch.End();
+            base.Draw(gameTime);
+            return;
+        }
+
         string speed = _paused ? "PAUSED" : $"{SpeedLevels[_speedLevel]}x";
         string hud = $"Time: {_displayTime:F1}s  |  Plants: {_displayPlants}  " +
                      $"Herbivores: {_displayHerbivores}  Carnivores: {_displayCarnivores}  " +
                      $"Omnivores: {_displayOmnivores}  |  Speed: {speed}";
         _spriteBatch.DrawString(_font, hud, new Vector2(10, 10), Color.White);
-        _spriteBatch.DrawString(_font, "WASD:move  Scroll:zoom  1(1x) 2(2x) 3(4x) Space:pause  Click:select  ESC:quit",
+        _spriteBatch.DrawString(_font, "WASD:move  Scroll:zoom  1(1x) 2(2x) 3(4x) Space:pause  Click:select  ESC:menu",
             new Vector2(10, 32), new Color(160, 160, 160));
 
         if (_logo != null)
