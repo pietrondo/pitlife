@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PitLife.Localization;
 using PitLife.Simulation;
 
 namespace PitLife.UI;
@@ -11,18 +12,18 @@ public sealed class InGameUi
     public const string CreatureWindowId = "creature";
 
     private readonly UiWindowManager _windowManager = new();
-    private readonly UiButton _statisticsButton = new("STATISTICHE");
-    private readonly UiButton _creatureButton = new("CREATURA");
+    private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));
+    private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
 
     public InGameUi()
     {
-        _windowManager.Add(new UiWindow("STATISTICHE", StatisticsWindowId)
+        _windowManager.Add(new UiWindow(I18n.T("window.statistics"), StatisticsWindowId)
         {
             Bounds = new Rectangle(32, 88, 320, 248),
             IsOpen = true,
             ShowCloseButton = true
         });
-        _windowManager.Add(new UiWindow("DETTAGLI CREATURA", CreatureWindowId)
+        _windowManager.Add(new UiWindow(I18n.T("window.creature"), CreatureWindowId)
         {
             Bounds = new Rectangle(376, 112, 384, 272),
             ShowCloseButton = true
@@ -41,6 +42,7 @@ public sealed class InGameUi
         int viewportWidth,
         int viewportHeight)
     {
+        RefreshText();
         LayoutToolbar(viewportHeight);
 
         if (Pressed(keyboard, previousKeyboard, Keys.F2))
@@ -118,13 +120,15 @@ public sealed class InGameUi
         float speed)
     {
         int total = plants + herbivores + carnivores + omnivores;
-        DrawLine(spriteBatch, font, content.X, content.Y, $"Tempo simulato: {time:F1}s", UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 22, $"Stato: {(paused ? "PAUSA" : $"{speed:0.#}x")}", paused ? UiTheme.DangerClay : UiTheme.MossSignal);
-        DrawLine(spriteBatch, font, content.X, content.Y + 54, $"Popolazione totale: {total}", UiTheme.WarmParchment);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 82, "Piante", plants, total, UiTheme.MossSignal);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 112, "Erbivori", herbivores, total, UiTheme.LakeBlue);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 142, "Carnivori", carnivores, total, UiTheme.DangerClay);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 172, "Onnivori", omnivores, total, UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 22,
+            paused ? I18n.T("stats.paused") : I18n.Format("stats.speed", speed),
+            paused ? UiTheme.DangerClay : UiTheme.MossSignal);
+        DrawLine(spriteBatch, font, content.X, content.Y + 54, I18n.Format("stats.total", total), UiTheme.WarmParchment);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 82, I18n.Format("stats.plants", plants), plants, total, UiTheme.MossSignal);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 112, I18n.Format("stats.herbivores", herbivores), herbivores, total, UiTheme.LakeBlue);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 142, I18n.Format("stats.carnivores", carnivores), carnivores, total, UiTheme.DangerClay);
+        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 172, I18n.Format("stats.omnivores", omnivores), omnivores, total, UiTheme.WarmParchment);
     }
 
     private static void DrawPopulationRow(
@@ -138,7 +142,7 @@ public sealed class InGameUi
         int total,
         Color color)
     {
-        DrawLine(spriteBatch, font, content.X, y, $"{label}: {value}", UiTheme.MutedStone);
+        DrawLine(spriteBatch, font, content.X, y, label, UiTheme.MutedStone);
         var track = new Rectangle(content.X + 112, y + 3, content.Width - 112, 10);
         UiPrimitives.Fill(spriteBatch, pixel, track, UiTheme.DeepGrove);
         int width = total == 0 ? 0 : (int)(track.Width * (value / (float)total));
@@ -156,21 +160,22 @@ public sealed class InGameUi
     {
         if (creature == null || !creature.IsAlive)
         {
-            DrawLine(spriteBatch, font, content.X, content.Y, "Nessuna creatura selezionata.", UiTheme.MutedStone);
-            DrawLine(spriteBatch, font, content.X, content.Y + 24, "Clicca una creatura nel mondo.", UiTheme.MutedStone);
+            DrawLine(spriteBatch, font, content.X, content.Y, I18n.T("creature.none"), UiTheme.MutedStone);
+            DrawLine(spriteBatch, font, content.X, content.Y + 24, I18n.T("creature.selectHint"), UiTheme.MutedStone);
             return;
         }
 
-        DrawLine(spriteBatch, font, content.X, content.Y, $"{creature.Species} - {creature.CreatureType}", UiTheme.MossSignal);
-        DrawLine(spriteBatch, font, content.X, content.Y + 28, $"Energia: {creature.Energy:F1} / {creature.MaxEnergy:F1}", UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y,
+            I18n.Format("creature.heading", I18n.Species(creature.Species), I18n.CreatureTypeName(creature.CreatureType)), UiTheme.MossSignal);
+        DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("creature.energy", creature.Energy, creature.MaxEnergy), UiTheme.WarmParchment);
         DrawProgress(spriteBatch, pixel, new Rectangle(content.X, content.Y + 48, content.Width, 14), creature.Energy / creature.MaxEnergy);
-        DrawLine(spriteBatch, font, content.X, content.Y + 78, $"Eta: {creature.Age:F1}s", UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 100, $"Velocita: {creature.Genome.Speed:F2}", UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 122, $"Dimensione: {creature.Genome.Size:F2}", UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 144, $"Metabolismo: {creature.Genome.Metabolism:F2}", UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 166, $"Visione: {creature.Genome.VisionRange:F1}", UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 188,
-            $"Genoma: #{creature.Genome.Color.R:X2}{creature.Genome.Color.G:X2}{creature.Genome.Color.B:X2}", UiTheme.MutedStone);
+        DrawLine(spriteBatch, font, content.X, content.Y + 78, I18n.Format("creature.age", creature.Age), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 100, I18n.Format("creature.speed", creature.Genome.Speed), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 122, I18n.Format("creature.size", creature.Genome.Size), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 144, I18n.Format("creature.metabolism", creature.Genome.Metabolism), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 166, I18n.Format("creature.vision", creature.Genome.VisionRange), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 188, I18n.Format("creature.genome",
+            creature.Genome.Color.R, creature.Genome.Color.G, creature.Genome.Color.B), UiTheme.MutedStone);
     }
 
     private static void DrawProgress(SpriteBatch spriteBatch, Texture2D pixel, Rectangle bounds, float value)
@@ -196,4 +201,17 @@ public sealed class InGameUi
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
         current.IsKeyDown(key) && previous.IsKeyUp(key);
+
+    private void RefreshText()
+    {
+        _statisticsButton.Text = I18n.T("toolbar.statistics");
+        _creatureButton.Text = I18n.T("toolbar.creature");
+        foreach (UiWindow window in _windowManager.Windows)
+        {
+            if (window.Id == StatisticsWindowId)
+                window.Title = I18n.T("window.statistics");
+            else if (window.Id == CreatureWindowId)
+                window.Title = I18n.T("window.creature");
+        }
+    }
 }

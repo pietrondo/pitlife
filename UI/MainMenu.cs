@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PitLife.Localization;
 
 namespace PitLife.UI;
 
@@ -15,17 +16,17 @@ public enum MenuAction
 
 public sealed class MainMenu
 {
-    private readonly UiWindow _window = new("MENU PRINCIPALE");
+    private readonly UiWindow _window = new(I18n.T("menu.mainTitle"));
     private readonly UiButton[] _mainButtons =
     [
-        new("INIZIA"),
-        new("OPZIONI"),
-        new("ESCI") { IsDestructive = true }
+        new(I18n.T("menu.start")),
+        new(I18n.T("menu.options")),
+        new(I18n.T("menu.exit")) { IsDestructive = true }
     ];
     private readonly UiButton[] _optionButtons =
     [
-        new("SCHERMO INTERO: NO"),
-        new("INDIETRO")
+        new(I18n.Format("menu.fullscreen", I18n.T("common.no"))),
+        new(I18n.T("common.back"))
     ];
 
     private bool _showOptions;
@@ -42,7 +43,7 @@ public sealed class MainMenu
         bool isFullscreen)
     {
         Layout(viewportWidth, viewportHeight);
-        _optionButtons[0].Text = $"SCHERMO INTERO: {(isFullscreen ? "SI" : "NO")}";
+        RefreshText(isFullscreen);
 
         if (!_inputReady)
         {
@@ -127,7 +128,7 @@ public sealed class MainMenu
         for (int i = 0; i < buttons.Length; i++)
             buttons[i].Draw(spriteBatch, pixel, font, mouse, i == _focusedIndex);
 
-        string hint = _showOptions ? "INVIO: seleziona   ESC: indietro" : "FRECCE: naviga   INVIO: seleziona";
+        string hint = I18n.T(_showOptions ? "menu.optionsHint" : "menu.hint");
         Vector2 hintSize = font.MeasureString(hint);
         spriteBatch.DrawString(font, hint, new Vector2(viewportWidth / 2f - hintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
     }
@@ -148,7 +149,7 @@ public sealed class MainMenu
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
         panelY = Math.Min(panelY, viewportHeight - panelHeight - 48);
         _window.Bounds = new Rectangle(viewportWidth / 2 - panelWidth / 2, panelY, panelWidth, panelHeight);
-        _window.Title = _showOptions ? "OPZIONI" : "MENU PRINCIPALE";
+        _window.Title = I18n.T(_showOptions ? "menu.optionsTitle" : "menu.mainTitle");
 
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         int buttonWidth = panelWidth - 48;
@@ -167,4 +168,13 @@ public sealed class MainMenu
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
         current.IsKeyDown(key) && previous.IsKeyUp(key);
+
+    private void RefreshText(bool isFullscreen)
+    {
+        _mainButtons[0].Text = I18n.T("menu.start");
+        _mainButtons[1].Text = I18n.T("menu.options");
+        _mainButtons[2].Text = I18n.T("menu.exit");
+        _optionButtons[0].Text = I18n.Format("menu.fullscreen", I18n.T(isFullscreen ? "common.yes" : "common.no"));
+        _optionButtons[1].Text = I18n.T("common.back");
+    }
 }

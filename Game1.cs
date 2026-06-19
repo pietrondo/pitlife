@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using PitLife.Rendering;
 using PitLife.Simulation;
 using PitLife.UI;
+using PitLife.Localization;
 
 namespace PitLife;
 
@@ -298,12 +299,11 @@ public class Game1 : Game
             return;
         }
 
-        string speed = _paused ? "PAUSED" : $"{SpeedLevels[_speedLevel]}x";
-        string hud = $"Time: {_displayTime:F1}s  |  Plants: {_displayPlants}  " +
-                     $"Herbivores: {_displayHerbivores}  Carnivores: {_displayCarnivores}  " +
-                     $"Omnivores: {_displayOmnivores}  |  Speed: {speed}";
+        string speed = _paused ? I18n.T("hud.paused") : $"{SpeedLevels[_speedLevel]}x";
+        string hud = I18n.Format("hud.summary", _displayTime, _displayPlants, _displayHerbivores,
+            _displayCarnivores, _displayOmnivores, speed);
         _spriteBatch.DrawString(_font, hud, new Vector2(10, 10), Color.White);
-        _spriteBatch.DrawString(_font, "WASD:move  Scroll:zoom  1(1x) 2(2x) 3(4x) Space:pause  Click:select  ESC:menu",
+        _spriteBatch.DrawString(_font, I18n.T("hud.controls"),
             new Vector2(10, 32), new Color(160, 160, 160));
 
         if (_logo != null)

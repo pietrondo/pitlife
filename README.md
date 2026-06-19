@@ -9,6 +9,7 @@ Clone di SimLife (Maxis 1992) — simulazione di ecosistema con genetica, mutazi
 - **Engine**: MonoGame 3.8 (DesktopGL)
 - **Grafica**: PixelLab pixel art
 - **Target**: .NET 9
+- **Lingua UI**: italiano predefinito, catalogo i18n italiano/inglese
 
 ## Eseguire
 
