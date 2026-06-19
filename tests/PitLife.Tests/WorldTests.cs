@@ -29,4 +29,18 @@ public class WorldTests
         Assert.True(shallowWaterTiles > world.Height,
             $"Expected river paths longer than one edge per river, found {shallowWaterTiles} shallow-water tiles.");
     }
+
+    [Fact]
+    public void World_InternalAccessors_AreAccessibleFromTests()
+    {
+        var world = new World(64, 48, 42);
+
+        float[] continent = world.ContinentMask;
+        float[] elevation = world.ElevationField;
+        bool[] rivers = world.RiverMask;
+
+        Assert.Equal(64 * 48, continent.Length);
+        Assert.Equal(64 * 48, elevation.Length);
+        Assert.Equal(64 * 48, rivers.Length);
+    }
 }

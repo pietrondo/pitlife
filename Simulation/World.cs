@@ -10,12 +10,18 @@ public class World
     public int PixelWidth => Width * TileSize;
     public int PixelHeight => Height * TileSize;
     public Tile[,] Tiles { get; }
+    internal float[] ContinentMask { get; }
+    internal float[] ElevationField { get; }
+    internal bool[] RiverMask { get; }
 
     public World(int width, int height, int seed)
     {
         Width = width;
         Height = height;
         Tiles = new Tile[width, height];
+        ContinentMask = new float[width * height];
+        ElevationField = new float[width * height];
+        RiverMask = new bool[width * height];
         Generate(seed);
     }
 
