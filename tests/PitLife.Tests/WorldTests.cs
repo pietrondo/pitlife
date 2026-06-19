@@ -106,6 +106,30 @@ public class WorldTests
         Assert.Equal(first.ElevationField, second.ElevationField);
     }
 
+    [Fact]
+    public void Constructor_RiverMask_HasAtLeastOneRiver()
+    {
+        var world = new World(64, 48, 42);
+        var hasRiver = false;
+        for (int i = 0; i < world.RiverMask.Length; i++)
+        {
+            if (world.RiverMask[i])
+            {
+                hasRiver = true;
+                break;
+            }
+        }
+        Assert.True(hasRiver, "Attesa almeno una cella fluviale con seed=42 64x48");
+    }
+
+    [Fact]
+    public void Constructor_RiverMask_IsDeterministic()
+    {
+        var first = new World(64, 48, 42);
+        var second = new World(64, 48, 42);
+        Assert.Equal(first.RiverMask, second.RiverMask);
+    }
+
     private static int CountContinents(float[] mask, int width, int height)
     {
         var visited = new bool[width * height];

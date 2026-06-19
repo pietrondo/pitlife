@@ -187,28 +187,65 @@ public class World
     private void CarveRivers(int seed)
     {
         var rng = new Random(seed);
-        int rivers = 3 + rng.Next(4);
+        int riverThreshold = 3 + (int)(rng.NextDouble() * 8f);
 
-        for (int r = 0; r < rivers; r++)
+        int W = Width, H = Height;
+        int[] dx = { 1, 1, 0, -1, -1, -1, 0, 1 };
+        int[] dy = { 0, 1, 1, 1, 0, -1, -1, -1 };
+        float[] dd = { 1f, 1.4142135f, 1f, 1.4142135f, 1f, 1.4142135f, 1f, 1.4142135f };
+
+        int[] flowDir = new int[W * H];
+        for (int y = 0; y < H; y++)
         {
-            int x = rng.Next(Width);
-            int dir = rng.Next(2) == 0 ? 1 : -1;
-            int y = dir > 0 ? 0 : Height - 1;
-
-            for (int i = 0; i < Height * 2 && y >= 0 && y < Height; i++)
+            for (int x = 0; x < W; x++)
             {
-                if (x >= 0 && x < Width && y >= 0 && y < Height)
+                int idx = y * W + x;
+                float e = ElevationField[idx];
+                int bestDir = -1;
+                float bestDrop = 0f;
+                for (int d = 0; d < 8; d++)
                 {
-                    var tile = Tiles[x, y];
-                    if (tile.Biome != BiomeType.DeepOcean && tile.Biome != BiomeType.ShallowWater)
+                    int nx = x + dx[d];
+                    int ny = y + dy[d];
+                    if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+                    float ne = ElevationField[ny * W + nx];
+                    float drop = (e - ne) / dd[d];
+                    if (drop > bestDrop)
                     {
-                        tile.Biome = BiomeType.ShallowWater;
-                        tile.Vegetation = 0;
+                        bestDrop = drop;
+                        bestDir = d;
                     }
                 }
-                x += rng.Next(3) - 1;
-                y += dir;
-                x = Math.Clamp(x, 0, Width - 1);
+                flowDir[idx] = bestDir;
+            }
+        }
+
+        int[] cells = new int[W * H];
+        for (int i = 0; i < W * H; i++) cells[i] = i;
+        Array.Sort(cells, (a, b) => ElevationField[b].CompareTo(ElevationField[a]));
+
+        int[] flowAccum = new int[W * H];
+        for (int i = 0; i < cells.Length; i++)
+        {
+            int idx = cells[i];
+            flowAccum[idx] = Math.Max(1, flowAccum[idx]);
+            int d = flowDir[idx];
+            if (d < 0) continue;
+            int x = idx % W;
+            int y = idx / W;
+            int nx = x + dx[d];
+            int ny = y + dy[d];
+            if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+            int nidx = ny * W + nx;
+            flowAccum[nidx] += flowAccum[idx];
+        }
+
+        for (int i = 0; i < W * H; i++)
+        {
+            if (flowAccum[i] > riverThreshold)
+            {
+                RiverMask[i] = true;
+                if (ElevationField[i] > 0.18f) ElevationField[i] = 0.18f;
             }
         }
     }
