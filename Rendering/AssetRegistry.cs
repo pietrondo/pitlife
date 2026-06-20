@@ -91,4 +91,6 @@ public static class AssetRegistry
             "Content/assets/creatures/mammals/herbivores/ungulates/goat_male.png",
             "Content/assets/creatures/mammals/herbivores/ungulates/goat_female.png"),
     };
+
+    public const string SpawnIcon = "Content/assets/ui/spawn_icon.png";
 }
