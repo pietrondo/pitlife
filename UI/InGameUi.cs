@@ -10,6 +10,7 @@ public sealed class InGameUi
 {
     public const string StatisticsWindowId = "statistics";
     public const string CreatureWindowId = "creature";
+    public const string TerrainWindowId = "terrain";
 
     private readonly UiWindowManager _windowManager = new();
     private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));

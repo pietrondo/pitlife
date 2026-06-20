@@ -59,6 +59,7 @@ public static class I18n
         ["common.no"] = "NO",
         ["common.back"] = "BACK",
         ["menu.start"] = "START",
+        ["menu.newWorld"] = "NEW WORLD",
         ["menu.options"] = "OPTIONS",
         ["menu.exit"] = "EXIT",
         ["menu.fullscreen"] = "FULLSCREEN: {0}",

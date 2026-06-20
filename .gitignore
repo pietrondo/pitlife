@@ -27,7 +27,7 @@ Thumbs.db
 AGENTS.md
 CLAUDE.md
 
-# Beads / Dolt files
+# Beads / Dolt files (added by bd init)
 .dolt/
 *.db
 .beads-credential-key

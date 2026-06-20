@@ -10,6 +10,7 @@ public enum MenuAction
 {
     None,
     StartGame,
+    NewWorld,
     ToggleFullscreen,
     Exit
 }
@@ -20,6 +21,7 @@ public sealed class MainMenu
     private readonly UiButton[] _mainButtons =
     [
         new(I18n.T("menu.start")),
+        new(I18n.T("menu.newWorld")),
         new(I18n.T("menu.options")),
         new(I18n.T("menu.exit")) { IsDestructive = true }
     ];
@@ -97,8 +99,9 @@ public sealed class MainMenu
         return activated switch
         {
             0 => MenuAction.StartGame,
-            1 => OpenOptions(),
-            2 => MenuAction.Exit,
+            1 => MenuAction.NewWorld,
+            2 => OpenOptions(),
+            3 => MenuAction.Exit,
             _ => MenuAction.None
         };
     }
@@ -143,7 +146,7 @@ public sealed class MainMenu
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showOptions ? 220 : 292;
+        int panelHeight = _showOptions ? 220 : 356;
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
@@ -172,8 +175,9 @@ public sealed class MainMenu
     private void RefreshText(bool isFullscreen)
     {
         _mainButtons[0].Text = I18n.T("menu.start");
-        _mainButtons[1].Text = I18n.T("menu.options");
-        _mainButtons[2].Text = I18n.T("menu.exit");
+        _mainButtons[1].Text = I18n.T("menu.newWorld");
+        _mainButtons[2].Text = I18n.T("menu.options");
+        _mainButtons[3].Text = I18n.T("menu.exit");
         _optionButtons[0].Text = I18n.Format("menu.fullscreen", I18n.T(isFullscreen ? "common.yes" : "common.no"));
         _optionButtons[1].Text = I18n.T("common.back");
     }

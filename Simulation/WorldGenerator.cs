@@ -39,9 +39,11 @@ public sealed class WorldGenerator
 
                 if (e < 0.22f && m > 0.3f) e = 0.18f;
 
-                float elev = _world.ContinentMask[y * _world.Width + x] > 0.5f
-                    ? _world.ContinentMask[y * _world.Width + x] * _baseHeight + warp[x, y] * _world.ContinentMask[y * _world.Width + x] * 0.25f
-                    : 0f;
+                float mask = _world.ContinentMask[y * _world.Width + x];
+                // Boost land elevation and reduce water areas
+                float elev = mask > 0.3f  // Lowered threshold from 0.5 to 0.3
+                    ? mask * _baseHeight * 1.2f + warp[x, y] * mask * 0.3f  // Boosted multipliers
+                    : mask * 0.15f;  // Give shallow water some elevation instead of 0
                 _world.ElevationField[y * _world.Width + x] = elev;
 
                 BiomeType biome = AssignBiome(e, m, t);
@@ -93,9 +95,9 @@ public sealed class WorldGenerator
         float cellRadius;
         switch (variant)
         {
-            case 0: cellCount = 1; cellRadius = 0.45f; break;
-            case 1: cellCount = 4; cellRadius = 0.28f; break;
-            default: cellCount = 6; cellRadius = 0.18f; break;
+            case 0: cellCount = 1; cellRadius = 0.55f; break;  // Was 0.45
+            case 1: cellCount = 4; cellRadius = 0.35f; break;  // Was 0.28
+            default: cellCount = 6; cellRadius = 0.24f; break;  // Was 0.18
         }
 
         _baseHeight = 0.4f + (float)rng.NextDouble() * 0.6f;
@@ -156,12 +158,13 @@ public sealed class WorldGenerator
 
     private static BiomeType AssignBiome(float e, float m, float t)
     {
-        if (e < 0.13f) return BiomeType.DeepOcean;
-        if (e < 0.22f) return BiomeType.ShallowWater;
-        if (e < 0.27f) return BiomeType.Beach;
-        if (e > 0.72f) return e > 0.87f || t < 0.15f ? BiomeType.Snow : BiomeType.Mountain;
-        if (e > 0.58f) return t < 0.25f || m < 0.25f ? BiomeType.Tundra : BiomeType.Mountain;
-        if (e < 0.32f && m > 0.55f) return BiomeType.Swamp;
+        // Raised water thresholds to create more land
+        if (e < 0.08f) return BiomeType.DeepOcean;      // Was 0.13
+        if (e < 0.16f) return BiomeType.ShallowWater;   // Was 0.22
+        if (e < 0.22f) return BiomeType.Beach;          // Was 0.27
+        if (e > 0.75f) return e > 0.88f || t < 0.15f ? BiomeType.Snow : BiomeType.Mountain;
+        if (e > 0.60f) return t < 0.25f || m < 0.25f ? BiomeType.Tundra : BiomeType.Mountain;
+        if (e < 0.28f && m > 0.55f) return BiomeType.Swamp;
         if (t < 0.18f) return m < 0.45f ? BiomeType.Tundra : BiomeType.Grassland;
         if (t < 0.32f) return m < 0.30f ? BiomeType.Tundra : BiomeType.Grassland;
         if (m < 0.12f) return BiomeType.Desert;

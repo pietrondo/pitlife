@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -79,6 +80,7 @@ public abstract class Creature
     public virtual void Die()
     {
         IsAlive = false;
+        Logger.Event("DEATH", $"{Species} died at age {Age:F1}s, energy {Energy:F1}");
     }
 
     public void Wander(World world, float dt, Random random, float radius)
@@ -139,13 +141,16 @@ public abstract class Creature
         if (!IsAlive || partner == null || !partner.IsAlive) return null;
         if (!IsAdult || !partner.IsAdult) return null;
         if (Gender == partner.Gender) return null;
-        if (Energy < ReproductionThreshold || partner.Energy < ReproductionThreshold)
+        if (Energy < ReproductionThreshold || partner.Energy < partner.ReproductionThreshold)
             return null;
         Energy -= MaxEnergy * 0.3f;
         partner.Energy -= partner.MaxEnergy * 0.3f;
         Genome childGenome = Genome.Reproduce(Genome, partner.Genome, rng);
         Vector2 offset = new((float)(rng.NextDouble() - 0.5) * 30, (float)(rng.NextDouble() - 0.5) * 30);
-        return CreateChild(ClampToWorld(Position + offset), childGenome, rng);
+        var child = CreateChild(ClampToWorld(Position + offset), childGenome, rng);
+        if (child != null)
+            Logger.Event("BIRTH", $"{Species} + {partner.Species} -> baby at ({child.Position.X:F0},{child.Position.Y:F0})");
+        return child;
     }
 
     public Creature? FindNearestSameSpecies(Ecosystem ecosystem)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -39,6 +40,7 @@ public class Ecosystem
         Random = new Random(seed);
         _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
+        Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -49,16 +51,19 @@ public class Ecosystem
         for (int i = 0; i < o; i++) SpawnSpecies<Omnivore>(OmnivoreSpecies, "Bear");
         FlushPending();
         UpdateStats();
+        Logger.Event("ECO", $"Initialized: P={p} H={h} C={c} O={o} | Total={Creatures.Count}");
     }
 
     public void AddCreature(Creature c)
     {
         lock (_lock) { _pendingAdd.Add(c); }
+        Logger.Event("SPAWN", $"{c.Species} at ({c.Position.X:F0},{c.Position.Y:F0})");
     }
 
     public void QueueRemove(Creature c)
     {
         lock (_lock) { _pendingRemove.Add(c); }
+        Logger.Event("DEATH", $"{c.Species} age={c.Age:F1}s energy={c.Energy:F1}");
     }
 
     private void FlushPending()
@@ -149,7 +154,7 @@ public class Ecosystem
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"Creature update failed for {c.Species}: {ex.Message}");
+                    Logger.Error($"Creature update failed for {c.Species}: {ex.Message}");
                     c.Die();
                 }
                 _spatialGrid.Update(c);
@@ -178,6 +183,8 @@ public class Ecosystem
         FlushPending();
     }
 
+    private int _logCounter = 0;
+    
     private void UpdateStats()
     {
         int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
@@ -196,6 +203,12 @@ public class Ecosystem
         HerbivoreCount = herbivores;
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
+        
+        _logCounter++;
+        if (_logCounter % 60 == 0) // Log every ~1 second at 60 FPS
+        {
+            Logger.Event("STATS", $"T={TotalTime:F1}s P={plants} H={herbivores} C={carnivores} O={omnivores} Total={Creatures.Count}");
+        }
     }
 
     public Plant? FindNearestPlant(Herbivore seeker) => FindNearest<Plant>(seeker);

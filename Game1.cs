@@ -137,6 +137,12 @@ public class Game1 : Game
                     _paused = false;
                     _controller.SetPause(false);
                     break;
+                case MenuAction.NewWorld:
+                    GenerateNewWorld();
+                    _screen = GameScreen.Playing;
+                    _paused = false;
+                    _controller.SetPause(false);
+                    break;
                 case MenuAction.ToggleFullscreen:
                     _graphics.ToggleFullScreen();
                     break;
@@ -227,6 +233,29 @@ public class Game1 : Game
         _prevMouse = mouse;
 
         base.Update(gameTime);
+    }
+
+    private void GenerateNewWorld()
+    {
+        int seed = new Random().Next();
+        _ecosystem = new Ecosystem(200, 150, seed);
+        _ecosystem.Initialize(60, 20, 15, 150);
+        _camera.WorldWidth = _ecosystem.World.PixelWidth;
+        _camera.WorldHeight = _ecosystem.World.PixelHeight;
+        _camera.Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f);
+        _worldRenderer = new WorldRenderer(_ecosystem.World);
+        _creatureRenderer = new CreatureRenderer(_ecosystem);
+        _minimap = new Minimap(_ecosystem, _camera);
+        _controller = new SimulationController(_ecosystem, _dayNight);
+        _selectedCreature = null;
+        
+        _worldRenderer.LoadContent(GraphicsDevice);
+        _creatureRenderer.LoadContent(GraphicsDevice);
+        _minimap.LoadContent(GraphicsDevice);
+        _worldRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Biomes);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
+        _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
     }
 
     private static Color GetPhaseColor(DayPhase phase) => phase switch
