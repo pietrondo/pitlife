@@ -130,6 +130,93 @@ public class WorldTests
         Assert.Equal(first.RiverMask, second.RiverMask);
     }
 
+    [Fact]
+    public void Constructor_RiverMask_AllCellsConnectedToOceanViaValleys()
+    {
+        var world = new World(96, 72, 42);
+        int W = world.Width, H = world.Height;
+        var visited = new bool[W * H];
+        var queue = new Queue<int>();
+
+        for (int y = 0; y < H; y++)
+        {
+            for (int x = 0; x < W; x++)
+            {
+                int i = y * W + x;
+                if (!world.RiverMask[i]) continue;
+                bool hasOceanNeighbor = false;
+                if (x > 0     && world.ContinentMask[i - 1] <= 0.5f) hasOceanNeighbor = true;
+                if (x < W - 1 && world.ContinentMask[i + 1] <= 0.5f) hasOceanNeighbor = true;
+                if (y > 0     && world.ContinentMask[i - W] <= 0.5f) hasOceanNeighbor = true;
+                if (y < H - 1 && world.ContinentMask[i + W] <= 0.5f) hasOceanNeighbor = true;
+                if (hasOceanNeighbor)
+                {
+                    visited[i] = true;
+                    queue.Enqueue(i);
+                }
+            }
+        }
+
+        while (queue.Count > 0)
+        {
+            int c = queue.Dequeue();
+            int cx = c % W, cy = c / W;
+            if (cx > 0)         { int n = c - 1; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cx < W - 1)     { int n = c + 1; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cy > 0)         { int n = c - W; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cy < H - 1)     { int n = c + W; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+        }
+
+        var disconnected = new List<int>();
+        for (int i = 0; i < world.RiverMask.Length; i++)
+            if (world.RiverMask[i] && !visited[i])
+                disconnected.Add(i);
+
+        Assert.True(disconnected.Count == 0,
+            $"Attese 0 celle fluviali scollegate dall'oceano via valli in 96x72 seed=42, trovate {disconnected.Count}: indici [{string.Join(",", disconnected.Take(10))}...]");
+    }
+
+    [Fact]
+    public void Constructor_Biomes_AllTwelveTypesPresent()
+    {
+        var world = new World(96, 72, 42);
+        var present = new HashSet<BiomeType>();
+        for (int y = 0; y < world.Height; y++)
+            for (int x = 0; x < world.Width; x++)
+                present.Add(world.Tiles[x, y].Biome);
+
+        var allTwelve = new[]
+        {
+            BiomeType.DeepOcean, BiomeType.ShallowWater, BiomeType.Beach,
+            BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest,
+            BiomeType.Desert, BiomeType.Savanna, BiomeType.Swamp,
+            BiomeType.Mountain, BiomeType.Snow, BiomeType.Tundra
+        };
+        var missing = new List<BiomeType>();
+        foreach (var b in allTwelve)
+            if (!present.Contains(b))
+                missing.Add(b);
+        Assert.True(missing.Count == 0,
+            $"Attesi tutti i 12 biomi in world 96x72 seed=42, mancanti: {string.Join(", ", missing)}");
+    }
+
+    [Fact]
+    public void Constructor_Biomes_RiverCells_AreShallowWater()
+    {
+        var world = new World(96, 72, 42);
+        var violations = new List<int>();
+        for (int i = 0; i < world.RiverMask.Length; i++)
+        {
+            if (!world.RiverMask[i]) continue;
+            int x = i % world.Width;
+            int y = i / world.Width;
+            if (world.Tiles[x, y].Biome != BiomeType.ShallowWater)
+                violations.Add(i);
+        }
+        Assert.True(violations.Count == 0,
+            $"Attese 0 celle fluviali con bioma != ShallowWater in 96x72 seed=42, trovate {violations.Count}: indici [{string.Join(",", violations.Take(10))}...]");
+    }
+
     private static int CountContinents(float[] mask, int width, int height)
     {
         var visited = new bool[width * height];

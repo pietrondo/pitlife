@@ -131,7 +131,29 @@ public static class I18n
         ["species.Butterfly"] = "Butterfly",
         ["species.Bear"] = "Bear",
         ["species.Jellyfish"] = "Jellyfish",
-        ["species.Gazelle"] = "Gazelle"
+        ["species.Gazelle"] = "Gazelle",
+        ["ui.gender.male"] = "Male",
+        ["ui.gender.female"] = "Female",
+        ["ui.age"] = "Age",
+        ["ui.age.seconds"] = "{0:F1}s",
+        ["ui.status.adult"] = "Adult",
+        ["ui.status.baby"] = "Baby",
+        ["dayphase.dawn"] = "Dawn",
+        ["dayphase.day"] = "Day",
+        ["dayphase.dusk"] = "Dusk",
+        ["dayphase.night"] = "Night",
+        ["minimap.title"] = "Map",
+        ["minimap.plants"] = "Plants",
+        ["minimap.herbivores"] = "Herbivores",
+        ["minimap.carnivores"] = "Carnivores",
+        ["minimap.omnivores"] = "Omnivores",
+        ["spawn.title"] = "Spawn",
+        ["spawn.plants"] = "Plants",
+        ["spawn.herbivores"] = "Herbivores",
+        ["spawn.carnivores"] = "Carnivores",
+        ["spawn.omnivores"] = "Omnivores",
+        ["spawn.hint"] = "Click map to spawn",
+        ["spawn.none"] = "Select species"
     };
 
     private static Dictionary<string, string> CreateItalianCatalog()
@@ -212,7 +234,29 @@ public static class I18n
             ["species.Butterfly"] = "Farfalla",
             ["species.Bear"] = "Orso",
             ["species.Jellyfish"] = "Medusa",
-            ["species.Gazelle"] = "Gazzella"
+            ["species.Gazelle"] = "Gazzella",
+            ["ui.gender.male"] = "Maschio",
+            ["ui.gender.female"] = "Femmina",
+            ["ui.age"] = "Età",
+            ["ui.age.seconds"] = "{0:F1}s",
+            ["ui.status.adult"] = "Adulto",
+            ["ui.status.baby"] = "Cucciolo",
+            ["dayphase.dawn"] = "Alba",
+            ["dayphase.day"] = "Giorno",
+            ["dayphase.dusk"] = "Tramonto",
+            ["dayphase.night"] = "Notte",
+            ["minimap.title"] = "Mappa",
+            ["minimap.plants"] = "Piante",
+            ["minimap.herbivores"] = "Erbivori",
+            ["minimap.carnivores"] = "Carnivori",
+            ["minimap.omnivores"] = "Onnivori",
+            ["spawn.title"] = "Spawn",
+            ["spawn.plants"] = "Piante",
+            ["spawn.herbivores"] = "Erbivori",
+            ["spawn.carnivores"] = "Carnivori",
+            ["spawn.omnivores"] = "Onnivori",
+            ["spawn.hint"] = "Clicca sulla mappa per spawnare",
+            ["spawn.none"] = "Seleziona specie"
         };
 
         return catalog;

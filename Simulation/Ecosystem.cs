@@ -11,6 +11,7 @@ public class Ecosystem
     public Random Random { get; }
     public float SimulationSpeed { get; set; } = 1f;
     public int MaxCreatures { get; set; } = 3000;
+    public bool IsFull => Creatures.Count + _pendingAdd.Count >= MaxCreatures;
 
     public int PlantCount { get; private set; }
     public int HerbivoreCount { get; private set; }
@@ -22,19 +23,22 @@ public class Ecosystem
     private readonly List<Creature> _pendingRemove = new();
     private readonly object _lock = new();
     private readonly SpatialGrid _spatialGrid;
+    private CreatureSpawner _spawner = null!;
 
-    private static readonly string[] PlantSpecies = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"];
-    private static readonly string[] HerbivoreSpecies = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle", "Salmon"];
-    private static readonly string[] CarnivoreSpecies = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf", "Shark", "Piranha"];
-    private static readonly string[] OmnivoreSpecies = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly", "Bear", "Jellyfish"];
+    private static readonly string[] PlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant)];
+    private static readonly string[] HerbivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Herbivore)];
+    private static readonly string[] CarnivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Carnivore)];
+    private static readonly string[] OmnivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Omnivore)];
 
-    private static readonly HashSet<string> AquaticSpecies = ["Fish", "Shark", "Piranha", "Salmon", "Jellyfish"];
+    public static bool IsPackAnimal(string species) => SpeciesRegistry.IsPackAnimal(species);
+    public static bool IsSolitary(string species) => SpeciesRegistry.IsSolitary(species);
 
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
         World = new World(worldWidth, worldHeight, seed);
         Random = new Random(seed);
         _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        _spawner = new CreatureSpawner(this);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -87,36 +91,27 @@ public class Ecosystem
     private void SpawnSpecies<T>(string[] species, string defaultSpecies) where T : Creature
     {
         string name = species[Random.Next(species.Length)];
-        bool isAquatic = AquaticSpecies.Contains(name);
-        var pos = RandomPassablePosition(isAquatic, name);
-        var genome = Genome.Random(Random);
-        genome.Size = name switch
-        {
-            "Shark" => 1.2f,
-            "Piranha" => 0.7f,
-            "Salmon" => 0.9f,
-            "Jellyfish" => 0.6f,
-            _ => genome.Size
-        };
-        Creature c = typeof(T).Name switch
-        {
-            nameof(Plant) => new Plant(pos, genome, name),
-            nameof(Herbivore) => new Herbivore(pos, genome, name),
-            nameof(Carnivore) => new Carnivore(pos, genome, name),
-            nameof(Omnivore) => new Omnivore(pos, genome, name),
-            _ => throw new ArgumentException()
-        };
-        AddCreature(c);
+        var pos = RandomPassablePosition(name);
+        _spawner.SpawnByName(name, pos);
     }
 
-    private Vector2 RandomPassablePosition(bool isAquatic = false, string? species = null)
+    public bool SpawnAt<T>(string species, Vector2 position) where T : Creature =>
+        _spawner.SpawnAt<T>(species, position);
+
+    public bool SpawnByName(string species, Vector2 position) =>
+        _spawner.SpawnByName(species, position);
+
+    private Vector2 RandomPassablePosition(string species)
     {
+        var def = SpeciesRegistry.Get(species);
+        bool isAquatic = def?.IsAquatic ?? false;
+
         for (int attempt = 0; attempt < 100; attempt++)
         {
             float x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
             float y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
             var tile = World.GetTileAtPosition(x, y);
-            if (tile.IsPassableFor(isAquatic) && IsValidSpawnBiome(species, tile.Biome))
+            if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidBiome(tile.Biome)))
                 return new Vector2(x, y);
         }
 
@@ -127,20 +122,12 @@ public class Ecosystem
             int tileX = index % World.Width;
             int tileY = index / World.Width;
             var tile = World.GetTile(tileX, tileY);
-            if (tile.IsPassableFor(isAquatic) && IsValidSpawnBiome(species, tile.Biome))
+            if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidBiome(tile.Biome)))
                 return new Vector2((tileX + 0.5f) * World.TileSize, (tileY + 0.5f) * World.TileSize);
         }
 
         return new Vector2(World.TileSize, World.TileSize);
     }
-
-    private static bool IsValidSpawnBiome(string? species, BiomeType biome) => species switch
-    {
-        "Shark" => biome == BiomeType.DeepOcean,
-        "Fish" or "Piranha" or "Salmon" => biome == BiomeType.ShallowWater,
-        "Jellyfish" => biome is BiomeType.DeepOcean or BiomeType.ShallowWater,
-        _ => true
-    };
 
     public void Tick(GameTime gameTime)
     {
@@ -220,6 +207,19 @@ public class Ecosystem
             c.CreatureType != CreatureType.Carnivore &&
             c.CreatureType != seeker.CreatureType &&
             (c.CreatureType != CreatureType.Plant || seeker is not Herbivore and not Omnivore));
+    }
+
+    public Creature? FindNearestSameSpecies(Creature seeker)
+    {
+        return _spatialGrid.FindNearest(seeker, c => c != seeker && c.Species == seeker.Species);
+    }
+
+    public Creature? FindNearestMate(Creature seeker)
+    {
+        if (!seeker.IsAdult) return null;
+        return _spatialGrid.FindNearest(seeker,
+            c => c != seeker && c.Species == seeker.Species
+                && c.Gender != seeker.Gender && c.IsAdult);
     }
 
     public Creature? FindNearestPredator(Creature seeker)
