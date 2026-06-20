@@ -30,4 +30,7 @@
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="PitLife.Tests" />
+  </ItemGroup>
 </Project>

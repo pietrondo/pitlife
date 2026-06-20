@@ -1,41 +1,88 @@
-<p align="center">
-  <img src="Content/assets/logo.png" alt="PitLife logo" width="180">
-</p>
+# PitLife
 
-<h1 align="center">PitLife</h1>
+Una simulazione di ecosistema 2D con creature che vivono, si nutrono, si riproducono e interagiscono in un mondo dinamico.
 
-Clone di SimLife (Maxis 1992) — simulazione di ecosistema con genetica, mutazioni e catena alimentare.
+## Come Giocare
 
-- **Engine**: MonoGame 3.8 (DesktopGL)
-- **Grafica**: PixelLab pixel art
-- **Target**: .NET 9
-- **Lingua UI**: italiano predefinito, catalogo i18n italiano/inglese
+### Obiettivo
+PitLife è una simulazione sandbox: non c'è un obiettivo preciso, ma puoi osservare come l'ecosistema evolve nel tempo. Prova a mantenere l'equilibrio tra piante, erbivori, carnivori e onnivori!
 
-## Eseguire
+### Controlli
 
+#### Movimento e Camera
+- **WASD** o **Frecce direzionali**: Muovi la camera nel mondo
+- **Rotella del mouse**: Zoom in/out
+- **Click sinistro su una creatura**: Seleziona la creatura per vedere i dettagli
+
+#### Velocità di Simulazione
+- **1**: Velocità normale (1x)
+- **2**: Velocità doppia (2x)
+- **3**: Velocità quadrupla (4x)
+- **Spazio**: Pausa/Riprendi
+
+#### Interfaccia
+- **F2**: Apri/Chiudi finestra Statistiche
+- **F3**: Apri/Chiudi finestra Dettagli Creatura
+- **ESC**: Apri menu principale
+
+#### Spawn Creature
+1. Seleziona una specie dal pannello "Spawn" a destra
+2. Clicca sulla mappa dove vuoi far apparire la creatura
+3. Le creature si evolvono e si riproducono automaticamente!
+
+### Tipi di Creature
+
+| Tipo | Comportamento | Esempi |
+|------|--------------|--------|
+| **Piante** | Crescono automaticamente, fonte di cibo | Erba, Fiori, Funghi, Cactus |
+| **Erbivori** | Mangiano piante, fuggono dai predatori | Conigli, Cervi, Pecore |
+| **Carnivori** | Cacciano altre creature | Lupi, Tigri, Aquile |
+| **Onnivori** | Mangiano piante e creature | Orsi, Procioni, Maiali |
+
+### Sistema di Ecosistema
+
+- **Ciclo giorno/notte**: Le creature sono più attive durante il giorno
+- **Energia**: Ogni creatura ha bisogno di energia per sopravvivere
+- **Età**: Le creature invecchiano e muoiono di vecchiaia
+- **Riproduzione**: Le creature adulte si riproducono quando hanno abbastanza energia
+- **DNA**: Ogni creatura ha un genoma unico che influenza le sue caratteristiche
+
+### Consigli
+
+- **Equilibrio**: Troppi erbivori esauriranno le piante; troppi carnivori decimeranno gli erbivori
+- **Seed**: Usa lo stesso seed per rigenerare un mondo identico
+- **Osserva**: Clicca su una creatura per vedere le sue statistiche dettagliate
+
+## Requisiti di Sistema
+
+- Windows, macOS o Linux
+- .NET 9.0 o superiore
+- Scheda video con supporto DirectX/OpenGL
+
+## Installazione
+
+### Da Codice Sorgente
 ```bash
+git clone <repository-url>
+cd PitLife
+dotnet build
 dotnet run
 ```
 
-Il menu principale supporta mouse, frecce e Invio. La finestra Opzioni permette di attivare o disattivare lo schermo intero.
+## Sviluppo
 
-Durante la simulazione: WASD/frecce per muovere la camera, scroll per zoom, spazio per la pausa, F2/F3 per le finestre e ESC per chiudere la finestra attiva o tornare al menu.
+PitLife è sviluppato in C# con MonoGame framework.
 
-## Test
+### Struttura del Progetto
+- `Simulation/`: Logica di simulazione (Ecosystem, Creature, World)
+- `UI/`: Interfaccia utente (Menu, Pannelli, Renderer)
+- `Rendering/`: Rendering grafico (Creature, World, Minimap)
+- `Localization/`: Supporto multilingua (Italiano/Inglese)
 
-```bash
-dotnet test PitLife.sln
-```
+## Licenza
 
-La suite copre la simulazione deterministica, i biomi, lo spatial grid, i limiti della camera e la gestione delle finestre.
+[Inserire licenza qui]
 
-## Creature
+## Crediti
 
-| Classe      | Specie                                  |
-|-------------|-----------------------------------------|
-| Piante      | Bush, Flowers, Mushroom, GrassTuft, Cactus |
-| Erbivori    | Gazelle, Rabbit, Deer, Sheep            |
-| Carnivori   | Wolf, Fox, Lynx, Tiger                  |
-| Onnivori    | Bear, Boar, Raccoon                     |
-
-Ogni creatura ha un genoma unico con 6 geni che mutano alla riproduzione.
+Sviluppato con ❤️ usando MonoGame e .NET

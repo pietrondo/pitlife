@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -12,6 +13,9 @@ public abstract class Creature
     public bool IsAlive { get; protected set; } = true;
     public CreatureType CreatureType { get; protected set; }
     public string Species { get; set; } = "";
+    public Gender Gender { get; set; } = Gender.Male;
+    public bool IsAdult => Age >= 30f;
+    public bool IsBaby => !IsAdult;
     public float MaxEnergy => 50f * Genome.Size;
     public float EnergyConsumption => Genome.Metabolism * 0.5f * Genome.Size;
     public float Speed => Genome.Speed * 30f;
@@ -20,6 +24,9 @@ public abstract class Creature
     public virtual bool IsAquatic => false;
 
     public Vector2 Facing { get; set; } = new(0, 1);
+    public Vector2? Waypoint { get; set; }
+    public ICreatureBehavior Behavior { get; set; } = new BaseBehavior();
+    private const float WaypointReachedDistance = 8f;
 
     protected Creature(Vector2 position, Genome genome, CreatureType type)
     {
@@ -42,7 +49,28 @@ public abstract class Creature
             return;
         }
         Position = ClampToWorld(Position, world);
+
+        Behavior.Update(this, world, ecosystem, gameTime);
+
+        if (IsAlive)
+            TryReproduce(ecosystem, dt);
     }
+
+    private void TryReproduce(Ecosystem ecosystem, float dt)
+    {
+        if (!IsAdult) return;
+        if (Energy < ReproductionThreshold) return;
+        if (CreatureType == CreatureType.Plant) return;
+
+        var mate = ecosystem.FindNearestMate(this);
+        if (mate != null && DistanceTo(mate) < VisionPixels * 0.5f)
+        {
+            var child = ReproduceWith(mate, ecosystem.Random);
+            if (child != null) ecosystem.AddCreature(child);
+        }
+    }
+
+    internal void GrowFor(float seconds) => Age += seconds;
 
     protected virtual void ConsumeEnergy(float dt)
     {
@@ -52,6 +80,26 @@ public abstract class Creature
     public virtual void Die()
     {
         IsAlive = false;
+        Logger.Event("DEATH", $"{Species} died at age {Age:F1}s, energy {Energy:F1}");
+    }
+
+    public void Wander(World world, float dt, Random random, float radius)
+    {
+        if (Waypoint == null || Vector2.Distance(Position, Waypoint.Value) < WaypointReachedDistance)
+            Waypoint = PickWaypoint(world, random, radius);
+
+        if (Waypoint.HasValue)
+            MoveToward(Waypoint.Value, dt, world);
+    }
+
+    protected Vector2 PickWaypoint(World world, Random random, float radius)
+    {
+        float rx = (float)(random.NextDouble() - 0.5) * radius * 2;
+        float ry = (float)(random.NextDouble() - 0.5) * radius * 2;
+        var target = Position + new Vector2(rx, ry);
+        target.X = Math.Clamp(target.X, 1, world.PixelWidth - 1);
+        target.Y = Math.Clamp(target.Y, 1, world.PixelHeight - 1);
+        return target;
     }
 
     public void MoveToward(Vector2 target, float dt, World? world = null)
@@ -91,13 +139,23 @@ public abstract class Creature
     public Creature? ReproduceWith(Creature partner, Random rng)
     {
         if (!IsAlive || partner == null || !partner.IsAlive) return null;
-        if (Energy < ReproductionThreshold || partner.Energy < ReproductionThreshold)
+        if (!IsAdult || !partner.IsAdult) return null;
+        if (Gender == partner.Gender) return null;
+        if (Energy < ReproductionThreshold || partner.Energy < partner.ReproductionThreshold)
             return null;
         Energy -= MaxEnergy * 0.3f;
         partner.Energy -= partner.MaxEnergy * 0.3f;
         Genome childGenome = Genome.Reproduce(Genome, partner.Genome, rng);
         Vector2 offset = new((float)(rng.NextDouble() - 0.5) * 30, (float)(rng.NextDouble() - 0.5) * 30);
-        return CreateChild(ClampToWorld(Position + offset), childGenome, rng);
+        var child = CreateChild(ClampToWorld(Position + offset), childGenome, rng);
+        if (child != null)
+            Logger.Event("BIRTH", $"{Species} + {partner.Species} -> baby at ({child.Position.X:F0},{child.Position.Y:F0})");
+        return child;
+    }
+
+    public Creature? FindNearestSameSpecies(Ecosystem ecosystem)
+    {
+        return ecosystem.FindNearestSameSpecies(this);
     }
 
     public bool IsInRange(Creature other, float range)

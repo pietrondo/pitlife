@@ -9,6 +9,7 @@ public sealed class UiButton
     public string Text { get; set; }
     public Rectangle Bounds { get; set; }
     public bool IsDestructive { get; init; }
+    public object? Tag { get; set; }
 
     public UiButton(string text)
     {

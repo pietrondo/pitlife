@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PitLife.Simulation;
@@ -82,6 +84,39 @@ public class WorldRenderer
         _texTundra = tundra;
         _texMountain = mountain;
         _texSnow = snow;
+    }
+
+    public void LoadFromRegistry(GraphicsDevice gd, IEnumerable<SpeciesAsset> assets)
+    {
+        foreach (var a in assets)
+        {
+            var tex = LoadTexture(gd, a.Path);
+            switch (a.Species)
+            {
+                case nameof(BiomeType.DeepOcean): _texDeepOcean = tex; break;
+                case nameof(BiomeType.ShallowWater): _texShallowWater = tex; break;
+                case nameof(BiomeType.Beach): _texBeach = tex; break;
+                case nameof(BiomeType.Desert): _texDesert = tex; break;
+                case nameof(BiomeType.Savanna): _texSavanna = tex; break;
+                case nameof(BiomeType.Grassland): _texGrassland = tex; break;
+                case nameof(BiomeType.Forest): _texForest = tex; break;
+                case nameof(BiomeType.DenseForest): _texDenseForest = tex; break;
+                case nameof(BiomeType.Swamp): _texSwamp = tex; break;
+                case nameof(BiomeType.Tundra): _texTundra = tex; break;
+                case nameof(BiomeType.Mountain): _texMountain = tex; break;
+                case nameof(BiomeType.Snow): _texSnow = tex; break;
+            }
+        }
+    }
+
+    private static Texture2D? LoadTexture(GraphicsDevice gd, string path)
+    {
+        try { if (File.Exists(path)) return Texture2D.FromFile(gd, path); }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unable to load texture '{path}': {ex.Message}");
+        }
+        return null;
     }
 
     private Texture2D? TextureFor(BiomeType b) => b switch

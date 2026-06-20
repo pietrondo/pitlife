@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PitLife.Simulation;
@@ -12,6 +13,7 @@ public class CreatureRenderer
     private Texture2D? _pixelTexture;
     private Texture2D? _plantTexture;
     private readonly Dictionary<string, Texture2D> _speciesTextures = new();
+    private readonly Dictionary<string, (Texture2D Male, Texture2D Female)> _genderedSpeciesTextures = new();
     private readonly HashSet<Creature> _reportedRenderFailures = new();
     private Texture2D? _herbivoreTexture;
     private Texture2D? _carnivoreTexture;
@@ -33,6 +35,48 @@ public class CreatureRenderer
     {
         if (t != null)
             _speciesTextures[species] = t;
+    }
+
+    public void RegisterGenderedSpeciesTexture(string species, Texture2D? male, Texture2D? female)
+    {
+        if (male != null && female != null)
+            _genderedSpeciesTextures[species] = (male, female);
+    }
+
+    public void LoadFromRegistry(GraphicsDevice gd, IEnumerable<SpeciesAsset> assets)
+    {
+        foreach (var asset in assets)
+        {
+            var tex = LoadTexture(gd, asset.Path);
+            switch (asset.Species)
+            {
+                case AssetRegistry.FallbackPlant: _plantTexture = tex; break;
+                case AssetRegistry.FallbackHerbivore: _herbivoreTexture = tex; break;
+                case AssetRegistry.FallbackCarnivore: _carnivoreTexture = tex; break;
+                case AssetRegistry.FallbackOmnivore: _omnivoreTexture = tex; break;
+                default: RegisterSpeciesTexture(asset.Species, tex); break;
+            }
+        }
+    }
+
+    public void LoadGenderedFromRegistry(GraphicsDevice gd, IEnumerable<GenderedSpeciesAsset> assets)
+    {
+        foreach (var a in assets)
+        {
+            var male = LoadTexture(gd, a.MalePath);
+            var female = LoadTexture(gd, a.FemalePath);
+            RegisterGenderedSpeciesTexture(a.Species, male, female);
+        }
+    }
+
+    private static Texture2D? LoadTexture(GraphicsDevice gd, string path)
+    {
+        try { if (File.Exists(path)) return Texture2D.FromFile(gd, path); }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unable to load texture '{path}': {ex.Message}");
+        }
+        return null;
     }
 
     public void Draw(SpriteBatch sb, Camera camera)
@@ -62,17 +106,24 @@ public class CreatureRenderer
                 float size = c.CreatureType == CreatureType.Plant
                     ? 18f * c.Genome.Size
                     : 28f * c.Genome.Size;
+                if (c.IsBaby) size *= 0.6f;
                 int s = Math.Max(6, (int)size);
                 Rectangle dest = new((int)(px - s / 2), (int)(py - s / 2), s, s);
 
-                Texture2D? tex = _speciesTextures.TryGetValue(c.Species, out var st) ? st : c.CreatureType switch
-                {
-                    CreatureType.Plant => _plantTexture,
-                    CreatureType.Herbivore => _herbivoreTexture,
-                    CreatureType.Carnivore => _carnivoreTexture,
-                    CreatureType.Omnivore => _omnivoreTexture,
-                    _ => null
-                };
+                Texture2D? tex;
+                if (_genderedSpeciesTextures.TryGetValue(c.Species, out var gendered))
+                    tex = c.Gender == Gender.Male ? gendered.Male : gendered.Female;
+                else if (_speciesTextures.TryGetValue(c.Species, out var st))
+                    tex = st;
+                else
+                    tex = c.CreatureType switch
+                    {
+                        CreatureType.Plant => _plantTexture,
+                        CreatureType.Herbivore => _herbivoreTexture,
+                        CreatureType.Carnivore => _carnivoreTexture,
+                        CreatureType.Omnivore => _omnivoreTexture,
+                        _ => null
+                    };
 
                 if (tex != null)
                 {
@@ -101,6 +152,15 @@ public class CreatureRenderer
                             (int)(py + dir.Y * eyeOffset - dir.X * eyeOffset / 2 - eyeSize / 2),
                             eyeSize, eyeSize), Color.White);
                     }
+                }
+
+                // Gender icon
+                if (c.CreatureType != CreatureType.Plant && _pixelTexture != null)
+                {
+                    Color genderColor = c.Gender == Gender.Male ? Color.Red : new Color(80, 120, 255);
+                    int dot = Math.Max(2, s / 6);
+                    int yOff = s / 2 + 2;
+                    sb.Draw(_pixelTexture, new Rectangle((int)px - dot / 2, (int)py + yOff, dot, dot), genderColor);
                 }
             }
             catch (Exception ex)

@@ -7,6 +7,7 @@ using PitLife.Rendering;
 using PitLife.Simulation;
 using PitLife.UI;
 using PitLife.Localization;
+using PitLife.Core;
 
 namespace PitLife;
 
@@ -18,20 +19,21 @@ public class Game1 : Game
     private Camera _camera = null!;
     private WorldRenderer _worldRenderer = null!;
     private CreatureRenderer _creatureRenderer = null!;
+    private DayNightCycle _dayNight = new();
+    private Minimap _minimap = null!;
     private SpriteFont _font = null!;
     private Texture2D? _logo;
     private Texture2D _uiPixel = null!;
     private readonly MainMenu _mainMenu = new();
     private readonly InGameUi _inGameUi = new();
+    private readonly SpawnPanel _spawnPanel = new();
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
 
     private int _displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores;
     private float _displayTime;
-    private float _timeAccumulator;
     private bool _paused;
-    private int _speedLevel = 1;
-    private static readonly float[] SpeedLevels = [0f, 1f, 2f, 4f];
+    private SimulationController _controller = null!;
 
     private Creature? _selectedCreature;
     private MouseState _prevMouse;
@@ -66,6 +68,8 @@ public class Game1 : Game
         };
         _worldRenderer = new WorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
+        _minimap = new Minimap(_ecosystem, _camera);
+        _controller = new SimulationController(_ecosystem, _dayNight);
 
         base.Initialize();
     }
@@ -78,61 +82,13 @@ public class Game1 : Game
         _uiPixel.SetData([Color.White]);
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
+        _minimap.LoadContent(GraphicsDevice);
+        _spawnPanel.SetIconTexture(LoadTexture(AssetRegistry.SpawnIcon));
 
-        _worldRenderer.SetTileTextures(
-            LoadTexture("Content/assets/biomes/biome_water.png"),
-            LoadTexture("Content/assets/biomes/biome_snow.png"),
-            LoadTexture("Content/assets/biomes/biome_sand.png"),
-            LoadTexture("Content/assets/biomes/biome_desert.png"),
-            LoadTexture("Content/assets/biomes/biome_grass.png"),
-            LoadTexture("Content/assets/biomes/biome_swamp.png"),
-            LoadTexture("Content/assets/biomes/biome_dense.png"),
-            LoadTexture("Content/assets/biomes/biome_tundra.png"),
-            LoadTexture("Content/assets/biomes/biome_forest.png"),
-            LoadTexture("Content/assets/biomes/biome_mountain.png"),
-            LoadTexture("Content/assets/biomes/biome_mountain.png"),
-            LoadTexture("Content/assets/biomes/biome_snow.png"));
-
-        _creatureRenderer.SetPlantTexture(LoadTexture("Content/assets/creatures/plants/shrubs/plant.png"));
-        _creatureRenderer.SetHerbivoreTexture(LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/herbivore.png"));
-        _creatureRenderer.SetCarnivoreTexture(LoadTexture("Content/assets/creatures/mammals/carnivores/felids/carnivore.png"));
-        _creatureRenderer.SetOmnivoreTexture(LoadTexture("Content/assets/creatures/mammals/omnivores/suids/omnivore.png"));
-
-        _creatureRenderer.RegisterSpeciesTexture("Deer", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/deer.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Rabbit", LoadTexture("Content/assets/creatures/mammals/herbivores/lagomorphs/rabbit.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Fox", LoadTexture("Content/assets/creatures/mammals/carnivores/canids/fox.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Boar", LoadTexture("Content/assets/creatures/mammals/omnivores/suids/boar.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Flowers", LoadTexture("Content/assets/creatures/plants/flowers/flowers.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Mushroom", LoadTexture("Content/assets/creatures/plants/fungi/mushroom.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Sheep", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/sheep.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Lynx", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/lynx.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Raccoon", LoadTexture("Content/assets/creatures/mammals/omnivores/procyonids/raccoon.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Tiger", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/tiger.png"));
-        _creatureRenderer.RegisterSpeciesTexture("GrassTuft", LoadTexture("Content/assets/creatures/plants/grasses/grasstuft.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Cactus", LoadTexture("Content/assets/creatures/plants/succulents/cactus.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Horse", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/horse.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Goat", LoadTexture("Content/assets/creatures/mammals/herbivores/ungulates/goat.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Lion", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/lion.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Leopard", LoadTexture("Content/assets/creatures/mammals/carnivores/felids/leopard.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Crocodile", LoadTexture("Content/assets/creatures/reptiles/crocodilians/crocodile.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Butterfly", LoadTexture("Content/assets/creatures/invertebrates/insects/butterfly.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Moss", LoadTexture("Content/assets/creatures/plants/grasses/moss.png"));
-        _creatureRenderer.RegisterSpeciesTexture("BerryBush", LoadTexture("Content/assets/creatures/plants/shrubs/berrybush.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Pine", LoadTexture("Content/assets/creatures/plants/trees/pine.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Toadstool", LoadTexture("Content/assets/creatures/plants/fungi/toadstool.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Snake", LoadTexture("Content/assets/creatures/reptiles/squamates/snake.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Eagle", LoadTexture("Content/assets/creatures/birds/raptors/eagle.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Frog", LoadTexture("Content/assets/creatures/amphibians/anurans/frog.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Beetle", LoadTexture("Content/assets/creatures/invertebrates/insects/beetle.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Fish", LoadTexture("Content/assets/creatures/fish/fish.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Lizard", LoadTexture("Content/assets/creatures/reptiles/squamates/lizard.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Wolf", LoadTexture("Content/assets/creatures/mammals/carnivores/canids/wolf.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Bear", LoadTexture("Content/assets/creatures/mammals/omnivores/ursids/bear.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Turtle", LoadTexture("Content/assets/creatures/reptiles/testudines/turtle.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Shark", LoadTexture("Content/assets/creatures/fish/shark.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Piranha", LoadTexture("Content/assets/creatures/fish/piranha.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Salmon", LoadTexture("Content/assets/creatures/fish/salmon.png"));
-        _creatureRenderer.RegisterSpeciesTexture("Jellyfish", LoadTexture("Content/assets/creatures/fish/jellyfish.png"));
+        _worldRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Biomes);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
+        _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
 
         _logo = LoadTexture("Content/assets/logo.png");
     }
@@ -160,7 +116,9 @@ public class Game1 : Game
 
         if (_screen == GameScreen.MainMenu)
         {
-            AdvanceSimulation(dt, 0.35f);
+            _ecosystem.SimulationSpeed = 0.35f;
+            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
+            _dayNight.Update(_ecosystem.TotalTime);
             _menuInputCooldown = Math.Max(0f, _menuInputCooldown - dt);
             MenuAction action = _menuInputCooldown > 0f
                 ? MenuAction.None
@@ -178,6 +136,19 @@ public class Game1 : Game
                 case MenuAction.StartGame:
                     _screen = GameScreen.Playing;
                     _paused = false;
+                    _controller.SetPause(false);
+                    break;
+                case MenuAction.NewWorld:
+                    GenerateNewWorld(null);
+                    _screen = GameScreen.Playing;
+                    _paused = false;
+                    _controller.SetPause(false);
+                    break;
+                case MenuAction.NewWorldWithSeed:
+                    GenerateNewWorld(_mainMenu.Seed);
+                    _screen = GameScreen.Playing;
+                    _paused = false;
+                    _controller.SetPause(false);
                     break;
                 case MenuAction.ToggleFullscreen:
                     _graphics.ToggleFullScreen();
@@ -222,16 +193,40 @@ public class Game1 : Game
             GraphicsDevice.Viewport.Width,
             GraphicsDevice.Viewport.Height);
 
+        _spawnPanel.SetViewportHeight(GraphicsDevice.Viewport.Height);
+        if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
+        {
+            _spawnPanel.Toggle();
+        }
+        bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse);
+
         _camera.HandleInput(dt);
-        if (kbd.IsKeyDown(Keys.D1) && !_prevKbd.IsKeyDown(Keys.D1)) { _speedLevel = 1; _paused = false; }
-        if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) { _speedLevel = 2; _paused = false; }
-        if (kbd.IsKeyDown(Keys.D3) && !_prevKbd.IsKeyDown(Keys.D3)) { _speedLevel = 3; _paused = false; }
-        if (kbd.IsKeyDown(Keys.Space) && !_prevKbd.IsKeyDown(Keys.Space)) _paused = !_paused;
+        if (kbd.IsKeyDown(Keys.D1) && !_prevKbd.IsKeyDown(Keys.D1)) _controller.SetSpeed(1);
+        if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) _controller.SetSpeed(2);
+        if (kbd.IsKeyDown(Keys.D3) && !_prevKbd.IsKeyDown(Keys.D3)) _controller.SetSpeed(3);
+        if (kbd.IsKeyDown(Keys.Space) && !_prevKbd.IsKeyDown(Keys.Space)) _controller.TogglePause();
         _prevKbd = kbd;
 
-        AdvanceSimulation(dt, _paused ? 0f : SpeedLevels[_speedLevel]);
+        _controller.Advance(dt);
+        _paused = _controller.IsPaused;
+        _displayPlants = _controller.PlantCount;
+        _displayHerbivores = _controller.HerbivoreCount;
+        _displayCarnivores = _controller.CarnivoreCount;
+        _displayOmnivores = _controller.OmnivoreCount;
+        _displayTime = _controller.TotalTime;
 
-        if (!pointerOverUi && mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
+        // Spawn creature only when panel is open, species selected, click is NOT on panel, and not consumed by UI
+        if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
+            !spawnPanelConsumed && !pointerOverUi &&
+            mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
+        {
+            var spawnPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
+            _ecosystem.SpawnByName(_spawnPanel.SelectedSpeciesKey, spawnPos);
+            Logger.Event("SPAWN", $"Player spawned {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
+            _spawnPanel.DeselectSpecies(); // Deselect after spawning (one-shot behavior)
+        }
+        else if (!pointerOverUi && !spawnPanelConsumed &&
+                 mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
             Creature? closest = null;
@@ -251,24 +246,37 @@ public class Game1 : Game
         base.Update(gameTime);
     }
 
-    private void AdvanceSimulation(float dt, float speed)
+    private void GenerateNewWorld(int? seedOverride)
     {
-        _ecosystem.SimulationSpeed = speed;
-        if (speed <= 0f)
-            return;
-
-        _timeAccumulator += dt;
-        while (_timeAccumulator >= 1f / 10f)
-        {
-            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(1f / 10f), TimeSpan.FromSeconds(1f / 10f)));
-            _timeAccumulator -= 1f / 10f;
-            _displayPlants = _ecosystem.PlantCount;
-            _displayHerbivores = _ecosystem.HerbivoreCount;
-            _displayCarnivores = _ecosystem.CarnivoreCount;
-            _displayOmnivores = _ecosystem.OmnivoreCount;
-            _displayTime = _ecosystem.TotalTime;
-        }
+        int seed = seedOverride ?? new Random().Next();
+        _ecosystem = new Ecosystem(200, 150, seed);
+        _ecosystem.Initialize(60, 20, 15, 150);
+        _camera.WorldWidth = _ecosystem.World.PixelWidth;
+        _camera.WorldHeight = _ecosystem.World.PixelHeight;
+        _camera.Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f);
+        _worldRenderer = new WorldRenderer(_ecosystem.World);
+        _creatureRenderer = new CreatureRenderer(_ecosystem);
+        _minimap = new Minimap(_ecosystem, _camera);
+        _controller = new SimulationController(_ecosystem, _dayNight);
+        _selectedCreature = null;
+        
+        _worldRenderer.LoadContent(GraphicsDevice);
+        _creatureRenderer.LoadContent(GraphicsDevice);
+        _minimap.LoadContent(GraphicsDevice);
+        _worldRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Biomes);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
+        _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
     }
+
+    private static Color GetPhaseColor(DayPhase phase) => phase switch
+    {
+        DayPhase.Dawn => new Color(255, 180, 100),
+        DayPhase.Day => Color.White,
+        DayPhase.Dusk => new Color(255, 140, 80),
+        DayPhase.Night => new Color(120, 140, 220),
+        _ => Color.White
+    };
 
     protected override void Draw(GameTime gameTime)
     {
@@ -283,6 +291,14 @@ public class Game1 : Game
             _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
         _spriteBatch.End();
+
+        var overlay = _dayNight.GetOverlayColor();
+        if (overlay.A > 0)
+        {
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), overlay);
+            _spriteBatch.End();
+        }
 
         _spriteBatch.Begin();
         if (_screen == GameScreen.MainMenu)
@@ -299,12 +315,16 @@ public class Game1 : Game
             return;
         }
 
-        string speed = _paused ? I18n.T("hud.paused") : $"{SpeedLevels[_speedLevel]}x";
+        string speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
         string hud = I18n.Format("hud.summary", _displayTime, _displayPlants, _displayHerbivores,
             _displayCarnivores, _displayOmnivores, speed);
         _spriteBatch.DrawString(_font, hud, new Vector2(10, 10), Color.White);
         _spriteBatch.DrawString(_font, I18n.T("hud.controls"),
             new Vector2(10, 32), new Color(160, 160, 160));
+        string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
+        _spriteBatch.DrawString(_font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
+        string seedLabel = $"Seed: {_ecosystem.Seed}";
+        _spriteBatch.DrawString(_font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
 
         if (_logo != null)
         {
@@ -326,8 +346,13 @@ public class Game1 : Game
             _displayOmnivores,
             _displayTime,
             _paused,
-            SpeedLevels[_speedLevel],
+            _controller.CurrentSpeed,
             GraphicsDevice.Viewport.Height);
+
+        _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
+        _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
+        _minimap.Draw(_spriteBatch, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+        _spawnPanel.Draw(_spriteBatch, _uiPixel, _font, Mouse.GetState());
         _spriteBatch.End();
 
         base.Draw(gameTime);

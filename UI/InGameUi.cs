@@ -10,6 +10,7 @@ public sealed class InGameUi
 {
     public const string StatisticsWindowId = "statistics";
     public const string CreatureWindowId = "creature";
+    public const string TerrainWindowId = "terrain";
 
     private readonly UiWindowManager _windowManager = new();
     private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));
@@ -170,11 +171,14 @@ public sealed class InGameUi
         DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("creature.energy", creature.Energy, creature.MaxEnergy), UiTheme.WarmParchment);
         DrawProgress(spriteBatch, pixel, new Rectangle(content.X, content.Y + 48, content.Width, 14), creature.Energy / creature.MaxEnergy);
         DrawLine(spriteBatch, font, content.X, content.Y + 78, I18n.Format("creature.age", creature.Age), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 100, I18n.Format("creature.speed", creature.Genome.Speed), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 122, I18n.Format("creature.size", creature.Genome.Size), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 144, I18n.Format("creature.metabolism", creature.Genome.Metabolism), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 166, I18n.Format("creature.vision", creature.Genome.VisionRange), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 188, I18n.Format("creature.genome",
+        DrawLine(spriteBatch, font, content.X, content.Y + 100,
+            $"{I18n.T(creature.Gender == Gender.Male ? "ui.gender.male" : "ui.gender.female")}  |  {I18n.T(creature.IsAdult ? "ui.status.adult" : "ui.status.baby")}",
+            UiTheme.MutedStone);
+        DrawLine(spriteBatch, font, content.X, content.Y + 122, I18n.Format("creature.speed", creature.Genome.Speed), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 144, I18n.Format("creature.size", creature.Genome.Size), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 166, I18n.Format("creature.metabolism", creature.Genome.Metabolism), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 188, I18n.Format("creature.vision", creature.Genome.VisionRange), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 210, I18n.Format("creature.genome",
             creature.Genome.Color.R, creature.Genome.Color.G, creature.Genome.Color.B), UiTheme.MutedStone);
     }
 
