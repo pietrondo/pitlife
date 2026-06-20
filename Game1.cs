@@ -82,6 +82,7 @@ public class Game1 : Game
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
         _minimap.LoadContent(GraphicsDevice);
+        _spawnPanel.SetIconTexture(LoadTexture(AssetRegistry.SpawnIcon));
 
         _worldRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Biomes);
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
