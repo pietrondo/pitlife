@@ -98,7 +98,7 @@ internal static class BuiltinSpecies
 
     public static void RegisterAll()
     {
-        // Plants
+        // Plants (Land)
         RegisterPlant("Plant");
         RegisterPlant("Flowers");
         RegisterPlant("Mushroom");
@@ -108,6 +108,13 @@ internal static class BuiltinSpecies
         RegisterPlant("BerryBush");
         RegisterPlant("Pine");
         RegisterPlant("Toadstool");
+
+        // Aquatic Plants
+        RegisterAquaticPlant("Seaweed");
+        RegisterAquaticPlant("Algae");
+        RegisterAquaticPlant("Kelp");
+        RegisterAquaticPlant("WaterLily");
+        RegisterAquaticPlant("Coral");
 
         // Herbivores
         RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
@@ -154,6 +161,15 @@ internal static class BuiltinSpecies
             isAquatic: false,
             socialBehavior: SocialBehavior.None,
             validBiomes: Land));
+
+    private static void RegisterAquaticPlant(string name) =>
+        SpeciesRegistry.Register(new SpeciesDefinition(
+            species: name,
+            creatureType: typeof(Plant),
+            kind: CreatureType.Plant,
+            isAquatic: true,
+            socialBehavior: SocialBehavior.None,
+            validBiomes: ShallowOrDeep));
 
     private static void RegisterAnimal(string name, CreatureType kind, bool isAquatic,
         SocialBehavior social, BiomeType[] biomes, float size = 1.0f)

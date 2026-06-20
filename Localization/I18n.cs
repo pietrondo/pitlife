@@ -133,6 +133,11 @@ public static class I18n
         ["species.Bear"] = "Bear",
         ["species.Jellyfish"] = "Jellyfish",
         ["species.Gazelle"] = "Gazelle",
+        ["species.Seaweed"] = "Seaweed",
+        ["species.Algae"] = "Algae",
+        ["species.Kelp"] = "Kelp",
+        ["species.WaterLily"] = "Water Lily",
+        ["species.Coral"] = "Coral",
         ["ui.gender.male"] = "Male",
         ["ui.gender.female"] = "Female",
         ["ui.age"] = "Age",
@@ -150,11 +155,14 @@ public static class I18n
         ["minimap.omnivores"] = "Omnivores",
         ["spawn.title"] = "Spawn",
         ["spawn.plants"] = "Plants",
+        ["spawn.aquaticplants"] = "Aquatic Plants",
         ["spawn.herbivores"] = "Herbivores",
         ["spawn.carnivores"] = "Carnivores",
         ["spawn.omnivores"] = "Omnivores",
         ["spawn.hint"] = "Click map to spawn",
-        ["spawn.none"] = "Select species"
+        ["spawn.none"] = "Select species",
+        ["spawn.selected"] = "Selected",
+        ["menu.seedPlaceholder"] = "Enter seed (optional)..."
     };
 
     private static Dictionary<string, string> CreateItalianCatalog()
@@ -235,8 +243,13 @@ public static class I18n
             ["species.Butterfly"] = "Farfalla",
             ["species.Bear"] = "Orso",
             ["species.Jellyfish"] = "Medusa",
-            ["species.Gazelle"] = "Gazzella",
-            ["ui.gender.male"] = "Maschio",
+        ["species.Gazelle"] = "Gazzella",
+        ["species.Seaweed"] = "Alga",
+        ["species.Algae"] = "Alghe",
+        ["species.Kelp"] = "Kelp",
+        ["species.WaterLily"] = "Ninfea",
+        ["species.Coral"] = "Corallo",
+        ["ui.gender.male"] = "Maschio",
             ["ui.gender.female"] = "Femmina",
             ["ui.age"] = "Età",
             ["ui.age.seconds"] = "{0:F1}s",
@@ -252,12 +265,15 @@ public static class I18n
             ["minimap.carnivores"] = "Carnivori",
             ["minimap.omnivores"] = "Onnivori",
             ["spawn.title"] = "Spawn",
-            ["spawn.plants"] = "Piante",
-            ["spawn.herbivores"] = "Erbivori",
+        ["spawn.plants"] = "Piante",
+        ["spawn.aquaticplants"] = "Piante Acquatiche",
+        ["spawn.herbivores"] = "Erbivori",
             ["spawn.carnivores"] = "Carnivori",
             ["spawn.omnivores"] = "Onnivori",
             ["spawn.hint"] = "Clicca sulla mappa per spawnare",
-            ["spawn.none"] = "Seleziona specie"
+            ["spawn.none"] = "Seleziona specie",
+            ["spawn.selected"] = "Selezionato",
+            ["menu.seedPlaceholder"] = "Inserisci seed (opzionale)..."
         };
 
         return catalog;

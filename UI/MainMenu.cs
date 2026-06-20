@@ -11,7 +11,9 @@ public enum MenuAction
     None,
     StartGame,
     NewWorld,
+    NewWorldWithSeed,
     ToggleFullscreen,
+    ShowHelp,
     Exit
 }
 
@@ -23,6 +25,7 @@ public sealed class MainMenu
         new(I18n.T("menu.start")),
         new(I18n.T("menu.newWorld")),
         new(I18n.T("menu.options")),
+        new(I18n.T("menu.help")),
         new(I18n.T("menu.exit")) { IsDestructive = true }
     ];
     private readonly UiButton[] _optionButtons =
@@ -31,9 +34,13 @@ public sealed class MainMenu
         new(I18n.T("common.back"))
     ];
 
+    private readonly UiTextInput _seedInput = new();
+
     private bool _showOptions;
     private bool _inputReady;
     private int _focusedIndex;
+
+    public int? Seed => _seedInput.Text.Length > 0 ? _seedInput.GetNumericValue() : null;
 
     public MenuAction Update(
         MouseState mouse,
@@ -46,6 +53,9 @@ public sealed class MainMenu
     {
         Layout(viewportWidth, viewportHeight);
         RefreshText(isFullscreen);
+
+        // Update seed input
+        _seedInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
 
         if (!_inputReady)
         {
@@ -99,9 +109,10 @@ public sealed class MainMenu
         return activated switch
         {
             0 => MenuAction.StartGame,
-            1 => MenuAction.NewWorld,
+            1 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
             2 => OpenOptions(),
-            3 => MenuAction.Exit,
+            3 => MenuAction.ShowHelp,
+            4 => MenuAction.Exit,
             _ => MenuAction.None
         };
     }
@@ -131,6 +142,12 @@ public sealed class MainMenu
         for (int i = 0; i < buttons.Length; i++)
             buttons[i].Draw(spriteBatch, pixel, font, mouse, i == _focusedIndex);
 
+        // Draw seed input
+        if (!_showOptions)
+        {
+            _seedInput.Draw(spriteBatch, pixel, font, mouse);
+        }
+
         string hint = I18n.T(_showOptions ? "menu.optionsHint" : "menu.hint");
         Vector2 hintSize = font.MeasureString(hint);
         spriteBatch.DrawString(font, hint, new Vector2(viewportWidth / 2f - hintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
@@ -146,7 +163,7 @@ public sealed class MainMenu
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showOptions ? 220 : 356;
+        int panelHeight = _showOptions ? 220 : 400; // Increased height for seed input
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
@@ -167,6 +184,20 @@ public sealed class MainMenu
                 buttonWidth,
                 buttonHeight);
         }
+
+        // Position seed input below the "New World" button
+        if (!_showOptions)
+        {
+            _seedInput.Placeholder = I18n.T("menu.seedPlaceholder");
+            _seedInput.IsNumericOnly = true;
+            _seedInput.MaxLength = 10;
+            int inputY = startY + 1 * (buttonHeight + gap) + buttonHeight + 8;
+            _seedInput.Bounds = new Rectangle(
+                viewportWidth / 2 - buttonWidth / 2,
+                inputY,
+                buttonWidth,
+                40);
+        }
     }
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
@@ -177,7 +208,8 @@ public sealed class MainMenu
         _mainButtons[0].Text = I18n.T("menu.start");
         _mainButtons[1].Text = I18n.T("menu.newWorld");
         _mainButtons[2].Text = I18n.T("menu.options");
-        _mainButtons[3].Text = I18n.T("menu.exit");
+        _mainButtons[3].Text = I18n.T("menu.help");
+        _mainButtons[4].Text = I18n.T("menu.exit");
         _optionButtons[0].Text = I18n.Format("menu.fullscreen", I18n.T(isFullscreen ? "common.yes" : "common.no"));
         _optionButtons[1].Text = I18n.T("common.back");
     }

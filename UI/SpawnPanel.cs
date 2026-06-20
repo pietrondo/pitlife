@@ -4,18 +4,20 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Localization;
+using PitLife.Core;
 
 namespace PitLife.UI;
 
 public sealed class SpawnPanel
 {
     public bool IsOpen { get; private set; }
-    public string? SelectedSpecies { get; private set; }
-    public string? SelectedCategory { get; private set; }
+    public string? SelectedSpeciesKey { get; private set; }
+    public string? SelectedCategory { get; private set; } // Internal English key, never localized
 
     private static readonly Dictionary<string, string[]> SpeciesByCategory = new()
     {
         ["Plants"] = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"],
+        ["AquaticPlants"] = ["Seaweed", "Algae", "Kelp", "WaterLily", "Coral"],
         ["Herbivores"] = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle", "Salmon"],
         ["Carnivores"] = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf", "Shark", "Piranha"],
         ["Omnivores"] = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly", "Bear", "Jellyfish"]
@@ -44,10 +46,11 @@ public sealed class SpawnPanel
     public void Close()
     {
         IsOpen = false;
-        SelectedSpecies = null;
+        SelectedSpeciesKey = null;
         SelectedCategory = null;
     }
     public void Toggle() => IsOpen = !IsOpen;
+    public void DeselectSpecies() => SelectedSpeciesKey = null;
 
     public void SetViewportHeight(int h) => _viewportHeight = h;
 
@@ -59,6 +62,7 @@ public sealed class SpawnPanel
         if (_toggleBounds.Contains(pos))
         {
             Toggle();
+            Logger.Debug($"SpawnPanel: toggled, IsOpen={IsOpen}");
             return true;
         }
 
@@ -68,8 +72,14 @@ public sealed class SpawnPanel
         {
             if (btn.Bounds.Contains(pos))
             {
-                SelectedCategory = btn.Text == SelectedCategory ? null : btn.Text;
-                SelectedSpecies = null;
+                var clickedKey = btn.Tag as string; // Internal English key
+                var newCategory = clickedKey == SelectedCategory ? null : clickedKey;
+                if (newCategory != SelectedCategory)
+                {
+                    Logger.Debug($"SpawnPanel: category changed from '{SelectedCategory}' to '{newCategory}'");
+                }
+                SelectedCategory = newCategory;
+                SelectedSpeciesKey = null;
                 RebuildSpeciesButtons();
                 return true;
             }
@@ -78,7 +88,8 @@ public sealed class SpawnPanel
         {
             if (btn.Bounds.Contains(pos))
             {
-                SelectedSpecies = btn.Text;
+                SelectedSpeciesKey = btn.Tag as string; // Store the internal key, not localized name
+                Logger.Debug($"SpawnPanel: species selected '{SelectedSpeciesKey}'");
                 return true;
             }
         }
@@ -117,22 +128,29 @@ public sealed class SpawnPanel
 
         foreach (var btn in _categoryButtons)
         {
-            bool isSelected = btn.Text == SelectedCategory;
+            bool isSelected = btn.Tag as string == SelectedCategory;
             btn.Draw(sb, pixel, font, mouse, isSelected);
             if (isSelected)
             {
                 foreach (var sBtn in _speciesButtons)
                 {
-                    bool isSel = sBtn.Text == SelectedSpecies;
+                    bool isSel = sBtn.Tag as string == SelectedSpeciesKey;
                     sBtn.Draw(sb, pixel, font, mouse, isSel);
                 }
             }
         }
 
-        if (SelectedSpecies != null)
+        if (SelectedSpeciesKey != null)
         {
-            string hint = I18n.T("spawn.hint");
+            // Draw selected species name at bottom
+            string selectedName = I18n.Species(SelectedSpeciesKey);
+            string hint = I18n.T("spawn.selected") + ": " + selectedName;
             sb.DrawString(font, hint,
+                new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 36),
+                UiTheme.MossSignal);
+
+            string clickHint = I18n.T("spawn.hint");
+            sb.DrawString(font, clickHint,
                 new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 22),
                 UiTheme.WarmParchment);
         }
@@ -166,7 +184,10 @@ public sealed class SpawnPanel
         int y = 0 + HeaderHeight;
         foreach (var category in SpeciesByCategory.Keys)
         {
-            _categoryButtons.Add(new UiButton(I18n.T($"spawn.{category.ToLowerInvariant()}")));
+            _categoryButtons.Add(new UiButton(I18n.T($"spawn.{category.ToLowerInvariant()}"))
+            {
+                Tag = category // Internal English key for selection logic
+            });
             y += ButtonHeight + ButtonSpacing + SectionSpacing;
         }
         LayoutCategoryButtons();
@@ -199,7 +220,8 @@ public sealed class SpawnPanel
         {
             _speciesButtons.Add(new UiButton(I18n.Species(s))
             {
-                Bounds = new Rectangle(Margin + 20, y, PanelWidth - 30, ButtonHeight)
+                Bounds = new Rectangle(Margin + 20, y, PanelWidth - 30, ButtonHeight),
+                Tag = s // Store the internal key for spawning
             });
             y += ButtonHeight + ButtonSpacing;
         }

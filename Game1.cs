@@ -7,6 +7,7 @@ using PitLife.Rendering;
 using PitLife.Simulation;
 using PitLife.UI;
 using PitLife.Localization;
+using PitLife.Core;
 
 namespace PitLife;
 
@@ -138,7 +139,13 @@ public class Game1 : Game
                     _controller.SetPause(false);
                     break;
                 case MenuAction.NewWorld:
-                    GenerateNewWorld();
+                    GenerateNewWorld(null);
+                    _screen = GameScreen.Playing;
+                    _paused = false;
+                    _controller.SetPause(false);
+                    break;
+                case MenuAction.NewWorldWithSeed:
+                    GenerateNewWorld(_mainMenu.Seed);
                     _screen = GameScreen.Playing;
                     _paused = false;
                     _controller.SetPause(false);
@@ -208,11 +215,15 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
-        if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpecies != null &&
+        // Spawn creature only when panel is open, species selected, click is NOT on panel, and not consumed by UI
+        if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
+            !spawnPanelConsumed && !pointerOverUi &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var spawnPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.SpawnByName(_spawnPanel.SelectedSpecies, spawnPos);
+            _ecosystem.SpawnByName(_spawnPanel.SelectedSpeciesKey, spawnPos);
+            Logger.Event("SPAWN", $"Player spawned {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
+            _spawnPanel.DeselectSpecies(); // Deselect after spawning (one-shot behavior)
         }
         else if (!pointerOverUi && !spawnPanelConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
@@ -235,9 +246,9 @@ public class Game1 : Game
         base.Update(gameTime);
     }
 
-    private void GenerateNewWorld()
+    private void GenerateNewWorld(int? seedOverride)
     {
-        int seed = new Random().Next();
+        int seed = seedOverride ?? new Random().Next();
         _ecosystem = new Ecosystem(200, 150, seed);
         _ecosystem.Initialize(60, 20, 15, 150);
         _camera.WorldWidth = _ecosystem.World.PixelWidth;
@@ -312,6 +323,8 @@ public class Game1 : Game
             new Vector2(10, 32), new Color(160, 160, 160));
         string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
         _spriteBatch.DrawString(_font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
+        string seedLabel = $"Seed: {_ecosystem.Seed}";
+        _spriteBatch.DrawString(_font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
 
         if (_logo != null)
         {

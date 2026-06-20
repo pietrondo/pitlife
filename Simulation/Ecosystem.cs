@@ -34,8 +34,11 @@ public class Ecosystem
     public static bool IsPackAnimal(string species) => SpeciesRegistry.IsPackAnimal(species);
     public static bool IsSolitary(string species) => SpeciesRegistry.IsSolitary(species);
 
+    public int Seed { get; }
+
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
+        Seed = seed;
         World = new World(worldWidth, worldHeight, seed);
         Random = new Random(seed);
         _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
