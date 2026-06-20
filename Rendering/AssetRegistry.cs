@@ -74,6 +74,15 @@ public static class AssetRegistry
         new("Piranha", "Content/assets/creatures/fish/piranha.png"),
         new("Salmon", "Content/assets/creatures/fish/salmon.png"),
         new("Jellyfish", "Content/assets/creatures/fish/jellyfish.png"),
+        // Nuove texture piante pixel art
+        new("OakTree", "Content/assets/plants/trees/oak_tree.png"),
+        new("PineTree", "Content/assets/plants/trees/pine_tree.png"),
+        new("Bush", "Content/assets/plants/bushes/bush.png"),
+        new("Grass", "Content/assets/plants/grass/grass.png"),
+        new("Seaweed", "Content/assets/plants/aquatic/seaweed.png"),
+        new("Kelp", "Content/assets/plants/aquatic/kelp.png"),
+        new("WaterLily", "Content/assets/plants/aquatic/water_lily.png"),
+        new("Coral", "Content/assets/plants/aquatic/coral.png"),
     };
 
     public static readonly IReadOnlyList<GenderedSpeciesAsset> GenderedSpeciesTextures = new GenderedSpeciesAsset[]

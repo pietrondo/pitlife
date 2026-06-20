@@ -108,6 +108,10 @@ internal static class BuiltinSpecies
         RegisterPlant("BerryBush");
         RegisterPlant("Pine");
         RegisterPlant("Toadstool");
+        RegisterPlant("OakTree");
+        RegisterPlant("PineTree");
+        RegisterPlant("Bush");
+        RegisterPlant("Grass");
 
         // Aquatic Plants
         RegisterAquaticPlant("Seaweed");

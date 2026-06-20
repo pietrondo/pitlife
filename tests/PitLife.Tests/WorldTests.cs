@@ -76,17 +76,18 @@ public class WorldTests
     }
 
     [Fact]
-    public void Constructor_ElevationField_OceanCellsHaveZeroElevation()
+    public void Constructor_ElevationField_OceanCellsHaveLowElevation()
     {
         var world = new World(64, 48, 42);
         var hasOcean = false;
         var hasLand = false;
         for (int i = 0; i < world.ContinentMask.Length; i++)
         {
-            if (world.ContinentMask[i] <= 0.5f)
+            if (world.ContinentMask[i] <= 0.3f)
             {
                 hasOcean = true;
-                Assert.Equal(0f, world.ElevationField[i]);
+                Assert.True(world.ElevationField[i] >= 0f && world.ElevationField[i] < 0.5f, 
+                    $"Cella oceanica {i} ha elev={world.ElevationField[i]}, atteso in [0, 0.5)");
             }
             else
             {

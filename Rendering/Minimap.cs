@@ -135,6 +135,23 @@ public class Minimap
         _ => Color.Magenta
     };
 
+    // Static accessor for testing - returns colors in biome order
+    public static Color[] GetBiomeColors() =>
+    [
+        new Color(28, 60, 110),    // DeepOcean
+        new Color(58, 118, 168),   // ShallowWater
+        new Color(220, 200, 140),  // Beach
+        new Color(220, 190, 110),  // Desert
+        new Color(200, 190, 110),  // Savanna
+        new Color(120, 180, 80),   // Grassland
+        new Color(60, 130, 60),    // Forest
+        new Color(35, 95, 45),     // DenseForest
+        new Color(80, 100, 70),    // Swamp
+        new Color(180, 185, 170),   // Tundra
+        new Color(120, 110, 100),  // Mountain
+        new Color(235, 240, 245),  // Snow
+    ];
+
     private static Color GetCreatureColor(CreatureType type) => type switch
     {
         CreatureType.Plant => new Color(120, 200, 80),

@@ -17,7 +17,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch = null!;
     private Ecosystem _ecosystem = null!;
     private Camera _camera = null!;
-    private WorldRenderer _worldRenderer = null!;
+    private PixelWorldRenderer _worldRenderer = null!;
     private CreatureRenderer _creatureRenderer = null!;
     private DayNightCycle _dayNight = new();
     private Minimap _minimap = null!;
@@ -66,7 +66,7 @@ public class Game1 : Game
             WorldHeight = _ecosystem.World.PixelHeight,
             Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f)
         };
-        _worldRenderer = new WorldRenderer(_ecosystem.World);
+        _worldRenderer = new PixelWorldRenderer(_ecosystem.World, 42);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
@@ -85,7 +85,6 @@ public class Game1 : Game
         _minimap.LoadContent(GraphicsDevice);
         _spawnPanel.SetIconTexture(LoadTexture(AssetRegistry.SpawnIcon));
 
-        _worldRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Biomes);
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
@@ -254,7 +253,7 @@ public class Game1 : Game
         _camera.WorldWidth = _ecosystem.World.PixelWidth;
         _camera.WorldHeight = _ecosystem.World.PixelHeight;
         _camera.Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f);
-        _worldRenderer = new WorldRenderer(_ecosystem.World);
+        _worldRenderer = new PixelWorldRenderer(_ecosystem.World, seed);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
@@ -263,7 +262,6 @@ public class Game1 : Game
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
         _minimap.LoadContent(GraphicsDevice);
-        _worldRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Biomes);
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);

@@ -16,7 +16,7 @@ public sealed class SpawnPanel
 
     private static readonly Dictionary<string, string[]> SpeciesByCategory = new()
     {
-        ["Plants"] = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool"],
+        ["Plants"] = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool", "OakTree", "PineTree", "Bush", "Grass"],
         ["AquaticPlants"] = ["Seaweed", "Algae", "Kelp", "WaterLily", "Coral"],
         ["Herbivores"] = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle", "Salmon"],
         ["Carnivores"] = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf", "Shark", "Piranha"],
@@ -104,11 +104,13 @@ public sealed class SpawnPanel
 
     private void UpdateLayout()
     {
-        int toggleY = _viewportHeight - Margin - ToggleButtonSize - 52;
+        // Toggle button in alto a sinistra
+        int toggleY = Margin + 10;
         _toggleBounds = new Rectangle(Margin, toggleY, ToggleButtonSize, ToggleButtonSize);
         if (IsOpen)
         {
-            int panelY = toggleY - Margin - ComputePanelHeight();
+            // Pannello si espande verso il basso dal toggle
+            int panelY = toggleY + ToggleButtonSize + Margin;
             _panelBounds = new Rectangle(Margin, panelY, PanelWidth, ComputePanelHeight());
         }
     }
@@ -126,17 +128,20 @@ public sealed class SpawnPanel
         sb.DrawString(font, I18n.T("spawn.title"),
             new Vector2(_panelBounds.X + 10, _panelBounds.Y + 6), UiTheme.MossSignal);
 
+        // Disegna prima tutte le categorie
         foreach (var btn in _categoryButtons)
         {
             bool isSelected = btn.Tag as string == SelectedCategory;
             btn.Draw(sb, pixel, font, mouse, isSelected);
-            if (isSelected)
+        }
+
+        // Poi disegna le specie della categoria selezionata (sempre dopo, per evitare sovrapposizione)
+        if (SelectedCategory != null)
+        {
+            foreach (var sBtn in _speciesButtons)
             {
-                foreach (var sBtn in _speciesButtons)
-                {
-                    bool isSel = sBtn.Tag as string == SelectedSpeciesKey;
-                    sBtn.Draw(sb, pixel, font, mouse, isSel);
-                }
+                bool isSel = sBtn.Tag as string == SelectedSpeciesKey;
+                sBtn.Draw(sb, pixel, font, mouse, isSel);
             }
         }
 
@@ -209,12 +214,13 @@ public sealed class SpawnPanel
         if (SelectedCategory == null) return;
         if (!SpeciesByCategory.TryGetValue(SelectedCategory, out var species)) return;
 
+        // Calcola Y di partenza: dopo tutte le categorie
         int y = HeaderHeight;
-        foreach (var c in _categoryButtons)
-        {
-            if (c.Text == SelectedCategory) break;
+        foreach (var _ in _categoryButtons)
             y += ButtonHeight + ButtonSpacing + SectionSpacing;
-        }
+
+        // Aggiungi spazio per le categorie precedentemente selezionate (se necessario)
+        // Ma posiziona sempre dopo tutte le categorie per evitare sovrapposizione
 
         foreach (var s in species)
         {

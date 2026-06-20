@@ -11,56 +11,56 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 4; // Each tile = 4x4 pixels for detail
+    private int _renderScale = 1; // 1:1 pixel-to-tile ratio for clean pixel art
 
-    // Biome color palettes (base + variation)
+    // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
     {
-        new(15, 40, 120),    // DeepOcean
-        new(50, 100, 200),   // ShallowWater
-        new(220, 200, 150),  // Beach
-        new(210, 180, 120),  // Desert
-        new(180, 190, 80),   // Savanna
-        new(100, 180, 60),   // Grassland
-        new(40, 130, 40),    // Forest
-        new(20, 90, 30),     // DenseForest
-        new(90, 100, 60),    // Swamp
-        new(140, 130, 110),  // Tundra
-        new(140, 120, 100),  // Mountain
-        new(230, 235, 240),  // Snow
+        new(28, 60, 110),    // DeepOcean
+        new(58, 118, 168),   // ShallowWater
+        new(220, 200, 140),  // Beach
+        new(220, 190, 110),  // Desert
+        new(200, 190, 110),  // Savanna
+        new(120, 180, 80),   // Grassland
+        new(60, 130, 60),    // Forest
+        new(35, 95, 45),     // DenseForest
+        new(80, 100, 70),    // Swamp
+        new(180, 185, 170),  // Tundra
+        new(120, 110, 100),  // Mountain
+        new(235, 240, 245),  // Snow
     };
 
-    // Detail colors for noise variation
+    // Slightly darker variation for subtle texture
     private static readonly Color[] BiomeDetailColors =
     {
-        new(10, 35, 100),    // DeepOcean dark
-        new(40, 90, 180),    // ShallowWater dark
-        new(200, 180, 130),  // Beach dark
-        new(190, 160, 100),  // Desert dark
-        new(160, 170, 60),   // Savanna dark
-        new(80, 160, 40),    // Grassland dark
-        new(30, 110, 30),    // Forest dark
-        new(15, 70, 20),     // DenseForest dark
-        new(70, 80, 40),     // Swamp dark
-        new(120, 110, 90),   // Tundra dark
-        new(120, 100, 80),   // Mountain dark
-        new(210, 215, 220),  // Snow dark
+        new(20, 50, 90),     // DeepOcean dark
+        new(48, 100, 148),   // ShallowWater dark
+        new(200, 180, 120),  // Beach dark
+        new(200, 170, 90),   // Desert dark
+        new(180, 170, 90),   // Savanna dark
+        new(100, 160, 60),   // Grassland dark
+        new(45, 110, 45),    // Forest dark
+        new(25, 80, 30),     // DenseForest dark
+        new(65, 85, 55),     // Swamp dark
+        new(160, 165, 150),  // Tundra dark
+        new(105, 95, 85),    // Mountain dark
+        new(220, 225, 230),  // Snow dark
     };
 
-    // Highlight colors for texture
+    // Slightly lighter variation for subtle highlights
     private static readonly Color[] BiomeHighlightColors =
     {
-        new(25, 55, 140),    // DeepOcean light
-        new(70, 130, 220),   // ShallowWater light
-        new(240, 220, 170),  // Beach light
-        new(230, 200, 140),  // Desert light
-        new(200, 210, 100),  // Savanna light
-        new(120, 200, 80),   // Grassland light
-        new(60, 150, 60),    // Forest light
-        new(35, 110, 45),    // DenseForest light
-        new(110, 120, 80),   // Swamp light
-        new(160, 150, 130),  // Tundra light
-        new(160, 140, 120),  // Mountain light
+        new(38, 75, 135),    // DeepOcean light
+        new(68, 135, 190),   // ShallowWater light
+        new(235, 215, 155),  // Beach light
+        new(235, 205, 125),  // Desert light
+        new(215, 205, 125),  // Savanna light
+        new(135, 200, 95),   // Grassland light
+        new(70, 150, 70),    // Forest light
+        new(45, 110, 60),    // DenseForest light
+        new(95, 115, 85),    // Swamp light
+        new(195, 200, 185),  // Tundra light
+        new(140, 125, 115),  // Mountain light
         new(250, 255, 255),  // Snow light
     };
 
@@ -137,30 +137,23 @@ public sealed class PixelWorldRenderer : IDisposable
                 float localX = (x % _renderScale) / (float)_renderScale;
                 float localY = (y % _renderScale) / (float)_renderScale;
 
-                // Sample noise for organic variation
-                float noiseVal = _noise.GetNoise(x * 0.5f, y * 0.5f);
+                // Sample noise at higher frequency for pixel-level variation
+                float noiseVal = _noise.GetNoise(x * 1.5f, y * 1.5f);
                 noiseVal = (noiseVal + 1f) * 0.5f; // Normalize to 0-1
 
-                // Blend colors based on noise and position
+                // Blend colors based on noise with more contrast
                 Color baseColor = BiomeBaseColors[biomeIdx];
                 Color detailColor = BiomeDetailColors[biomeIdx];
                 Color highlightColor = BiomeHighlightColors[biomeIdx];
 
-                // Create pixel-art-like texture with dithering
+                // More pronounced color variation
                 Color finalColor;
-                float pattern = ((x ^ y) & 1) * 0.1f; // Checkerboard dither
-                float combined = noiseVal + pattern;
-
-                if (combined < 0.4f)
-                    finalColor = detailColor;
-                else if (combined > 0.7f)
-                    finalColor = highlightColor;
+                if (noiseVal < 0.4f)
+                    finalColor = Color.Lerp(detailColor, baseColor, (noiseVal - 0.2f) / 0.2f);
+                else if (noiseVal > 0.6f)
+                    finalColor = Color.Lerp(baseColor, highlightColor, (noiseVal - 0.6f) / 0.4f);
                 else
                     finalColor = baseColor;
-
-                // Add subtle edge darkening between tiles
-                if (localX < 0.1f || localX > 0.9f || localY < 0.1f || localY > 0.9f)
-                    finalColor = Color.Lerp(finalColor, Color.Black, 0.15f);
 
                 data[y * width + x] = finalColor;
             }
@@ -174,6 +167,12 @@ public sealed class PixelWorldRenderer : IDisposable
         _worldTexture?.Dispose();
         _worldTexture = null;
     }
+
+    // Static accessors for testing
+    public static Color[] GetBiomeBaseColors() => BiomeBaseColors;
+    public static Color[] GetBiomeDetailColors() => BiomeDetailColors;
+    public static Color[] GetBiomeHighlightColors() => BiomeHighlightColors;
+    public static int RenderScale => 1;
 }
 
 // Simplex noise implementation (FastNoiseLite-style)
@@ -203,9 +202,9 @@ public sealed class FastNoiseLite
     // Simplified OpenSimplex2 implementation
     private float OpenSimplex2(float x, float y)
     {
-        // Skew and unskew factors
-        const float F2 = 0.5f * (MathF.Sqrt(3f) - 1f);
-        const float G2 = (3f - MathF.Sqrt(3f)) / 6f;
+        // Skew and unskew factors (pre-calculated constants)
+        const float F2 = 0.366025403f; // 0.5 * (Sqrt(3) - 1)
+        const float G2 = 0.211324865f; // (3 - Sqrt(3)) / 6
 
         float s = (x + y) * F2;
         int i = (int)MathF.Floor(x + s);
