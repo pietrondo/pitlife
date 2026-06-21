@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "Game1.cs": {
-    "mtime": 1782044625.4676719,
-    "ast_hash": "b341177afe6e991f623fcad0e5ccd1b5",
+    "mtime": 1782045433.6206703,
+    "ast_hash": "f3c26bab650d7a24f3177edb6e01e55f",
     "semantic_hash": ""
   },
   "Game/SimulationController.cs": {
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "Simulation/Creature.cs": {
-    "mtime": 1782034852.224856,
-    "ast_hash": "3f27033c14af00eba783d9406554b5a2",
+    "mtime": 1782045433.6186707,
+    "ast_hash": "afae6a9301421b605539be92cb14e367",
     "semantic_hash": ""
   },
   "Simulation/CreatureSpawner.cs": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "Simulation/SpeciesRegistry.cs": {
-    "mtime": 1782043627.304214,
-    "ast_hash": "eda7299d1de8d9553172d39f3c4a540f",
+    "mtime": 1782045433.6066704,
+    "ast_hash": "159633b13255db608b4bcb2a404ac3f9",
     "semantic_hash": ""
   },
   "Simulation/Tile.cs": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/AssetTests.cs": {
-    "mtime": 1781854473.934874,
-    "ast_hash": "4f3b99982786892945dc316eec7ec562",
+    "mtime": 1782045433.6256726,
+    "ast_hash": "8bbd096f339e520f50aa3cef7667ffd0",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/BalanceTests.cs": {
@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SocialSystemTests.cs": {
-    "mtime": 1782043711.050287,
-    "ast_hash": "8798be60d071429e9bae78577fd2f41d",
+    "mtime": 1782045433.6226707,
+    "ast_hash": "41d5b6d21a2e5786e1244017923bd94e",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SpatialGridTests.cs": {
@@ -817,6 +817,16 @@
   "tests/PitLife.Tests/InGameUiTests.cs": {
     "mtime": 1782044625.4716802,
     "ast_hash": "431b9a6c03c779af357ec21e4e971548",
+    "semantic_hash": ""
+  },
+  "Simulation/LifeStage.cs": {
+    "mtime": 1782045433.605671,
+    "ast_hash": "cc08cbbf8f8d1c0da16c13c29e506064",
+    "semantic_hash": ""
+  },
+  "tests/PitLife.Tests/CreatureSelectionTests.cs": {
+    "mtime": 1782045433.627673,
+    "ast_hash": "ed28aa574d02b7ce07da08daef2cd36d",
     "semantic_hash": ""
   }
 }

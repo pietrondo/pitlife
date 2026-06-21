@@ -38,6 +38,19 @@ public class AssetTests
         Assert.True(bytes.Length > 2000);
     }
 
+    [Fact]
+    public void TurtleSprite_IsFullSizeTransparentReplacement()
+    {
+        string path = Path.Combine(FindRepositoryRoot(), "Content", "assets", "creatures",
+            "reptiles", "testudines", "turtle.png");
+        byte[] bytes = File.ReadAllBytes(path);
+
+        Assert.Equal(64, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16, 4)));
+        Assert.Equal(64, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20, 4)));
+        Assert.Equal(6, bytes[25]);
+        Assert.True(bytes.Length > 2000);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

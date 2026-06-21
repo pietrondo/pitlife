@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -264,15 +265,7 @@ public class Game1 : Game
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            Creature? closest = null;
-            float closestDist = 30f;
-            foreach (var c in _ecosystem.Creatures)
-            {
-                if (c == null || !c.IsAlive) continue;
-                float d = Vector2.Distance(worldPos, c.Position);
-                if (d < closestDist) { closestDist = d; closest = c; }
-            }
-            _selectedCreature = closest;
+            _selectedCreature = FindClosestCreature(_ecosystem.Creatures, worldPos);
             if (_selectedCreature != null)
             {
                 _inGameUi.OpenCreatureWindow();
@@ -290,6 +283,28 @@ public class Game1 : Game
         _prevMouse = mouse;
 
         base.Update(gameTime);
+    }
+
+    internal static Creature? FindClosestCreature(
+        IEnumerable<Creature> creatures,
+        Vector2 worldPosition,
+        float selectionRadius = 30f)
+    {
+        Creature? closest = null;
+        float closestDistance = selectionRadius;
+        foreach (Creature creature in creatures)
+        {
+            if (!creature.IsAlive)
+                continue;
+
+            float distance = Vector2.Distance(worldPosition, creature.Position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closest = creature;
+            }
+        }
+        return closest;
     }
 
     private void GenerateNewWorld(int? seedOverride)

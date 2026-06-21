@@ -23,6 +23,7 @@ public sealed class SpeciesDefinition
     public SocialBehavior SocialBehavior { get; }
     public HashSet<BiomeType> ValidBiomes { get; }
     public float DefaultSize { get; }
+    public float MaturityAge { get; }
 
     public SpeciesDefinition(
         string species,
@@ -31,7 +32,8 @@ public sealed class SpeciesDefinition
         bool isAquatic,
         SocialBehavior socialBehavior,
         IEnumerable<BiomeType> validBiomes,
-        float defaultSize = 1.0f)
+        float defaultSize = 1.0f,
+        float maturityAge = 30f)
     {
         Species = species;
         CreatureType = creatureType;
@@ -40,6 +42,7 @@ public sealed class SpeciesDefinition
         SocialBehavior = socialBehavior;
         ValidBiomes = new HashSet<BiomeType>(validBiomes);
         DefaultSize = defaultSize;
+        MaturityAge = maturityAge;
     }
 
     public bool IsValidBiome(BiomeType biome) => ValidBiomes.Contains(biome);
@@ -361,6 +364,19 @@ internal static class BuiltinSpecies
             isAquatic: isAquatic,
             socialBehavior: social,
             validBiomes: biomes,
-            defaultSize: size));
+            defaultSize: size,
+            maturityAge: GetMaturityAge(name)));
     }
+
+    private static float GetMaturityAge(string species) => species switch
+    {
+        "Beetle" or "Butterfly" or "Frog" or "Piranha" or "Rabbit" => 10f,
+        "Fish" or "Jellyfish" or "Lizard" or "Salmon" => 15f,
+        "Fox" or "Otter" or "Raccoon" => 20f,
+        "Boar" or "Cheetah" or "Gazelle" or "Goat" or "Kangaroo" or "Seal" or
+            "SeaLion" or "Sheep" => 25f,
+        "Horse" or "Hippopotamus" or "Orca" or "Shark" or "Turtle" => 40f,
+        "Walrus" or "Whale" => 50f,
+        _ => 30f
+    };
 }

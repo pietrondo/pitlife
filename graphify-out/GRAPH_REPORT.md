@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 85 files · ~44,591 words
+- 87 files · ~44,881 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 962 nodes · 1419 edges · 82 communities (61 shown, 21 thin omitted)
+- 976 nodes · 1437 edges · 84 communities (63 shown, 21 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2662ff4f`
+- Built from commit: `0d6d18e4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -89,9 +89,10 @@
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Game1` - 32 edges
+1. `Game1` - 33 edges
 2. `Ecosystem` - 30 edges
 3. `SpawnPanel` - 26 edges
 4. `InGameUi` - 19 edges
@@ -111,7 +112,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (82 total, 21 thin omitted)
+## Communities (84 total, 21 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
@@ -127,7 +128,7 @@ Nodes (14): CreatureSpawner, Herbivore, Plant, Creature, Func, GameTime, int, Li
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
-Nodes (27): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+19 more)
+Nodes (29): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+21 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.14
@@ -213,6 +214,10 @@ Nodes (13): 1. Visual Theme & Atmosphere, 2. Color Palette & Roles, 3. Typograph
 Cohesion: 0.20
 Nodes (5): IReadOnlyCollection, IReadOnlyDictionary, CreatureType, Dictionary, I18n
 
+### Community 26 - "Community 26"
+Cohesion: 0.18
+Nodes (4): SocialSystemTests, Fact, InlineData, Theory
+
 ### Community 27 - "Community 27"
 Cohesion: 0.23
 Nodes (5): int, List, object, string, Logger
@@ -259,7 +264,7 @@ Nodes (5): MouseState, SpriteBatch, SpriteFont, Texture2D, UiButton
 
 ### Community 40 - "Community 40"
 Cohesion: 0.25
-Nodes (5): InlineData, TileTests, BiomeType, Fact, Theory
+Nodes (5): TileTests, BiomeType, Fact, InlineData, Theory
 
 ### Community 41 - "Community 41"
 Cohesion: 0.24
@@ -326,7 +331,7 @@ Cohesion: 0.32
 Nodes (4): SpawnPanelTests, Fact, MouseState, SpawnPanel
 
 ## Knowledge Gaps
-- **283 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+278 more)
+- **286 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+281 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -334,13 +339,13 @@ Nodes (4): SpawnPanelTests, Fact, MouseState, SpawnPanel
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _283 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _286 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.09103840682788052 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.07207207207207207 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06794871794871794 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**

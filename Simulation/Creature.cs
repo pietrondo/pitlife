@@ -14,8 +14,10 @@ public abstract class Creature
     public CreatureType CreatureType { get; protected set; }
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
-    public bool IsAdult => Age >= 30f;
-    public bool IsBaby => !IsAdult;
+    public float MaturityAge => SpeciesRegistry.Get(Species)?.MaturityAge ?? 30f;
+    public LifeStage LifeStage => Age >= MaturityAge ? LifeStage.Adult : LifeStage.Infant;
+    public bool IsAdult => LifeStage == LifeStage.Adult;
+    public bool IsBaby => LifeStage == LifeStage.Infant;
     public float MaxEnergy => 50f * Genome.Size;
     public float EnergyConsumption => Genome.Metabolism * 0.5f * Genome.Size;
     public float CurrentSpeedMultiplier { get; protected set; } = 1f;

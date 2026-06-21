@@ -23,6 +23,26 @@ public class SocialSystemTests
         Assert.False(c.IsBaby);
     }
 
+    [Theory]
+    [InlineData("Rabbit", 10f)]
+    [InlineData("Turtle", 40f)]
+    [InlineData("Whale", 50f)]
+    public void LifeStage_TransitionsAtSpeciesMaturityAge(string species, float maturityAge)
+    {
+        var creature = new Herbivore(
+            new Vector2(10, 10),
+            Genome.Random(new Random(1)),
+            species);
+
+        creature.GrowFor(maturityAge - 0.01f);
+        Assert.Equal(LifeStage.Infant, creature.LifeStage);
+        Assert.False(creature.IsAdult);
+
+        creature.GrowFor(0.01f);
+        Assert.Equal(LifeStage.Adult, creature.LifeStage);
+        Assert.True(creature.IsAdult);
+    }
+
     [Fact]
     public void ReproduceWith_SameGender_ReturnsNull()
     {
