@@ -99,6 +99,30 @@ public class AdaptationTests
     }
 
     [Fact]
+    public void Genome_Reproduce_InheritsTraitsFromBothParents()
+    {
+        var first = new Genome
+        {
+            Speed = 0.51f, Size = 0.61f, Metabolism = 0.71f, VisionRange = 1.1f,
+            MutationRate = 0f, DesertAdaptation = 0.11f, ColdAdaptation = 0.21f,
+            ForestAdaptation = 0.31f, WaterAdaptation = 0.41f, Color = Color.Red
+        };
+        var second = new Genome
+        {
+            Speed = 1.51f, Size = 1.61f, Metabolism = 1.71f, VisionRange = 9.1f,
+            MutationRate = 0f, DesertAdaptation = 0.91f, ColdAdaptation = 0.81f,
+            ForestAdaptation = 0.72f, WaterAdaptation = 0.62f, Color = Color.Blue
+        };
+
+        Genome child = Genome.Reproduce(first, second, new Random(7));
+        float[] traits = [child.Speed, child.Size, child.Metabolism, child.VisionRange,
+            child.DesertAdaptation, child.ColdAdaptation, child.ForestAdaptation, child.WaterAdaptation];
+
+        Assert.Contains(traits, value => value is 0.51f or 0.61f or 0.71f or 1.1f or 0.11f or 0.21f or 0.31f or 0.41f);
+        Assert.Contains(traits, value => value is 1.51f or 1.61f or 1.71f or 9.1f or 0.91f or 0.81f or 0.72f or 0.62f);
+    }
+
+    [Fact]
     public void Creatures_CanEvolveIntoDifferentSpecies_WhenGenomeChanges()
     {
         var rng = new Random(42);

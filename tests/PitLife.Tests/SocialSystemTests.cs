@@ -64,6 +64,34 @@ public class SocialSystemTests
     }
 
     [Fact]
+    public void ReproduceWith_UnassignedGender_ReturnsNull()
+    {
+        var genome = Genome.Random(new Random(1));
+        var unassigned = new Herbivore(new Vector2(10, 10), genome, "Deer")
+        { Energy = 1000f, Gender = Gender.None };
+        var female = new Herbivore(new Vector2(20, 20), genome, "Deer")
+        { Energy = 1000f, Gender = Gender.Female };
+        unassigned.GrowFor(60f);
+        female.GrowFor(60f);
+
+        Assert.Null(unassigned.ReproduceWith(female, new Random(1)));
+    }
+
+    [Fact]
+    public void ReproduceWith_DifferentSpecies_ReturnsNull()
+    {
+        var genome = Genome.Random(new Random(1));
+        var deer = new Herbivore(new Vector2(10, 10), genome, "Deer")
+        { Energy = 1000f, Gender = Gender.Male };
+        var rabbit = new Herbivore(new Vector2(20, 20), genome, "Rabbit")
+        { Energy = 1000f, Gender = Gender.Female };
+        deer.GrowFor(60f);
+        rabbit.GrowFor(60f);
+
+        Assert.Null(deer.ReproduceWith(rabbit, new Random(1)));
+    }
+
+    [Fact]
     public void IsPackAnimal_Deer_ReturnsTrue()
     {
         Assert.True(Ecosystem.IsPackAnimal("Deer"));

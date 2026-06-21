@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 87 files · ~44,881 words
+- 87 files · ~45,246 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 976 nodes · 1437 edges · 84 communities (63 shown, 21 thin omitted)
+- 984 nodes · 1454 edges · 85 communities (63 shown, 22 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0d6d18e4`
+- Built from commit: `4113d92a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -90,18 +90,19 @@
 - [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 84|Community 84]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Game1` - 33 edges
 2. `Ecosystem` - 30 edges
 3. `SpawnPanel` - 26 edges
-4. `InGameUi` - 19 edges
-5. `Creature` - 18 edges
+4. `Creature` - 19 edges
+5. `InGameUi` - 19 edges
 6. `UiWindowManager` - 18 edges
-7. `CreatureRenderer` - 16 edges
-8. `PixelWorldRenderer` - 16 edges
-9. `FastNoiseLite` - 16 edges
-10. `WorldGenerator` - 16 edges
+7. `CreatureRenderer` - 17 edges
+8. `SocialSystemTests` - 17 edges
+9. `PixelWorldRenderer` - 16 edges
+10. `FastNoiseLite` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `BaseBehavior` --implements--> `ICreatureBehavior`  [EXTRACTED]
@@ -112,11 +113,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (84 total, 21 thin omitted)
+## Communities (85 total, 22 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
-Nodes (5): Creature, Carnivore, Genome, Random, Vector2
+Nodes (4): Carnivore, Genome, Random, Vector2
 
 ### Community 1 - "Community 1"
 Cohesion: 0.09
@@ -159,8 +160,8 @@ Cohesion: 0.12
 Nodes (15): b, l, r, BiomeType, Camera, Color, GraphicsDevice, IEnumerable (+7 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.14
-Nodes (12): GenderedSpeciesAsset, HashSet, CreatureRenderer, Camera, Color, Dictionary, Ecosystem, GraphicsDevice (+4 more)
+Cohesion: 0.13
+Nodes (13): Gender, GenderedSpeciesAsset, HashSet, CreatureRenderer, Camera, Color, Dictionary, Ecosystem (+5 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.13
@@ -215,7 +216,7 @@ Cohesion: 0.20
 Nodes (5): IReadOnlyCollection, IReadOnlyDictionary, CreatureType, Dictionary, I18n
 
 ### Community 26 - "Community 26"
-Cohesion: 0.18
+Cohesion: 0.16
 Nodes (4): SocialSystemTests, Fact, InlineData, Theory
 
 ### Community 27 - "Community 27"
@@ -291,8 +292,8 @@ Cohesion: 0.40
 Nodes (4): MonoGame.Content.Builder.Task (3.8.*), MonoGame.Framework.DesktopGL (3.8.*), net9.0, Microsoft.NET.Sdk
 
 ### Community 56 - "Community 56"
-Cohesion: 0.80
-Nodes (4): Genome, Mutate(), Random(), Reproduce()
+Cohesion: 0.73
+Nodes (5): Choose(), Genome, Mutate(), Random(), Reproduce()
 
 ### Community 59 - "Community 59"
 Cohesion: 0.50
@@ -303,8 +304,8 @@ Cohesion: 0.25
 Nodes (6): JsonSerializerOptions, CreatureSaveData, Ecosystem, GenomeSaveData, SaveData, SaveSystem
 
 ### Community 74 - "Community 74"
-Cohesion: 0.21
-Nodes (6): AdaptationTests, TestCreature, Fact, Genome, Random, Vector2
+Cohesion: 0.29
+Nodes (4): TestCreature, Genome, Random, Vector2
 
 ### Community 75 - "Community 75"
 Cohesion: 0.33
@@ -324,7 +325,7 @@ Nodes (4): Genome, Random, Vector2, Herbivore
 
 ### Community 79 - "Community 79"
 Cohesion: 0.33
-Nodes (4): Genome, Random, Vector2, Omnivore
+Nodes (5): Creature, Genome, Random, Vector2, Omnivore
 
 ### Community 80 - "Community 80"
 Cohesion: 0.32
@@ -333,7 +334,7 @@ Nodes (4): SpawnPanelTests, Fact, MouseState, SpawnPanel
 ## Knowledge Gaps
 - **286 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+281 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

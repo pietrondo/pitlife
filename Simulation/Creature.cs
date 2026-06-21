@@ -208,9 +208,7 @@ public abstract class Creature
 
     public Creature? ReproduceWith(Creature partner, Random rng)
     {
-        if (!IsAlive || partner == null || !partner.IsAlive) return null;
-        if (!IsAdult || !partner.IsAdult) return null;
-        if (Gender == partner.Gender) return null;
+        if (!CanMateWith(partner)) return null;
         if (Energy < ReproductionThreshold || partner.Energy < partner.ReproductionThreshold)
             return null;
         Energy -= MaxEnergy * 0.3f;
@@ -227,6 +225,16 @@ public abstract class Creature
             Logger.Event("BIRTH", $"{Species} + {partner.Species} -> baby at ({child.Position.X:F0},{child.Position.Y:F0})");
         }
         return child;
+    }
+
+    public bool CanMateWith(Creature? partner)
+    {
+        if (!IsAlive || partner == null || !partner.IsAlive) return false;
+        if (!IsAdult || !partner.IsAdult) return false;
+        if (!string.Equals(Species, partner.Species, StringComparison.Ordinal)) return false;
+        if (Gender is not (Gender.Male or Gender.Female)) return false;
+        if (partner.Gender is not (Gender.Male or Gender.Female)) return false;
+        return Gender != partner.Gender;
     }
 
     public Creature? FindNearestSameSpecies(Ecosystem ecosystem)

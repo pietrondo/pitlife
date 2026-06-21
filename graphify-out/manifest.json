@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "Rendering/CreatureRenderer.cs": {
-    "mtime": 1782033988.5617397,
-    "ast_hash": "3fc914e2a7dad56150a45c334d6a466a",
+    "mtime": 1782045859.7990575,
+    "ast_hash": "1e90fb357d01182545b8f0f4f719dea4",
     "semantic_hash": ""
   },
   "Rendering/DayNightCycle.cs": {
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "Simulation/Creature.cs": {
-    "mtime": 1782045433.6186707,
-    "ast_hash": "afae6a9301421b605539be92cb14e367",
+    "mtime": 1782045859.7920573,
+    "ast_hash": "c5eaa0a49fb8037fd1bdc39f5d3ff348",
     "semantic_hash": ""
   },
   "Simulation/CreatureSpawner.cs": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "Simulation/Ecosystem.cs": {
-    "mtime": 1782043552.6412766,
-    "ast_hash": "299495ac56a9bf016a7cfa688f2c0837",
+    "mtime": 1782045859.7950618,
+    "ast_hash": "bd80e0dddca7692bcdf805ab616c7221",
     "semantic_hash": ""
   },
   "Simulation/Gender.cs": {
@@ -130,8 +130,8 @@
     "semantic_hash": ""
   },
   "Simulation/Genome.cs": {
-    "mtime": 1782034846.671025,
-    "ast_hash": "6f10bd326946aba737417fd7e1a3219b",
+    "mtime": 1782045859.7970595,
+    "ast_hash": "a465962a1ff6befdd450758d4aa80839",
     "semantic_hash": ""
   },
   "Simulation/Herbivore.cs": {
@@ -305,8 +305,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/PixelWorldRendererTests.cs": {
-    "mtime": 1781971129.7779987,
-    "ast_hash": "47ea762835add554852ad711ecc2355c",
+    "mtime": 1782045890.8882554,
+    "ast_hash": "80ffedfcb6bc1c0e0056ab90865e7e81",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SimulationControllerTests.cs": {
@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SocialSystemTests.cs": {
-    "mtime": 1782045433.6226707,
-    "ast_hash": "41d5b6d21a2e5786e1244017923bd94e",
+    "mtime": 1782045859.8010583,
+    "ast_hash": "992a97b96017c3b52d7f2fe1c4ff7586",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SpatialGridTests.cs": {
@@ -795,8 +795,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/AdaptationTests.cs": {
-    "mtime": 1782035024.408974,
-    "ast_hash": "ff25a37a3351a3d834b20f0f3ffa46f2",
+    "mtime": 1782045890.8902423,
+    "ast_hash": "514768293a96f01a0ced7f142ef7de02",
     "semantic_hash": ""
   },
   "Content/assets/creatures/mammals/carnivores/felids/cheetah.png": {

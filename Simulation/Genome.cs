@@ -35,7 +35,19 @@ public struct Genome
 
     public static Genome Reproduce(Genome parent1, Genome parent2, Random rng)
     {
-        var child = rng.Next(2) == 0 ? parent1 : parent2;
+        var child = new Genome
+        {
+            Speed = Choose(parent1.Speed, parent2.Speed, rng),
+            Size = Choose(parent1.Size, parent2.Size, rng),
+            Metabolism = Choose(parent1.Metabolism, parent2.Metabolism, rng),
+            VisionRange = Choose(parent1.VisionRange, parent2.VisionRange, rng),
+            Color = rng.Next(2) == 0 ? parent1.Color : parent2.Color,
+            MutationRate = Choose(parent1.MutationRate, parent2.MutationRate, rng),
+            DesertAdaptation = Choose(parent1.DesertAdaptation, parent2.DesertAdaptation, rng),
+            ColdAdaptation = Choose(parent1.ColdAdaptation, parent2.ColdAdaptation, rng),
+            ForestAdaptation = Choose(parent1.ForestAdaptation, parent2.ForestAdaptation, rng),
+            WaterAdaptation = Choose(parent1.WaterAdaptation, parent2.WaterAdaptation, rng)
+        };
         child.Speed = Mutate(child.Speed, 0.5f, 2.0f, child.MutationRate, rng);
         child.Size = Mutate(child.Size, 0.5f, 2.0f, child.MutationRate, rng);
         child.Metabolism = Mutate(child.Metabolism, 0.5f, 2.0f, child.MutationRate, rng);
@@ -60,6 +72,9 @@ public struct Genome
         }
         return child;
     }
+
+    private static float Choose(float parent1, float parent2, Random rng) =>
+        rng.Next(2) == 0 ? parent1 : parent2;
 
     private static float Mutate(float value, float min, float max, float rate, Random rng)
     {

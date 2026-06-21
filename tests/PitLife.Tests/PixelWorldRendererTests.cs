@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using PitLife.Rendering;
 using PitLife.Simulation;
 
@@ -5,6 +6,17 @@ namespace PitLife.Tests;
 
 public class PixelWorldRendererTests
 {
+    [Fact]
+    public void GenderIndicators_AreDistinctForMaleAndFemale()
+    {
+        Color? male = CreatureRenderer.GetGenderIndicatorColor(Gender.Male);
+        Color? female = CreatureRenderer.GetGenderIndicatorColor(Gender.Female);
+
+        Assert.NotNull(male);
+        Assert.NotNull(female);
+        Assert.NotEqual(male, female);
+        Assert.Null(CreatureRenderer.GetGenderIndicatorColor(Gender.None));
+    }
     [Fact]
     public void PixelWorldRenderer_BiomeColors_AreDefinedForAllBiomes()
     {

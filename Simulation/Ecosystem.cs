@@ -232,10 +232,9 @@ public class Ecosystem
 
     public Creature? FindNearestMate(Creature seeker)
     {
-        if (!seeker.IsAdult) return null;
-        return _spatialGrid.FindNearest(seeker,
-            c => c != seeker && c.Species == seeker.Species
-                && c.Gender != seeker.Gender && c.IsAdult);
+        if (!seeker.IsAdult || seeker.Gender is not (Gender.Male or Gender.Female))
+            return null;
+        return _spatialGrid.FindNearest(seeker, seeker.CanMateWith);
     }
 
     public Creature? FindNearestPredator(Creature seeker)

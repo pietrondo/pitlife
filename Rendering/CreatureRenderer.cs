@@ -168,7 +168,7 @@ public class CreatureRenderer
                 // Gender icon
                 if (c.Gender != Gender.None && _pixelTexture != null)
                 {
-                    Color genderColor = c.Gender == Gender.Male ? Color.Red : new Color(80, 120, 255);
+                    Color genderColor = GetGenderIndicatorColor(c.Gender)!.Value;
                     genderColor = ApplyOverlay(genderColor);
                     int dot = Math.Max(2, s / 6);
                     int yOff = s / 2 + 2;
@@ -182,4 +182,11 @@ public class CreatureRenderer
             }
         }
     }
+
+    internal static Color? GetGenderIndicatorColor(Gender gender) => gender switch
+    {
+        Gender.Male => Color.Red,
+        Gender.Female => new Color(80, 120, 255),
+        _ => null
+    };
 }
