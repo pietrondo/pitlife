@@ -61,6 +61,7 @@ public static class I18n
         ["menu.start"] = "START",
         ["menu.newWorld"] = "NEW WORLD",
         ["menu.options"] = "OPTIONS",
+        ["menu.help"] = "HOW TO PLAY",
         ["menu.saveGame"] = "SAVE GAME",
         ["menu.loadGame"] = "LOAD GAME",
         ["menu.exit"] = "EXIT",
@@ -203,7 +204,25 @@ public static class I18n
         ["spawn.hint"] = "Click map to spawn",
         ["spawn.none"] = "Select species",
         ["spawn.selected"] = "Selected",
-        ["menu.seedPlaceholder"] = "Enter seed (optional)..."
+        ["menu.seedPlaceholder"] = "Enter seed (optional)...",
+        ["help.title"] = "HOW TO PLAY",
+        ["help.objectiveTitle"] = "OBJECTIVE",
+        ["help.objective"] = "Build a stable ecosystem where plants and animals can survive and evolve.",
+        ["help.controlsTitle"] = "CONTROLS",
+        ["help.controls.movement"] = "WASD / Arrows: move camera   Mouse wheel: zoom",
+        ["help.controls.speed"] = "1 / 2 / 3: simulation speed   Space: pause",
+        ["help.controls.interface"] = "F2 / F3 / F5: windows   Esc: close window or open menu",
+        ["help.spawnTitle"] = "SPAWN CREATURES",
+        ["help.spawn"] = "Use the + button or F4, choose a species, then click a valid biome.",
+        ["help.creaturesTitle"] = "CREATURE TYPES",
+        ["help.creatures.plants"] = "Plants feed herbivores and spread when energy is sufficient.",
+        ["help.creatures.herbivores"] = "Herbivores eat plants and flee from predators.",
+        ["help.creatures.carnivores"] = "Carnivores hunt other creatures and regulate populations.",
+        ["help.creatures.omnivores"] = "Omnivores can eat plants and prey.",
+        ["help.tipsTitle"] = "TIPS",
+        ["help.tips.balance"] = "Keep producers, prey and predators in balance.",
+        ["help.tips.seed"] = "Reuse a seed to generate the same world again.",
+        ["help.tips.observe"] = "Click creatures and terrain to inspect their details."
     };
 
     private static Dictionary<string, string> CreateItalianCatalog()
@@ -215,6 +234,7 @@ public static class I18n
             ["common.back"] = "INDIETRO",
             ["menu.start"] = "INIZIA",
             ["menu.options"] = "OPZIONI",
+            ["menu.help"] = "COME GIOCARE",
             ["menu.saveGame"] = "SALVA PARTITA",
             ["menu.loadGame"] = "CARICA PARTITA",
             ["menu.exit"] = "ESCI",
@@ -355,7 +375,25 @@ public static class I18n
             ["spawn.hint"] = "Clicca sulla mappa per spawnare",
             ["spawn.none"] = "Seleziona specie",
             ["spawn.selected"] = "Selezionato",
-            ["menu.seedPlaceholder"] = "Inserisci seed (opzionale)..."
+            ["menu.seedPlaceholder"] = "Inserisci seed (opzionale)...",
+            ["help.title"] = "COME GIOCARE",
+            ["help.objectiveTitle"] = "OBIETTIVO",
+            ["help.objective"] = "Costruisci un ecosistema stabile in cui piante e animali possano sopravvivere ed evolvere.",
+            ["help.controlsTitle"] = "CONTROLLI",
+            ["help.controls.movement"] = "WASD / Frecce: muovi camera   Rotella: zoom",
+            ["help.controls.speed"] = "1 / 2 / 3: velocità simulazione   Spazio: pausa",
+            ["help.controls.interface"] = "F2 / F3 / F5: finestre   Esc: chiudi finestra o apri menu",
+            ["help.spawnTitle"] = "INSERIRE CREATURE",
+            ["help.spawn"] = "Usa il pulsante + o F4, scegli una specie e clicca su un bioma valido.",
+            ["help.creaturesTitle"] = "TIPI DI CREATURE",
+            ["help.creatures.plants"] = "Le piante nutrono gli erbivori e si diffondono quando hanno energia sufficiente.",
+            ["help.creatures.herbivores"] = "Gli erbivori mangiano piante e fuggono dai predatori.",
+            ["help.creatures.carnivores"] = "I carnivori cacciano altre creature e regolano le popolazioni.",
+            ["help.creatures.omnivores"] = "Gli onnivori possono mangiare piante e prede.",
+            ["help.tipsTitle"] = "CONSIGLI",
+            ["help.tips.balance"] = "Mantieni in equilibrio produttori, prede e predatori.",
+            ["help.tips.seed"] = "Riusa un seed per generare nuovamente lo stesso mondo.",
+            ["help.tips.observe"] = "Clicca creature e terreno per esaminarne i dettagli."
         };
 
         return catalog;

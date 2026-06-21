@@ -26,6 +26,7 @@ public class Game1 : Game
     private Texture2D? _logo;
     private Texture2D _uiPixel = null!;
     private readonly MainMenu _mainMenu = new();
+    private readonly HelpScreen _helpScreen = new();
     private readonly InGameUi _inGameUi = new();
     private readonly SpawnPanel _spawnPanel = new();
     private GameScreen _screen = GameScreen.MainMenu;
@@ -120,6 +121,24 @@ public class Game1 : Game
             _ecosystem.SimulationSpeed = 0.35f;
             _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
             _dayNight.Update(_ecosystem.TotalTime);
+
+            if (_helpScreen.IsActive)
+            {
+                _helpScreen.Update(
+                    mouse,
+                    _prevMouse,
+                    kbd,
+                    _prevKbd,
+                    GraphicsDevice.Viewport.Width,
+                    GraphicsDevice.Viewport.Height);
+                if (gamepadBack)
+                    _helpScreen.Hide();
+                _prevKbd = kbd;
+                _prevMouse = mouse;
+                base.Update(gameTime);
+                return;
+            }
+
             _menuInputCooldown = Math.Max(0f, _menuInputCooldown - dt);
             MenuAction action = _menuInputCooldown > 0f
                 ? MenuAction.None
@@ -168,6 +187,9 @@ public class Game1 : Game
                     break;
                 case MenuAction.ToggleFullscreen:
                     _graphics.ToggleFullScreen();
+                    break;
+                case MenuAction.ShowHelp:
+                    _helpScreen.Show();
                     break;
                 case MenuAction.Exit:
                     Exit();
@@ -436,6 +458,12 @@ public class Game1 : Game
                 _uiPixel,
                 _font,
                 _logo,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height);
+            _helpScreen.Draw(
+                _spriteBatch,
+                _uiPixel,
+                _font,
                 GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height);
             _spriteBatch.End();

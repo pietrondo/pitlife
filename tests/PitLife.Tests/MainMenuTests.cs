@@ -119,6 +119,27 @@ public class MainMenuTests
         Assert.Equal(42, menu.Seed);
     }
 
+    [Fact]
+    public void HelpButton_RequestsHelpScreen()
+    {
+        var menu = new MainMenu();
+        MouseState released = MouseAt(450, 520, ButtonState.Released);
+        menu.Update(released, released, new KeyboardState(), new KeyboardState(), 800, 720, false);
+        menu.Update(MouseAt(450, 520, ButtonState.Pressed), released,
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        MenuAction action = menu.Update(
+            released,
+            MouseAt(450, 520, ButtonState.Pressed),
+            new KeyboardState(),
+            new KeyboardState(),
+            800,
+            720,
+            false);
+
+        Assert.Equal(MenuAction.ShowHelp, action);
+    }
+
     private static MouseState MouseAt(int x, int y, ButtonState state) =>
         new(x, y, 0, state, ButtonState.Released, ButtonState.Released,
             ButtonState.Released, ButtonState.Released);
