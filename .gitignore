@@ -6,6 +6,8 @@ obj/
 *.userprefs
 .vs/
 .serena/
+graphify-out/
+docs/superpowers/
 # MonoGame Content
 Content/bin/
 Content/obj/
@@ -23,9 +25,43 @@ Thumbs.db
 # Local agent tooling
 .agents/
 .claude/
+.claude.json*
 .beads/
 AGENTS.md
 CLAUDE.md
+.design-context.md
+
+# Local credentials and shell/tool state
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*credentials*.json
+*secrets*.json
+.bash_history
+.boto
+.emulator_console_auth_token
+.gitconfig
+.git-for-windows-updater
+.lesshst
+.lmstudio-home-pointer
+.node_repl_history
+.npmrc
+.python_history
+.wakatime.cfg
+.wslconfig
+.zshrc
+
+# One-off downloads and generated tooling
+biome.exe
+menu.zip
+install.sh
+copy_sprites.ps1
+download_*.ps1
+bun.lock
 
 # Beads / Dolt files (added by bd init)
 .dolt/

@@ -81,7 +81,7 @@ PitLife è sviluppato in C# con MonoGame framework.
 
 ## Licenza
 
-[Inserire licenza qui]
+PitLife è distribuito con licenza [MIT](LICENSE).
 
 ## Crediti
 
