@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Localization;
 using PitLife.Core;
+using PitLife.Simulation;
 
 namespace PitLife.UI;
 
@@ -14,14 +15,9 @@ public sealed class SpawnPanel
     public string? SelectedSpeciesKey { get; private set; }
     public string? SelectedCategory { get; private set; } // Internal English key, never localized
 
-    private static readonly Dictionary<string, string[]> SpeciesByCategory = new()
-    {
-        ["Plants"] = ["Plant", "Flowers", "Mushroom", "GrassTuft", "Cactus", "Moss", "BerryBush", "Pine", "Toadstool", "OakTree", "PineTree", "Bush", "Grass"],
-        ["AquaticPlants"] = ["Seaweed", "Algae", "Kelp", "WaterLily", "Coral"],
-        ["Herbivores"] = ["Rabbit", "Deer", "Sheep", "Horse", "Goat", "Fish", "Lizard", "Turtle", "Salmon"],
-        ["Carnivores"] = ["Fox", "Lynx", "Tiger", "Lion", "Leopard", "Crocodile", "Snake", "Eagle", "Wolf", "Shark", "Piranha"],
-        ["Omnivores"] = ["Boar", "Raccoon", "Frog", "Beetle", "Butterfly", "Bear", "Jellyfish"]
-    };
+    private static readonly string[] CategoryOrder =
+        ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
+    private static readonly Dictionary<string, string[]> SpeciesByCategory = BuildSpeciesByCategory();
 
     public const int PanelWidth = 200;
     public const int ToggleButtonSize = 44;
@@ -39,6 +35,9 @@ public sealed class SpawnPanel
     private Texture2D? _iconTexture;
 
     public SpawnPanel() { RebuildCategoryButtons(); }
+
+    internal static IReadOnlyList<string> SpeciesForCategory(string category) =>
+        SpeciesByCategory.TryGetValue(category, out var species) ? species : Array.Empty<string>();
 
     public void SetIconTexture(Texture2D? icon) => _iconTexture = icon;
 
@@ -112,6 +111,8 @@ public sealed class SpawnPanel
             // Pannello si espande verso il basso dal toggle
             int panelY = toggleY + ToggleButtonSize + Margin;
             _panelBounds = new Rectangle(Margin, panelY, PanelWidth, ComputePanelHeight());
+            LayoutCategoryButtons();
+            LayoutSpeciesButtons();
         }
     }
 
@@ -187,7 +188,7 @@ public sealed class SpawnPanel
     {
         _categoryButtons.Clear();
         int y = 0 + HeaderHeight;
-        foreach (var category in SpeciesByCategory.Keys)
+        foreach (var category in CategoryOrder)
         {
             _categoryButtons.Add(new UiButton(I18n.T($"spawn.{category.ToLowerInvariant()}"))
             {
@@ -200,10 +201,10 @@ public sealed class SpawnPanel
 
     private void LayoutCategoryButtons()
     {
-        int y = HeaderHeight;
+        int y = _panelBounds.Y + HeaderHeight;
         foreach (var btn in _categoryButtons)
         {
-            btn.Bounds = new Rectangle(Margin + 10, y, PanelWidth - 20, ButtonHeight);
+            btn.Bounds = new Rectangle(_panelBounds.X + 10, y, PanelWidth - 20, ButtonHeight);
             y += ButtonHeight + ButtonSpacing + SectionSpacing;
         }
     }
@@ -214,21 +215,23 @@ public sealed class SpawnPanel
         if (SelectedCategory == null) return;
         if (!SpeciesByCategory.TryGetValue(SelectedCategory, out var species)) return;
 
-        // Calcola Y di partenza: dopo tutte le categorie
-        int y = HeaderHeight;
-        foreach (var _ in _categoryButtons)
-            y += ButtonHeight + ButtonSpacing + SectionSpacing;
-
-        // Aggiungi spazio per le categorie precedentemente selezionate (se necessario)
-        // Ma posiziona sempre dopo tutte le categorie per evitare sovrapposizione
-
         foreach (var s in species)
         {
             _speciesButtons.Add(new UiButton(I18n.Species(s))
             {
-                Bounds = new Rectangle(Margin + 20, y, PanelWidth - 30, ButtonHeight),
                 Tag = s // Store the internal key for spawning
             });
+        }
+        LayoutSpeciesButtons();
+    }
+
+    private void LayoutSpeciesButtons()
+    {
+        int y = _panelBounds.Y + HeaderHeight +
+            _categoryButtons.Count * (ButtonHeight + ButtonSpacing + SectionSpacing);
+        foreach (var button in _speciesButtons)
+        {
+            button.Bounds = new Rectangle(_panelBounds.X + 20, y, PanelWidth - 30, ButtonHeight);
             y += ButtonHeight + ButtonSpacing;
         }
     }
@@ -246,4 +249,31 @@ public sealed class SpawnPanel
 
     private static bool WasClicked(MouseState current, MouseState previous) =>
         current.LeftButton == ButtonState.Pressed && previous.LeftButton == ButtonState.Released;
+
+    private static Dictionary<string, string[]> BuildSpeciesByCategory()
+    {
+        var categories = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        foreach (string category in CategoryOrder)
+            categories[category] = new List<string>();
+
+        foreach (string species in SpeciesRegistry.All)
+        {
+            SpeciesDefinition definition = SpeciesRegistry.Get(species)!;
+            string category = definition.Kind switch
+            {
+                CreatureType.Plant when definition.IsAquatic => "AquaticPlants",
+                CreatureType.Plant => "Plants",
+                CreatureType.Herbivore => "Herbivores",
+                CreatureType.Carnivore => "Carnivores",
+                CreatureType.Omnivore => "Omnivores",
+                _ => throw new InvalidOperationException($"Unsupported creature type: {definition.Kind}")
+            };
+            categories[category].Add(species);
+        }
+
+        var result = new Dictionary<string, string[]>(StringComparer.Ordinal);
+        foreach (string category in CategoryOrder)
+            result[category] = categories[category].ToArray();
+        return result;
+    }
 }

@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 83 files · ~44,161 words
+- 84 files · ~44,353 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 937 nodes · 1383 edges · 80 communities (60 shown, 20 thin omitted)
+- 950 nodes · 1401 edges · 81 communities (61 shown, 20 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1bdac549`
+- Built from commit: `0a917674`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -87,11 +87,12 @@
 - [[_COMMUNITY_Community 77|Community 77]]
 - [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Game1` - 31 edges
 2. `Ecosystem` - 30 edges
-3. `SpawnPanel` - 22 edges
+3. `SpawnPanel` - 26 edges
 4. `Creature` - 18 edges
 5. `InGameUi` - 18 edges
 6. `UiWindowManager` - 18 edges
@@ -109,7 +110,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (80 total, 20 thin omitted)
+## Communities (81 total, 20 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
@@ -136,8 +137,8 @@ Cohesion: 0.17
 Nodes (13): Color, Creature, KeyboardState, Keys, MouseState, Rectangle, SpriteBatch, SpriteFont (+5 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.13
-Nodes (9): Dictionary, int, List, MouseState, Rectangle, SpriteBatch, SpriteFont, Texture2D (+1 more)
+Cohesion: 0.11
+Nodes (11): Dictionary, int, IReadOnlyList, List, MouseState, Rectangle, SpriteBatch, SpriteFont (+3 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.29
@@ -289,7 +290,7 @@ Nodes (4): Genome, Mutate(), Random(), Reproduce()
 
 ### Community 59 - "Community 59"
 Cohesion: 0.50
-Nodes (3): IReadOnlyList, AssetRegistry, string
+Nodes (3): AssetRegistry, IReadOnlyList, string
 
 ### Community 71 - "Community 71"
 Cohesion: 0.25
@@ -319,8 +320,12 @@ Nodes (4): Genome, Random, Vector2, Herbivore
 Cohesion: 0.33
 Nodes (4): Genome, Random, Vector2, Omnivore
 
+### Community 80 - "Community 80"
+Cohesion: 0.32
+Nodes (4): SpawnPanelTests, Fact, MouseState, SpawnPanel
+
 ## Knowledge Gaps
-- **277 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+272 more)
+- **280 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+275 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -328,7 +333,7 @@ Nodes (4): Genome, Random, Vector2, Omnivore
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _277 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _280 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
@@ -338,6 +343,6 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**
-  _Cohesion score 0.13230769230769232 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11182795698924732 - nodes in this community are weakly interconnected._
 - **Should `Community 10` be split into smaller, more focused modules?**
   _Cohesion score 0.1225296442687747 - nodes in this community are weakly interconnected._

@@ -289,7 +289,7 @@
       "source_file": "Game1.cs",
       "source_location": "L29",
       "_origin": "ast",
-      "id": "spawnpanel",
+      "id": "game1_cs_spawnpanel",
       "community": 3,
       "norm_label": "spawnpanel"
     },
@@ -737,7 +737,7 @@
       "label": ".CreateItalianCatalog()",
       "file_type": "code",
       "source_file": "Localization/I18n.cs",
-      "source_location": "L200",
+      "source_location": "L209",
       "_origin": "ast",
       "id": "localization_i18n_i18n_createitaliancatalog",
       "community": 25,
@@ -879,7 +879,7 @@
       "source_file": "Rendering/AssetRegistry.cs",
       "source_location": "L16",
       "_origin": "ast",
-      "id": "ireadonlylist",
+      "id": "rendering_assetregistry_cs_ireadonlylist",
       "community": 59,
       "norm_label": "ireadonlylist"
     },
@@ -4957,17 +4957,27 @@
       "label": "SpawnPanel",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L11",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel",
       "community": 6,
       "norm_label": "spawnpanel"
     },
     {
+      "label": "string",
+      "file_type": "code",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "ui_spawnpanel_cs_string",
+      "community": 6,
+      "norm_label": "string"
+    },
+    {
       "label": "Dictionary",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L17",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_dictionary",
       "community": 6,
@@ -4977,7 +4987,7 @@
       "label": "int",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L26",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_int",
       "community": 6,
@@ -4987,7 +4997,7 @@
       "label": "List",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L34",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_list",
       "community": 6,
@@ -4997,7 +5007,7 @@
       "label": "Rectangle",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L36",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_rectangle",
       "community": 6,
@@ -5007,17 +5017,37 @@
       "label": "Texture2D",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L39",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_texture2d",
       "community": 6,
       "norm_label": "texture2d"
     },
     {
+      "label": ".SpeciesForCategory()",
+      "file_type": "code",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "ui_spawnpanel_spawnpanel_speciesforcategory",
+      "community": 6,
+      "norm_label": ".speciesforcategory()"
+    },
+    {
+      "label": "IReadOnlyList",
+      "file_type": "code",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "ui_spawnpanel_cs_ireadonlylist",
+      "community": 6,
+      "norm_label": "ireadonlylist"
+    },
+    {
       "label": ".SetIconTexture()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L43",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_seticontexture",
       "community": 6,
@@ -5027,7 +5057,7 @@
       "label": ".Open()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L45",
+      "source_location": "L44",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_open",
       "community": 6,
@@ -5037,7 +5067,7 @@
       "label": ".Close()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L46",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_close",
       "community": 6,
@@ -5047,7 +5077,7 @@
       "label": ".Toggle()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L52",
+      "source_location": "L51",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_toggle",
       "community": 6,
@@ -5057,7 +5087,7 @@
       "label": ".DeselectSpecies()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L53",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_deselectspecies",
       "community": 6,
@@ -5067,7 +5097,7 @@
       "label": ".SetViewportHeight()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L55",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_setviewportheight",
       "community": 6,
@@ -5077,7 +5107,7 @@
       "label": ".HandleClick()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L57",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_handleclick",
       "community": 6,
@@ -5087,7 +5117,7 @@
       "label": "MouseState",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L57",
+      "source_location": "L56",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_mousestate",
       "community": 6,
@@ -5097,7 +5127,7 @@
       "label": ".Update()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L99",
+      "source_location": "L98",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_update",
       "community": 6,
@@ -5107,7 +5137,7 @@
       "label": ".UpdateLayout()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L105",
+      "source_location": "L104",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_updatelayout",
       "community": 6,
@@ -5117,7 +5147,7 @@
       "label": ".Draw()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L118",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_draw",
       "community": 6,
@@ -5127,7 +5157,7 @@
       "label": "SpriteBatch",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L118",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_spritebatch",
       "community": 6,
@@ -5137,7 +5167,7 @@
       "label": "SpriteFont",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L118",
+      "source_location": "L119",
       "_origin": "ast",
       "id": "ui_spawnpanel_cs_spritefont",
       "community": 6,
@@ -5147,7 +5177,7 @@
       "label": ".DrawToggleButton()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L164",
+      "source_location": "L165",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_drawtogglebutton",
       "community": 6,
@@ -5157,7 +5187,7 @@
       "label": ".RebuildCategoryButtons()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L186",
+      "source_location": "L187",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_rebuildcategorybuttons",
       "community": 6,
@@ -5167,7 +5197,7 @@
       "label": ".LayoutCategoryButtons()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L201",
+      "source_location": "L202",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_layoutcategorybuttons",
       "community": 6,
@@ -5177,17 +5207,27 @@
       "label": ".RebuildSpeciesButtons()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L211",
+      "source_location": "L212",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_rebuildspeciesbuttons",
       "community": 6,
       "norm_label": ".rebuildspeciesbuttons()"
     },
     {
+      "label": ".LayoutSpeciesButtons()",
+      "file_type": "code",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L228",
+      "_origin": "ast",
+      "id": "ui_spawnpanel_spawnpanel_layoutspeciesbuttons",
+      "community": 6,
+      "norm_label": ".layoutspeciesbuttons()"
+    },
+    {
       "label": ".ComputePanelHeight()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L236",
+      "source_location": "L239",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_computepanelheight",
       "community": 6,
@@ -5197,11 +5237,21 @@
       "label": ".WasClicked()",
       "file_type": "code",
       "source_file": "UI/SpawnPanel.cs",
-      "source_location": "L247",
+      "source_location": "L250",
       "_origin": "ast",
       "id": "ui_spawnpanel_spawnpanel_wasclicked",
       "community": 6,
       "norm_label": ".wasclicked()"
+    },
+    {
+      "label": ".BuildSpeciesByCategory()",
+      "file_type": "code",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L253",
+      "_origin": "ast",
+      "id": "ui_spawnpanel_spawnpanel_buildspeciesbycategory",
+      "community": 6,
+      "norm_label": ".buildspeciesbycategory()"
     },
     {
       "label": "UiButton.cs",
@@ -7800,6 +7850,86 @@
       "norm_label": ".testgenome()"
     },
     {
+      "label": "SpawnPanelTests.cs",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pitlife_tests_spawnpaneltests",
+      "community": 80,
+      "norm_label": "spawnpaneltests.cs"
+    },
+    {
+      "label": "SpawnPanelTests",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "pitlife_tests_spawnpaneltests_spawnpaneltests",
+      "community": 80,
+      "norm_label": "spawnpaneltests"
+    },
+    {
+      "label": ".Categories_ContainEveryRegisteredSpecies()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "pitlife_tests_spawnpaneltests_spawnpaneltests_categories_containeveryregisteredspecies",
+      "community": 80,
+      "norm_label": ".categories_containeveryregisteredspecies()"
+    },
+    {
+      "label": "Fact",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "tests_pitlife_tests_spawnpaneltests_cs_fact",
+      "community": 80,
+      "norm_label": "fact"
+    },
+    {
+      "label": ".ClickingButtons_UsesPanelRelativeCoordinates()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L18",
+      "_origin": "ast",
+      "id": "pitlife_tests_spawnpaneltests_spawnpaneltests_clickingbuttons_usespanelrelativecoordinates",
+      "community": 80,
+      "norm_label": ".clickingbuttons_usespanelrelativecoordinates()"
+    },
+    {
+      "label": ".Click()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "pitlife_tests_spawnpaneltests_spawnpaneltests_click",
+      "community": 80,
+      "norm_label": ".click()"
+    },
+    {
+      "label": "SpawnPanel",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "tests_pitlife_tests_spawnpaneltests_cs_spawnpanel",
+      "community": 80,
+      "norm_label": "spawnpanel"
+    },
+    {
+      "label": "MouseState",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "tests_pitlife_tests_spawnpaneltests_cs_mousestate",
+      "community": 80,
+      "norm_label": "mousestate"
+    },
+    {
       "label": "SpawnTests.cs",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/SpawnTests.cs",
@@ -9817,6 +9947,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "Game1.cs",
+      "source_location": "L29",
+      "weight": 1.0,
+      "context": "field",
+      "source": "game1_game1",
+      "target": "game1_cs_spawnpanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "Game1.cs",
       "source_location": "L17",
       "weight": 1.0,
       "context": "field",
@@ -9980,17 +10121,6 @@
       "confidence_score": 1.0,
       "source": "game1_game1",
       "target": "pixelworldrenderer"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "source_file": "Game1.cs",
-      "source_location": "L29",
-      "weight": 1.0,
-      "context": "field",
-      "confidence_score": 1.0,
-      "source": "game1_game1",
-      "target": "spawnpanel"
     },
     {
       "relation": "references",
@@ -10580,12 +10710,12 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "Rendering/AssetRegistry.cs",
-      "source_location": "L88",
+      "source_location": "L99",
       "weight": 1.0,
       "context": "field",
-      "confidence_score": 1.0,
       "source": "rendering_assetregistry_assetregistry",
-      "target": "ireadonlylist"
+      "target": "rendering_assetregistry_cs_ireadonlylist",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -12628,9 +12758,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L252",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior",
-      "target": "behaviors_basebehavior_basebehavior_applyflocking",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_applyflocking"
     },
     {
       "relation": "method",
@@ -12638,9 +12768,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L325",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior",
-      "target": "behaviors_basebehavior_basebehavior_applypairbehavior",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_applypairbehavior"
     },
     {
       "relation": "method",
@@ -12658,9 +12788,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L354",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior",
-      "target": "behaviors_basebehavior_basebehavior_applysolitarybehavior",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_applysolitarybehavior"
     },
     {
       "relation": "method",
@@ -12668,9 +12798,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L59",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior",
-      "target": "behaviors_basebehavior_basebehavior_ishungry",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_ishungry"
     },
     {
       "relation": "method",
@@ -12688,9 +12818,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior",
-      "target": "behaviors_basebehavior_basebehavior_tryfeed",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_tryfeed"
     },
     {
       "relation": "method",
@@ -12698,9 +12828,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L157",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior",
-      "target": "behaviors_basebehavior_basebehavior_tryfeednearby",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_tryfeednearby"
     },
     {
       "relation": "method",
@@ -12740,9 +12870,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_update",
-      "target": "behaviors_basebehavior_basebehavior_ishungry",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_ishungry"
     },
     {
       "relation": "calls",
@@ -12762,9 +12892,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_update",
-      "target": "behaviors_basebehavior_basebehavior_tryfeed",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_tryfeed"
     },
     {
       "relation": "calls",
@@ -12773,9 +12903,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_update",
-      "target": "behaviors_basebehavior_basebehavior_tryfeednearby",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_tryfeednearby"
     },
     {
       "relation": "references",
@@ -12828,9 +12958,9 @@
       "source_location": "L252",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applyflocking",
-      "target": "simulation_behaviors_basebehavior_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_creature"
     },
     {
       "relation": "references",
@@ -12839,9 +12969,9 @@
       "source_location": "L325",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applypairbehavior",
-      "target": "simulation_behaviors_basebehavior_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_creature"
     },
     {
       "relation": "references",
@@ -12861,9 +12991,9 @@
       "source_location": "L354",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applysolitarybehavior",
-      "target": "simulation_behaviors_basebehavior_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_creature"
     },
     {
       "relation": "references",
@@ -12872,9 +13002,9 @@
       "source_location": "L59",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_ishungry",
-      "target": "simulation_behaviors_basebehavior_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_creature"
     },
     {
       "relation": "references",
@@ -12894,9 +13024,9 @@
       "source_location": "L69",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_tryfeed",
-      "target": "simulation_behaviors_basebehavior_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_creature"
     },
     {
       "relation": "references",
@@ -12905,9 +13035,9 @@
       "source_location": "L157",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_tryfeednearby",
-      "target": "simulation_behaviors_basebehavior_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_creature"
     },
     {
       "relation": "references",
@@ -12916,9 +13046,9 @@
       "source_location": "L252",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applyflocking",
-      "target": "simulation_behaviors_basebehavior_cs_world",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_world"
     },
     {
       "relation": "references",
@@ -12927,9 +13057,9 @@
       "source_location": "L325",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applypairbehavior",
-      "target": "simulation_behaviors_basebehavior_cs_world",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_world"
     },
     {
       "relation": "references",
@@ -12949,9 +13079,9 @@
       "source_location": "L354",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applysolitarybehavior",
-      "target": "simulation_behaviors_basebehavior_cs_world",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_world"
     },
     {
       "relation": "references",
@@ -12960,9 +13090,9 @@
       "source_location": "L69",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_tryfeed",
-      "target": "simulation_behaviors_basebehavior_cs_world",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_world"
     },
     {
       "relation": "references",
@@ -12971,9 +13101,9 @@
       "source_location": "L157",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_tryfeednearby",
-      "target": "simulation_behaviors_basebehavior_cs_world",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_world"
     },
     {
       "relation": "references",
@@ -12982,9 +13112,9 @@
       "source_location": "L252",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applyflocking",
-      "target": "simulation_behaviors_basebehavior_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_ecosystem"
     },
     {
       "relation": "references",
@@ -12993,9 +13123,9 @@
       "source_location": "L325",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applypairbehavior",
-      "target": "simulation_behaviors_basebehavior_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_ecosystem"
     },
     {
       "relation": "references",
@@ -13015,9 +13145,9 @@
       "source_location": "L354",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applysolitarybehavior",
-      "target": "simulation_behaviors_basebehavior_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_ecosystem"
     },
     {
       "relation": "references",
@@ -13026,9 +13156,9 @@
       "source_location": "L69",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_tryfeed",
-      "target": "simulation_behaviors_basebehavior_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_ecosystem"
     },
     {
       "relation": "references",
@@ -13037,9 +13167,9 @@
       "source_location": "L157",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_tryfeednearby",
-      "target": "simulation_behaviors_basebehavior_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "simulation_behaviors_basebehavior_cs_ecosystem"
     },
     {
       "relation": "calls",
@@ -13048,9 +13178,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L222",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applysocialbehavior",
-      "target": "behaviors_basebehavior_basebehavior_applyflocking",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_applyflocking"
     },
     {
       "relation": "calls",
@@ -13059,9 +13189,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L243",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applysocialbehavior",
-      "target": "behaviors_basebehavior_basebehavior_applypairbehavior",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_applypairbehavior"
     },
     {
       "relation": "calls",
@@ -13070,9 +13200,9 @@
       "source_file": "Simulation/Behaviors/BaseBehavior.cs",
       "source_location": "L246",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "behaviors_basebehavior_basebehavior_applysocialbehavior",
-      "target": "behaviors_basebehavior_basebehavior_applysolitarybehavior",
-      "confidence_score": 1.0
+      "target": "behaviors_basebehavior_basebehavior_applysolitarybehavior"
     },
     {
       "relation": "contains",
@@ -14250,9 +14380,9 @@
       "source_file": "Simulation/Ecosystem.cs",
       "source_location": "L274",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem",
-      "target": "simulation_ecosystem_ecosystem_findneighbors",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_ecosystem_findneighbors"
     },
     {
       "relation": "method",
@@ -14402,9 +14532,9 @@
       "source_location": "L274",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem_findneighbors",
-      "target": "simulation_ecosystem_cs_list",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_cs_list"
     },
     {
       "relation": "calls",
@@ -14523,9 +14653,9 @@
       "source_location": "L274",
       "weight": 1.0,
       "context": "generic_arg",
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem_findneighbors",
-      "target": "simulation_ecosystem_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_cs_creature"
     },
     {
       "relation": "references",
@@ -14765,9 +14895,9 @@
       "source_location": "L274",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem_findneighbors",
-      "target": "simulation_ecosystem_cs_func",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_cs_func"
     },
     {
       "relation": "contains",
@@ -15184,9 +15314,9 @@
       "source_file": "Simulation/SpatialGrid.cs",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid",
-      "target": "simulation_spatialgrid_spatialgrid_getneighbors",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_spatialgrid_getneighbors"
     },
     {
       "relation": "method",
@@ -15299,9 +15429,9 @@
       "source_location": "L66",
       "weight": 1.0,
       "context": "generic_arg",
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid_getneighbors",
-      "target": "simulation_spatialgrid_cs_creature",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_cs_creature"
     },
     {
       "relation": "references",
@@ -15409,9 +15539,9 @@
       "source_location": "L66",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid_getneighbors",
-      "target": "simulation_spatialgrid_cs_func",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_cs_func"
     },
     {
       "relation": "references",
@@ -15420,9 +15550,9 @@
       "source_location": "L66",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid_getneighbors",
-      "target": "simulation_spatialgrid_cs_list",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_cs_list"
     },
     {
       "relation": "references",
@@ -15431,9 +15561,9 @@
       "source_location": "L100",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid_findnearest",
-      "target": "simulation_spatialgrid_cs_func",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_cs_func"
     },
     {
       "relation": "references",
@@ -15442,9 +15572,9 @@
       "source_location": "L153",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid_visitcell",
-      "target": "simulation_spatialgrid_cs_func",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_cs_func"
     },
     {
       "relation": "references",
@@ -15453,9 +15583,9 @@
       "source_location": "L121",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_spatialgrid_spatialgrid_visitring",
-      "target": "simulation_spatialgrid_cs_func",
-      "confidence_score": 1.0
+      "target": "simulation_spatialgrid_cs_func"
     },
     {
       "relation": "calls",
@@ -17771,12 +17901,33 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L18",
+      "weight": 1.0,
+      "context": "field",
+      "source": "ui_spawnpanel_spawnpanel",
+      "target": "ui_spawnpanel_cs_string",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
       "source_location": "L39",
       "weight": 1.0,
       "context": "field",
       "confidence_score": 1.0,
       "source": "ui_spawnpanel_spawnpanel",
       "target": "ui_spawnpanel_cs_texture2d"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L253",
+      "weight": 1.0,
+      "source": "ui_spawnpanel_spawnpanel",
+      "target": "ui_spawnpanel_spawnpanel_buildspeciesbycategory",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -17852,6 +18003,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L228",
+      "weight": 1.0,
+      "source": "ui_spawnpanel_spawnpanel",
+      "target": "ui_spawnpanel_spawnpanel_layoutspeciesbuttons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
       "source_location": "L45",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -17902,6 +18063,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "ui_spawnpanel_spawnpanel",
+      "target": "ui_spawnpanel_spawnpanel_speciesforcategory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
       "source_location": "L52",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -17942,6 +18113,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L253",
+      "weight": 1.0,
+      "context": "return_type",
+      "source": "ui_spawnpanel_spawnpanel_buildspeciesbycategory",
+      "target": "ui_spawnpanel_cs_dictionary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
       "source_location": "L118",
       "weight": 1.0,
       "context": "parameter_type",
@@ -17970,6 +18152,17 @@
       "confidence_score": 1.0,
       "source": "ui_spawnpanel_spawnpanel_seticontexture",
       "target": "ui_spawnpanel_cs_texture2d"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L39",
+      "weight": 1.0,
+      "context": "return_type",
+      "source": "ui_spawnpanel_spawnpanel_speciesforcategory",
+      "target": "ui_spawnpanel_cs_ireadonlylist",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -18104,6 +18297,28 @@
       "target": "ui_spawnpanel_spawnpanel_computepanelheight"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "ui_spawnpanel_spawnpanel_updatelayout",
+      "target": "ui_spawnpanel_spawnpanel_layoutcategorybuttons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L115",
+      "weight": 1.0,
+      "source": "ui_spawnpanel_spawnpanel_updatelayout",
+      "target": "ui_spawnpanel_spawnpanel_layoutspeciesbuttons",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "UI/SpawnPanel.cs",
@@ -18168,6 +18383,17 @@
       "confidence_score": 1.0,
       "source": "ui_spawnpanel_spawnpanel_rebuildcategorybuttons",
       "target": "ui_spawnpanel_spawnpanel_layoutcategorybuttons"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/SpawnPanel.cs",
+      "source_location": "L225",
+      "weight": 1.0,
+      "source": "ui_spawnpanel_spawnpanel_rebuildspeciesbuttons",
+      "target": "ui_spawnpanel_spawnpanel_layoutspeciesbuttons",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -21717,9 +21943,9 @@
       "source_file": "tests/PitLife.Tests/SocialSystemTests.cs",
       "source_location": "L160",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests",
-      "target": "pitlife_tests_socialsystemtests_socialsystemtests_basebehavior_solitarycarnivores_fightandloseenergy",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_socialsystemtests_socialsystemtests_basebehavior_solitarycarnivores_fightandloseenergy"
     },
     {
       "relation": "method",
@@ -21747,9 +21973,9 @@
       "source_file": "tests/PitLife.Tests/SocialSystemTests.cs",
       "source_location": "L131",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests",
-      "target": "pitlife_tests_socialsystemtests_socialsystemtests_determineevolvedspecies_terrestrialmammaltowater_evolvestomarinemammal",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_socialsystemtests_socialsystemtests_determineevolvedspecies_terrestrialmammaltowater_evolvestomarinemammal"
     },
     {
       "relation": "method",
@@ -21861,9 +22087,9 @@
       "source_location": "L160",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests_basebehavior_solitarycarnivores_fightandloseenergy",
-      "target": "tests_pitlife_tests_socialsystemtests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_socialsystemtests_cs_fact"
     },
     {
       "relation": "references",
@@ -21883,9 +22109,9 @@
       "source_location": "L131",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests_determineevolvedspecies_terrestrialmammaltowater_evolvestomarinemammal",
-      "target": "tests_pitlife_tests_socialsystemtests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_socialsystemtests_cs_fact"
     },
     {
       "relation": "references",
@@ -22143,6 +22369,101 @@
       "confidence_score": 1.0,
       "source": "pitlife_tests_spatialgridtests_testcreature_testgenome",
       "target": "tests_pitlife_tests_spatialgridtests_cs_genome"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "pitlife_tests_spawnpaneltests",
+      "target": "pitlife_tests_spawnpaneltests_spawnpaneltests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests",
+      "target": "pitlife_tests_spawnpaneltests_spawnpaneltests_categories_containeveryregisteredspecies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests",
+      "target": "pitlife_tests_spawnpaneltests_spawnpaneltests_click",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests",
+      "target": "pitlife_tests_spawnpaneltests_spawnpaneltests_clickingbuttons_usespanelrelativecoordinates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L9",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests_categories_containeveryregisteredspecies",
+      "target": "tests_pitlife_tests_spawnpaneltests_cs_fact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L18",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests_clickingbuttons_usespanelrelativecoordinates",
+      "target": "tests_pitlife_tests_spawnpaneltests_cs_fact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests_clickingbuttons_usespanelrelativecoordinates",
+      "target": "pitlife_tests_spawnpaneltests_spawnpaneltests_click",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L35",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests_click",
+      "target": "tests_pitlife_tests_spawnpaneltests_cs_mousestate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/SpawnPanelTests.cs",
+      "source_location": "L35",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "pitlife_tests_spawnpaneltests_spawnpaneltests_click",
+      "target": "tests_pitlife_tests_spawnpaneltests_cs_spawnpanel",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -24097,5 +24418,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1bdac549dd22bc2d6f0d54a95088cf8e42c47669"
+  "built_at_commit": "0a917674aa65fe9559800864147a22308a487d9a"
 }
