@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 81 files · ~40,842 words
+- 82 files · ~41,380 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 905 nodes · 1322 edges · 73 communities (54 shown, 19 thin omitted)
+- 912 nodes · 1335 edges · 74 communities (54 shown, 20 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `03ac0a3e`
+- Built from commit: `3757eb2d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -80,18 +80,19 @@
 - [[_COMMUNITY_Community 62|Community 62]]
 - [[_COMMUNITY_Community 71|Community 71]]
 - [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Game1` - 31 edges
 2. `Ecosystem` - 29 edges
 3. `SpawnPanel` - 22 edges
-4. `UiWindowManager` - 18 edges
-5. `Creature` - 17 edges
-6. `CreatureRenderer` - 16 edges
-7. `PixelWorldRenderer` - 16 edges
-8. `FastNoiseLite` - 16 edges
-9. `WorldGenerator` - 16 edges
-10. `InGameUi` - 16 edges
+4. `InGameUi` - 18 edges
+5. `UiWindowManager` - 18 edges
+6. `Creature` - 17 edges
+7. `CreatureRenderer` - 16 edges
+8. `PixelWorldRenderer` - 16 edges
+9. `FastNoiseLite` - 16 edges
+10. `WorldGenerator` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `BaseBehavior` --implements--> `ICreatureBehavior`  [EXTRACTED]
@@ -102,7 +103,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (73 total, 19 thin omitted)
+## Communities (74 total, 20 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -291,7 +292,7 @@ Nodes (6): JsonSerializerOptions, CreatureSaveData, Ecosystem, GenomeSaveData, S
 ## Knowledge Gaps
 - **272 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+267 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

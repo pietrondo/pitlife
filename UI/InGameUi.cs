@@ -19,6 +19,8 @@ public sealed class InGameUi
     private readonly UiButton _menuButton = new(I18n.T("toolbar.menu"));
 
     public bool WantsToGoToMainMenu { get; set; } = false;
+    public World? World { get; set; }
+    public Point? SelectedTile { get; set; }
 
     public InGameUi()
     {
@@ -33,9 +35,15 @@ public sealed class InGameUi
             Bounds = new Rectangle(376, 112, 384, 272),
             ShowCloseButton = true
         });
+        _windowManager.Add(new UiWindow(I18n.T("window.terrain"), TerrainWindowId)
+        {
+            Bounds = new Rectangle(32, 352, 320, 180),
+            ShowCloseButton = true
+        });
     }
 
     public void OpenCreatureWindow() => _windowManager.Open(CreatureWindowId);
+    public void OpenTerrainWindow() => _windowManager.Open(TerrainWindowId);
 
     public bool CloseTopWindow() => _windowManager.CloseTopWindow();
 
@@ -129,6 +137,10 @@ public sealed class InGameUi
             else if (window.Id == CreatureWindowId)
             {
                 DrawCreature(spriteBatch, pixel, font, window.ContentBounds, selectedCreature);
+            }
+            else if (window.Id == TerrainWindowId)
+            {
+                DrawTerrainWindow(spriteBatch, pixel, font, window.ContentBounds);
             }
         }
     }
@@ -247,6 +259,40 @@ public sealed class InGameUi
                 window.Title = I18n.T("window.statistics");
             else if (window.Id == CreatureWindowId)
                 window.Title = I18n.T("window.creature");
+            else if (window.Id == TerrainWindowId)
+                window.Title = I18n.T("window.terrain");
         }
+    }
+
+    private void DrawTerrainWindow(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        Rectangle content)
+    {
+        if (World == null || SelectedTile == null)
+        {
+            DrawLine(spriteBatch, font, content.X, content.Y, I18n.T("terrain.none"), UiTheme.MutedStone);
+            DrawLine(spriteBatch, font, content.X, content.Y + 24, I18n.T("terrain.selectHint"), UiTheme.MutedStone);
+            return;
+        }
+
+        Point p = SelectedTile.Value;
+        int x = MathHelper.Clamp(p.X, 0, World.Width - 1);
+        int y = MathHelper.Clamp(p.Y, 0, World.Height - 1);
+
+        Tile tile = World.Tiles[x, y];
+        float elevation = World.ElevationField[y * World.Width + x];
+        bool isRiver = World.RiverMask[y * World.Width + x];
+
+        string passStr = I18n.T(tile.IsPassable ? "common.yes" : "common.no");
+        string riverStr = I18n.T(isRiver ? "common.yes" : "common.no");
+        string biomeName = I18n.T($"biome.{tile.Biome}");
+
+        DrawLine(spriteBatch, font, content.X, content.Y, I18n.Format("terrain.heading", x, y), UiTheme.MossSignal);
+        DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("terrain.biome", biomeName), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 50, I18n.Format("terrain.elevation", elevation), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 72, I18n.Format("terrain.passable", passStr), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 94, I18n.Format("terrain.river", riverStr), UiTheme.WarmParchment);
     }
 }

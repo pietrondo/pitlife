@@ -70,6 +70,7 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
+        _inGameUi.World = _ecosystem.World;
 
         base.Initialize();
     }
@@ -273,7 +274,18 @@ public class Game1 : Game
             }
             _selectedCreature = closest;
             if (_selectedCreature != null)
+            {
                 _inGameUi.OpenCreatureWindow();
+            }
+            else
+            {
+                int tileX = (int)(worldPos.X / _ecosystem.World.TileSize);
+                int tileY = (int)(worldPos.Y / _ecosystem.World.TileSize);
+                tileX = Math.Clamp(tileX, 0, _ecosystem.World.Width - 1);
+                tileY = Math.Clamp(tileY, 0, _ecosystem.World.Height - 1);
+                _inGameUi.SelectedTile = new Point(tileX, tileY);
+                _inGameUi.OpenTerrainWindow();
+            }
         }
         _prevMouse = mouse;
 
@@ -292,6 +304,7 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
+        _inGameUi.World = _ecosystem.World;
         _selectedCreature = null;
         
         _worldRenderer.LoadContent(GraphicsDevice);
@@ -346,6 +359,7 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
+        _inGameUi.World = _ecosystem.World;
         _selectedCreature = null;
 
         _worldRenderer.LoadContent(GraphicsDevice);

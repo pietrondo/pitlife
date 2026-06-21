@@ -387,7 +387,7 @@
       "label": ".LoadContent()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L77",
+      "source_location": "L78",
       "_origin": "ast",
       "id": "game1_game1_loadcontent",
       "community": 3,
@@ -397,7 +397,7 @@
       "label": ".LoadTexture()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L95",
+      "source_location": "L96",
       "_origin": "ast",
       "id": "game1_game1_loadtexture",
       "community": 3,
@@ -407,7 +407,7 @@
       "label": ".Update()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L105",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "game1_game1_update",
       "community": 3,
@@ -417,7 +417,7 @@
       "label": "GameTime",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L105",
+      "source_location": "L106",
       "_origin": "ast",
       "id": "game1_cs_gametime",
       "community": 3,
@@ -427,7 +427,7 @@
       "label": ".GenerateNewWorld()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L283",
+      "source_location": "L295",
       "_origin": "ast",
       "id": "game1_game1_generatenewworld",
       "community": 3,
@@ -437,7 +437,7 @@
       "label": ".RestoreLoadedEcosystem()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L305",
+      "source_location": "L318",
       "_origin": "ast",
       "id": "game1_game1_restoreloadedecosystem",
       "community": 3,
@@ -447,7 +447,7 @@
       "label": "SaveData",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L305",
+      "source_location": "L318",
       "_origin": "ast",
       "id": "savedata",
       "community": 3,
@@ -457,7 +457,7 @@
       "label": ".GetPhaseColor()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L359",
+      "source_location": "L373",
       "_origin": "ast",
       "id": "game1_game1_getphasecolor",
       "community": 3,
@@ -467,7 +467,7 @@
       "label": "DayPhase",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L359",
+      "source_location": "L373",
       "_origin": "ast",
       "id": "game1_cs_dayphase",
       "community": 3,
@@ -477,7 +477,7 @@
       "label": "Color",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L359",
+      "source_location": "L373",
       "_origin": "ast",
       "id": "game1_cs_color",
       "community": 3,
@@ -487,7 +487,7 @@
       "label": ".Draw()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L368",
+      "source_location": "L382",
       "_origin": "ast",
       "id": "game1_game1_draw",
       "community": 3,
@@ -737,7 +737,7 @@
       "label": ".CreateItalianCatalog()",
       "file_type": "code",
       "source_file": "Localization/I18n.cs",
-      "source_location": "L172",
+      "source_location": "L192",
       "_origin": "ast",
       "id": "localization_i18n_i18n_createitaliancatalog",
       "community": 25,
@@ -4407,17 +4407,27 @@
       "label": ".OpenCreatureWindow()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L38",
+      "source_location": "L45",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_opencreaturewindow",
       "community": 5,
       "norm_label": ".opencreaturewindow()"
     },
     {
+      "label": ".OpenTerrainWindow()",
+      "file_type": "code",
+      "source_file": "UI/InGameUi.cs",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "ui_ingameui_ingameui_openterrainwindow",
+      "community": 5,
+      "norm_label": ".openterrainwindow()"
+    },
+    {
       "label": ".CloseTopWindow()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L40",
+      "source_location": "L48",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_closetopwindow",
       "community": 5,
@@ -4427,7 +4437,7 @@
       "label": ".Update()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L42",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_update",
       "community": 5,
@@ -4437,7 +4447,7 @@
       "label": "MouseState",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L42",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "ui_ingameui_cs_mousestate",
       "community": 5,
@@ -4447,7 +4457,7 @@
       "label": "KeyboardState",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L42",
+      "source_location": "L50",
       "_origin": "ast",
       "id": "ui_ingameui_cs_keyboardstate",
       "community": 5,
@@ -4457,7 +4467,7 @@
       "label": ".Draw()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L89",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_draw",
       "community": 5,
@@ -4467,7 +4477,7 @@
       "label": "SpriteBatch",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L89",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "ui_ingameui_cs_spritebatch",
       "community": 5,
@@ -4477,7 +4487,7 @@
       "label": "Texture2D",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L89",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "ui_ingameui_cs_texture2d",
       "community": 5,
@@ -4487,7 +4497,7 @@
       "label": "SpriteFont",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L89",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "ui_ingameui_cs_spritefont",
       "community": 5,
@@ -4497,7 +4507,7 @@
       "label": "Creature",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L89",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "ui_ingameui_cs_creature",
       "community": 5,
@@ -4507,7 +4517,7 @@
       "label": ".DrawStatistics()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L136",
+      "source_location": "L148",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawstatistics",
       "community": 5,
@@ -4517,7 +4527,7 @@
       "label": "Rectangle",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L136",
+      "source_location": "L148",
       "_origin": "ast",
       "id": "ui_ingameui_cs_rectangle",
       "community": 5,
@@ -4527,7 +4537,7 @@
       "label": ".DrawPopulationRow()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L161",
+      "source_location": "L173",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawpopulationrow",
       "community": 5,
@@ -4537,7 +4547,7 @@
       "label": "Color",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L161",
+      "source_location": "L173",
       "_origin": "ast",
       "id": "ui_ingameui_cs_color",
       "community": 5,
@@ -4547,7 +4557,7 @@
       "label": ".DrawCreature()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L181",
+      "source_location": "L193",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawcreature",
       "community": 5,
@@ -4557,7 +4567,7 @@
       "label": ".DrawProgress()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L212",
+      "source_location": "L224",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawprogress",
       "community": 5,
@@ -4567,7 +4577,7 @@
       "label": ".DrawLine()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L221",
+      "source_location": "L233",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawline",
       "community": 5,
@@ -4577,7 +4587,7 @@
       "label": ".LayoutToolbar()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L226",
+      "source_location": "L238",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_layouttoolbar",
       "community": 5,
@@ -4587,7 +4597,7 @@
       "label": ".Pressed()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L235",
+      "source_location": "L247",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_pressed",
       "community": 5,
@@ -4597,7 +4607,7 @@
       "label": "Keys",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L235",
+      "source_location": "L247",
       "_origin": "ast",
       "id": "ui_ingameui_cs_keys",
       "community": 5,
@@ -4607,11 +4617,21 @@
       "label": ".RefreshText()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L238",
+      "source_location": "L250",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_refreshtext",
       "community": 5,
       "norm_label": ".refreshtext()"
+    },
+    {
+      "label": ".DrawTerrainWindow()",
+      "file_type": "code",
+      "source_file": "UI/InGameUi.cs",
+      "source_location": "L267",
+      "_origin": "ast",
+      "id": "ui_ingameui_ingameui_drawterrainwindow",
+      "community": 5,
+      "norm_label": ".drawterrainwindow()"
     },
     {
       "label": "MainMenu.cs",
@@ -7770,6 +7790,56 @@
       "norm_label": ".all_containsallregisteredspecies()"
     },
     {
+      "label": "TerrainTests.cs",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "pitlife_tests_terraintests",
+      "community": 73,
+      "norm_label": "terraintests.cs"
+    },
+    {
+      "label": "TerrainTests",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "pitlife_tests_terraintests_terraintests",
+      "community": 73,
+      "norm_label": "terraintests"
+    },
+    {
+      "label": ".TerrainWindow_SelectedTile_ReturnsCorrectCoordinates()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "pitlife_tests_terraintests_terraintests_terrainwindow_selectedtile_returnscorrectcoordinates",
+      "community": 73,
+      "norm_label": ".terrainwindow_selectedtile_returnscorrectcoordinates()"
+    },
+    {
+      "label": "Fact",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "tests_pitlife_tests_terraintests_cs_fact",
+      "community": 73,
+      "norm_label": "fact"
+    },
+    {
+      "label": ".TerrainWindow_WorldTileData_IsConsistentWithSimulationWorld()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "pitlife_tests_terraintests_terraintests_terrainwindow_worldtiledata_isconsistentwithsimulationworld",
+      "community": 73,
+      "norm_label": ".terrainwindow_worldtiledata_isconsistentwithsimulationworld()"
+    },
+    {
       "label": "TileTests.cs",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/TileTests.cs",
@@ -9592,9 +9662,9 @@
       "source_file": "Game1.cs",
       "source_location": "L305",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "game1_game1",
-      "target": "game1_game1_restoreloadedecosystem",
-      "confidence_score": 1.0
+      "target": "game1_game1_restoreloadedecosystem"
     },
     {
       "relation": "method",
@@ -9723,9 +9793,9 @@
       "source_file": "Game1.cs",
       "source_location": "L351",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "game1_game1_restoreloadedecosystem",
-      "target": "game1_game1_loadcontent",
-      "confidence_score": 1.0
+      "target": "game1_game1_loadcontent"
     },
     {
       "relation": "references",
@@ -9756,9 +9826,9 @@
       "source_file": "Game1.cs",
       "source_location": "L160",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "game1_game1_update",
-      "target": "game1_game1_restoreloadedecosystem",
-      "confidence_score": 1.0
+      "target": "game1_game1_restoreloadedecosystem"
     },
     {
       "relation": "references",
@@ -9778,9 +9848,9 @@
       "source_location": "L305",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "game1_game1_restoreloadedecosystem",
-      "target": "savedata",
-      "confidence_score": 1.0
+      "target": "savedata"
     },
     {
       "relation": "calls",
@@ -13657,9 +13727,9 @@
       "source_file": "Simulation/Ecosystem.cs",
       "source_location": "L274",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem",
-      "target": "simulation_ecosystem_ecosystem_clear",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_ecosystem_clear"
     },
     {
       "relation": "method",
@@ -14000,9 +14070,9 @@
       "source_file": "Simulation/Ecosystem.cs",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem_flushpending",
-      "target": "simulation_ecosystem_ecosystem_clear",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_ecosystem_clear"
     },
     {
       "relation": "calls",
@@ -14473,9 +14543,9 @@
       "source_file": "Simulation/SaveSystem.cs",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_savesystem",
-      "target": "simulation_savesystem_creaturesavedata",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_creaturesavedata"
     },
     {
       "relation": "contains",
@@ -14483,9 +14553,9 @@
       "source_file": "Simulation/SaveSystem.cs",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_savesystem",
-      "target": "simulation_savesystem_genomesavedata",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_genomesavedata"
     },
     {
       "relation": "contains",
@@ -14493,9 +14563,9 @@
       "source_file": "Simulation/SaveSystem.cs",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_savesystem",
-      "target": "simulation_savesystem_savedata",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_savedata"
     },
     {
       "relation": "contains",
@@ -14503,9 +14573,9 @@
       "source_file": "Simulation/SaveSystem.cs",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_savesystem",
-      "target": "simulation_savesystem_savesystem",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_savesystem"
     },
     {
       "relation": "references",
@@ -14514,9 +14584,9 @@
       "source_location": "L45",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "simulation_savesystem_savesystem",
-      "target": "jsonserializeroptions",
-      "confidence_score": 1.0
+      "target": "jsonserializeroptions"
     },
     {
       "relation": "method",
@@ -14524,9 +14594,9 @@
       "source_file": "Simulation/SaveSystem.cs",
       "source_location": "L92",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_savesystem_savesystem",
-      "target": "simulation_savesystem_savesystem_load",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_savesystem_load"
     },
     {
       "relation": "method",
@@ -14534,9 +14604,9 @@
       "source_file": "Simulation/SaveSystem.cs",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_savesystem_savesystem",
-      "target": "simulation_savesystem_savesystem_save",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_savesystem_save"
     },
     {
       "relation": "references",
@@ -14545,9 +14615,9 @@
       "source_location": "L92",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "simulation_savesystem_savesystem_load",
-      "target": "simulation_savesystem_savedata",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_savedata"
     },
     {
       "relation": "references",
@@ -14556,9 +14626,9 @@
       "source_location": "L50",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_savesystem_savesystem_save",
-      "target": "simulation_savesystem_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "simulation_savesystem_cs_ecosystem"
     },
     {
       "relation": "contains",
@@ -16209,6 +16279,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "UI/InGameUi.cs",
+      "source_location": "L267",
+      "weight": 1.0,
+      "source": "ui_ingameui_ingameui",
+      "target": "ui_ingameui_ingameui_drawterrainwindow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
       "source_location": "L199",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -16224,6 +16304,16 @@
       "confidence_score": 1.0,
       "source": "ui_ingameui_ingameui",
       "target": "ui_ingameui_ingameui_opencreaturewindow"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "ui_ingameui_ingameui",
+      "target": "ui_ingameui_ingameui_openterrainwindow",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -16414,6 +16504,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "UI/InGameUi.cs",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "ui_ingameui_ingameui_draw",
+      "target": "ui_ingameui_ingameui_drawterrainwindow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
       "source_location": "L85",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -16479,6 +16580,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "UI/InGameUi.cs",
+      "source_location": "L267",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "ui_ingameui_ingameui_drawterrainwindow",
+      "target": "ui_ingameui_cs_spritebatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
       "source_location": "L155",
       "weight": 1.0,
       "context": "parameter_type",
@@ -16523,6 +16635,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "UI/InGameUi.cs",
+      "source_location": "L267",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "ui_ingameui_ingameui_drawterrainwindow",
+      "target": "ui_ingameui_cs_texture2d",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
       "source_location": "L155",
       "weight": 1.0,
       "context": "parameter_type",
@@ -16562,6 +16685,17 @@
       "confidence_score": 1.0,
       "source": "ui_ingameui_ingameui_drawstatistics",
       "target": "ui_ingameui_cs_spritefont"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
+      "source_location": "L267",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "ui_ingameui_ingameui_drawterrainwindow",
+      "target": "ui_ingameui_cs_spritefont",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -16644,6 +16778,17 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "UI/InGameUi.cs",
+      "source_location": "L267",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "ui_ingameui_ingameui_drawterrainwindow",
+      "target": "ui_ingameui_cs_rectangle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
       "source_location": "L135",
       "weight": 1.0,
       "context": "parameter_type",
@@ -16694,6 +16839,17 @@
       "confidence_score": 1.0,
       "source": "ui_ingameui_ingameui_drawcreature",
       "target": "ui_ingameui_ingameui_drawprogress"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "UI/InGameUi.cs",
+      "source_location": "L275",
+      "weight": 1.0,
+      "source": "ui_ingameui_ingameui_drawterrainwindow",
+      "target": "ui_ingameui_ingameui_drawline",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -18221,9 +18377,9 @@
       "source_file": "UI/UiWindowManager.cs",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager_toggle",
-      "target": "ui_uiwindowmanager_uiwindowmanager_isactive",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_uiwindowmanager_isactive"
     },
     {
       "relation": "calls",
@@ -20471,9 +20627,9 @@
       "source_file": "tests/PitLife.Tests/SaveSystemTests.cs",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_savesystemtests",
-      "target": "pitlife_tests_savesystemtests_savesystemtests",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_savesystemtests_savesystemtests"
     },
     {
       "relation": "method",
@@ -20481,9 +20637,9 @@
       "source_file": "tests/PitLife.Tests/SaveSystemTests.cs",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_savesystemtests_savesystemtests",
-      "target": "pitlife_tests_savesystemtests_savesystemtests_saveandload_restoresecosystemcorrectly",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_savesystemtests_savesystemtests_saveandload_restoresecosystemcorrectly"
     },
     {
       "relation": "references",
@@ -20492,9 +20648,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_savesystemtests_savesystemtests_saveandload_restoresecosystemcorrectly",
-      "target": "tests_pitlife_tests_savesystemtests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_savesystemtests_cs_fact"
     },
     {
       "relation": "contains",
@@ -21649,6 +21805,58 @@
       "confidence_score": 1.0,
       "source": "pitlife_tests_speciesregistrytests_speciesregistrytests_oftype_returnsonlyplants_forplantkind",
       "target": "tests_pitlife_tests_speciesregistrytests_cs_fact"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "pitlife_tests_terraintests",
+      "target": "pitlife_tests_terraintests_terraintests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "pitlife_tests_terraintests_terraintests",
+      "target": "pitlife_tests_terraintests_terraintests_terrainwindow_selectedtile_returnscorrectcoordinates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "pitlife_tests_terraintests_terraintests",
+      "target": "pitlife_tests_terraintests_terraintests_terrainwindow_worldtiledata_isconsistentwithsimulationworld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_terraintests_terraintests_terrainwindow_selectedtile_returnscorrectcoordinates",
+      "target": "tests_pitlife_tests_terraintests_cs_fact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/TerrainTests.cs",
+      "source_location": "L24",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_terraintests_terraintests_terrainwindow_worldtiledata_isconsistentwithsimulationworld",
+      "target": "tests_pitlife_tests_terraintests_cs_fact",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -23128,5 +23336,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "03ac0a3e3964df6d7a385ee7ec5ff792ffd36478"
+  "built_at_commit": "3757eb2daf79e70c44578232b9a2d581365aabc3"
 }
