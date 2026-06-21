@@ -6600,10 +6600,40 @@
       "norm_label": ".genderedspecies_aredistinctvalidpngpairs()"
     },
     {
-      "label": ".FallbackKeys_AreDistinct()",
+      "label": ".CriticalReplacementSprites_AreTransparent64PixelPngs()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
       "source_location": "L65",
+      "_origin": "ast",
+      "id": "pitlife_tests_assetregistrytests_assetregistrytests_criticalreplacementsprites_aretransparent64pixelpngs",
+      "community": 45,
+      "norm_label": ".criticalreplacementsprites_aretransparent64pixelpngs()"
+    },
+    {
+      "label": "Theory",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "tests_pitlife_tests_assetregistrytests_cs_theory",
+      "community": 45,
+      "norm_label": "theory"
+    },
+    {
+      "label": "InlineData",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "tests_pitlife_tests_assetregistrytests_cs_inlinedata",
+      "community": 45,
+      "norm_label": "inlinedata"
+    },
+    {
+      "label": ".FallbackKeys_AreDistinct()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L81",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_fallbackkeys_aredistinct",
       "community": 45,
@@ -6613,7 +6643,7 @@
       "label": ".ReadAndValidatePng()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L73",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_readandvalidatepng",
       "community": 45,
@@ -6623,7 +6653,7 @@
       "label": ".FindRepositoryRoot()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L87",
+      "source_location": "L103",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_findrepositoryroot",
       "community": 45,
@@ -15012,9 +15042,9 @@
       "source_file": "Simulation/Ecosystem.cs",
       "source_location": "L271",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem",
-      "target": "simulation_ecosystem_ecosystem_countpendingplants",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_ecosystem_countpendingplants"
     },
     {
       "relation": "method",
@@ -15596,9 +15626,9 @@
       "source_file": "Simulation/Ecosystem.cs",
       "source_location": "L251",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_ecosystem_ecosystem_tryspreadplant",
-      "target": "simulation_ecosystem_ecosystem_countpendingplants",
-      "confidence_score": 1.0
+      "target": "simulation_ecosystem_ecosystem_countpendingplants"
     },
     {
       "relation": "references",
@@ -21156,6 +21186,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_criticalreplacementsprites_aretransparent64pixelpngs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
       "source_location": "L40",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -21278,6 +21318,50 @@
       "confidence_score": 1.0,
       "source": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_aredistinctvalidpngpairs",
       "target": "pitlife_tests_assetregistrytests_assetregistrytests_readandvalidatepng"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_criticalreplacementsprites_aretransparent64pixelpngs",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_findrepositoryroot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_criticalreplacementsprites_aretransparent64pixelpngs",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_readandvalidatepng",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L65",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_criticalreplacementsprites_aretransparent64pixelpngs",
+      "target": "tests_pitlife_tests_assetregistrytests_cs_inlinedata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L65",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_criticalreplacementsprites_aretransparent64pixelpngs",
+      "target": "tests_pitlife_tests_assetregistrytests_cs_theory",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22222,9 +22306,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests"
     },
     {
       "relation": "method",
@@ -22232,9 +22316,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_adultmixedsexherd_reproduceswithoutpopulationexplosion",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_adultmixedsexherd_reproduceswithoutpopulationexplosion"
     },
     {
       "relation": "method",
@@ -22242,9 +22326,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance"
     },
     {
       "relation": "method",
@@ -22252,9 +22336,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition"
     },
     {
       "relation": "method",
@@ -22262,9 +22346,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_fixedseed_producesstabledeterministiclifecyclemetrics",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_fixedseed_producesstabledeterministiclifecyclemetrics"
     },
     {
       "relation": "method",
@@ -22272,9 +22356,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_herd_remainscohesivewithinvisionrange",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_herd_remainscohesivewithinvisionrange"
     },
     {
       "relation": "method",
@@ -22282,9 +22366,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_runfixedseedsimulation",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_runfixedseedsimulation"
     },
     {
       "relation": "method",
@@ -22292,9 +22376,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L123",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome"
     },
     {
       "relation": "references",
@@ -22303,9 +22387,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_itestoutputhelper",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_itestoutputhelper"
     },
     {
       "relation": "calls",
@@ -22314,9 +22398,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_fixedseed_producesstabledeterministiclifecyclemetrics",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_runfixedseedsimulation",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_runfixedseedsimulation"
     },
     {
       "relation": "references",
@@ -22325,9 +22409,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_fixedseed_producesstabledeterministiclifecyclemetrics",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_fact"
     },
     {
       "relation": "references",
@@ -22336,9 +22420,9 @@
       "source_location": "L30",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_adultmixedsexherd_reproduceswithoutpopulationexplosion",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_fact"
     },
     {
       "relation": "references",
@@ -22347,9 +22431,9 @@
       "source_location": "L57",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_herd_remainscohesivewithinvisionrange",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_fact"
     },
     {
       "relation": "calls",
@@ -22358,9 +22442,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_adultmixedsexherd_reproduceswithoutpopulationexplosion",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance"
     },
     {
       "relation": "calls",
@@ -22369,9 +22453,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_adultmixedsexherd_reproduceswithoutpopulationexplosion",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition"
     },
     {
       "relation": "calls",
@@ -22380,9 +22464,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_adultmixedsexherd_reproduceswithoutpopulationexplosion",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome"
     },
     {
       "relation": "calls",
@@ -22391,9 +22475,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_herd_remainscohesivewithinvisionrange",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance"
     },
     {
       "relation": "calls",
@@ -22402,9 +22486,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_herd_remainscohesivewithinvisionrange",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition"
     },
     {
       "relation": "calls",
@@ -22413,9 +22497,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L65",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_herd_remainscohesivewithinvisionrange",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome"
     },
     {
       "relation": "references",
@@ -22424,9 +22508,9 @@
       "source_location": "L82",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_runfixedseedsimulation",
-      "target": "lifecyclemetrics",
-      "confidence_score": 1.0
+      "target": "lifecyclemetrics"
     },
     {
       "relation": "calls",
@@ -22435,9 +22519,9 @@
       "source_file": "tests/PitLife.Tests/LifecycleBalanceTests.cs",
       "source_location": "L86",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_runfixedseedsimulation",
-      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance"
     },
     {
       "relation": "references",
@@ -22446,9 +22530,9 @@
       "source_location": "L103",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_advance",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_ecosystem",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_ecosystem"
     },
     {
       "relation": "references",
@@ -22457,9 +22541,9 @@
       "source_location": "L111",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_vector2",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_vector2"
     },
     {
       "relation": "references",
@@ -22468,9 +22552,9 @@
       "source_location": "L111",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_findlandposition",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_world",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_world"
     },
     {
       "relation": "references",
@@ -22479,9 +22563,9 @@
       "source_location": "L123",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_lifecyclebalancetests_lifecyclebalancetests_stablegenome",
-      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_genome",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_lifecyclebalancetests_cs_genome"
     },
     {
       "relation": "contains",
@@ -22654,9 +22738,9 @@
       "source_location": "L12",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_mainmenutests_mainmenutests",
-      "target": "tests_pitlife_tests_mainmenutests_cs_itestoutputhelper",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_mainmenutests_cs_itestoutputhelper"
     },
     {
       "relation": "references",
@@ -25872,5 +25956,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b74c9f61645b020b7ff7fbffe4972840365df560"
+  "built_at_commit": "c2ae16a0ba50679beb1cf8a2db3136a753e73cf4"
 }

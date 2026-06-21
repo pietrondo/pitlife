@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 88 files · ~45,930 words
+- 88 files · ~45,962 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1004 nodes · 1487 edges · 86 communities (64 shown, 22 thin omitted)
+- 1007 nodes · 1492 edges · 86 communities (65 shown, 21 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b74c9f61`
+- Built from commit: `c2ae16a0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -114,7 +114,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (86 total, 22 thin omitted)
+## Communities (86 total, 21 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
@@ -280,6 +280,10 @@ Nodes (3): Camera, int, Vector2
 Cohesion: 0.43
 Nodes (5): Color, Rectangle, SpriteBatch, Texture2D, UiPrimitives
 
+### Community 45 - "Community 45"
+Cohesion: 0.26
+Nodes (4): AssetRegistryTests, Fact, InlineData, Theory
+
 ### Community 49 - "Community 49"
 Cohesion: 0.33
 Nodes (5): Accessibility, Brand, PitLife Design Context, Product, Reference Sites
@@ -337,9 +341,9 @@ Cohesion: 0.21
 Nodes (8): LifecycleMetrics, LifecycleBalanceTests, Ecosystem, Fact, Genome, ITestOutputHelper, Vector2, World
 
 ## Knowledge Gaps
-- **292 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+287 more)
+- **294 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+289 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -347,7 +351,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `TestCreature` connect `Community 75` to `Community 79`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _292 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _294 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**

@@ -62,6 +62,22 @@ public class AssetRegistryTests
         }
     }
 
+    [Theory]
+    [InlineData("Pine")]
+    [InlineData("Crocodile")]
+    [InlineData("Fox")]
+    [InlineData("Fish")]
+    public void CriticalReplacementSprites_AreTransparent64PixelPngs(string species)
+    {
+        SpeciesAsset asset = Assert.Single(
+            AssetRegistry.SpeciesTextures,
+            candidate => candidate.Species == species);
+        byte[] bytes = ReadAndValidatePng(Path.Combine(FindRepositoryRoot(), asset.Path));
+
+        Assert.Equal(64, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16, 4)));
+        Assert.Equal(64, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20, 4)));
+    }
+
     [Fact]
     public void FallbackKeys_AreDistinct()
     {

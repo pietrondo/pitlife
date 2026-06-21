@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "Rendering/AssetRegistry.cs": {
-    "mtime": 1782043705.4152288,
-    "ast_hash": "cbd0f717009b71a04a7b8580f3e57d3b",
+    "mtime": 1782053931.5516696,
+    "ast_hash": "b05b0533da1801106831c961378ff97f",
     "semantic_hash": ""
   },
   "Rendering/Camera.cs": {
@@ -245,8 +245,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/AssetRegistryTests.cs": {
-    "mtime": 1782052718.82944,
-    "ast_hash": "9bdde6a3730b7b972101d4ab20e4a3eb",
+    "mtime": 1782053931.55367,
+    "ast_hash": "146c2299aaaa35faa4635c2ac75d528d",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/AssetTests.cs": {
