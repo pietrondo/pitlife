@@ -13,7 +13,7 @@ public abstract class Creature
     public bool IsAlive { get; protected set; } = true;
     public CreatureType CreatureType { get; protected set; }
     public string Species { get; set; } = "";
-    public Gender Gender { get; set; } = Gender.Male;
+    public Gender Gender { get; set; } = Gender.None;
     public bool IsAdult => Age >= 30f;
     public bool IsBaby => !IsAdult;
     public float MaxEnergy => 50f * Genome.Size;
@@ -149,7 +149,13 @@ public abstract class Creature
         Vector2 offset = new((float)(rng.NextDouble() - 0.5) * 30, (float)(rng.NextDouble() - 0.5) * 30);
         var child = CreateChild(ClampToWorld(Position + offset), childGenome, rng);
         if (child != null)
+        {
+            if (child.CreatureType != CreatureType.Plant)
+            {
+                child.Gender = rng.Next(2) == 0 ? Gender.Male : Gender.Female;
+            }
             Logger.Event("BIRTH", $"{Species} + {partner.Species} -> baby at ({child.Position.X:F0},{child.Position.Y:F0})");
+        }
         return child;
     }
 

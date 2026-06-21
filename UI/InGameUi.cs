@@ -197,7 +197,7 @@ public sealed class InGameUi
         DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("creature.energy", creature.Energy, creature.MaxEnergy), UiTheme.WarmParchment);
         DrawProgress(spriteBatch, pixel, new Rectangle(content.X, content.Y + 48, content.Width, 14), creature.Energy / creature.MaxEnergy);
         DrawLine(spriteBatch, font, content.X, content.Y + 78, I18n.Format("creature.age", creature.Age), UiTheme.WarmParchment);
-        string statusText = creature.CreatureType == CreatureType.Plant
+        string statusText = creature.Gender == Gender.None
             ? I18n.T(creature.IsAdult ? "ui.status.adult" : "ui.status.baby")
             : $"{I18n.T(creature.Gender == Gender.Male ? "ui.gender.male" : "ui.gender.female")}  |  {I18n.T(creature.IsAdult ? "ui.status.adult" : "ui.status.baby")}";
         DrawLine(spriteBatch, font, content.X, content.Y + 100, statusText, UiTheme.MutedStone);

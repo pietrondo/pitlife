@@ -66,9 +66,15 @@ public sealed class UiWindowManager
         if (window == null)
             return;
 
-        window.IsOpen = !window.IsOpen;
-        if (window.IsOpen)
+        if (window.IsOpen && IsActive(window))
+        {
+            window.IsOpen = false;
+        }
+        else
+        {
+            window.IsOpen = true;
             BringToFront(window);
+        }
     }
 
     public void Open(string id)
@@ -188,11 +194,16 @@ public sealed class UiWindowManager
 
     private static Rectangle Clamp(Rectangle bounds, int viewportWidth, int viewportHeight)
     {
-        int maxX = System.Math.Max(8, viewportWidth - bounds.Width - 8);
-        int maxY = System.Math.Max(56, viewportHeight - bounds.Height - 64);
+        // Allow the window to be dragged partially off-screen,
+        // but keep the title bar clickable. Title bar height is 40px.
+        int minX = -bounds.Width + 40;
+        int maxX = viewportWidth - 40;
+        int minY = 56; // Keep below top HUD
+        int maxY = viewportHeight - 56 - 40; // Keep above toolbar
+
         return new Rectangle(
-            System.Math.Clamp(bounds.X, 8, maxX),
-            System.Math.Clamp(bounds.Y, 56, maxY),
+            System.Math.Clamp(bounds.X, minX, maxX),
+            System.Math.Clamp(bounds.Y, minY, System.Math.Max(minY, maxY)),
             bounds.Width,
             bounds.Height);
     }

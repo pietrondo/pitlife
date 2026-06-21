@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 79 files · ~39,834 words
+- 81 files · ~40,842 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 889 nodes · 1303 edges · 71 communities (53 shown, 18 thin omitted)
+- 905 nodes · 1322 edges · 73 communities (54 shown, 19 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a092e63a`
+- Built from commit: `03ac0a3e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -78,10 +78,12 @@
 - [[_COMMUNITY_Community 60|Community 60]]
 - [[_COMMUNITY_Community 61|Community 61]]
 - [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Game1` - 30 edges
-2. `Ecosystem` - 28 edges
+1. `Game1` - 31 edges
+2. `Ecosystem` - 29 edges
 3. `SpawnPanel` - 22 edges
 4. `UiWindowManager` - 18 edges
 5. `Creature` - 17 edges
@@ -100,7 +102,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (71 total, 18 thin omitted)
+## Communities (73 total, 19 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
@@ -116,7 +118,7 @@ Nodes (13): CreatureSpawner, Herbivore, Plant, Creature, GameTime, int, List, ob
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
-Nodes (26): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+18 more)
+Nodes (27): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+19 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.13
@@ -187,7 +189,7 @@ Cohesion: 0.12
 Nodes (16): Aquatic Species Expansion Implementation Plan, Execution Handoff, File Structure, Self-Review Checklist (run before declaring plan complete), Task 10: Build verification, Task 11: Manual test in game, Task 12: Commit, Task 1: Create 4 PixelLab sprite jobs in parallel (+8 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.17
+Cohesion: 0.18
 Nodes (8): DateTime, List, MouseState, Point, Rectangle, string, UiWindow, UiWindowManager
 
 ### Community 23 - "Community 23"
@@ -282,24 +284,28 @@ Nodes (4): Genome, Mutate(), Random(), Reproduce()
 Cohesion: 0.50
 Nodes (3): IReadOnlyList, AssetRegistry, string
 
+### Community 71 - "Community 71"
+Cohesion: 0.25
+Nodes (6): JsonSerializerOptions, CreatureSaveData, Ecosystem, GenomeSaveData, SaveData, SaveSystem
+
 ## Knowledge Gaps
-- **266 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+261 more)
+- **272 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+267 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _266 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _272 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.06153846153846154 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.09747899159663866 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.07130124777183601 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06984126984126984 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.13230769230769232 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**

@@ -149,6 +149,21 @@ public class Game1 : Game
                     _paused = false;
                     _controller.SetPause(false);
                     break;
+                case MenuAction.SaveGame:
+                    SaveSystem.Save("savegame.json", _ecosystem);
+                    _menuInputCooldown = 0.5f;
+                    break;
+                case MenuAction.LoadGame:
+                    var saveData = SaveSystem.Load("savegame.json");
+                    if (saveData != null)
+                    {
+                        RestoreLoadedEcosystem(saveData);
+                        _screen = GameScreen.Playing;
+                        _paused = false;
+                        _controller.SetPause(false);
+                    }
+                    _menuInputCooldown = 0.5f;
+                    break;
                 case MenuAction.ToggleFullscreen:
                     _graphics.ToggleFullScreen();
                     break;
@@ -287,6 +302,60 @@ public class Game1 : Game
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
     }
 
+    private void RestoreLoadedEcosystem(SaveSystem.SaveData data)
+    {
+        _ecosystem = new Ecosystem(data.WorldWidth, data.WorldHeight, data.Seed);
+        _ecosystem.TotalTime = data.TotalTime;
+
+        foreach (var cData in data.Creatures)
+        {
+            var def = SpeciesRegistry.Get(cData.Species);
+            if (def == null) continue;
+
+            var genome = new Genome
+            {
+                Speed = cData.Genome.Speed,
+                Size = cData.Genome.Size,
+                Metabolism = cData.Genome.Metabolism,
+                VisionRange = cData.Genome.VisionRange,
+                Color = new Color(cData.Genome.ColorR, cData.Genome.ColorG, cData.Genome.ColorB),
+                MutationRate = cData.Genome.MutationRate
+            };
+
+            Creature c = (Creature)Activator.CreateInstance(
+                def.CreatureType,
+                new Vector2(cData.PositionX, cData.PositionY),
+                genome,
+                def.Species)!;
+
+            c.Energy = cData.Energy;
+            c.Gender = cData.Gender;
+            c.Facing = new Vector2(cData.FacingX, cData.FacingY);
+            c.GrowFor(cData.Age);
+
+            _ecosystem.AddCreature(c);
+        }
+
+        _ecosystem.FlushPending();
+        _ecosystem.UpdateStats();
+
+        _camera.WorldWidth = _ecosystem.World.PixelWidth;
+        _camera.WorldHeight = _ecosystem.World.PixelHeight;
+        _camera.Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f);
+        _worldRenderer = new PixelWorldRenderer(_ecosystem.World, data.Seed);
+        _creatureRenderer = new CreatureRenderer(_ecosystem);
+        _minimap = new Minimap(_ecosystem, _camera);
+        _controller = new SimulationController(_ecosystem, _dayNight);
+        _selectedCreature = null;
+
+        _worldRenderer.LoadContent(GraphicsDevice);
+        _creatureRenderer.LoadContent(GraphicsDevice);
+        _minimap.LoadContent(GraphicsDevice);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
+        _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
+    }
+
     private static Color GetPhaseColor(DayPhase phase) => phase switch
     {
         DayPhase.Dawn => new Color(255, 180, 100),
@@ -300,7 +369,7 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
-        // Draw the map with Linear Clamp (for smooth, blended biome transitions)
+        // Draw the map with Linear Clamp (for smooth transitions)
         _spriteBatch.Begin(samplerState: SamplerState.LinearClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
         _spriteBatch.End();

@@ -18,7 +18,7 @@ public class Ecosystem
     public int HerbivoreCount { get; private set; }
     public int CarnivoreCount { get; private set; }
     public int OmnivoreCount { get; private set; }
-    public float TotalTime { get; private set; }
+    public float TotalTime { get; set; }
 
     private readonly List<Creature> _pendingAdd = new();
     private readonly List<Creature> _pendingRemove = new();
@@ -69,7 +69,7 @@ public class Ecosystem
         Logger.Event("DEATH", $"{c.Species} age={c.Age:F1}s energy={c.Energy:F1}");
     }
 
-    private void FlushPending()
+    public void FlushPending()
     {
         lock (_lock)
         {
@@ -188,7 +188,7 @@ public class Ecosystem
 
     private int _logCounter = 0;
     
-    private void UpdateStats()
+    public void UpdateStats()
     {
         int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
         foreach (var c in Creatures)
@@ -269,5 +269,21 @@ public class Ecosystem
     private T? FindNearest<T>(Creature seeker) where T : Creature
     {
         return _spatialGrid.FindNearest(seeker, c => c is T) as T;
+    }
+
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            Creatures.Clear();
+            _pendingAdd.Clear();
+            _pendingRemove.Clear();
+            TotalTime = 0f;
+            PlantCount = 0;
+            HerbivoreCount = 0;
+            CarnivoreCount = 0;
+            OmnivoreCount = 0;
+            _spatialGrid.Rebuild(Array.Empty<Creature>());
+        }
     }
 }

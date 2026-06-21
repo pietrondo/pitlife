@@ -166,7 +166,7 @@ public class CreatureRenderer
                 }
 
                 // Gender icon
-                if (c.CreatureType != CreatureType.Plant && _pixelTexture != null)
+                if (c.Gender != Gender.None && _pixelTexture != null)
                 {
                     Color genderColor = c.Gender == Gender.Male ? Color.Red : new Color(80, 120, 255);
                     genderColor = ApplyOverlay(genderColor);

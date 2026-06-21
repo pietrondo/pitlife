@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "Game1.cs": {
-    "mtime": 1782033639.383632,
-    "ast_hash": "24fe6535f2067a5162a2a029d822c33e",
+    "mtime": 1782034126.6757374,
+    "ast_hash": "979e634330a5c7ad92fb47d79b886241",
     "semantic_hash": ""
   },
   "Game/SimulationController.cs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "Localization/I18n.cs": {
-    "mtime": 1782033600.498523,
-    "ast_hash": "4eb721a96a56dfb22cb0071fe3b53a79",
+    "mtime": 1782034105.4803364,
+    "ast_hash": "e63282fbc685cc226f6666d336127787",
     "semantic_hash": ""
   },
   "PitLife.csproj": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "Rendering/CreatureRenderer.cs": {
-    "mtime": 1782033618.1764033,
-    "ast_hash": "3dcc6f3184e378d91ef025a453fefd21",
+    "mtime": 1782033988.5617397,
+    "ast_hash": "3fc914e2a7dad56150a45c334d6a466a",
     "semantic_hash": ""
   },
   "Rendering/DayNightCycle.cs": {
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "Simulation/Creature.cs": {
-    "mtime": 1781967939.3476305,
-    "ast_hash": "9b9c706d1a4008a387cc864bb0e5963a",
+    "mtime": 1782033984.4881814,
+    "ast_hash": "7fe6147e5f889da96909498bba0cfefb",
     "semantic_hash": ""
   },
   "Simulation/CreatureSpawner.cs": {
@@ -120,13 +120,13 @@
     "semantic_hash": ""
   },
   "Simulation/Ecosystem.cs": {
-    "mtime": 1781967939.348631,
-    "ast_hash": "29f625cd7161fabf1919ac0bc9f06de7",
+    "mtime": 1782034090.1643877,
+    "ast_hash": "cf75c2155879ae8e802a1db0ac8d8686",
     "semantic_hash": ""
   },
   "Simulation/Gender.cs": {
-    "mtime": 1781967939.348631,
-    "ast_hash": "64528c9519e30b94606b83c09105dabf",
+    "mtime": 1782033982.361659,
+    "ast_hash": "8b66e102c0f9195a82690ea9d3919965",
     "semantic_hash": ""
   },
   "Simulation/Genome.cs": {
@@ -180,13 +180,13 @@
     "semantic_hash": ""
   },
   "UI/InGameUi.cs": {
-    "mtime": 1782033606.2695944,
-    "ast_hash": "03fabe8af6e74b8aaa4b376c6751ac55",
+    "mtime": 1782033986.3372407,
+    "ast_hash": "cf2bf12551aeb89d1ef5178c281b0946",
     "semantic_hash": ""
   },
   "UI/MainMenu.cs": {
-    "mtime": 1782033449.475488,
-    "ast_hash": "e9b01bbfbfe4bac29ccc4eadc2f4b8ec",
+    "mtime": 1782034119.2958794,
+    "ast_hash": "64bde7a1205b1b5c16b3732ba8575ac9",
     "semantic_hash": ""
   },
   "UI/SpawnPanel.cs": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "UI/UiWindowManager.cs": {
-    "mtime": 1782033430.6885872,
-    "ast_hash": "2abc2dc796f9dca22f48c6953daa163d",
+    "mtime": 1782034050.7678416,
+    "ast_hash": "608bf2c3e2ce18797819f2fe353440b2",
     "semantic_hash": ""
   },
   "copy_sprites.ps1": {
@@ -777,6 +777,16 @@
   "Content/logo.png": {
     "mtime": 1781802726.1035662,
     "ast_hash": "8b5054c9c8a5f0acd989716b8ebe5fe8",
+    "semantic_hash": ""
+  },
+  "Simulation/SaveSystem.cs": {
+    "mtime": 1782034098.519433,
+    "ast_hash": "5394ab6a695d6b38d4cf7ed3a18e101a",
+    "semantic_hash": ""
+  },
+  "tests/PitLife.Tests/SaveSystemTests.cs": {
+    "mtime": 1782034136.1028118,
+    "ast_hash": "2537d4b0842db7feb9ecd7e6fede2623",
     "semantic_hash": ""
   }
 }

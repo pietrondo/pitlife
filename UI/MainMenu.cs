@@ -14,7 +14,9 @@ public enum MenuAction
     NewWorldWithSeed,
     ToggleFullscreen,
     ShowHelp,
-    Exit
+    Exit,
+    SaveGame,
+    LoadGame
 }
 
 public sealed class MainMenu
@@ -24,6 +26,8 @@ public sealed class MainMenu
     [
         new(I18n.T("menu.start")),
         new(I18n.T("menu.newWorld")),
+        new(I18n.T("menu.saveGame")),
+        new(I18n.T("menu.loadGame")),
         new(I18n.T("menu.options")),
         new(I18n.T("menu.help")),
         new(I18n.T("menu.exit")) { IsDestructive = true }
@@ -62,7 +66,7 @@ public sealed class MainMenu
             return MenuAction.None;
         }
 
-        int totalElements = _showOptions ? 2 : 6;
+        int totalElements = _showOptions ? 2 : 8;
         int prevFocused = _focusedIndex;
 
         // Keyboard navigation
@@ -70,6 +74,21 @@ public sealed class MainMenu
             _focusedIndex = (_focusedIndex - 1 + totalElements) % totalElements;
         if (Pressed(keyboard, previousKeyboard, Keys.Down))
             _focusedIndex = (_focusedIndex + 1) % totalElements;
+
+        // Left/Right navigation for side-by-side buttons
+        if (!_showOptions)
+        {
+            if (Pressed(keyboard, previousKeyboard, Keys.Right))
+            {
+                if (_focusedIndex == 3) _focusedIndex = 4; // Save -> Load
+                else if (_focusedIndex == 5) _focusedIndex = 6; // Options -> Help
+            }
+            if (Pressed(keyboard, previousKeyboard, Keys.Left))
+            {
+                if (_focusedIndex == 4) _focusedIndex = 3; // Load -> Save
+                else if (_focusedIndex == 6) _focusedIndex = 5; // Help -> Options
+            }
+        }
 
         // Sync keyboard navigation to seed input focus
         if (!_showOptions && _focusedIndex != prevFocused)
@@ -101,7 +120,7 @@ public sealed class MainMenu
         if (_showOptions && Pressed(keyboard, previousKeyboard, Keys.Escape))
         {
             _showOptions = false;
-            _focusedIndex = 3; // Focus Options button in main menu
+            _focusedIndex = 4; // Focus Options button in main menu
             return MenuAction.None;
         }
 
@@ -132,7 +151,7 @@ public sealed class MainMenu
                 return MenuAction.ToggleFullscreen;
 
             _showOptions = false;
-            _focusedIndex = 3; // Focus Options button in main menu
+            _focusedIndex = 4; // Focus Options button in main menu
             return MenuAction.None;
         }
 
@@ -141,9 +160,11 @@ public sealed class MainMenu
             0 => MenuAction.StartGame,
             1 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
             2 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
-            3 => OpenOptions(),
-            4 => MenuAction.ShowHelp,
-            5 => MenuAction.Exit,
+            3 => MenuAction.SaveGame,
+            4 => MenuAction.LoadGame,
+            5 => OpenOptions(),
+            6 => MenuAction.ShowHelp,
+            7 => MenuAction.Exit,
             _ => MenuAction.None
         };
     }
@@ -199,7 +220,7 @@ public sealed class MainMenu
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showOptions ? 220 : 450; // Increased height for seed input layout
+        int panelHeight = _showOptions ? 220 : 436; // Optimized grid height
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
@@ -240,7 +261,7 @@ public sealed class MainMenu
                 buttonWidth,
                 buttonHeight);
 
-            // Seed input (positioned between New World and Options)
+            // Seed input
             int inputY = startY + 2 * (buttonHeight + gap);
             _seedInput.Placeholder = I18n.T("menu.seedPlaceholder");
             _seedInput.IsNumericOnly = true;
@@ -251,16 +272,40 @@ public sealed class MainMenu
                 buttonWidth,
                 40);
 
-            // Options, Help, Exit buttons (indices 2, 3, 4 in _mainButtons)
-            // Shifted down to accommodate the seed input
-            for (int i = 2; i < buttons.Length; i++)
-            {
-                buttons[i].Bounds = new Rectangle(
-                    viewportWidth / 2 - buttonWidth / 2,
-                    inputY + 40 + gap + (i - 2) * (buttonHeight + gap),
-                    buttonWidth,
-                    buttonHeight);
-            }
+            // Side-by-side Save & Load (indices 2 & 3 in _mainButtons)
+            int halfWidth = (buttonWidth - gap) / 2;
+            int saveLoadY = inputY + 40 + gap;
+            buttons[2].Bounds = new Rectangle(
+                _window.Bounds.X + 24,
+                saveLoadY,
+                halfWidth,
+                buttonHeight);
+            buttons[3].Bounds = new Rectangle(
+                _window.Bounds.X + 24 + halfWidth + gap,
+                saveLoadY,
+                halfWidth,
+                buttonHeight);
+
+            // Side-by-side Options & Help (indices 4 & 5 in _mainButtons)
+            int optionsHelpY = saveLoadY + buttonHeight + gap;
+            buttons[4].Bounds = new Rectangle(
+                _window.Bounds.X + 24,
+                optionsHelpY,
+                halfWidth,
+                buttonHeight);
+            buttons[5].Bounds = new Rectangle(
+                _window.Bounds.X + 24 + halfWidth + gap,
+                optionsHelpY,
+                halfWidth,
+                buttonHeight);
+
+            // Exit button (index 6 in _mainButtons)
+            int exitY = optionsHelpY + buttonHeight + gap;
+            buttons[6].Bounds = new Rectangle(
+                viewportWidth / 2 - buttonWidth / 2,
+                exitY,
+                buttonWidth,
+                buttonHeight);
         }
     }
 
@@ -271,9 +316,11 @@ public sealed class MainMenu
     {
         _mainButtons[0].Text = I18n.T("menu.start");
         _mainButtons[1].Text = I18n.T("menu.newWorld");
-        _mainButtons[2].Text = I18n.T("menu.options");
-        _mainButtons[3].Text = I18n.T("menu.help");
-        _mainButtons[4].Text = I18n.T("menu.exit");
+        _mainButtons[2].Text = I18n.T("menu.saveGame");
+        _mainButtons[3].Text = I18n.T("menu.loadGame");
+        _mainButtons[4].Text = I18n.T("menu.options");
+        _mainButtons[5].Text = I18n.T("menu.help");
+        _mainButtons[6].Text = I18n.T("menu.exit");
         _optionButtons[0].Text = I18n.Format("menu.fullscreen", I18n.T(isFullscreen ? "common.yes" : "common.no"));
         _optionButtons[1].Text = I18n.T("common.back");
     }
