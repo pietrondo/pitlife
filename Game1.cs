@@ -369,8 +369,8 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
-        // Draw the map with Linear Clamp (for smooth transitions)
-        _spriteBatch.Begin(samplerState: SamplerState.LinearClamp, transformMatrix: _camera.TransformMatrix);
+        // Draw the map with Point Clamp (for crisp pixel art matching the minimap)
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
         _spriteBatch.End();
 
