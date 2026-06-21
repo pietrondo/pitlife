@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "Simulation/Ecosystem.cs": {
-    "mtime": 1782045859.7950618,
-    "ast_hash": "bd80e0dddca7692bcdf805ab616c7221",
+    "mtime": 1782053410.110181,
+    "ast_hash": "b70217674ee2a45172a5eb2743b2cc4a",
     "semantic_hash": ""
   },
   "Simulation/Gender.cs": {
@@ -827,6 +827,11 @@
   "tests/PitLife.Tests/CreatureSelectionTests.cs": {
     "mtime": 1782045433.627673,
     "ast_hash": "ed28aa574d02b7ce07da08daef2cd36d",
+    "semantic_hash": ""
+  },
+  "tests/PitLife.Tests/LifecycleBalanceTests.cs": {
+    "mtime": 1782053410.1151812,
+    "ast_hash": "a8ebbec3ec39bf567e27b287da569213",
     "semantic_hash": ""
   }
 }

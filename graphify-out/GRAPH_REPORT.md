@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 87 files · ~45,388 words
+- 88 files · ~45,930 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 987 nodes · 1460 edges · 85 communities (63 shown, 22 thin omitted)
+- 1004 nodes · 1487 edges · 86 communities (64 shown, 22 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `cd3c21fb`
+- Built from commit: `b74c9f61`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -91,10 +91,11 @@
 - [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Game1` - 33 edges
-2. `Ecosystem` - 30 edges
+2. `Ecosystem` - 31 edges
 3. `SpawnPanel` - 26 edges
 4. `Creature` - 19 edges
 5. `InGameUi` - 19 edges
@@ -113,7 +114,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (85 total, 22 thin omitted)
+## Communities (86 total, 22 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
@@ -269,7 +270,7 @@ Nodes (5): TileTests, BiomeType, Fact, InlineData, Theory
 
 ### Community 41 - "Community 41"
 Cohesion: 0.24
-Nodes (6): ButtonState, ITestOutputHelper, MainMenuTests, Fact, MainMenu, MouseState
+Nodes (6): ButtonState, MainMenuTests, Fact, ITestOutputHelper, MainMenu, MouseState
 
 ### Community 42 - "Community 42"
 Cohesion: 0.36
@@ -331,25 +332,29 @@ Nodes (5): Creature, Genome, Random, Vector2, Omnivore
 Cohesion: 0.32
 Nodes (4): SpawnPanelTests, Fact, MouseState, SpawnPanel
 
+### Community 85 - "Community 85"
+Cohesion: 0.21
+Nodes (8): LifecycleMetrics, LifecycleBalanceTests, Ecosystem, Fact, Genome, ITestOutputHelper, Vector2, World
+
 ## Knowledge Gaps
-- **286 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+281 more)
+- **292 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+287 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `TestCreature` connect `Community 75` to `Community 79`?**
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _286 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _292 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.09103840682788052 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08906882591093117 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.06794871794871794 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**
   _Cohesion score 0.11182795698924732 - nodes in this community are weakly interconnected._
-- **Should `Community 10` be split into smaller, more focused modules?**
-  _Cohesion score 0.1225296442687747 - nodes in this community are weakly interconnected._

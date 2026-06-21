@@ -13,6 +13,8 @@ public class Ecosystem
     public float SimulationSpeed { get; set; } = 1f;
     public int MaxCreatures { get; set; } = 3000;
     public bool IsFull => Creatures.Count + _pendingAdd.Count >= MaxCreatures;
+    public int PlantCarryingCapacity => Math.Max(1,
+        Math.Min((int)(MaxCreatures * 0.6f), World.Width * World.Height / 8));
 
     public int PlantCount { get; private set; }
     public int HerbivoreCount { get; private set; }
@@ -246,6 +248,7 @@ public class Ecosystem
     {
         if (plant == null || !plant.IsAlive) return;
         if (Creatures.Count >= MaxCreatures) return;
+        if (PlantCount + CountPendingPlants() >= PlantCarryingCapacity) return;
         if (plant.Energy < plant.ReproductionThreshold) return;
 
         float angle = (float)(Random.NextDouble() * Math.PI * 2);
@@ -263,6 +266,18 @@ public class Ecosystem
         child.Energy = child.MaxEnergy * 0.3f;
         AddCreature(child);
         plant.Energy -= plant.MaxEnergy * 0.2f;
+    }
+
+    private int CountPendingPlants()
+    {
+        lock (_lock)
+        {
+            int count = 0;
+            foreach (Creature creature in _pendingAdd)
+                if (creature.CreatureType == CreatureType.Plant)
+                    count++;
+            return count;
+        }
     }
 
     private T? FindNearest<T>(Creature seeker) where T : Creature
