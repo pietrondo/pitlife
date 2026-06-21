@@ -271,6 +271,11 @@ public class Ecosystem
         return _spatialGrid.FindNearest(seeker, c => c is T) as T;
     }
 
+    public List<Creature> FindNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
+    {
+        return _spatialGrid.GetNeighbors(seeker, radius, predicate);
+    }
+
     public void Clear()
     {
         lock (_lock)

@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "Rendering/AssetRegistry.cs": {
-    "mtime": 1782035007.640354,
-    "ast_hash": "0e113c0f3e12f819f0d61d18cd5537d3",
+    "mtime": 1782043705.4152288,
+    "ast_hash": "cbd0f717009b71a04a7b8580f3e57d3b",
     "semantic_hash": ""
   },
   "Rendering/Camera.cs": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "Simulation/Behaviors/BaseBehavior.cs": {
-    "mtime": 1781967939.3456323,
-    "ast_hash": "a1ad83709b7479d259f0bc6942fb8d89",
+    "mtime": 1782043575.1889493,
+    "ast_hash": "aa93959d51e3aa960666f5def7a76baf",
     "semantic_hash": ""
   },
   "Simulation/Behaviors/ICreatureBehavior.cs": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "Simulation/Ecosystem.cs": {
-    "mtime": 1782034090.1643877,
-    "ast_hash": "cf75c2155879ae8e802a1db0ac8d8686",
+    "mtime": 1782043552.6412766,
+    "ast_hash": "299495ac56a9bf016a7cfa688f2c0837",
     "semantic_hash": ""
   },
   "Simulation/Gender.cs": {
@@ -150,13 +150,13 @@
     "semantic_hash": ""
   },
   "Simulation/SpatialGrid.cs": {
-    "mtime": 1781851783.413228,
-    "ast_hash": "5e628be1f2d5cdc245b4a8a68de83fd0",
+    "mtime": 1782043548.6554418,
+    "ast_hash": "61c54a6b68be813b3de152a92ebbc777",
     "semantic_hash": ""
   },
   "Simulation/SpeciesRegistry.cs": {
-    "mtime": 1782035140.0859096,
-    "ast_hash": "96fb15e65257beb8fe0e0319afb92d26",
+    "mtime": 1782043627.304214,
+    "ast_hash": "eda7299d1de8d9553172d39f3c4a540f",
     "semantic_hash": ""
   },
   "Simulation/Tile.cs": {
@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SocialSystemTests.cs": {
-    "mtime": 1781967939.6194239,
-    "ast_hash": "f7aff58f1055b79eaec112d137093886",
+    "mtime": 1782043711.050287,
+    "ast_hash": "8798be60d071429e9bae78577fd2f41d",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SpatialGridTests.cs": {

@@ -6,8 +6,12 @@ namespace PitLife.Simulation;
 public enum SocialBehavior
 {
     None,
+    Solitary,
+    Pair,
+    Herd,
     Pack,
-    Solitary
+    School,
+    Swarm
 }
 
 public sealed class SpeciesDefinition
@@ -72,7 +76,11 @@ public static class SpeciesRegistry
         _byKind.TryGetValue(kind, out var list) ? list : Array.Empty<string>();
 
     public static bool IsPackAnimal(string species) =>
-        _bySpecies.TryGetValue(species, out var def) && def.SocialBehavior == SocialBehavior.Pack;
+        _bySpecies.TryGetValue(species, out var def) &&
+        (def.SocialBehavior == SocialBehavior.Pack ||
+         def.SocialBehavior == SocialBehavior.Herd ||
+         def.SocialBehavior == SocialBehavior.School ||
+         def.SocialBehavior == SocialBehavior.Swarm);
 
     public static bool IsSolitary(string species) =>
         _bySpecies.TryGetValue(species, out var def) && def.SocialBehavior == SocialBehavior.Solitary;
@@ -84,11 +92,28 @@ public static class SpeciesRegistry
 
     public static string DetermineEvolvedSpecies(CreatureType kind, Genome genome, string currentSpecies, Random rng)
     {
+        bool isLandMammal = currentSpecies switch
+        {
+            "Rabbit" or "Deer" or "Sheep" or "Horse" or "Goat" or "Gazelle" or "Kangaroo" or
+            "Fox" or "Lynx" or "Tiger" or "Lion" or "Leopard" or "Wolf" or "Cheetah" or
+            "Boar" or "Raccoon" or "Bear" => true,
+            _ => false
+        };
+
         if (kind == CreatureType.Herbivore)
         {
             if (genome.WaterAdaptation >= 0.65f)
             {
-                return rng.Next(2) == 0 ? "Fish" : "Salmon";
+                if (isLandMammal)
+                {
+                    if (genome.Speed >= 1.2f) return "Dolphin";
+                    if (genome.Size >= 1.2f) return "Whale";
+                    return "Manatee";
+                }
+                else
+                {
+                    return rng.Next(2) == 0 ? "Fish" : "Salmon";
+                }
             }
             if (genome.DesertAdaptation >= 0.45f && genome.Speed >= 1.2f && genome.Size >= 1.0f)
             {
@@ -127,7 +152,16 @@ public static class SpeciesRegistry
         {
             if (genome.WaterAdaptation >= 0.65f)
             {
-                return rng.Next(2) == 0 ? "Shark" : "Piranha";
+                if (isLandMammal)
+                {
+                    if (genome.Size >= 1.2f) return "Orca";
+                    if (genome.ColdAdaptation >= 0.5f) return "Seal";
+                    return "SeaLion";
+                }
+                else
+                {
+                    return rng.Next(2) == 0 ? "Shark" : "Piranha";
+                }
             }
             if (genome.Speed >= 1.4f && (genome.DesertAdaptation >= 0.4f || genome.ForestAdaptation <= 0.4f))
             {
@@ -166,7 +200,16 @@ public static class SpeciesRegistry
         {
             if (genome.WaterAdaptation >= 0.65f)
             {
-                return "Jellyfish";
+                if (isLandMammal)
+                {
+                    if (genome.Size >= 1.3f) return "Hippopotamus";
+                    if (genome.ColdAdaptation >= 0.5f) return "Walrus";
+                    return "Otter";
+                }
+                else
+                {
+                    return "Jellyfish";
+                }
             }
             if (genome.WaterAdaptation >= 0.4f && genome.ForestAdaptation >= 0.4f)
             {
@@ -202,6 +245,12 @@ internal static class BuiltinSpecies
     private static readonly BiomeType[] Shallow = [BiomeType.ShallowWater];
     private static readonly BiomeType[] Deep = [BiomeType.DeepOcean];
     private static readonly BiomeType[] ShallowOrDeep = [BiomeType.ShallowWater, BiomeType.DeepOcean];
+    private static readonly BiomeType[] LandAndShallow =
+    [
+        BiomeType.Beach, BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland,
+        BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp, BiomeType.Tundra,
+        BiomeType.Mountain, BiomeType.Snow, BiomeType.ShallowWater
+    ];
 
     public static void RegisterAll()
     {
@@ -228,15 +277,15 @@ internal static class BuiltinSpecies
         RegisterAquaticPlant("Coral");
 
         // Herbivores
-        RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Deer", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Sheep", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Horse", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Goat", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Fish", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow);
+        RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+        RegisterAnimal("Deer", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+        RegisterAnimal("Sheep", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+        RegisterAnimal("Horse", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+        RegisterAnimal("Goat", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+        RegisterAnimal("Fish", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow);
         RegisterAnimal("Lizard", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Turtle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Salmon", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow, size: 0.9f);
+        RegisterAnimal("Salmon", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow, size: 0.9f);
 
         // Carnivores
         RegisterAnimal("Fox", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
@@ -246,24 +295,35 @@ internal static class BuiltinSpecies
         RegisterAnimal("Leopard", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Crocodile", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Snake", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Eagle", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
+        RegisterAnimal("Eagle", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pair, biomes: Land);
         RegisterAnimal("Wolf", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
         RegisterAnimal("Shark", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Deep, size: 1.2f);
-        RegisterAnimal("Piranha", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Shallow, size: 0.7f);
+        RegisterAnimal("Piranha", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow, size: 0.7f);
 
         // Omnivores
         RegisterAnimal("Boar", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Raccoon", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Frog", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Beetle", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Butterfly", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
+        RegisterAnimal("Frog", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Pair, biomes: Land);
+        RegisterAnimal("Beetle", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm, biomes: Land);
+        RegisterAnimal("Butterfly", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm, biomes: Land);
         RegisterAnimal("Bear", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Jellyfish", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: ShallowOrDeep, size: 0.6f);
+        RegisterAnimal("Jellyfish", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Swarm, biomes: ShallowOrDeep, size: 0.6f);
 
         // Misc
-        RegisterAnimal("Gazelle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Kangaroo", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land, size: 1.1f);
+        RegisterAnimal("Gazelle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+        RegisterAnimal("Kangaroo", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 1.1f);
         RegisterAnimal("Cheetah", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.9f);
+
+        // New Marine Mammals and Semi-Aquatic Creatures
+        RegisterAnimal("Dolphin", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Pack, biomes: ShallowOrDeep, size: 1.0f);
+        RegisterAnimal("Whale", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Herd, biomes: Deep, size: 2.0f);
+        RegisterAnimal("Manatee", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Shallow, size: 1.3f);
+        RegisterAnimal("Orca", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Deep, size: 1.8f);
+        RegisterAnimal("Seal", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.0f);
+        RegisterAnimal("SeaLion", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.1f);
+        RegisterAnimal("Otter", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Pair, biomes: Shallow, size: 0.8f);
+        RegisterAnimal("Walrus", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.5f);
+        RegisterAnimal("Hippopotamus", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Herd, biomes: LandAndShallow, size: 1.6f);
     }
 
     private static void RegisterPlant(string name) =>

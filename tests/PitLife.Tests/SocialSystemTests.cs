@@ -127,4 +127,56 @@ public class SocialSystemTests
         other.GrowFor(60f);
         Assert.Null(child.ReproduceWith(other, new Random(1)));
     }
+
+    [Fact]
+    public void DetermineEvolvedSpecies_TerrestrialMammalToWater_EvolvesToMarineMammal()
+    {
+        var rng = new Random(42);
+
+        // Herbivore land mammal (e.g. Rabbit) with high water adaptation evolves to Dolphin/Whale/Manatee
+        var g1 = new Genome { WaterAdaptation = 0.8f, Speed = 1.3f, Size = 1.0f };
+        var evolved1 = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, g1, "Rabbit", rng);
+        Assert.Equal("Dolphin", evolved1);
+
+        var g2 = new Genome { WaterAdaptation = 0.8f, Speed = 1.0f, Size = 1.4f };
+        var evolved2 = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, g2, "Rabbit", rng);
+        Assert.Equal("Whale", evolved2);
+
+        // Carnivore land mammal (e.g. Wolf) with high water adaptation evolves to Orca/Seal/SeaLion
+        var g3 = new Genome { WaterAdaptation = 0.8f, Size = 1.3f };
+        var evolved3 = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Carnivore, g3, "Wolf", rng);
+        Assert.Equal("Orca", evolved3);
+
+        // Omnivore land mammal (e.g. Bear) with high water adaptation evolves to Hippo/Walrus/Otter
+        var g4 = new Genome { WaterAdaptation = 0.8f, Size = 1.5f };
+        var evolved4 = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Omnivore, g4, "Bear", rng);
+        Assert.Equal("Hippopotamus", evolved4);
+
+        // Fish stays fish
+        var evolvedFish = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, g1, "Fish", rng);
+        Assert.True(evolvedFish == "Fish" || evolvedFish == "Salmon");
+    }
+
+    [Fact]
+    public void BaseBehavior_SolitaryCarnivores_FightAndLoseEnergy()
+    {
+        var eco = new Ecosystem(200, 200, 42);
+
+        // Create two solitary carnivores (Tigers) extremely close
+        var g = new Genome { Size = 1.0f, Speed = 1.0f, VisionRange = 3.0f }; // VisionPixels = 96
+        var t1 = new Carnivore(new Vector2(100, 100), g) { Species = "Tiger", Energy = 50f };
+        var t2 = new Carnivore(new Vector2(105, 100), g) { Species = "Tiger", Energy = 50f };
+
+        eco.AddCreature(t1);
+        eco.AddCreature(t2);
+        eco.FlushPending();
+
+        // Run tick to update spatial grid and execute base behavior
+        eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
+
+        // Solitary stress + combat reduces energy significantly below starting value
+        Assert.True(t1.Energy < 49f);
+        Assert.True(t2.Energy < 49f);
+    }
 }
+

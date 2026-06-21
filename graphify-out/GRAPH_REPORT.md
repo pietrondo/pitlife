@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 83 files · ~42,763 words
+- 83 files · ~44,161 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 928 nodes · 1358 edges · 80 communities (60 shown, 20 thin omitted)
+- 937 nodes · 1383 edges · 80 communities (60 shown, 20 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8985d564`
+- Built from commit: `1bdac549`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -90,7 +90,7 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `Game1` - 31 edges
-2. `Ecosystem` - 29 edges
+2. `Ecosystem` - 30 edges
 3. `SpawnPanel` - 22 edges
 4. `Creature` - 18 edges
 5. `InGameUi` - 18 edges
@@ -120,15 +120,15 @@ Cohesion: 0.09
 Nodes (15): byte, FastNoiseLite, IDisposable, NoiseType, bool, Camera, Color, float (+7 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.10
-Nodes (13): CreatureSpawner, Herbivore, Plant, Creature, GameTime, int, List, object (+5 more)
+Cohesion: 0.09
+Nodes (14): CreatureSpawner, Herbivore, Plant, Creature, Func, GameTime, int, List (+6 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
 Nodes (27): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+19 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.13
+Cohesion: 0.14
 Nodes (15): BaseBehavior, ICreatureBehavior, PlantBehavior, Creature, Ecosystem, GameTime, World, Creature (+7 more)
 
 ### Community 5 - "Community 5"
@@ -168,8 +168,8 @@ Cohesion: 0.14
 Nodes (13): MenuAction, bool, int, KeyboardState, Keys, MouseState, SpriteBatch, SpriteFont (+5 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.25
-Nodes (9): Func, Creature, Dictionary, IEnumerable, int, Vector2, SpatialGrid, X (+1 more)
+Cohesion: 0.22
+Nodes (10): Creature, Dictionary, Func, IEnumerable, int, List, Vector2, SpatialGrid (+2 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.11
@@ -320,7 +320,7 @@ Cohesion: 0.33
 Nodes (4): Genome, Random, Vector2, Omnivore
 
 ## Knowledge Gaps
-- **276 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+271 more)
+- **277 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+272 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -328,15 +328,15 @@ Nodes (4): Genome, Random, Vector2, Omnivore
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _276 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _277 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09103840682788052 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.06984126984126984 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
-  _Cohesion score 0.13230769230769232 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**
   _Cohesion score 0.13230769230769232 - nodes in this community are weakly interconnected._
 - **Should `Community 10` be split into smaller, more focused modules?**

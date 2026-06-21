@@ -63,6 +63,40 @@ internal sealed class SpatialGrid
         RemoveFromBucket(creature, cell);
     }
 
+    public List<Creature> GetNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
+    {
+        var results = new List<Creature>();
+        float radiusSquared = radius * radius;
+        var position = seeker.Position;
+
+        int minCellX = Math.Clamp((int)((position.X - radius) / _cellSize), 0, _columns - 1);
+        int maxCellX = Math.Clamp((int)((position.X + radius) / _cellSize), 0, _columns - 1);
+        int minCellY = Math.Clamp((int)((position.Y - radius) / _cellSize), 0, _rows - 1);
+        int maxCellY = Math.Clamp((int)((position.Y + radius) / _cellSize), 0, _rows - 1);
+
+        for (int y = minCellY; y <= maxCellY; y++)
+        {
+            for (int x = minCellX; x <= maxCellX; x++)
+            {
+                if (_buckets.TryGetValue((x, y), out var bucket))
+                {
+                    foreach (var candidate in bucket)
+                    {
+                        if (candidate == seeker || !candidate.IsAlive || !predicate(candidate))
+                            continue;
+
+                        if (Vector2.DistanceSquared(position, candidate.Position) <= radiusSquared)
+                        {
+                            results.Add(candidate);
+                        }
+                    }
+                }
+            }
+        }
+
+        return results;
+    }
+
     public Creature? FindNearest(Creature seeker, Func<Creature, bool> predicate)
     {
         var center = GetCell(seeker.Position);
