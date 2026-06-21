@@ -11,6 +11,10 @@ public struct Genome
     public float VisionRange;
     public Color Color;
     public float MutationRate;
+    public float DesertAdaptation;
+    public float ColdAdaptation;
+    public float ForestAdaptation;
+    public float WaterAdaptation;
 
     public static Genome Random(Random rng)
     {
@@ -21,17 +25,27 @@ public struct Genome
             Metabolism = (float)(0.5 + rng.NextDouble() * 1.5),
             VisionRange = (float)(1.0 + rng.NextDouble() * 9.0),
             Color = new Color(rng.Next(40, 256), rng.Next(40, 256), rng.Next(40, 256)),
-            MutationRate = 0.05f
+            MutationRate = 0.05f,
+            DesertAdaptation = (float)rng.NextDouble(),
+            ColdAdaptation = (float)rng.NextDouble(),
+            ForestAdaptation = (float)rng.NextDouble(),
+            WaterAdaptation = (float)rng.NextDouble()
         };
     }
 
     public static Genome Reproduce(Genome parent1, Genome parent2, Random rng)
     {
         var child = rng.Next(2) == 0 ? parent1 : parent2;
-        child.Speed = Mutate(child.Speed, 0.5f, 2.0f, rng);
-        child.Size = Mutate(child.Size, 0.5f, 2.0f, rng);
-        child.Metabolism = Mutate(child.Metabolism, 0.5f, 2.0f, rng);
-        child.VisionRange = Mutate(child.VisionRange, 1.0f, 10.0f, rng);
+        child.Speed = Mutate(child.Speed, 0.5f, 2.0f, child.MutationRate, rng);
+        child.Size = Mutate(child.Size, 0.5f, 2.0f, child.MutationRate, rng);
+        child.Metabolism = Mutate(child.Metabolism, 0.5f, 2.0f, child.MutationRate, rng);
+        child.VisionRange = Mutate(child.VisionRange, 1.0f, 10.0f, child.MutationRate, rng);
+        child.MutationRate = Mutate(child.MutationRate, 0.01f, 0.2f, child.MutationRate, rng);
+        child.DesertAdaptation = Mutate(child.DesertAdaptation, 0.0f, 1.0f, child.MutationRate, rng);
+        child.ColdAdaptation = Mutate(child.ColdAdaptation, 0.0f, 1.0f, child.MutationRate, rng);
+        child.ForestAdaptation = Mutate(child.ForestAdaptation, 0.0f, 1.0f, child.MutationRate, rng);
+        child.WaterAdaptation = Mutate(child.WaterAdaptation, 0.0f, 1.0f, child.MutationRate, rng);
+
         if (rng.NextDouble() < child.MutationRate)
         {
             int comp = rng.Next(3);
@@ -47,9 +61,9 @@ public struct Genome
         return child;
     }
 
-    private static float Mutate(float value, float min, float max, Random rng)
+    private static float Mutate(float value, float min, float max, float rate, Random rng)
     {
-        if (rng.NextDouble() >= 0.05) return value;
+        if (rng.NextDouble() >= rate) return value;
         value += (float)((rng.NextDouble() - 0.5) * 0.3);
         return MathHelper.Clamp(value, min, max);
     }

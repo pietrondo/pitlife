@@ -18,7 +18,9 @@ public abstract class Creature
     public bool IsBaby => !IsAdult;
     public float MaxEnergy => 50f * Genome.Size;
     public float EnergyConsumption => Genome.Metabolism * 0.5f * Genome.Size;
-    public float Speed => Genome.Speed * 30f;
+    public float CurrentSpeedMultiplier { get; protected set; } = 1f;
+    public float CurrentEnergyMultiplier { get; protected set; } = 1f;
+    public float Speed => Genome.Speed * 30f * CurrentSpeedMultiplier;
     public float VisionPixels => Genome.VisionRange * 32f;
     public float ReproductionThreshold => MaxEnergy * 0.7f;
     public virtual bool IsAquatic => false;
@@ -42,6 +44,9 @@ public abstract class Creature
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
+
+        UpdateEnvironmentalMultipliers(world);
+
         ConsumeEnergy(dt);
         if (Energy <= 0 || Age > 300f)
         {
@@ -74,7 +79,70 @@ public abstract class Creature
 
     protected virtual void ConsumeEnergy(float dt)
     {
-        Energy -= EnergyConsumption * dt;
+        Energy -= EnergyConsumption * CurrentEnergyMultiplier * dt;
+    }
+
+    private void UpdateEnvironmentalMultipliers(World world)
+    {
+        var tile = world.GetTileAtPosition(Position.X, Position.Y);
+        if (tile == null)
+        {
+            CurrentSpeedMultiplier = 1f;
+            CurrentEnergyMultiplier = 1f;
+            return;
+        }
+
+        if (IsAquatic)
+        {
+            bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater;
+            if (inWater)
+            {
+                CurrentSpeedMultiplier = 1.0f;
+                CurrentEnergyMultiplier = 1.0f;
+            }
+            else
+            {
+                CurrentSpeedMultiplier = 0.2f;
+                CurrentEnergyMultiplier = 3.0f;
+            }
+            return;
+        }
+
+        // Terrestrial creature
+        switch (tile.Biome)
+        {
+            case BiomeType.Desert:
+            case BiomeType.Savanna:
+            case BiomeType.Beach:
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.DesertAdaptation) * 1.5f;
+                CurrentSpeedMultiplier = 0.5f + Genome.DesertAdaptation * 0.5f;
+                break;
+
+            case BiomeType.Tundra:
+            case BiomeType.Snow:
+            case BiomeType.Mountain:
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.ColdAdaptation) * 2.0f;
+                CurrentSpeedMultiplier = 0.4f + Genome.ColdAdaptation * 0.6f;
+                break;
+
+            case BiomeType.Forest:
+            case BiomeType.DenseForest:
+            case BiomeType.Swamp:
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.ForestAdaptation) * 0.5f;
+                CurrentSpeedMultiplier = 0.5f + Genome.ForestAdaptation * 0.5f;
+                break;
+
+            case BiomeType.DeepOcean:
+            case BiomeType.ShallowWater:
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.WaterAdaptation) * 1.0f;
+                CurrentSpeedMultiplier = 0.3f + Genome.WaterAdaptation * 0.7f;
+                break;
+
+            default: // Grassland or others with no penalty
+                CurrentSpeedMultiplier = 1.0f;
+                CurrentEnergyMultiplier = 1.0f;
+                break;
+        }
     }
 
     public virtual void Die()

@@ -11,6 +11,7 @@ public class Herbivore : Creature
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
     {
-        return new Herbivore(position, genome, Species);
+        string evolvedSpecies = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, Species, rng);
+        return new Herbivore(position, genome, evolvedSpecies);
     }
 }

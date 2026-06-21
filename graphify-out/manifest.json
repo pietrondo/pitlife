@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "Game1.cs": {
-    "mtime": 1782034421.8302383,
-    "ast_hash": "7e638dc14dca3d0bbf7e22de2758618e",
+    "mtime": 1782034857.7011669,
+    "ast_hash": "2b1d270c28ea31b5ee54a5da4efed00b",
     "semantic_hash": ""
   },
   "Game/SimulationController.cs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "Localization/I18n.cs": {
-    "mtime": 1782034314.1323662,
-    "ast_hash": "516faf3455d09c7e7aa0d968025dc12e",
+    "mtime": 1782035017.3196735,
+    "ast_hash": "9cbff39d7a59bae012505dbeeb24b37f",
     "semantic_hash": ""
   },
   "PitLife.csproj": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "Rendering/AssetRegistry.cs": {
-    "mtime": 1781968461.876118,
-    "ast_hash": "a762ee713b0f2b94316e717d68761494",
+    "mtime": 1782035007.640354,
+    "ast_hash": "0e113c0f3e12f819f0d61d18cd5537d3",
     "semantic_hash": ""
   },
   "Rendering/Camera.cs": {
@@ -100,13 +100,13 @@
     "semantic_hash": ""
   },
   "Simulation/Carnivore.cs": {
-    "mtime": 1781967939.3466308,
-    "ast_hash": "3ae1ed5c1cce69f7cb1f9e0e79e9a2e4",
+    "mtime": 1782035000.7482252,
+    "ast_hash": "774049155b6fc5b36d590118083708ac",
     "semantic_hash": ""
   },
   "Simulation/Creature.cs": {
-    "mtime": 1782033984.4881814,
-    "ast_hash": "7fe6147e5f889da96909498bba0cfefb",
+    "mtime": 1782034852.224856,
+    "ast_hash": "3f27033c14af00eba783d9406554b5a2",
     "semantic_hash": ""
   },
   "Simulation/CreatureSpawner.cs": {
@@ -130,18 +130,18 @@
     "semantic_hash": ""
   },
   "Simulation/Genome.cs": {
-    "mtime": 1781796259.0660112,
-    "ast_hash": "6a72741c6a9f336c1cfb1be42f7073a2",
+    "mtime": 1782034846.671025,
+    "ast_hash": "6f10bd326946aba737417fd7e1a3219b",
     "semantic_hash": ""
   },
   "Simulation/Herbivore.cs": {
-    "mtime": 1781967939.3496304,
-    "ast_hash": "15236466aa4e6a24bebd3e74e43875d9",
+    "mtime": 1782034997.2938955,
+    "ast_hash": "0bd0f0cddd9fb9f8b4111ad9066a34f9",
     "semantic_hash": ""
   },
   "Simulation/Omnivore.cs": {
-    "mtime": 1781967939.3496304,
-    "ast_hash": "972b6374db32c8a17117465bdad7a3df",
+    "mtime": 1782035003.8212805,
+    "ast_hash": "b217975aa5d3015beb1608c9aee79d21",
     "semantic_hash": ""
   },
   "Simulation/Plant.cs": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "Simulation/SpeciesRegistry.cs": {
-    "mtime": 1781968747.351036,
-    "ast_hash": "4e31187f1978d8b97326037104c3367c",
+    "mtime": 1782035140.0859096,
+    "ast_hash": "96fb15e65257beb8fe0e0319afb92d26",
     "semantic_hash": ""
   },
   "Simulation/Tile.cs": {
@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "UI/InGameUi.cs": {
-    "mtime": 1782034417.8879685,
-    "ast_hash": "7ced4ec5f1e8607f56a5a70882bc1c3f",
+    "mtime": 1782034886.4577694,
+    "ast_hash": "cd493c66cb99b6f90831d0386fc504b9",
     "semantic_hash": ""
   },
   "UI/MainMenu.cs": {
@@ -780,8 +780,8 @@
     "semantic_hash": ""
   },
   "Simulation/SaveSystem.cs": {
-    "mtime": 1782034098.519433,
-    "ast_hash": "5394ab6a695d6b38d4cf7ed3a18e101a",
+    "mtime": 1782034855.2112405,
+    "ast_hash": "26a1dc66e6f55728a7403ef7d9cd3469",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/SaveSystemTests.cs": {
@@ -792,6 +792,21 @@
   "tests/PitLife.Tests/TerrainTests.cs": {
     "mtime": 1782034466.589948,
     "ast_hash": "8e6049f49b36a20d4ebdb72e5bc0127e",
+    "semantic_hash": ""
+  },
+  "tests/PitLife.Tests/AdaptationTests.cs": {
+    "mtime": 1782035024.408974,
+    "ast_hash": "ff25a37a3351a3d834b20f0f3ffa46f2",
+    "semantic_hash": ""
+  },
+  "Content/assets/creatures/mammals/carnivores/felids/cheetah.png": {
+    "mtime": 1782027890.0,
+    "ast_hash": "0b61e2885ab7cd89065dbcdb6ae04d5c",
+    "semantic_hash": ""
+  },
+  "Content/assets/creatures/mammals/herbivores/ungulates/kangaroo.png": {
+    "mtime": 1782027826.0,
+    "ast_hash": "e983269f0f02e91f9b83f8d2530fc58c",
     "semantic_hash": ""
   }
 }

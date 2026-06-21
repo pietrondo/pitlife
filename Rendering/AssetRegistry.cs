@@ -74,6 +74,8 @@ public static class AssetRegistry
         new("Piranha", "Content/assets/creatures/fish/piranha.png"),
         new("Salmon", "Content/assets/creatures/fish/salmon.png"),
         new("Jellyfish", "Content/assets/creatures/fish/jellyfish.png"),
+        new("Kangaroo", "Content/assets/creatures/mammals/herbivores/ungulates/kangaroo.png"),
+        new("Cheetah", "Content/assets/creatures/mammals/carnivores/felids/cheetah.png"),
         // Nuove texture piante pixel art
         new("OakTree", "Content/assets/plants/trees/oak_tree.png"),
         new("PineTree", "Content/assets/plants/trees/pine_tree.png"),

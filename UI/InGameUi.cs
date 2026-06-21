@@ -32,7 +32,7 @@ public sealed class InGameUi
         });
         _windowManager.Add(new UiWindow(I18n.T("window.creature"), CreatureWindowId)
         {
-            Bounds = new Rectangle(376, 112, 384, 272),
+            Bounds = new Rectangle(376, 112, 384, 410),
             ShowCloseButton = true
         });
         _windowManager.Add(new UiWindow(I18n.T("window.terrain"), TerrainWindowId)
@@ -217,7 +217,19 @@ public sealed class InGameUi
         DrawLine(spriteBatch, font, content.X, content.Y + 144, I18n.Format("creature.size", creature.Genome.Size), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, content.X, content.Y + 166, I18n.Format("creature.metabolism", creature.Genome.Metabolism), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, content.X, content.Y + 188, I18n.Format("creature.vision", creature.Genome.VisionRange), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 210, I18n.Format("creature.genome",
+        DrawLine(spriteBatch, font, content.X, content.Y + 210, I18n.Format("creature.mutationRate", creature.Genome.MutationRate), UiTheme.WarmParchment);
+
+        DrawLine(spriteBatch, font, content.X, content.Y + 236, I18n.T("creature.adaptations"), UiTheme.MossSignal);
+
+        int col1X = content.X;
+        int col2X = content.X + content.Width / 2;
+
+        DrawLine(spriteBatch, font, col1X, content.Y + 258, I18n.Format("creature.adaptDesert", creature.Genome.DesertAdaptation), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, col2X, content.Y + 258, I18n.Format("creature.adaptCold", creature.Genome.ColdAdaptation), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, col1X, content.Y + 280, I18n.Format("creature.adaptForest", creature.Genome.ForestAdaptation), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, col2X, content.Y + 280, I18n.Format("creature.adaptWater", creature.Genome.WaterAdaptation), UiTheme.WarmParchment);
+
+        DrawLine(spriteBatch, font, content.X, content.Y + 312, I18n.Format("creature.genome",
             creature.Genome.Color.R, creature.Genome.Color.G, creature.Genome.Color.B), UiTheme.MutedStone);
     }
 

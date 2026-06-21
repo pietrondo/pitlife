@@ -332,7 +332,11 @@ public class Game1 : Game
                 Metabolism = cData.Genome.Metabolism,
                 VisionRange = cData.Genome.VisionRange,
                 Color = new Color(cData.Genome.ColorR, cData.Genome.ColorG, cData.Genome.ColorB),
-                MutationRate = cData.Genome.MutationRate
+                MutationRate = cData.Genome.MutationRate,
+                DesertAdaptation = cData.Genome.DesertAdaptation,
+                ColdAdaptation = cData.Genome.ColdAdaptation,
+                ForestAdaptation = cData.Genome.ForestAdaptation,
+                WaterAdaptation = cData.Genome.WaterAdaptation
             };
 
             Creature c = (Creature)Activator.CreateInstance(

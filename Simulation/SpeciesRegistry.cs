@@ -81,6 +81,113 @@ public static class SpeciesRegistry
         _bySpecies.TryGetValue(species, out var def) && def.IsValidBiome(biome);
 
     internal static void Reset() { /* no-op: builtins registered in static ctor */ }
+
+    public static string DetermineEvolvedSpecies(CreatureType kind, Genome genome, string currentSpecies, Random rng)
+    {
+        if (kind == CreatureType.Herbivore)
+        {
+            if (genome.WaterAdaptation >= 0.65f)
+            {
+                return rng.Next(2) == 0 ? "Fish" : "Salmon";
+            }
+            if (genome.DesertAdaptation >= 0.45f && genome.Speed >= 1.2f && genome.Size >= 1.0f)
+            {
+                return "Kangaroo";
+            }
+            if (genome.DesertAdaptation >= 0.65f && genome.Size <= 0.8f)
+            {
+                return "Lizard";
+            }
+            if (genome.DesertAdaptation >= 0.55f && genome.Speed >= 1.1f)
+            {
+                return "Gazelle";
+            }
+            if (genome.Size <= 0.75f && genome.Speed >= 1.1f)
+            {
+                return "Rabbit";
+            }
+            if (genome.ColdAdaptation >= 0.55f && genome.Size <= 1.1f)
+            {
+                return "Goat";
+            }
+            if (genome.Size >= 1.25f && genome.Speed >= 1.1f)
+            {
+                return "Horse";
+            }
+            if (genome.Size >= 1.0f && genome.ForestAdaptation >= 0.5f)
+            {
+                return "Deer";
+            }
+            if (genome.Size >= 0.8f && genome.Size <= 1.2f && genome.Speed <= 0.9f)
+            {
+                return "Sheep";
+            }
+        }
+        else if (kind == CreatureType.Carnivore)
+        {
+            if (genome.WaterAdaptation >= 0.65f)
+            {
+                return rng.Next(2) == 0 ? "Shark" : "Piranha";
+            }
+            if (genome.Speed >= 1.4f && (genome.DesertAdaptation >= 0.4f || genome.ForestAdaptation <= 0.4f))
+            {
+                return "Cheetah";
+            }
+            if (genome.WaterAdaptation >= 0.45f && genome.DesertAdaptation >= 0.45f)
+            {
+                return "Crocodile";
+            }
+            if (genome.DesertAdaptation >= 0.45f && genome.Speed >= 1.1f)
+            {
+                return "Lion";
+            }
+            if (genome.ColdAdaptation >= 0.45f && genome.Size >= 0.9f)
+            {
+                return "Wolf";
+            }
+            if (genome.ColdAdaptation >= 0.55f && genome.Size <= 1.0f)
+            {
+                return "Lynx";
+            }
+            if (genome.ForestAdaptation >= 0.65f && genome.Size >= 1.2f)
+            {
+                return "Tiger";
+            }
+            if (genome.ForestAdaptation >= 0.5f && genome.Size < 1.2f)
+            {
+                return "Leopard";
+            }
+            if (genome.Size <= 0.8f)
+            {
+                return "Fox";
+            }
+        }
+        else if (kind == CreatureType.Omnivore)
+        {
+            if (genome.WaterAdaptation >= 0.65f)
+            {
+                return "Jellyfish";
+            }
+            if (genome.WaterAdaptation >= 0.4f && genome.ForestAdaptation >= 0.4f)
+            {
+                return "Frog";
+            }
+            if (genome.Size >= 1.3f)
+            {
+                return "Bear";
+            }
+            if (genome.Size >= 0.9f && genome.Size < 1.3f)
+            {
+                return "Boar";
+            }
+            if (genome.Size < 0.9f)
+            {
+                return "Raccoon";
+            }
+        }
+
+        return currentSpecies;
+    }
 }
 
 internal static class BuiltinSpecies
@@ -155,6 +262,8 @@ internal static class BuiltinSpecies
 
         // Misc
         RegisterAnimal("Gazelle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
+        RegisterAnimal("Kangaroo", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land, size: 1.1f);
+        RegisterAnimal("Cheetah", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.9f);
     }
 
     private static void RegisterPlant(string name) =>

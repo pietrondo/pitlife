@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 82 files · ~41,380 words
+- 83 files · ~42,763 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 912 nodes · 1335 edges · 74 communities (54 shown, 20 thin omitted)
+- 928 nodes · 1358 edges · 80 communities (60 shown, 20 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3757eb2d`
+- Built from commit: `8985d564`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -81,14 +81,20 @@
 - [[_COMMUNITY_Community 71|Community 71]]
 - [[_COMMUNITY_Community 72|Community 72]]
 - [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Game1` - 31 edges
 2. `Ecosystem` - 29 edges
 3. `SpawnPanel` - 22 edges
-4. `InGameUi` - 18 edges
-5. `UiWindowManager` - 18 edges
-6. `Creature` - 17 edges
+4. `Creature` - 18 edges
+5. `InGameUi` - 18 edges
+6. `UiWindowManager` - 18 edges
 7. `CreatureRenderer` - 16 edges
 8. `PixelWorldRenderer` - 16 edges
 9. `FastNoiseLite` - 16 edges
@@ -103,11 +109,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (74 total, 20 thin omitted)
+## Communities (80 total, 20 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.06
-Nodes (25): Creature, SpatialGridTests, TestCreature, Carnivore, Genome, Random, Vector2, Genome (+17 more)
+Cohesion: 0.33
+Nodes (5): Creature, Carnivore, Genome, Random, Vector2
 
 ### Community 1 - "Community 1"
 Cohesion: 0.09
@@ -142,7 +148,7 @@ Cohesion: 0.16
 Nodes (12): BiomeType, Camera, Color, CreatureType, Ecosystem, GraphicsDevice, int, Rectangle (+4 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.18
+Cohesion: 0.17
 Nodes (8): Creature, Ecosystem, float, GameTime, Genome, Random, Vector2, World
 
 ### Community 10 - "Community 10"
@@ -154,8 +160,8 @@ Cohesion: 0.14
 Nodes (12): GenderedSpeciesAsset, HashSet, CreatureRenderer, Camera, Color, Dictionary, Ecosystem, GraphicsDevice (+4 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.15
-Nodes (8): BuiltinSpecies, BiomeType, CreatureType, Dictionary, IEnumerable, SpeciesDefinition, SpeciesRegistry, SocialBehavior
+Cohesion: 0.13
+Nodes (10): BuiltinSpecies, BiomeType, CreatureType, Dictionary, Genome, IEnumerable, Random, SpeciesDefinition (+2 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.14
@@ -289,8 +295,32 @@ Nodes (3): IReadOnlyList, AssetRegistry, string
 Cohesion: 0.25
 Nodes (6): JsonSerializerOptions, CreatureSaveData, Ecosystem, GenomeSaveData, SaveData, SaveSystem
 
+### Community 74 - "Community 74"
+Cohesion: 0.21
+Nodes (6): AdaptationTests, TestCreature, Fact, Genome, Random, Vector2
+
+### Community 75 - "Community 75"
+Cohesion: 0.33
+Nodes (4): TestCreature, Genome, Random, Vector2
+
+### Community 76 - "Community 76"
+Cohesion: 0.43
+Nodes (4): SpatialGridTests, TestCreature, CreatureType, Fact
+
+### Community 77 - "Community 77"
+Cohesion: 0.29
+Nodes (4): Genome, Random, Vector2, Plant
+
+### Community 78 - "Community 78"
+Cohesion: 0.33
+Nodes (4): Genome, Random, Vector2, Herbivore
+
+### Community 79 - "Community 79"
+Cohesion: 0.33
+Nodes (4): Genome, Random, Vector2, Omnivore
+
 ## Knowledge Gaps
-- **272 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+267 more)
+- **276 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+271 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -298,9 +328,7 @@ Nodes (6): JsonSerializerOptions, CreatureSaveData, Ecosystem, GenomeSaveData, S
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _272 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.06153846153846154 - nodes in this community are weakly interconnected._
+  _276 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
@@ -311,3 +339,5 @@ _Questions this graph is uniquely positioned to answer:_
   _Cohesion score 0.13230769230769232 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**
   _Cohesion score 0.13230769230769232 - nodes in this community are weakly interconnected._
+- **Should `Community 10` be split into smaller, more focused modules?**
+  _Cohesion score 0.1225296442687747 - nodes in this community are weakly interconnected._

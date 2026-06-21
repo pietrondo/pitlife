@@ -13,6 +13,7 @@ public class Carnivore : Creature
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
     {
-        return new Carnivore(position, genome, Species);
+        string evolvedSpecies = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, Species, rng);
+        return new Carnivore(position, genome, evolvedSpecies);
     }
 }

@@ -18,6 +18,10 @@ public static class SaveSystem
         public byte ColorG { get; set; }
         public byte ColorB { get; set; }
         public float MutationRate { get; set; }
+        public float DesertAdaptation { get; set; }
+        public float ColdAdaptation { get; set; }
+        public float ForestAdaptation { get; set; }
+        public float WaterAdaptation { get; set; }
     }
 
     public class CreatureSaveData
@@ -80,7 +84,11 @@ public static class SaveSystem
                     ColorR = c.Genome.Color.R,
                     ColorG = c.Genome.Color.G,
                     ColorB = c.Genome.Color.B,
-                    MutationRate = c.Genome.MutationRate
+                    MutationRate = c.Genome.MutationRate,
+                    DesertAdaptation = c.Genome.DesertAdaptation,
+                    ColdAdaptation = c.Genome.ColdAdaptation,
+                    ForestAdaptation = c.Genome.ForestAdaptation,
+                    WaterAdaptation = c.Genome.WaterAdaptation
                 }
             });
         }

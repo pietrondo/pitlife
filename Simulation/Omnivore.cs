@@ -13,6 +13,7 @@ public class Omnivore : Creature
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
     {
-        return new Omnivore(position, genome, Species);
+        string evolvedSpecies = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, Species, rng);
+        return new Omnivore(position, genome, evolvedSpecies);
     }
 }
