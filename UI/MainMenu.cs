@@ -167,7 +167,7 @@ public sealed class MainMenu
             spriteBatch.Draw(logo, logoBounds, Color.White);
         }
 
-        _window.Draw(spriteBatch, pixel, font);
+        _window.Draw(spriteBatch, pixel, font, true, Mouse.GetState().Position);
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         MouseState mouse = Mouse.GetState();
         for (int i = 0; i < buttons.Length; i++)

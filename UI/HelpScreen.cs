@@ -76,7 +76,7 @@ public sealed class HelpScreen
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(0, 0, viewportWidth, viewportHeight), UiTheme.MenuScrim);
 
         // Window
-        _window.Draw(spriteBatch, pixel, font);
+        _window.Draw(spriteBatch, pixel, font, true, Mouse.GetState().Position);
 
         // Draw help content
         DrawHelpContent(spriteBatch, font);

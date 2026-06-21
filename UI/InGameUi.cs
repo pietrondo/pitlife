@@ -15,6 +15,7 @@ public sealed class InGameUi
     private readonly UiWindowManager _windowManager = new();
     private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));
     private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
+    private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange"));
 
     public InGameUi()
     {
@@ -50,6 +51,8 @@ public sealed class InGameUi
             _windowManager.Toggle(StatisticsWindowId);
         if (Pressed(keyboard, previousKeyboard, Keys.F3))
             _windowManager.Toggle(CreatureWindowId);
+        if (Pressed(keyboard, previousKeyboard, Keys.F5))
+            _windowManager.TileWindows(viewportWidth, viewportHeight);
 
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
@@ -62,8 +65,15 @@ public sealed class InGameUi
             _windowManager.Toggle(CreatureWindowId);
             toolbarConsumed = true;
         }
+        if (_arrangeButton.WasClicked(mouse, previousMouse))
+        {
+            _windowManager.TileWindows(viewportWidth, viewportHeight);
+            toolbarConsumed = true;
+        }
 
-        bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || _creatureButton.Bounds.Contains(mouse.Position);
+        bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || 
+                           _creatureButton.Bounds.Contains(mouse.Position) ||
+                           _arrangeButton.Bounds.Contains(mouse.Position);
         return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
     }
 
@@ -83,18 +93,24 @@ public sealed class InGameUi
         int viewportHeight)
     {
         LayoutToolbar(viewportHeight);
-        var toolbar = new Rectangle(8, viewportHeight - 60, 304, 52);
+        var toolbar = new Rectangle(8, viewportHeight - 60, 454, 52);
         UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
         UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
         _statisticsButton.Draw(spriteBatch, pixel, font, mouse, false);
         _creatureButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _arrangeButton.Draw(spriteBatch, pixel, font, mouse, false);
 
         foreach (UiWindow window in _windowManager.Windows)
         {
             if (!window.IsOpen)
                 continue;
 
-            window.Draw(spriteBatch, pixel, font);
+            bool isActive = _windowManager.IsActive(window);
+            window.Draw(spriteBatch, pixel, font, isActive, mouse.Position);
+
+            if (window.IsCollapsed)
+                continue;
+
             if (window.Id == StatisticsWindowId)
             {
                 DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
@@ -199,8 +215,9 @@ public sealed class InGameUi
     private void LayoutToolbar(int viewportHeight)
     {
         int y = viewportHeight - 56;
-        _statisticsButton.Bounds = new Rectangle(12, y, 142, 44);
-        _creatureButton.Bounds = new Rectangle(162, y, 142, 44);
+        _statisticsButton.Bounds = new Rectangle(12, y, 140, 44);
+        _creatureButton.Bounds = new Rectangle(160, y, 140, 44);
+        _arrangeButton.Bounds = new Rectangle(308, y, 140, 44);
     }
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
@@ -210,6 +227,7 @@ public sealed class InGameUi
     {
         _statisticsButton.Text = I18n.T("toolbar.statistics");
         _creatureButton.Text = I18n.T("toolbar.creature");
+        _arrangeButton.Text = I18n.T("toolbar.arrange");
         foreach (UiWindow window in _windowManager.Windows)
         {
             if (window.Id == StatisticsWindowId)

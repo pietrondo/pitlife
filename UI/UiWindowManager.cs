@@ -10,9 +10,55 @@ public sealed class UiWindowManager
     private UiWindow? _draggedWindow;
     private Point _dragOffset;
 
+    private System.DateTime _lastClickTime = System.DateTime.MinValue;
+    private string? _lastClickedWindowId;
+
     public IReadOnlyList<UiWindow> Windows => _windows;
 
     public void Add(UiWindow window) => _windows.Add(window);
+
+    public bool IsActive(UiWindow window)
+    {
+        if (!window.IsOpen) return false;
+        for (int i = _windows.Count - 1; i >= 0; i--)
+        {
+            if (_windows[i].IsOpen)
+                return _windows[i] == window;
+        }
+        return false;
+    }
+
+    public void TileWindows(int viewportWidth, int viewportHeight)
+    {
+        int startX = 32;
+        int startY = 88;
+        int gap = 16;
+        int currentX = startX;
+        int currentY = startY;
+        int maxRowHeight = 0;
+
+        foreach (UiWindow window in _windows)
+        {
+            if (!window.IsOpen)
+                continue;
+
+            // If the window exceeds viewport width, wrap to next row
+            if (currentX + window.Bounds.Width > viewportWidth - 32 && currentX > startX)
+            {
+                currentX = startX;
+                currentY += maxRowHeight + gap;
+                maxRowHeight = 0;
+            }
+
+            window.Bounds = new Rectangle(currentX, currentY, window.Bounds.Width, window.Bounds.Height);
+            currentX += window.Bounds.Width + gap;
+            if (window.Bounds.Height > maxRowHeight)
+                maxRowHeight = window.Bounds.Height;
+        }
+
+        // Clamp them after tiling to ensure they are inside viewport bounds
+        ClampWindows(viewportWidth, viewportHeight);
+    }
 
     public void Toggle(string id)
     {
@@ -81,6 +127,14 @@ public sealed class UiWindowManager
                     continue;
 
                 BringToFront(window);
+
+                // Double click detection on title bar to collapse/expand
+                var now = System.DateTime.UtcNow;
+                var elapsed = now - _lastClickTime;
+                bool isDoubleClick = _lastClickedWindowId == window.Id && elapsed.TotalMilliseconds < 350;
+                _lastClickTime = now;
+                _lastClickedWindowId = window.Id;
+
                 if (window.ShowCloseButton && window.CloseButtonBounds.Contains(mouse.Position))
                 {
                     window.IsOpen = false;
@@ -89,6 +143,13 @@ public sealed class UiWindowManager
 
                 if (window.IsDraggable && window.TitleBarBounds.Contains(mouse.Position))
                 {
+                    if (isDoubleClick)
+                    {
+                        window.ToggleCollapse();
+                        _draggedWindow = null;
+                        return true;
+                    }
+
                     _draggedWindow = window;
                     _dragOffset = new Point(mouse.X - window.Bounds.X, mouse.Y - window.Bounds.Y);
                 }
