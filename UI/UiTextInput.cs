@@ -62,6 +62,18 @@ public sealed class UiTextInput
                 char c = shift ? char.ToUpper((char)('A' + (key - Keys.A))) : char.ToLower((char)('A' + (key - Keys.A)));
                 Text += c;
             }
+            else if (!IsNumericOnly && Text.Length < MaxLength)
+            {
+                bool shift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
+                Text += key switch
+                {
+                    Keys.OemPeriod => ".",
+                    Keys.OemQuestion => shift ? "?" : "/",
+                    Keys.OemMinus => shift ? "_" : "-",
+                    Keys.OemBackslash => "\\",
+                    _ => ""
+                };
+            }
         }
 
         _prevPressedKeys = pressedKeys;

@@ -17,7 +17,7 @@ public sealed class SpawnPanel
 
     private static readonly string[] CategoryOrder =
         ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
-    private static readonly Dictionary<string, string[]> SpeciesByCategory = BuildSpeciesByCategory();
+    private Dictionary<string, string[]> _speciesByCategory = BuildSpeciesByCategory();
 
     public const int PanelWidth = 200;
     public const int ToggleButtonSize = 44;
@@ -37,7 +37,14 @@ public sealed class SpawnPanel
     public SpawnPanel() { RebuildCategoryButtons(); }
 
     internal static IReadOnlyList<string> SpeciesForCategory(string category) =>
-        SpeciesByCategory.TryGetValue(category, out var species) ? species : Array.Empty<string>();
+        BuildSpeciesByCategory().TryGetValue(category, out var species) ? species : Array.Empty<string>();
+
+    public void RefreshSpeciesCatalog()
+    {
+        _speciesByCategory = BuildSpeciesByCategory();
+        SelectedSpeciesKey = null;
+        RebuildSpeciesButtons();
+    }
 
     public void SetIconTexture(Texture2D? icon) => _iconTexture = icon;
 
@@ -213,7 +220,7 @@ public sealed class SpawnPanel
     {
         _speciesButtons.Clear();
         if (SelectedCategory == null) return;
-        if (!SpeciesByCategory.TryGetValue(SelectedCategory, out var species)) return;
+        if (!_speciesByCategory.TryGetValue(SelectedCategory, out var species)) return;
 
         foreach (var s in species)
         {

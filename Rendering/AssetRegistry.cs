@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using PitLife.Simulation;
 
 namespace PitLife.Rendering;
@@ -8,6 +10,7 @@ public sealed record GenderedSpeciesAsset(string Species, string MalePath, strin
 
 public static class AssetRegistry
 {
+    private static readonly object SpeciesTextureSync = new();
     public const string FallbackPlant = "_fallback_plant";
     public const string FallbackHerbivore = "_fallback_herbivore";
     public const string FallbackCarnivore = "_fallback_carnivore";
@@ -37,7 +40,7 @@ public static class AssetRegistry
         new(FallbackOmnivore, "Content/assets/creatures/mammals/omnivores/suids/omnivore.png"),
     };
 
-    public static readonly IReadOnlyList<SpeciesAsset> SpeciesTextures = new SpeciesAsset[]
+    private static readonly List<SpeciesAsset> SpeciesTextureEntries = new()
     {
         new("Plant", "Content/assets/creatures/plants/shrubs/plant.png"),
         new("Deer", "Content/assets/creatures/mammals/herbivores/ungulates/deer.png"),
@@ -107,6 +110,37 @@ public static class AssetRegistry
         new("Morel", "Content/assets/creatures/plants/fungi/morel.png"),
         new("OysterMushroom", "Content/assets/creatures/plants/fungi/oyster_mushroom.png"),
     };
+
+    public static IReadOnlyList<SpeciesAsset> SpeciesTextures
+    {
+        get
+        {
+            lock (SpeciesTextureSync)
+                return SpeciesTextureEntries.ToArray();
+        }
+    }
+
+    public static void RegisterCustomSpeciesTexture(string species, string path)
+    {
+        lock (SpeciesTextureSync)
+        {
+            if (SpeciesTextureEntries.Exists(asset => asset.Species == species))
+                throw new InvalidOperationException($"Texture already registered for species '{species}'.");
+            SpeciesTextureEntries.Add(new SpeciesAsset(species, path));
+        }
+    }
+
+    internal static bool UnregisterCustomSpeciesTexture(string species)
+    {
+        lock (SpeciesTextureSync)
+        {
+            int index = SpeciesTextureEntries.FindIndex(asset => asset.Species == species);
+            if (index < 0)
+                return false;
+            SpeciesTextureEntries.RemoveAt(index);
+            return true;
+        }
+    }
 
     public static readonly IReadOnlyList<GenderedSpeciesAsset> GenderedSpeciesTextures = new GenderedSpeciesAsset[]
     {

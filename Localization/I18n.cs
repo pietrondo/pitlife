@@ -53,6 +53,22 @@ public static class I18n
     public static IReadOnlyCollection<string> Keys(string language) =>
         language.StartsWith("it", StringComparison.OrdinalIgnoreCase) ? Italian.Keys : English.Keys;
 
+    public static void RegisterCustomSpecies(string species, string englishName, string italianName)
+    {
+        string key = $"species.{species}";
+        if (English.ContainsKey(key) || Italian.ContainsKey(key))
+            throw new InvalidOperationException($"Localization already registered for species '{species}'.");
+        English[key] = englishName;
+        Italian[key] = italianName;
+    }
+
+    internal static void UnregisterCustomSpecies(string species)
+    {
+        string key = $"species.{species}";
+        English.Remove(key);
+        Italian.Remove(key);
+    }
+
     private static Dictionary<string, string> CreateEnglishCatalog() => new(StringComparer.Ordinal)
     {
         ["common.yes"] = "YES",
@@ -122,7 +138,24 @@ public static class I18n
         ["creature.adaptWater"] = "Water: {0:P0}",
         ["hud.paused"] = "PAUSED",
         ["hud.summary"] = "Time: {0:F1}s | Plants: {1}  Herbivores: {2}  Carnivores: {3}  Omnivores: {4} | Speed: {5}",
-        ["hud.controls"] = "WASD:move  Scroll:zoom  1(1x) 2(2x) 3(4x) Space:pause  F2/F3/F5:windows  ESC:menu",
+        ["hud.controls"] = "WASD:move  Scroll:zoom  1/2/3:speed  Space:pause  F2/F3/F5:windows  F6:species  ESC:menu",
+        ["editor.title"] = "SPECIES EDITOR",
+        ["editor.key"] = "Stable species key",
+        ["editor.englishName"] = "English name",
+        ["editor.italianName"] = "Italian name",
+        ["editor.texture"] = "PNG texture path",
+        ["editor.kind"] = "Type",
+        ["editor.social"] = "Social",
+        ["editor.biomes"] = "Biomes",
+        ["editor.reproduction"] = "Reproduction",
+        ["editor.load"] = "LOAD",
+        ["editor.clone"] = "CLONE",
+        ["editor.save"] = "SAVE",
+        ["editor.clear"] = "CLEAR",
+        ["editor.saved"] = "Species catalog saved and applied.",
+        ["editor.loaded"] = "Custom species loaded for editing.",
+        ["editor.cloned"] = "Species cloned: choose a unique key.",
+        ["editor.empty"] = "No custom species in the catalog.",
         ["creatureType.Plant"] = "Plant",
         ["creatureType.Herbivore"] = "Herbivore",
         ["creatureType.Carnivore"] = "Carnivore",
@@ -304,7 +337,24 @@ public static class I18n
             ["creature.adaptWater"] = "Acqua: {0:P0}",
             ["hud.paused"] = "PAUSA",
             ["hud.summary"] = "Tempo: {0:F1}s | Piante: {1}  Erbivori: {2}  Carnivori: {3}  Onnivori: {4} | Velocità: {5}",
-            ["hud.controls"] = "WASD:muovi  Rotella:zoom  1(1x) 2(2x) 3(4x) Spazio:pausa  F2/F3/F5:finestre  ESC:menu",
+            ["hud.controls"] = "WASD:muovi  Rotella:zoom  1/2/3:velocità  Spazio:pausa  F2/F3/F5:finestre  F6:specie  ESC:menu",
+            ["editor.title"] = "EDITOR SPECIE",
+            ["editor.key"] = "Chiave stabile della specie",
+            ["editor.englishName"] = "Nome inglese",
+            ["editor.italianName"] = "Nome italiano",
+            ["editor.texture"] = "Percorso texture PNG",
+            ["editor.kind"] = "Tipo",
+            ["editor.social"] = "Sociale",
+            ["editor.biomes"] = "Biomi",
+            ["editor.reproduction"] = "Riproduzione",
+            ["editor.load"] = "CARICA",
+            ["editor.clone"] = "CLONA",
+            ["editor.save"] = "SALVA",
+            ["editor.clear"] = "PULISCI",
+            ["editor.saved"] = "Catalogo specie salvato e applicato.",
+            ["editor.loaded"] = "Specie personalizzata caricata per la modifica.",
+            ["editor.cloned"] = "Specie clonata: scegli una chiave univoca.",
+            ["editor.empty"] = "Il catalogo non contiene specie personalizzate.",
             ["creatureType.Plant"] = "Pianta",
             ["creatureType.Herbivore"] = "Erbivoro",
             ["creatureType.Carnivore"] = "Carnivoro",

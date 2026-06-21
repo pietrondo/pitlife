@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -29,6 +30,9 @@ public class Game1 : Game
     private readonly HelpScreen _helpScreen = new();
     private readonly InGameUi _inGameUi = new();
     private readonly SpawnPanel _spawnPanel = new();
+    private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
+    private readonly SpeciesEditorPanel _speciesEditor;
+    private bool _contentLoaded;
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
 
@@ -50,12 +54,23 @@ public class Game1 : Game
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
+        _speciesEditor = new SpeciesEditorPanel(new SpeciesEditorService(
+            _speciesCatalogRuntime,
+            Directory.GetCurrentDirectory(),
+            SpeciesCatalogRuntime.DefaultCatalogPath));
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
 
     protected override void Initialize()
     {
+        _speciesCatalogRuntime.CatalogChanged += OnSpeciesCatalogChanged;
+        IReadOnlyList<SpeciesCatalogValidationError> catalogErrors = _speciesCatalogRuntime.LoadAndApply(
+            SpeciesCatalogRuntime.DefaultCatalogPath,
+            Directory.GetCurrentDirectory());
+        foreach (SpeciesCatalogValidationError error in catalogErrors)
+            Logger.Warn($"Species catalog [{error.EntryIndex}:{error.Field}] {error.Message}");
+
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 800;
         _graphics.ApplyChanges();
@@ -93,6 +108,7 @@ public class Game1 : Game
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
 
         _logo = LoadTexture("Content/assets/logo.png");
+        _contentLoaded = true;
     }
 
     private Texture2D? LoadTexture(string path)
@@ -198,6 +214,23 @@ public class Game1 : Game
 
             if (gamepadBack)
                 Exit();
+
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
+        if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
+            _speciesEditor.Toggle();
+
+        if (_speciesEditor.IsOpen)
+        {
+            if (escapePressed)
+                _speciesEditor.Close();
+            else
+                _speciesEditor.Update(mouse, _prevMouse, kbd, _prevKbd,
+                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             _prevKbd = kbd;
             _prevMouse = mouse;
@@ -509,8 +542,26 @@ public class Game1 : Game
         _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
         _minimap.Draw(_spriteBatch, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         _spawnPanel.Draw(_spriteBatch, _uiPixel, _font, Mouse.GetState());
+        _speciesEditor.Draw(
+            _spriteBatch,
+            _uiPixel,
+            _font,
+            Mouse.GetState(),
+            GraphicsDevice.Viewport.Width,
+            GraphicsDevice.Viewport.Height);
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private void OnSpeciesCatalogChanged()
+    {
+        _spawnPanel.RefreshSpeciesCatalog();
+        if (!_contentLoaded)
+            return;
+
+        var customAssets = AssetRegistry.SpeciesTextures
+            .Where(asset => _speciesCatalogRuntime.CustomKeys.Contains(asset.Species));
+        _creatureRenderer.LoadFromRegistry(GraphicsDevice, customAssets);
     }
 }
