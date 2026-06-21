@@ -245,8 +245,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/AssetRegistryTests.cs": {
-    "mtime": 1781967939.6164296,
-    "ast_hash": "5365ba4a9efb9e1cbbc3f86af38db987",
+    "mtime": 1782052718.82944,
+    "ast_hash": "9bdde6a3730b7b972101d4ab20e4a3eb",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/AssetTests.cs": {

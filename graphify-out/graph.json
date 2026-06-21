@@ -6533,7 +6533,7 @@
       "label": "AssetRegistryTests",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L6",
+      "source_location": "L7",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests",
       "community": 45,
@@ -6543,7 +6543,7 @@
       "label": ".AllBuiltinSpecies_HaveTexture()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_allbuiltinspecies_havetexture",
       "community": 45,
@@ -6553,7 +6553,7 @@
       "label": "Fact",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L8",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "tests_pitlife_tests_assetregistrytests_cs_fact",
       "community": 45,
@@ -6563,7 +6563,7 @@
       "label": ".AllBiomes_HaveTexture()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_allbiomes_havetexture",
       "community": 45,
@@ -6573,21 +6573,51 @@
       "label": ".GenderedSpecies_HaveBothPaths()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L29",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_havebothpaths",
       "community": 45,
       "norm_label": ".genderedspecies_havebothpaths()"
     },
     {
+      "label": ".GenderedSpecies_AreDistinctValidPngPairs()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_aredistinctvalidpngpairs",
+      "community": 45,
+      "norm_label": ".genderedspecies_aredistinctvalidpngpairs()"
+    },
+    {
       "label": ".FallbackKeys_AreDistinct()",
       "file_type": "code",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
-      "source_location": "L40",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "pitlife_tests_assetregistrytests_assetregistrytests_fallbackkeys_aredistinct",
       "community": 45,
       "norm_label": ".fallbackkeys_aredistinct()"
+    },
+    {
+      "label": ".ReadAndValidatePng()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "pitlife_tests_assetregistrytests_assetregistrytests_readandvalidatepng",
+      "community": 45,
+      "norm_label": ".readandvalidatepng()"
+    },
+    {
+      "label": ".FindRepositoryRoot()",
+      "file_type": "code",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L87",
+      "_origin": "ast",
+      "id": "pitlife_tests_assetregistrytests_assetregistrytests_findrepositoryroot",
+      "community": 45,
+      "norm_label": ".findrepositoryroot()"
     },
     {
       "label": "AssetTests.cs",
@@ -11307,9 +11337,9 @@
       "source_file": "Rendering/CreatureRenderer.cs",
       "source_location": "L186",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "rendering_creaturerenderer_creaturerenderer",
-      "target": "rendering_creaturerenderer_creaturerenderer_getgenderindicatorcolor",
-      "confidence_score": 1.0
+      "target": "rendering_creaturerenderer_creaturerenderer_getgenderindicatorcolor"
     },
     {
       "relation": "method",
@@ -11660,9 +11690,9 @@
       "source_file": "Rendering/CreatureRenderer.cs",
       "source_location": "L171",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "rendering_creaturerenderer_creaturerenderer_draw",
-      "target": "rendering_creaturerenderer_creaturerenderer_getgenderindicatorcolor",
-      "confidence_score": 1.0
+      "target": "rendering_creaturerenderer_creaturerenderer_getgenderindicatorcolor"
     },
     {
       "relation": "references",
@@ -11704,9 +11734,9 @@
       "source_location": "L186",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "rendering_creaturerenderer_creaturerenderer_getgenderindicatorcolor",
-      "target": "rendering_creaturerenderer_cs_color",
-      "confidence_score": 1.0
+      "target": "rendering_creaturerenderer_cs_color"
     },
     {
       "relation": "references",
@@ -11715,9 +11745,9 @@
       "source_location": "L186",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "rendering_creaturerenderer_creaturerenderer_getgenderindicatorcolor",
-      "target": "gender",
-      "confidence_score": 1.0
+      "target": "gender"
     },
     {
       "relation": "contains",
@@ -14018,9 +14048,9 @@
       "source_location": "L230",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_creature_creature_canmatewith",
-      "target": "simulation_creature_creature",
-      "confidence_score": 1.0
+      "target": "simulation_creature_creature"
     },
     {
       "relation": "method",
@@ -14546,9 +14576,9 @@
       "source_file": "Simulation/Creature.cs",
       "source_location": "L211",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_creature_creature_reproducewith",
-      "target": "simulation_creature_creature_canmatewith",
-      "confidence_score": 1.0
+      "target": "simulation_creature_creature_canmatewith"
     },
     {
       "relation": "calls",
@@ -15407,9 +15437,9 @@
       "source_file": "Simulation/Genome.cs",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_genome",
-      "target": "simulation_genome_choose",
-      "confidence_score": 1.0
+      "target": "simulation_genome_choose"
     },
     {
       "relation": "contains",
@@ -15448,9 +15478,9 @@
       "source_location": "L76",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "simulation_genome_choose",
-      "target": "simulation_genome_random",
-      "confidence_score": 1.0
+      "target": "simulation_genome_random"
     },
     {
       "relation": "references",
@@ -15503,9 +15533,9 @@
       "source_file": "Simulation/Genome.cs",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "simulation_genome_reproduce",
-      "target": "simulation_genome_choose",
-      "confidence_score": 1.0
+      "target": "simulation_genome_choose"
     },
     {
       "relation": "calls",
@@ -20779,9 +20809,9 @@
       "source_file": "tests/PitLife.Tests/AdaptationTests.cs",
       "source_location": "L101",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_adaptationtests_adaptationtests",
-      "target": "pitlife_tests_adaptationtests_adaptationtests_genome_reproduce_inheritstraitsfrombothparents",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_adaptationtests_adaptationtests_genome_reproduce_inheritstraitsfrombothparents"
     },
     {
       "relation": "method",
@@ -20886,9 +20916,9 @@
       "source_location": "L101",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_adaptationtests_adaptationtests_genome_reproduce_inheritstraitsfrombothparents",
-      "target": "tests_pitlife_tests_adaptationtests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_adaptationtests_cs_fact"
     },
     {
       "relation": "references",
@@ -20945,11 +20975,41 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_findrepositoryroot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_aredistinctvalidpngpairs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
       "source_location": "L29",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "pitlife_tests_assetregistrytests_assetregistrytests",
       "target": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_havebothpaths"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_readandvalidatepng",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -20988,12 +21048,45 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L41",
+      "weight": 1.0,
+      "context": "attribute",
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_aredistinctvalidpngpairs",
+      "target": "tests_pitlife_tests_assetregistrytests_cs_fact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
       "source_location": "L29",
       "weight": 1.0,
       "context": "attribute",
       "confidence_score": 1.0,
       "source": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_havebothpaths",
       "target": "tests_pitlife_tests_assetregistrytests_cs_fact"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_aredistinctvalidpngpairs",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_findrepositoryroot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/PitLife.Tests/AssetRegistryTests.cs",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "pitlife_tests_assetregistrytests_assetregistrytests_genderedspecies_aredistinctvalidpngpairs",
+      "target": "pitlife_tests_assetregistrytests_assetregistrytests_readandvalidatepng",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22296,9 +22389,9 @@
       "source_file": "tests/PitLife.Tests/PixelWorldRendererTests.cs",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_pixelworldrenderertests_pixelworldrenderertests",
-      "target": "pitlife_tests_pixelworldrenderertests_pixelworldrenderertests_genderindicators_aredistinctformaleandfemale",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_pixelworldrenderertests_pixelworldrenderertests_genderindicators_aredistinctformaleandfemale"
     },
     {
       "relation": "method",
@@ -22347,9 +22440,9 @@
       "source_location": "L9",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_pixelworldrenderertests_pixelworldrenderertests_genderindicators_aredistinctformaleandfemale",
-      "target": "tests_pitlife_tests_pixelworldrenderertests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_pixelworldrenderertests_cs_fact"
     },
     {
       "relation": "references",
@@ -22872,9 +22965,9 @@
       "source_file": "tests/PitLife.Tests/SocialSystemTests.cs",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests",
-      "target": "pitlife_tests_socialsystemtests_socialsystemtests_reproducewith_differentspecies_returnsnull",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_socialsystemtests_socialsystemtests_reproducewith_differentspecies_returnsnull"
     },
     {
       "relation": "method",
@@ -22892,9 +22985,9 @@
       "source_file": "tests/PitLife.Tests/SocialSystemTests.cs",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests",
-      "target": "pitlife_tests_socialsystemtests_socialsystemtests_reproducewith_unassignedgender_returnsnull",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_socialsystemtests_socialsystemtests_reproducewith_unassignedgender_returnsnull"
     },
     {
       "relation": "method",
@@ -23034,9 +23127,9 @@
       "source_location": "L80",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests_reproducewith_differentspecies_returnsnull",
-      "target": "tests_pitlife_tests_socialsystemtests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_socialsystemtests_cs_fact"
     },
     {
       "relation": "references",
@@ -23056,9 +23149,9 @@
       "source_location": "L66",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_socialsystemtests_socialsystemtests_reproducewith_unassignedgender_returnsnull",
-      "target": "tests_pitlife_tests_socialsystemtests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_socialsystemtests_cs_fact"
     },
     {
       "relation": "references",
@@ -25321,5 +25414,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4113d92a69902041d2deafa7b83f27d71a2a0907"
+  "built_at_commit": "cd3c21fb3473b9b7241be93f4218cb5533ecb339"
 }

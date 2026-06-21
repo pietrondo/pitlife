@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 87 files · ~45,246 words
+- 87 files · ~45,388 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 984 nodes · 1454 edges · 85 communities (63 shown, 22 thin omitted)
+- 987 nodes · 1460 edges · 85 communities (63 shown, 22 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4113d92a`
+- Built from commit: `cd3c21fb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
