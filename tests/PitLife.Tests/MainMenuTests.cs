@@ -18,14 +18,14 @@ public class MainMenuTests
 
     private static int GetFocusedIndex(MainMenu menu)
     {
-        var field = typeof(MainMenu).GetField("_focusedIndex", BindingFlags.NonPublic | BindingFlags.Instance);
-        return (int)field.GetValue(menu);
+        var field = typeof(MainMenu).GetField("_focusedIndex", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        return (int)field.GetValue(menu)!;
     }
 
     private static bool GetSeedInputFocused(MainMenu menu)
     {
-        var field = typeof(MainMenu).GetField("_seedInput", BindingFlags.NonPublic | BindingFlags.Instance);
-        var seedInput = (UiTextInput)field.GetValue(menu);
+        var field = typeof(MainMenu).GetField("_seedInput", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var seedInput = (UiTextInput)field.GetValue(menu)!;
         return seedInput.IsFocused;
     }
 
@@ -58,4 +58,68 @@ public class MainMenuTests
 
         Assert.True(GetSeedInputFocused(menu));
     }
+
+    [Fact]
+    public void NewWorldButton_RequestsRandomWorld_WhenSeedIsEmpty()
+    {
+        var menu = new MainMenu();
+        MouseState released = MouseAt(400, 340, ButtonState.Released);
+        menu.Update(released, released, new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        menu.Update(MouseAt(400, 340, ButtonState.Pressed), released,
+            new KeyboardState(),
+            new KeyboardState(),
+            800,
+            720,
+            false);
+        MenuAction action = menu.Update(
+            released,
+            MouseAt(400, 340, ButtonState.Pressed),
+            new KeyboardState(),
+            new KeyboardState(),
+            800,
+            720,
+            false);
+
+        Assert.Equal(MenuAction.NewWorld, action);
+    }
+
+    [Fact]
+    public void NewWorldButton_UsesEnteredSeed()
+    {
+        var menu = new MainMenu();
+        MouseState releasedInput = MouseAt(400, 390, ButtonState.Released);
+        menu.Update(releasedInput, releasedInput, new KeyboardState(), new KeyboardState(), 800, 720, false);
+        menu.Update(MouseAt(400, 390, ButtonState.Pressed), releasedInput,
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+        menu.Update(releasedInput, MouseAt(400, 390, ButtonState.Pressed),
+            new KeyboardState(Keys.D4), new KeyboardState(), 800, 720, false);
+        menu.Update(releasedInput, releasedInput,
+            new KeyboardState(), new KeyboardState(Keys.D4), 800, 720, false);
+        menu.Update(releasedInput, releasedInput,
+            new KeyboardState(Keys.D2), new KeyboardState(), 800, 720, false);
+
+        menu.Update(MouseAt(400, 340, ButtonState.Pressed),
+            MouseAt(400, 340, ButtonState.Released),
+            new KeyboardState(),
+            new KeyboardState(Keys.D2),
+            800,
+            720,
+            false);
+        MenuAction action = menu.Update(
+            MouseAt(400, 340, ButtonState.Released),
+            MouseAt(400, 340, ButtonState.Pressed),
+            new KeyboardState(),
+            new KeyboardState(),
+            800,
+            720,
+            false);
+
+        Assert.Equal(MenuAction.NewWorldWithSeed, action);
+        Assert.Equal(42, menu.Seed);
+    }
+
+    private static MouseState MouseAt(int x, int y, ButtonState state) =>
+        new(x, y, 0, state, ButtonState.Released, ButtonState.Released,
+            ButtonState.Released, ButtonState.Released);
 }

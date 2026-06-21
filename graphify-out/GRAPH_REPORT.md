@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 84 files · ~44,353 words
+- 85 files · ~44,591 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 950 nodes · 1401 edges · 81 communities (61 shown, 20 thin omitted)
+- 962 nodes · 1419 edges · 82 communities (61 shown, 21 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0a917674`
+- Built from commit: `2662ff4f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -88,13 +88,14 @@
 - [[_COMMUNITY_Community 78|Community 78]]
 - [[_COMMUNITY_Community 79|Community 79]]
 - [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Game1` - 31 edges
+1. `Game1` - 32 edges
 2. `Ecosystem` - 30 edges
 3. `SpawnPanel` - 26 edges
-4. `Creature` - 18 edges
-5. `InGameUi` - 18 edges
+4. `InGameUi` - 19 edges
+5. `Creature` - 18 edges
 6. `UiWindowManager` - 18 edges
 7. `CreatureRenderer` - 16 edges
 8. `PixelWorldRenderer` - 16 edges
@@ -110,7 +111,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (81 total, 20 thin omitted)
+## Communities (82 total, 21 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
@@ -133,8 +134,8 @@ Cohesion: 0.14
 Nodes (15): BaseBehavior, ICreatureBehavior, PlantBehavior, Creature, Ecosystem, GameTime, World, Creature (+7 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.17
-Nodes (13): Color, Creature, KeyboardState, Keys, MouseState, Rectangle, SpriteBatch, SpriteFont (+5 more)
+Cohesion: 0.15
+Nodes (14): Color, Creature, KeyboardState, Keys, MouseState, Rectangle, SpriteBatch, SpriteFont (+6 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.11
@@ -261,8 +262,8 @@ Cohesion: 0.25
 Nodes (5): InlineData, TileTests, BiomeType, Fact, Theory
 
 ### Community 41 - "Community 41"
-Cohesion: 0.36
-Nodes (4): ITestOutputHelper, MainMenuTests, Fact, MainMenu
+Cohesion: 0.24
+Nodes (6): ButtonState, ITestOutputHelper, MainMenuTests, Fact, MainMenu, MouseState
 
 ### Community 42 - "Community 42"
 Cohesion: 0.36
@@ -325,21 +326,21 @@ Cohesion: 0.32
 Nodes (4): SpawnPanelTests, Fact, MouseState, SpawnPanel
 
 ## Knowledge Gaps
-- **280 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+275 more)
+- **283 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+278 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _280 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _283 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.09103840682788052 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.06984126984126984 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07207207207207207 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
 - **Should `Community 6` be split into smaller, more focused modules?**

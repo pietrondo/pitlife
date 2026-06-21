@@ -297,15 +297,11 @@ public class Game1 : Game
         int seed = seedOverride ?? new Random().Next();
         _ecosystem = new Ecosystem(200, 150, seed);
         _ecosystem.Initialize(60, 20, 15, 150);
-        _camera.WorldWidth = _ecosystem.World.PixelWidth;
-        _camera.WorldHeight = _ecosystem.World.PixelHeight;
-        _camera.Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f);
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World, seed);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
-        _inGameUi.World = _ecosystem.World;
-        _selectedCreature = null;
+        ResetWorldSessionState();
         
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
@@ -356,15 +352,11 @@ public class Game1 : Game
         _ecosystem.FlushPending();
         _ecosystem.UpdateStats();
 
-        _camera.WorldWidth = _ecosystem.World.PixelWidth;
-        _camera.WorldHeight = _ecosystem.World.PixelHeight;
-        _camera.Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f);
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World, data.Seed);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
-        _inGameUi.World = _ecosystem.World;
-        _selectedCreature = null;
+        ResetWorldSessionState();
 
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
@@ -372,6 +364,25 @@ public class Game1 : Game
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.Fallbacks);
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
+    }
+
+    private void ResetWorldSessionState()
+    {
+        _camera.WorldWidth = _ecosystem.World.PixelWidth;
+        _camera.WorldHeight = _ecosystem.World.PixelHeight;
+        _camera.Zoom = 1f;
+        _camera.Position = new Vector2(
+            _ecosystem.World.PixelWidth / 2f,
+            _ecosystem.World.PixelHeight / 2f);
+        _selectedCreature = null;
+        _spawnPanel.Close();
+        _inGameUi.ResetForWorld(_ecosystem.World);
+        _displayPlants = _ecosystem.PlantCount;
+        _displayHerbivores = _ecosystem.HerbivoreCount;
+        _displayCarnivores = _ecosystem.CarnivoreCount;
+        _displayOmnivores = _ecosystem.OmnivoreCount;
+        _displayTime = _ecosystem.TotalTime;
+        _dayNight.Update(_ecosystem.TotalTime);
     }
 
     private static Color GetPhaseColor(DayPhase phase) => phase switch

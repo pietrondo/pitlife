@@ -45,6 +45,13 @@ public sealed class InGameUi
     public void OpenCreatureWindow() => _windowManager.Open(CreatureWindowId);
     public void OpenTerrainWindow() => _windowManager.Open(TerrainWindowId);
 
+    public void ResetForWorld(World world)
+    {
+        World = world;
+        SelectedTile = null;
+        WantsToGoToMainMenu = false;
+    }
+
     public bool CloseTopWindow() => _windowManager.CloseTopWindow();
 
     public bool Update(
