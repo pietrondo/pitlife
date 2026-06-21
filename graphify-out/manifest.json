@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "Game1.cs": {
-    "mtime": 1782045433.6206703,
-    "ast_hash": "f3c26bab650d7a24f3177edb6e01e55f",
+    "mtime": 1782054281.3872058,
+    "ast_hash": "59eec8474fa14d912c226362a6456685",
     "semantic_hash": ""
   },
   "Game/SimulationController.cs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "Localization/I18n.cs": {
-    "mtime": 1782044119.676169,
-    "ast_hash": "da614feb447f3083392ccf8e9ef2acf5",
+    "mtime": 1782054289.0297291,
+    "ast_hash": "3eb3347f0d00d8631f23ba1cdb2f421f",
     "semantic_hash": ""
   },
   "PitLife.csproj": {
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/MainMenuTests.cs": {
-    "mtime": 1782044704.1120267,
-    "ast_hash": "78bfcab1d7a7666a92cbb2fcadb1a845",
+    "mtime": 1782054281.3872058,
+    "ast_hash": "aa11ac658309e8d263968f4698d50337",
     "semantic_hash": ""
   },
   "tests/PitLife.Tests/MinimapTests.cs": {
@@ -832,6 +832,11 @@
   "tests/PitLife.Tests/LifecycleBalanceTests.cs": {
     "mtime": 1782053410.1151812,
     "ast_hash": "a8ebbec3ec39bf567e27b287da569213",
+    "semantic_hash": ""
+  },
+  "tests/PitLife.Tests/HelpScreenTests.cs": {
+    "mtime": 1782054281.3887048,
+    "ast_hash": "e7eab9c8e144b75cb6045af1372411c5",
     "semantic_hash": ""
   }
 }

@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 88 files · ~45,962 words
+- 89 files · ~46,438 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1007 nodes · 1492 edges · 86 communities (65 shown, 21 thin omitted)
+- 1013 nodes · 1499 edges · 87 communities (65 shown, 22 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c2ae16a0`
+- Built from commit: `c0d0cd19`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -92,9 +92,10 @@
 - [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 84|Community 84]]
 - [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `Game1` - 33 edges
+1. `Game1` - 34 edges
 2. `Ecosystem` - 31 edges
 3. `SpawnPanel` - 26 edges
 4. `Creature` - 19 edges
@@ -114,7 +115,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (86 total, 21 thin omitted)
+## Communities (87 total, 22 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.33
@@ -130,7 +131,7 @@ Nodes (14): CreatureSpawner, Herbivore, Plant, Creature, Func, GameTime, int, Li
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
-Nodes (29): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+21 more)
+Nodes (30): CreatureRenderer, Game, bool, Camera, Color, Creature, DayNightCycle, DayPhase (+22 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.14
@@ -341,24 +342,24 @@ Cohesion: 0.21
 Nodes (8): LifecycleMetrics, LifecycleBalanceTests, Ecosystem, Fact, Genome, ITestOutputHelper, Vector2, World
 
 ## Knowledge Gaps
-- **294 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+289 more)
+- **296 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+291 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `TestCreature` connect `Community 75` to `Community 79`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `SpatialGridTests` connect `Community 76` to `Community 75`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _294 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _296 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 1` be split into smaller, more focused modules?**
   _Cohesion score 0.08907563025210084 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.08906882591093117 - nodes in this community are weakly interconnected._
 - **Should `Community 3` be split into smaller, more focused modules?**
-  _Cohesion score 0.06794871794871794 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06585365853658537 - nodes in this community are weakly interconnected._
 - **Should `Community 4` be split into smaller, more focused modules?**
   _Cohesion score 0.13793103448275862 - nodes in this community are weakly interconnected._
-- **Should `Community 6` be split into smaller, more focused modules?**
-  _Cohesion score 0.11182795698924732 - nodes in this community are weakly interconnected._
