@@ -10,8 +10,8 @@
     "semantic_hash": ""
   },
   "Game1.cs": {
-    "mtime": 1782007554.854761,
-    "ast_hash": "31d3683a8b73424f57e0796a79291b30",
+    "mtime": 1782033639.383632,
+    "ast_hash": "24fe6535f2067a5162a2a029d822c33e",
     "semantic_hash": ""
   },
   "Game/SimulationController.cs": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "Localization/I18n.cs": {
-    "mtime": 1782033436.0850108,
-    "ast_hash": "67235b23f7cd18c0037292d98b433624",
+    "mtime": 1782033600.498523,
+    "ast_hash": "4eb721a96a56dfb22cb0071fe3b53a79",
     "semantic_hash": ""
   },
   "PitLife.csproj": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "Rendering/CreatureRenderer.cs": {
-    "mtime": 1781967939.3426316,
-    "ast_hash": "1a3ab8f4a69d66e939816c231c79f518",
+    "mtime": 1782033618.1764033,
+    "ast_hash": "3dcc6f3184e378d91ef025a453fefd21",
     "semantic_hash": ""
   },
   "Rendering/DayNightCycle.cs": {
@@ -180,8 +180,8 @@
     "semantic_hash": ""
   },
   "UI/InGameUi.cs": {
-    "mtime": 1782033441.5327296,
-    "ast_hash": "9588d897614e6adf99ca4a4e629cda61",
+    "mtime": 1782033606.2695944,
+    "ast_hash": "03fabe8af6e74b8aaa4b376c6751ac55",
     "semantic_hash": ""
   },
   "UI/MainMenu.cs": {

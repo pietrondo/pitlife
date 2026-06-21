@@ -192,6 +192,17 @@ public class Game1 : Game
             GraphicsDevice.Viewport.Width,
             GraphicsDevice.Viewport.Height);
 
+        if (_inGameUi.WantsToGoToMainMenu)
+        {
+            _inGameUi.WantsToGoToMainMenu = false;
+            _screen = GameScreen.MainMenu;
+            _paused = true;
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
         _spawnPanel.SetViewportHeight(GraphicsDevice.Viewport.Height);
         if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
         {
@@ -289,23 +300,20 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
+        // Draw the map with Linear Clamp (for smooth, blended biome transitions)
+        _spriteBatch.Begin(samplerState: SamplerState.LinearClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
-        _creatureRenderer.Draw(_spriteBatch, _camera);
+        _spriteBatch.End();
+
+        // Draw the creatures with Point Clamp (for crisp pixel art)
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
+        _creatureRenderer.Draw(_spriteBatch, _camera, _dayNight.GetOverlayColor());
         if (_screen == GameScreen.Playing && _selectedCreature != null && _selectedCreature.IsAlive)
         {
             var center = _selectedCreature.Position;
             _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
         _spriteBatch.End();
-
-        var overlay = _dayNight.GetOverlayColor();
-        if (overlay.A > 0)
-        {
-            _spriteBatch.Begin();
-            _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), overlay);
-            _spriteBatch.End();
-        }
 
         _spriteBatch.Begin();
         if (_screen == GameScreen.MainMenu)

@@ -1,16 +1,16 @@
 # Graph Report - PitLife  (2026-06-21)
 
 ## Corpus Check
-- 79 files · ~39,701 words
+- 79 files · ~39,834 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 888 nodes · 1302 edges · 71 communities (53 shown, 18 thin omitted)
+- 889 nodes · 1303 edges · 71 communities (53 shown, 18 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6024ae8a`
+- Built from commit: `a092e63a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -147,8 +147,8 @@ Cohesion: 0.12
 Nodes (15): b, l, r, BiomeType, Camera, Color, GraphicsDevice, IEnumerable (+7 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.15
-Nodes (11): GenderedSpeciesAsset, HashSet, CreatureRenderer, Camera, Dictionary, Ecosystem, GraphicsDevice, IEnumerable (+3 more)
+Cohesion: 0.14
+Nodes (12): GenderedSpeciesAsset, HashSet, CreatureRenderer, Camera, Color, Dictionary, Ecosystem, GraphicsDevice (+4 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.15
@@ -283,7 +283,7 @@ Cohesion: 0.50
 Nodes (3): IReadOnlyList, AssetRegistry, string
 
 ## Knowledge Gaps
-- **265 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+260 more)
+- **266 isolated node(s):** `string`, `object`, `List`, `int`, `GraphicsDeviceManager` (+261 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -291,7 +291,7 @@ Nodes (3): IReadOnlyList, AssetRegistry, string
 _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `string`, `object`, `List` to the rest of the system?**
-  _265 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _266 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.06153846153846154 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**

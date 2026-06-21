@@ -79,12 +79,22 @@ public class CreatureRenderer
         return null;
     }
 
-    public void Draw(SpriteBatch sb, Camera camera)
+    public void Draw(SpriteBatch sb, Camera camera, Color? dayNightOverlay = null)
     {
         if (_pixelTexture == null) return;
 
         Rectangle visible = camera.VisibleArea;
         var creatures = _ecosystem.Creatures;
+
+        Color ApplyOverlay(Color original)
+        {
+            if (dayNightOverlay.HasValue && dayNightOverlay.Value.A > 0)
+            {
+                float alpha = dayNightOverlay.Value.A / 255f;
+                return Color.Lerp(original, new Color(dayNightOverlay.Value.R, dayNightOverlay.Value.G, dayNightOverlay.Value.B, (byte)255), alpha);
+            }
+            return original;
+        }
 
         for (int i = 0; i < creatures.Count; i++)
         {
@@ -130,11 +140,12 @@ public class CreatureRenderer
                     Color tint = c.CreatureType == CreatureType.Plant
                         ? new Color(c.Genome.Color.R, (byte)Math.Min(255, c.Genome.Color.G * 1.3f), c.Genome.Color.B)
                         : c.Genome.Color;
+                    tint = ApplyOverlay(tint);
                     sb.Draw(tex, dest, null, tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
                 }
                 else
                 {
-                    Color bodyColor = c.Genome.Color;
+                    Color bodyColor = ApplyOverlay(c.Genome.Color);
                     sb.Draw(_pixelTexture, dest, bodyColor * 0.9f);
 
                     Vector2 dir = c.Facing;
@@ -158,6 +169,7 @@ public class CreatureRenderer
                 if (c.CreatureType != CreatureType.Plant && _pixelTexture != null)
                 {
                     Color genderColor = c.Gender == Gender.Male ? Color.Red : new Color(80, 120, 255);
+                    genderColor = ApplyOverlay(genderColor);
                     int dot = Math.Max(2, s / 6);
                     int yOff = s / 2 + 2;
                     sb.Draw(_pixelTexture, new Rectangle((int)px - dot / 2, (int)py + yOff, dot, dot), genderColor);

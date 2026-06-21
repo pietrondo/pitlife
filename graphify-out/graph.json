@@ -427,7 +427,7 @@
       "label": ".GenerateNewWorld()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L257",
+      "source_location": "L268",
       "_origin": "ast",
       "id": "game1_game1_generatenewworld",
       "community": 3,
@@ -437,7 +437,7 @@
       "label": ".GetPhaseColor()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L279",
+      "source_location": "L290",
       "_origin": "ast",
       "id": "game1_game1_getphasecolor",
       "community": 3,
@@ -447,7 +447,7 @@
       "label": "DayPhase",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L279",
+      "source_location": "L290",
       "_origin": "ast",
       "id": "game1_cs_dayphase",
       "community": 3,
@@ -457,7 +457,7 @@
       "label": "Color",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L279",
+      "source_location": "L290",
       "_origin": "ast",
       "id": "game1_cs_color",
       "community": 3,
@@ -467,7 +467,7 @@
       "label": ".Draw()",
       "file_type": "code",
       "source_file": "Game1.cs",
-      "source_location": "L288",
+      "source_location": "L299",
       "_origin": "ast",
       "id": "game1_game1_draw",
       "community": 3,
@@ -717,7 +717,7 @@
       "label": ".CreateItalianCatalog()",
       "file_type": "code",
       "source_file": "Localization/I18n.cs",
-      "source_location": "L169",
+      "source_location": "L170",
       "_origin": "ast",
       "id": "localization_i18n_i18n_createitaliancatalog",
       "community": 25,
@@ -1172,6 +1172,16 @@
       "id": "rendering_creaturerenderer_cs_camera",
       "community": 11,
       "norm_label": "camera"
+    },
+    {
+      "label": "Color",
+      "file_type": "code",
+      "source_file": "Rendering/CreatureRenderer.cs",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "rendering_creaturerenderer_cs_color",
+      "community": 11,
+      "norm_label": "color"
     },
     {
       "label": "DayNightCycle.cs",
@@ -4277,7 +4287,7 @@
       "label": ".OpenCreatureWindow()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L35",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_opencreaturewindow",
       "community": 5,
@@ -4287,7 +4297,7 @@
       "label": ".CloseTopWindow()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L37",
+      "source_location": "L40",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_closetopwindow",
       "community": 5,
@@ -4297,7 +4307,7 @@
       "label": ".Update()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L39",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_update",
       "community": 5,
@@ -4307,7 +4317,7 @@
       "label": "MouseState",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L39",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "ui_ingameui_cs_mousestate",
       "community": 5,
@@ -4317,7 +4327,7 @@
       "label": "KeyboardState",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L39",
+      "source_location": "L42",
       "_origin": "ast",
       "id": "ui_ingameui_cs_keyboardstate",
       "community": 5,
@@ -4327,7 +4337,7 @@
       "label": ".Draw()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L80",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_draw",
       "community": 5,
@@ -4337,7 +4347,7 @@
       "label": "SpriteBatch",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L80",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "ui_ingameui_cs_spritebatch",
       "community": 5,
@@ -4347,7 +4357,7 @@
       "label": "Texture2D",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L80",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "ui_ingameui_cs_texture2d",
       "community": 5,
@@ -4357,7 +4367,7 @@
       "label": "SpriteFont",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L80",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "ui_ingameui_cs_spritefont",
       "community": 5,
@@ -4367,7 +4377,7 @@
       "label": "Creature",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L80",
+      "source_location": "L89",
       "_origin": "ast",
       "id": "ui_ingameui_cs_creature",
       "community": 5,
@@ -4377,7 +4387,7 @@
       "label": ".DrawStatistics()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L126",
+      "source_location": "L136",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawstatistics",
       "community": 5,
@@ -4387,7 +4397,7 @@
       "label": "Rectangle",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L126",
+      "source_location": "L136",
       "_origin": "ast",
       "id": "ui_ingameui_cs_rectangle",
       "community": 5,
@@ -4397,7 +4407,7 @@
       "label": ".DrawPopulationRow()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L151",
+      "source_location": "L161",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawpopulationrow",
       "community": 5,
@@ -4407,7 +4417,7 @@
       "label": "Color",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L151",
+      "source_location": "L161",
       "_origin": "ast",
       "id": "ui_ingameui_cs_color",
       "community": 5,
@@ -4417,7 +4427,7 @@
       "label": ".DrawCreature()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L171",
+      "source_location": "L181",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawcreature",
       "community": 5,
@@ -4427,7 +4437,7 @@
       "label": ".DrawProgress()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L201",
+      "source_location": "L212",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawprogress",
       "community": 5,
@@ -4437,7 +4447,7 @@
       "label": ".DrawLine()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L210",
+      "source_location": "L221",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_drawline",
       "community": 5,
@@ -4447,7 +4457,7 @@
       "label": ".LayoutToolbar()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L215",
+      "source_location": "L226",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_layouttoolbar",
       "community": 5,
@@ -4457,7 +4467,7 @@
       "label": ".Pressed()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L223",
+      "source_location": "L235",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_pressed",
       "community": 5,
@@ -4467,7 +4477,7 @@
       "label": "Keys",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L223",
+      "source_location": "L235",
       "_origin": "ast",
       "id": "ui_ingameui_cs_keys",
       "community": 5,
@@ -4477,7 +4487,7 @@
       "label": ".RefreshText()",
       "file_type": "code",
       "source_file": "UI/InGameUi.cs",
-      "source_location": "L226",
+      "source_location": "L238",
       "_origin": "ast",
       "id": "ui_ingameui_ingameui_refreshtext",
       "community": 5,
@@ -10553,6 +10563,17 @@
       "confidence_score": 1.0,
       "source": "rendering_creaturerenderer_creaturerenderer_draw",
       "target": "rendering_creaturerenderer_cs_camera"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "Rendering/CreatureRenderer.cs",
+      "source_location": "L82",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "source": "rendering_creaturerenderer_creaturerenderer_draw",
+      "target": "rendering_creaturerenderer_cs_color",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -17557,9 +17578,9 @@
       "source_location": "L15",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "ui_uiwindow_uiwindow",
-      "target": "ui_uiwindow_cs_int",
-      "confidence_score": 1.0
+      "target": "ui_uiwindow_cs_int"
     },
     {
       "relation": "method",
@@ -17577,9 +17598,9 @@
       "source_file": "UI/UiWindow.cs",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_uiwindow_uiwindow",
-      "target": "ui_uiwindow_uiwindow_togglecollapse",
-      "confidence_score": 1.0
+      "target": "ui_uiwindow_uiwindow_togglecollapse"
     },
     {
       "relation": "references",
@@ -17588,9 +17609,9 @@
       "source_location": "L42",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "ui_uiwindow_uiwindow_draw",
-      "target": "ui_uiwindow_cs_point",
-      "confidence_score": 1.0
+      "target": "ui_uiwindow_cs_point"
     },
     {
       "relation": "references",
@@ -17642,9 +17663,9 @@
       "source_location": "L13",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager",
-      "target": "datetime",
-      "confidence_score": 1.0
+      "target": "datetime"
     },
     {
       "relation": "references",
@@ -17664,9 +17685,9 @@
       "source_location": "L11",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager",
-      "target": "ui_uiwindowmanager_cs_point",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_cs_point"
     },
     {
       "relation": "references",
@@ -17675,9 +17696,9 @@
       "source_location": "L14",
       "weight": 1.0,
       "context": "field",
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager",
-      "target": "ui_uiwindowmanager_cs_string",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_cs_string"
     },
     {
       "relation": "references",
@@ -17756,9 +17777,9 @@
       "source_file": "UI/UiWindowManager.cs",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager",
-      "target": "ui_uiwindowmanager_uiwindowmanager_isactive",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_uiwindowmanager_isactive"
     },
     {
       "relation": "method",
@@ -17786,9 +17807,9 @@
       "source_file": "UI/UiWindowManager.cs",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager",
-      "target": "ui_uiwindowmanager_uiwindowmanager_tilewindows",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_uiwindowmanager_tilewindows"
     },
     {
       "relation": "method",
@@ -17850,9 +17871,9 @@
       "source_location": "L20",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager_isactive",
-      "target": "ui_uiwindowmanager_cs_uiwindow",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_cs_uiwindow"
     },
     {
       "relation": "references",
@@ -17861,9 +17882,9 @@
       "source_location": "L164",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager_ispointeroverwindow",
-      "target": "ui_uiwindowmanager_cs_point",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_cs_point"
     },
     {
       "relation": "calls",
@@ -17883,9 +17904,9 @@
       "source_file": "UI/UiWindowManager.cs",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ui_uiwindowmanager_uiwindowmanager_tilewindows",
-      "target": "ui_uiwindowmanager_uiwindowmanager_clampwindows",
-      "confidence_score": 1.0
+      "target": "ui_uiwindowmanager_uiwindowmanager_clampwindows"
     },
     {
       "relation": "calls",
@@ -21370,9 +21391,9 @@
       "source_file": "tests/PitLife.Tests/UiWindowManagerTests.cs",
       "source_location": "L37",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests",
-      "target": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_isactive_returnstrueonlyforfrontmostopenwindow",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_isactive_returnstrueonlyforfrontmostopenwindow"
     },
     {
       "relation": "method",
@@ -21390,9 +21411,9 @@
       "source_file": "tests/PitLife.Tests/UiWindowManagerTests.cs",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests",
-      "target": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_tilewindows_arrangesopenwindowssidebyside",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_tilewindows_arrangesopenwindowssidebyside"
     },
     {
       "relation": "method",
@@ -21400,9 +21421,9 @@
       "source_file": "tests/PitLife.Tests/UiWindowManagerTests.cs",
       "source_location": "L81",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests",
-      "target": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_togglecollapse_collapsesandrestoresheightcorrectly",
-      "confidence_score": 1.0
+      "target": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_togglecollapse_collapsesandrestoresheightcorrectly"
     },
     {
       "relation": "references",
@@ -21433,9 +21454,9 @@
       "source_location": "L37",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_isactive_returnstrueonlyforfrontmostopenwindow",
-      "target": "tests_pitlife_tests_uiwindowmanagertests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_uiwindowmanagertests_cs_fact"
     },
     {
       "relation": "references",
@@ -21444,9 +21465,9 @@
       "source_location": "L61",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_tilewindows_arrangesopenwindowssidebyside",
-      "target": "tests_pitlife_tests_uiwindowmanagertests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_uiwindowmanagertests_cs_fact"
     },
     {
       "relation": "references",
@@ -21455,9 +21476,9 @@
       "source_location": "L81",
       "weight": 1.0,
       "context": "attribute",
+      "confidence_score": 1.0,
       "source": "pitlife_tests_uiwindowmanagertests_uiwindowmanagertests_togglecollapse_collapsesandrestoresheightcorrectly",
-      "target": "tests_pitlife_tests_uiwindowmanagertests_cs_fact",
-      "confidence_score": 1.0
+      "target": "tests_pitlife_tests_uiwindowmanagertests_cs_fact"
     },
     {
       "relation": "contains",
@@ -22748,5 +22769,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6024ae8ac50500fe74c6f58de6d139d900599e59"
+  "built_at_commit": "a092e63a626cf43ca25d21217a138647cb4eae93"
 }
