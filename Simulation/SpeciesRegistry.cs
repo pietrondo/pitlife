@@ -14,6 +14,24 @@ public enum SocialBehavior
     Swarm
 }
 
+public enum PlantReproductionMode
+{
+    Seeds,
+    Spores,
+    Vegetative,
+    Fragmentation,
+    BroadcastSpawning
+}
+
+public enum PollinationMode
+{
+    None,
+    Wind,
+    Insects,
+    Self,
+    Water
+}
+
 public sealed class SpeciesDefinition
 {
     public string Species { get; }
@@ -24,6 +42,8 @@ public sealed class SpeciesDefinition
     public HashSet<BiomeType> ValidBiomes { get; }
     public float DefaultSize { get; }
     public float MaturityAge { get; }
+    public PlantReproductionMode? PlantReproduction { get; }
+    public PollinationMode Pollination { get; }
 
     public SpeciesDefinition(
         string species,
@@ -33,8 +53,18 @@ public sealed class SpeciesDefinition
         SocialBehavior socialBehavior,
         IEnumerable<BiomeType> validBiomes,
         float defaultSize = 1.0f,
-        float maturityAge = 30f)
+        float maturityAge = 30f,
+        PlantReproductionMode? plantReproduction = null,
+        PollinationMode pollination = PollinationMode.None)
     {
+        if (kind == global::PitLife.Simulation.CreatureType.Plant && plantReproduction is null)
+            throw new ArgumentException("Plant species require a reproduction mode.", nameof(plantReproduction));
+        if (kind != global::PitLife.Simulation.CreatureType.Plant &&
+            (plantReproduction is not null || pollination != PollinationMode.None))
+            throw new ArgumentException("Animal species cannot use plant reproduction settings.", nameof(plantReproduction));
+        if (plantReproduction is not PlantReproductionMode.Seeds && pollination != PollinationMode.None)
+            throw new ArgumentException("Only seed-producing species can define pollination.", nameof(pollination));
+
         Species = species;
         CreatureType = creatureType;
         Kind = kind;
@@ -43,6 +73,8 @@ public sealed class SpeciesDefinition
         ValidBiomes = new HashSet<BiomeType>(validBiomes);
         DefaultSize = defaultSize;
         MaturityAge = maturityAge;
+        PlantReproduction = plantReproduction;
+        Pollination = pollination;
     }
 
     public bool IsValidBiome(BiomeType biome) => ValidBiomes.Contains(biome);
@@ -258,26 +290,38 @@ internal static class BuiltinSpecies
     public static void RegisterAll()
     {
         // Plants (Land)
-        RegisterPlant("Plant");
-        RegisterPlant("Flowers");
-        RegisterPlant("Mushroom");
-        RegisterPlant("GrassTuft");
-        RegisterPlant("Cactus");
-        RegisterPlant("Moss");
-        RegisterPlant("BerryBush");
-        RegisterPlant("Pine");
-        RegisterPlant("Toadstool");
-        RegisterPlant("OakTree");
-        RegisterPlant("PineTree");
-        RegisterPlant("Bush");
-        RegisterPlant("Grass");
+        RegisterPlant("Plant", PlantReproductionMode.Vegetative);
+        RegisterPlant("Flowers", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterPlant("Mushroom", PlantReproductionMode.Spores);
+        RegisterPlant("GrassTuft", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("Cactus", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterPlant("Moss", PlantReproductionMode.Spores);
+        RegisterPlant("BerryBush", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterPlant("Pine", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("Toadstool", PlantReproductionMode.Spores);
+        RegisterPlant("OakTree", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("PineTree", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("Bush", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterPlant("Grass", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("Lavender", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            [BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland, BiomeType.Mountain]);
+        RegisterPlant("Fern", PlantReproductionMode.Spores, biomes:
+            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp]);
+        RegisterPlant("Sunflower", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            [BiomeType.Savanna, BiomeType.Grassland]);
+        RegisterPlant("Chanterelle", PlantReproductionMode.Spores, biomes:
+            [BiomeType.Forest, BiomeType.DenseForest]);
+        RegisterPlant("Morel", PlantReproductionMode.Spores, biomes:
+            [BiomeType.Forest, BiomeType.Grassland]);
+        RegisterPlant("OysterMushroom", PlantReproductionMode.Spores, biomes:
+            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp]);
 
         // Aquatic Plants
-        RegisterAquaticPlant("Seaweed");
-        RegisterAquaticPlant("Algae");
-        RegisterAquaticPlant("Kelp");
-        RegisterAquaticPlant("WaterLily");
-        RegisterAquaticPlant("Coral");
+        RegisterAquaticPlant("Seaweed", PlantReproductionMode.Fragmentation);
+        RegisterAquaticPlant("Algae", PlantReproductionMode.Fragmentation);
+        RegisterAquaticPlant("Kelp", PlantReproductionMode.Spores);
+        RegisterAquaticPlant("WaterLily", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterAquaticPlant("Coral", PlantReproductionMode.BroadcastSpawning);
 
         // Herbivores
         RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
@@ -289,6 +333,9 @@ internal static class BuiltinSpecies
         RegisterAnimal("Lizard", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Turtle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Salmon", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow, size: 0.9f);
+        RegisterAnimal("Moose", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp,
+                BiomeType.Tundra, BiomeType.Mountain, BiomeType.Snow], size: 1.4f);
 
         // Carnivores
         RegisterAnimal("Fox", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
@@ -302,6 +349,8 @@ internal static class BuiltinSpecies
         RegisterAnimal("Wolf", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
         RegisterAnimal("Shark", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Deep, size: 1.2f);
         RegisterAnimal("Piranha", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow, size: 0.7f);
+        RegisterAnimal("Owl", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp], size: 0.7f);
 
         // Omnivores
         RegisterAnimal("Boar", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
@@ -311,6 +360,8 @@ internal static class BuiltinSpecies
         RegisterAnimal("Butterfly", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm, biomes: Land);
         RegisterAnimal("Bear", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Jellyfish", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Swarm, biomes: ShallowOrDeep, size: 0.6f);
+        RegisterAnimal("Badger", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest], size: 0.8f);
 
         // Misc
         RegisterAnimal("Gazelle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
@@ -329,23 +380,34 @@ internal static class BuiltinSpecies
         RegisterAnimal("Hippopotamus", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Herd, biomes: LandAndShallow, size: 1.6f);
     }
 
-    private static void RegisterPlant(string name) =>
+    private static void RegisterPlant(
+        string name,
+        PlantReproductionMode reproduction,
+        PollinationMode pollination = PollinationMode.None,
+        BiomeType[]? biomes = null) =>
         SpeciesRegistry.Register(new SpeciesDefinition(
             species: name,
             creatureType: typeof(Plant),
             kind: CreatureType.Plant,
             isAquatic: false,
             socialBehavior: SocialBehavior.None,
-            validBiomes: Land));
+            validBiomes: biomes ?? Land,
+            plantReproduction: reproduction,
+            pollination: pollination));
 
-    private static void RegisterAquaticPlant(string name) =>
+    private static void RegisterAquaticPlant(
+        string name,
+        PlantReproductionMode reproduction,
+        PollinationMode pollination = PollinationMode.None) =>
         SpeciesRegistry.Register(new SpeciesDefinition(
             species: name,
             creatureType: typeof(Plant),
             kind: CreatureType.Plant,
             isAquatic: true,
             socialBehavior: SocialBehavior.None,
-            validBiomes: ShallowOrDeep));
+            validBiomes: ShallowOrDeep,
+            plantReproduction: reproduction,
+            pollination: pollination));
 
     private static void RegisterAnimal(string name, CreatureType kind, bool isAquatic,
         SocialBehavior social, BiomeType[] biomes, float size = 1.0f)

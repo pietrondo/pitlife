@@ -63,4 +63,49 @@ public class SpeciesRegistryTests
         Assert.Contains("Bear", SpeciesRegistry.All);
         Assert.Contains("Wolf", SpeciesRegistry.All);
     }
+
+    [Fact]
+    public void NewSpecies_HaveExpectedKindsAndBiomes()
+    {
+        Assert.Equal(CreatureType.Herbivore, SpeciesRegistry.Get("Moose")!.Kind);
+        Assert.Equal(CreatureType.Omnivore, SpeciesRegistry.Get("Badger")!.Kind);
+        Assert.Equal(CreatureType.Carnivore, SpeciesRegistry.Get("Owl")!.Kind);
+        Assert.True(SpeciesRegistry.IsValidBiome("Fern", BiomeType.Swamp));
+        Assert.False(SpeciesRegistry.IsValidBiome("Fern", BiomeType.Desert));
+        Assert.True(SpeciesRegistry.IsValidBiome("Sunflower", BiomeType.Grassland));
+    }
+
+    [Fact]
+    public void Plants_DeclareConsistentReproductionModes()
+    {
+        foreach (string species in SpeciesRegistry.OfType(CreatureType.Plant))
+        {
+            SpeciesDefinition definition = SpeciesRegistry.Get(species)!;
+            Assert.NotNull(definition.PlantReproduction);
+
+            if (definition.PlantReproduction != PlantReproductionMode.Seeds)
+                Assert.Equal(PollinationMode.None, definition.Pollination);
+        }
+
+        Assert.Equal(PlantReproductionMode.Spores, SpeciesRegistry.Get("Fern")!.PlantReproduction);
+        Assert.Equal(PlantReproductionMode.Spores, SpeciesRegistry.Get("Chanterelle")!.PlantReproduction);
+        Assert.Equal(PlantReproductionMode.Seeds, SpeciesRegistry.Get("Lavender")!.PlantReproduction);
+        Assert.Equal(PollinationMode.Insects, SpeciesRegistry.Get("Lavender")!.Pollination);
+        Assert.Equal(PlantReproductionMode.Fragmentation, SpeciesRegistry.Get("Algae")!.PlantReproduction);
+        Assert.Equal(PlantReproductionMode.BroadcastSpawning, SpeciesRegistry.Get("Coral")!.PlantReproduction);
+    }
+
+    [Fact]
+    public void Animals_DoNotExposePlantReproduction()
+    {
+        foreach (CreatureType kind in new[] { CreatureType.Herbivore, CreatureType.Carnivore, CreatureType.Omnivore })
+        {
+            foreach (string species in SpeciesRegistry.OfType(kind))
+            {
+                SpeciesDefinition definition = SpeciesRegistry.Get(species)!;
+                Assert.Null(definition.PlantReproduction);
+                Assert.Equal(PollinationMode.None, definition.Pollination);
+            }
+        }
+    }
 }

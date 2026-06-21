@@ -39,6 +39,7 @@ public static class AssetRegistry
 
     public static readonly IReadOnlyList<SpeciesAsset> SpeciesTextures = new SpeciesAsset[]
     {
+        new("Plant", "Content/assets/creatures/plants/shrubs/plant.png"),
         new("Deer", "Content/assets/creatures/mammals/herbivores/ungulates/deer.png"),
         new("Rabbit", "Content/assets/creatures/mammals/herbivores/lagomorphs/rabbit.png"),
         new("Fox", "Content/assets/creatures/mammals/canids/fox.png"),
@@ -69,6 +70,9 @@ public static class AssetRegistry
         new("Lizard", "Content/assets/creatures/reptiles/squamates/lizard.png"),
         new("Wolf", "Content/assets/creatures/mammals/carnivores/canids/wolf.png"),
         new("Bear", "Content/assets/creatures/mammals/omnivores/ursids/bear.png"),
+        new("Moose", "Content/assets/creatures/mammals/herbivores/ungulates/moose.png"),
+        new("Badger", "Content/assets/creatures/mammals/omnivores/mustelids/badger.png"),
+        new("Owl", "Content/assets/creatures/birds/owls/owl.png"),
         new("Turtle", "Content/assets/creatures/reptiles/testudines/turtle.png"),
         new("Shark", "Content/assets/creatures/fish/shark.png"),
         new("Piranha", "Content/assets/creatures/fish/piranha.png"),
@@ -85,6 +89,7 @@ public static class AssetRegistry
         new("Otter", "Content/assets/creatures/mammals/omnivores/procyonids/raccoon.png"),
         new("Walrus", "Content/assets/creatures/mammals/omnivores/suids/boar.png"),
         new("Hippopotamus", "Content/assets/creatures/mammals/omnivores/suids/boar.png"),
+        new("Gazelle", "Content/assets/creatures/mammals/herbivores/ungulates/gazelle.png"),
         // Nuove texture piante pixel art
         new("OakTree", "Content/assets/plants/trees/oak_tree.png"),
         new("PineTree", "Content/assets/plants/trees/pine_tree.png"),
@@ -94,6 +99,13 @@ public static class AssetRegistry
         new("Kelp", "Content/assets/plants/aquatic/kelp.png"),
         new("WaterLily", "Content/assets/plants/aquatic/water_lily.png"),
         new("Coral", "Content/assets/plants/aquatic/coral.png"),
+        new("Algae", "Content/assets/plants/aquatic/algae.png"),
+        new("Lavender", "Content/assets/creatures/plants/flowers/lavender.png"),
+        new("Fern", "Content/assets/creatures/plants/ferns/fern.png"),
+        new("Sunflower", "Content/assets/creatures/plants/flowers/sunflower.png"),
+        new("Chanterelle", "Content/assets/creatures/plants/fungi/chanterelle.png"),
+        new("Morel", "Content/assets/creatures/plants/fungi/morel.png"),
+        new("OysterMushroom", "Content/assets/creatures/plants/fungi/oyster_mushroom.png"),
     };
 
     public static readonly IReadOnlyList<GenderedSpeciesAsset> GenderedSpeciesTextures = new GenderedSpeciesAsset[]

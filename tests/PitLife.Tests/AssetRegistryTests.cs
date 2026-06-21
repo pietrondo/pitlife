@@ -12,9 +12,6 @@ public class AssetRegistryTests
         var speciesTextures = AssetRegistry.SpeciesTextures.Select(a => a.Species).ToHashSet();
         foreach (var species in SpeciesRegistry.All)
         {
-            var def = SpeciesRegistry.Get(species);
-            if (def == null || def.Kind == CreatureType.Plant) continue;
-            if (species == "Gazelle") continue;
             Assert.Contains(species, speciesTextures);
         }
     }
