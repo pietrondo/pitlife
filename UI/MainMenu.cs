@@ -54,33 +54,54 @@ public sealed class MainMenu
         Layout(viewportWidth, viewportHeight);
         RefreshText(isFullscreen);
 
-        // Update seed input
-        _seedInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
-
         if (!_inputReady)
         {
             _inputReady = keyboard.IsKeyUp(Keys.Enter) &&
-                          keyboard.IsKeyUp(Keys.Space) &&
-                          mouse.LeftButton == ButtonState.Released;
+                           keyboard.IsKeyUp(Keys.Space) &&
+                           mouse.LeftButton == ButtonState.Released;
             return MenuAction.None;
+        }
+
+        int totalElements = _showOptions ? 2 : 6;
+        int prevFocused = _focusedIndex;
+
+        // Keyboard navigation
+        if (Pressed(keyboard, previousKeyboard, Keys.Up))
+            _focusedIndex = (_focusedIndex - 1 + totalElements) % totalElements;
+        if (Pressed(keyboard, previousKeyboard, Keys.Down))
+            _focusedIndex = (_focusedIndex + 1) % totalElements;
+
+        // Sync keyboard navigation to seed input focus
+        if (!_showOptions && _focusedIndex != prevFocused)
+        {
+            if (_focusedIndex == 2)
+                _seedInput.IsFocused = true;
+            else
+                _seedInput.IsFocused = false;
+        }
+
+        // Update seed input
+        _seedInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
+
+        // Sync mouse click focus from seed input to _focusedIndex
+        if (!_showOptions && _seedInput.IsFocused)
+        {
+            _focusedIndex = 2;
         }
 
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {
             if (buttons[i].IsHovered(mouse))
-                _focusedIndex = i;
+            {
+                _focusedIndex = _showOptions ? i : (i < 2 ? i : i + 1);
+            }
         }
-
-        if (Pressed(keyboard, previousKeyboard, Keys.Up))
-            _focusedIndex = (_focusedIndex - 1 + buttons.Length) % buttons.Length;
-        if (Pressed(keyboard, previousKeyboard, Keys.Down))
-            _focusedIndex = (_focusedIndex + 1) % buttons.Length;
 
         if (_showOptions && Pressed(keyboard, previousKeyboard, Keys.Escape))
         {
             _showOptions = false;
-            _focusedIndex = 1;
+            _focusedIndex = 3; // Focus Options button in main menu
             return MenuAction.None;
         }
 
@@ -88,9 +109,18 @@ public sealed class MainMenu
         for (int i = 0; i < buttons.Length; i++)
         {
             if (buttons[i].WasClicked(mouse, previousMouse))
-                activated = i;
+            {
+                activated = _showOptions ? i : (i < 2 ? i : i + 1);
+            }
         }
-        if (Pressed(keyboard, previousKeyboard, Keys.Enter) || Pressed(keyboard, previousKeyboard, Keys.Space))
+
+        bool activatePressed = Pressed(keyboard, previousKeyboard, Keys.Enter);
+        if (!(_seedInput.IsFocused && !_showOptions))
+        {
+            activatePressed = activatePressed || Pressed(keyboard, previousKeyboard, Keys.Space);
+        }
+
+        if (activatePressed)
             activated = _focusedIndex;
 
         if (activated < 0)
@@ -102,7 +132,7 @@ public sealed class MainMenu
                 return MenuAction.ToggleFullscreen;
 
             _showOptions = false;
-            _focusedIndex = 1;
+            _focusedIndex = 3; // Focus Options button in main menu
             return MenuAction.None;
         }
 
@@ -110,9 +140,10 @@ public sealed class MainMenu
         {
             0 => MenuAction.StartGame,
             1 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
-            2 => OpenOptions(),
-            3 => MenuAction.ShowHelp,
-            4 => MenuAction.Exit,
+            2 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
+            3 => OpenOptions(),
+            4 => MenuAction.ShowHelp,
+            5 => MenuAction.Exit,
             _ => MenuAction.None
         };
     }
@@ -140,7 +171,12 @@ public sealed class MainMenu
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         MouseState mouse = Mouse.GetState();
         for (int i = 0; i < buttons.Length; i++)
-            buttons[i].Draw(spriteBatch, pixel, font, mouse, i == _focusedIndex);
+        {
+            bool isFocused = _showOptions 
+                ? (i == _focusedIndex) 
+                : (i < 2 ? i == _focusedIndex : i + 1 == _focusedIndex);
+            buttons[i].Draw(spriteBatch, pixel, font, mouse, isFocused);
+        }
 
         // Draw seed input
         if (!_showOptions)
@@ -163,7 +199,7 @@ public sealed class MainMenu
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showOptions ? 220 : 400; // Increased height for seed input
+        int panelHeight = _showOptions ? 220 : 450; // Increased height for seed input layout
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
@@ -176,27 +212,55 @@ public sealed class MainMenu
         int buttonHeight = 52;
         int gap = 12;
         int startY = _window.Bounds.Y + 60;
-        for (int i = 0; i < buttons.Length; i++)
+
+        if (_showOptions)
         {
-            buttons[i].Bounds = new Rectangle(
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                buttons[i].Bounds = new Rectangle(
+                    viewportWidth / 2 - buttonWidth / 2,
+                    startY + i * (buttonHeight + gap),
+                    buttonWidth,
+                    buttonHeight);
+            }
+        }
+        else
+        {
+            // Start Game button (index 0)
+            buttons[0].Bounds = new Rectangle(
                 viewportWidth / 2 - buttonWidth / 2,
-                startY + i * (buttonHeight + gap),
+                startY,
                 buttonWidth,
                 buttonHeight);
-        }
 
-        // Position seed input below the "New World" button
-        if (!_showOptions)
-        {
+            // New World button (index 1)
+            buttons[1].Bounds = new Rectangle(
+                viewportWidth / 2 - buttonWidth / 2,
+                startY + (buttonHeight + gap),
+                buttonWidth,
+                buttonHeight);
+
+            // Seed input (positioned between New World and Options)
+            int inputY = startY + 2 * (buttonHeight + gap);
             _seedInput.Placeholder = I18n.T("menu.seedPlaceholder");
             _seedInput.IsNumericOnly = true;
             _seedInput.MaxLength = 10;
-            int inputY = startY + 1 * (buttonHeight + gap) + buttonHeight + 8;
             _seedInput.Bounds = new Rectangle(
                 viewportWidth / 2 - buttonWidth / 2,
                 inputY,
                 buttonWidth,
                 40);
+
+            // Options, Help, Exit buttons (indices 2, 3, 4 in _mainButtons)
+            // Shifted down to accommodate the seed input
+            for (int i = 2; i < buttons.Length; i++)
+            {
+                buttons[i].Bounds = new Rectangle(
+                    viewportWidth / 2 - buttonWidth / 2,
+                    inputY + 40 + gap + (i - 2) * (buttonHeight + gap),
+                    buttonWidth,
+                    buttonHeight);
+            }
         }
     }
 

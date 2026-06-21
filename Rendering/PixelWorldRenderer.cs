@@ -93,23 +93,11 @@ public sealed class PixelWorldRenderer : IDisposable
             _needsRedraw = false;
         }
 
-        // Draw the cached world texture scaled to screen
-        Rectangle visible = camera.VisibleArea;
-        float scale = camera.Zoom / _renderScale;
-
+        // Draw the cached world texture over the entire world bounds.
+        // The camera transform matrix will automatically handle position, zoom, and viewport clipping.
         sb.Draw(_worldTexture,
-            new Vector2(visible.X, visible.Y),
-            new Rectangle(
-                (int)(visible.X / scale),
-                (int)(visible.Y / scale),
-                (int)(visible.Width / scale),
-                (int)(visible.Height / scale)),
-            Color.White,
-            0f,
-            Vector2.Zero,
-            scale,
-            SpriteEffects.None,
-            0f);
+            new Rectangle(0, 0, _world.PixelWidth, _world.PixelHeight),
+            Color.White);
     }
 
     private void RedrawWorldTexture(GraphicsDevice gd)
@@ -131,31 +119,8 @@ public sealed class PixelWorldRenderer : IDisposable
 
                 // Get biome at this tile
                 BiomeType biome = _world.GetTile(tileX, tileY).Biome;
-                int biomeIdx = (int)biome;
-
-                // Calculate local position within tile (0-1)
-                float localX = (x % _renderScale) / (float)_renderScale;
-                float localY = (y % _renderScale) / (float)_renderScale;
-
-                // Sample noise at higher frequency for pixel-level variation
-                float noiseVal = _noise.GetNoise(x * 1.5f, y * 1.5f);
-                noiseVal = (noiseVal + 1f) * 0.5f; // Normalize to 0-1
-
-                // Blend colors based on noise with more contrast
-                Color baseColor = BiomeBaseColors[biomeIdx];
-                Color detailColor = BiomeDetailColors[biomeIdx];
-                Color highlightColor = BiomeHighlightColors[biomeIdx];
-
-                // More pronounced color variation
-                Color finalColor;
-                if (noiseVal < 0.4f)
-                    finalColor = Color.Lerp(detailColor, baseColor, (noiseVal - 0.2f) / 0.2f);
-                else if (noiseVal > 0.6f)
-                    finalColor = Color.Lerp(baseColor, highlightColor, (noiseVal - 0.6f) / 0.4f);
-                else
-                    finalColor = baseColor;
-
-                data[y * width + x] = finalColor;
+                int biomeIdx = (int)biome;                // Use clean solid base color to match the minimap and ensure readability
+                data[y * width + x] = BiomeBaseColors[biomeIdx];
             }
         }
 

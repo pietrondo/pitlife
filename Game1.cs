@@ -220,9 +220,18 @@ public class Game1 : Game
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var spawnPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.SpawnByName(_spawnPanel.SelectedSpeciesKey, spawnPos);
-            Logger.Event("SPAWN", $"Player spawned {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
-            _spawnPanel.DeselectSpecies(); // Deselect after spawning (one-shot behavior)
+            bool spawned = _ecosystem.SpawnByName(_spawnPanel.SelectedSpeciesKey, spawnPos);
+            if (spawned)
+            {
+                Logger.Event("SPAWN", $"Player spawned {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
+                _spawnPanel.DeselectSpecies(); // Deselect after successful spawn (one-shot behavior)
+            }
+            else
+            {
+                var tile = _ecosystem.World.GetTileAtPosition(spawnPos.X, spawnPos.Y);
+                Logger.Warn($"Spawn failed for {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0}) - biome={tile.Biome}. Try a different location.");
+                // Keep species selected so player can try another spot
+            }
         }
         else if (!pointerOverUi && !spawnPanelConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)

@@ -201,18 +201,20 @@ public class WorldTests
             $"Attesi tutti i 12 biomi in world 96x72 seed=42, mancanti: {string.Join(", ", missing)}");
     }
 
+
+
     [Fact]
     public void Constructor_Biomes_RiverCells_AreShallowWater()
     {
         var world = new World(96, 72, 42);
-        var violations = new List<int>();
+        var violations = new List<string>();
         for (int i = 0; i < world.RiverMask.Length; i++)
         {
             if (!world.RiverMask[i]) continue;
             int x = i % world.Width;
             int y = i / world.Width;
             if (world.Tiles[x, y].Biome != BiomeType.ShallowWater)
-                violations.Add(i);
+                violations.Add($"{i}({world.Tiles[x, y].Biome})");
         }
         Assert.True(violations.Count == 0,
             $"Attese 0 celle fluviali con bioma != ShallowWater in 96x72 seed=42, trovate {violations.Count}: indici [{string.Join(",", violations.Take(10))}...]");

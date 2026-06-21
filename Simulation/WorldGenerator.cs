@@ -46,7 +46,7 @@ public sealed class WorldGenerator
                     : mask * 0.15f;  // Give shallow water some elevation instead of 0
                 _world.ElevationField[y * _world.Width + x] = elev;
 
-                BiomeType biome = AssignBiome(e, m, t);
+                BiomeType biome = AssignBiome(elev, m, t);
                 _world.Tiles[x, y] = new Tile(biome);
             }
         }
