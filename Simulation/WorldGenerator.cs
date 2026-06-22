@@ -17,8 +17,20 @@ public sealed class WorldGenerator
         _rng = new Random(seed);
     }
 
-    public void Generate()
+    public void Generate() => Generate(WorldGenOptions.Pangea());
+
+    public void Generate(WorldGenOptions options)
     {
+        float seaLevel = options.SeaLevel;
+        float islandScale = options.IslandSize switch
+        {
+            IslandSize.Small => 0.20f,
+            IslandSize.Medium => 0.15f,
+            IslandSize.Large => 0.10f,
+            _ => 0.15f
+        };
+        int continentCount = options.ContinentCount;
+
         var noise = new FastNoiseLite(_rng.Next());
         noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
         noise.SetFrequency(0.8f);
@@ -29,8 +41,8 @@ public sealed class WorldGenerator
             float phi = y / (float)h * MathF.PI;
             for (int x = 0; x < w; x++)
             {
-                float sx = x * 0.15f;
-                float sy = y * 0.15f;
+                float sx = x * islandScale;
+                float sy = y * islandScale;
 
                 float elev = (noise.GetNoise(sx, sy) + 1f) * 0.5f;
                 float cont = (noise.GetNoise(sx + 3f, sy + 3f) + 1f) * 0.5f;
@@ -38,15 +50,15 @@ public sealed class WorldGenerator
 
                 float lat = MathF.Abs(phi / MathF.PI - 0.5f) * 2f;
                 elev = elev * (1f - lat * 0.3f);
-                if (cont < 0.35f) elev = cont * 0.3f;
+                if (cont < seaLevel) elev = cont * 0.3f;
 
                 int idx = y * w + x;
                 _world.ElevationField[idx] = elev;
-                _world.ContinentMask[idx] = cont;
+                _world.ContinentMask[idx] = Math.Clamp(cont - seaLevel + 0.5f, 0f, 1f);
 
                 BiomeType biome = elev switch
                 {
-                    < 0.15f => cont < 0.35f ? BiomeType.DeepOcean : BiomeType.ShallowWater,
+                    < 0.15f => cont < seaLevel ? BiomeType.DeepOcean : BiomeType.ShallowWater,
                     < 0.22f => BiomeType.Beach,
                     < 0.35f => moist < 0.3f ? BiomeType.Desert : BiomeType.Grassland,
                     < 0.50f => moist < 0.35f ? BiomeType.Savanna : BiomeType.Forest,

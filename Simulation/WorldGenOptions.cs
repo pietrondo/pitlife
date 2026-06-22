@@ -1,0 +1,87 @@
+using System;
+
+namespace PitLife.Simulation;
+
+public record WorldGenOptions
+{
+    public WorldGenPreset Preset { get; init; }
+    public int ContinentCount
+    {
+        get => field;
+        init
+        {
+            if (value < 1 || value > 6)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Must be between 1 and 6");
+            field = value;
+        }
+    }
+    public float SeaLevel
+    {
+        get => field;
+        init
+        {
+            if (value < 0f || value > 1f)
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Must be between 0 and 1");
+            field = value;
+        }
+    }
+    public IslandSize IslandSize { get; init; }
+    public int MapWidth
+    {
+        get => field;
+        init
+        {
+            if (value < 16)
+                throw new ArgumentOutOfRangeException(nameof(MapWidth), value, "Map must be at least 16 wide");
+            field = value;
+        }
+    }
+    public int MapHeight
+    {
+        get => field;
+        init
+        {
+            if (value < 16)
+                throw new ArgumentOutOfRangeException(nameof(MapHeight), value, "Map must be at least 16 tall");
+            field = value;
+        }
+    }
+
+    public WorldGenOptions(
+        WorldGenPreset preset,
+        int continentCount,
+        float seaLevel,
+        IslandSize islandSize,
+        int mapWidth,
+        int mapHeight)
+    {
+        if (continentCount < 1 || continentCount > 6)
+            throw new ArgumentOutOfRangeException(nameof(continentCount), continentCount, "Must be between 1 and 6");
+        if (seaLevel < 0f || seaLevel > 1f)
+            throw new ArgumentOutOfRangeException(nameof(seaLevel), seaLevel, "Must be between 0 and 1");
+        if (mapWidth < 16 || mapHeight < 16)
+            throw new ArgumentOutOfRangeException(nameof(mapWidth), "Map must be at least 16x16");
+
+        Preset = preset;
+        ContinentCount = continentCount;
+        SeaLevel = seaLevel;
+        IslandSize = islandSize;
+        MapWidth = mapWidth;
+        MapHeight = mapHeight;
+    }
+
+    public static WorldGenOptions Pangea() =>
+        new(WorldGenPreset.Pangea, continentCount: 1, seaLevel: 0.40f, islandSize: IslandSize.Large, mapWidth: 96, mapHeight: 72);
+
+    public static WorldGenOptions Continents() =>
+        new(WorldGenPreset.Continents, continentCount: 4, seaLevel: 0.45f, islandSize: IslandSize.Medium, mapWidth: 96, mapHeight: 72);
+
+    public static WorldGenOptions Archipelago() =>
+        new(WorldGenPreset.Archipelago, continentCount: 6, seaLevel: 0.45f, islandSize: IslandSize.Small, mapWidth: 96, mapHeight: 72);
+
+    public static WorldGenOptions WetWorld() =>
+        new(WorldGenPreset.WetWorld, continentCount: 4, seaLevel: 0.60f, islandSize: IslandSize.Medium, mapWidth: 96, mapHeight: 72);
+
+    public static WorldGenOptions DryWorld() =>
+        new(WorldGenPreset.DryWorld, continentCount: 4, seaLevel: 0.30f, islandSize: IslandSize.Medium, mapWidth: 96, mapHeight: 72);
+}

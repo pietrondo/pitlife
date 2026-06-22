@@ -16,7 +16,7 @@ public class World
     public float[] ElevationField { get; }
     public bool[] RiverMask { get; }
 
-    public World(int width, int height, int seed)
+    private World(int width, int height, int seed, WorldGenOptions? options)
     {
         Width = width;
         Height = height;
@@ -24,7 +24,20 @@ public class World
         ContinentMask = new float[width * height];
         ElevationField = new float[width * height];
         RiverMask = new bool[width * height];
-        new WorldGenerator(this, seed).Generate();
+        if (options is null)
+            new WorldGenerator(this, seed).Generate();
+        else
+            new WorldGenerator(this, seed).Generate(options);
+    }
+
+    public World(int width, int height, int seed)
+        : this(width, height, seed, (WorldGenOptions?)null)
+    {
+    }
+
+    public World(WorldGenOptions options, int seed)
+        : this(options.MapWidth, options.MapHeight, seed, options)
+    {
     }
 
     public Tile GetTile(int x, int y)
