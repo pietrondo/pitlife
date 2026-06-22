@@ -19,7 +19,7 @@ public sealed class InGameUi
     private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
     private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange"));
     private readonly UiButton _menuButton = new(I18n.T("toolbar.menu"));
-    private readonly UiButton _cataclysmButton = new("CATA");
+    private readonly UiButton _cataclysmButton = new("CATACLYSM");
 
     public bool WantsToGoToMainMenu { get; set; } = false;
     public World? World { get; set; }
@@ -108,6 +108,8 @@ public sealed class InGameUi
             _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
         }
+
+        HandleCataclysmClick(mouse, previousMouse);
 
         bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || 
                            _creatureButton.Bounds.Contains(mouse.Position) ||
@@ -366,29 +368,43 @@ public sealed class InGameUi
         DrawLine(spriteBatch, font, content.X, content.Y + 94, I18n.Format("terrain.river", riverStr), UiTheme.WarmParchment);
     }
 
+    private readonly UiButton[] _cataclysmButtons = new[]
+    {
+        new UiButton("Asteroid") { Tag = "Asteroid" },
+        new UiButton("Ice Age") { Tag = "IceAge" },
+        new UiButton("Supervolcano") { Tag = "Supervolcano" },
+        new UiButton("Earthquake") { Tag = "Earthquake" },
+        new UiButton("Drought") { Tag = "Drought" },
+        new UiButton("Flood") { Tag = "Flood" }
+    };
+
     private void DrawCataclysmWindow(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content)
     {
         int y = content.Y;
-        string[] cataclysms = ["Asteroid", "IceAge", "Supervolcano", "Earthquake", "Drought", "Flood"];
-        Color[] colors = [new(255,100,50), new(100,200,255), new(255,60,20), new(180,140,100), new(255,180,40), new(40,140,255)];
         var mouse = Microsoft.Xna.Framework.Input.Mouse.GetState();
 
-        for (int i = 0; i < cataclysms.Length; i++)
+        for (int i = 0; i < _cataclysmButtons.Length; i++)
         {
-            var btn = new UiButton(cataclysms[i]) { Tag = cataclysms[i] };
+            var btn = _cataclysmButtons[i];
             btn.Bounds = new Rectangle(content.X, y, content.Width, 22);
-            bool sel = SelectedCataclysm == cataclysms[i];
+            bool sel = SelectedCataclysm == (string)btn.Tag!;
             btn.Draw(sb, pixel, font, mouse, sel);
-            if (sel)
-            {
-                var txtSize = font.MeasureString("Click map to place");
-                sb.DrawString(font, "Click map to place", new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
-            }
-            if (btn.WasClicked(mouse, new Microsoft.Xna.Framework.Input.MouseState()))
-            {
-                SelectedCataclysm = (string)btn.Tag!;
-            }
             y += 26;
         }
+        if (!string.IsNullOrEmpty(SelectedCataclysm))
+            sb.DrawString(font, "Click on map to place", new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
+    }
+
+    public bool HandleCataclysmClick(MouseState mouse, MouseState prevMouse)
+    {
+        for (int i = 0; i < _cataclysmButtons.Length; i++)
+        {
+            if (_cataclysmButtons[i].WasClicked(mouse, prevMouse))
+            {
+                SelectedCataclysm = (string)_cataclysmButtons[i].Tag!;
+                return true;
+            }
+        }
+        return false;
     }
 }
