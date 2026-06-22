@@ -522,7 +522,7 @@ public class Game1 : Game
 
         // Draw the creatures with Point Clamp (for crisp pixel art)
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
-        _creatureRenderer.Draw(_spriteBatch, _camera, _dayNight.GetOverlayColor());
+        _creatureRenderer.Draw(_spriteBatch, _camera, _dayNight.GetOverlayColor(), _font);
         if (_screen == GameScreen.Playing && _selectedCreature != null && _selectedCreature.IsAlive)
         {
             var center = _selectedCreature.Position;

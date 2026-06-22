@@ -79,7 +79,7 @@ public class CreatureRenderer
         return null;
     }
 
-    public void Draw(SpriteBatch sb, Camera camera, Color? dayNightOverlay = null)
+    public void Draw(SpriteBatch sb, Camera camera, Color? dayNightOverlay = null, SpriteFont? font = null)
     {
         if (_pixelTexture == null) return;
 
@@ -142,6 +142,8 @@ public class CreatureRenderer
                         : c.Genome.Color;
                     tint = ApplyOverlay(tint);
                     sb.Draw(tex, dest, null, tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+                    if (font != null && c.IsSleeping)
+                        sb.DrawString(font, "z", new Vector2(dest.Right - 4, dest.Top - 8), Color.LightBlue);
                 }
                 else
                 {

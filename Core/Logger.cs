@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace PitLife.Core;
 
@@ -16,7 +17,20 @@ public static class Logger
     static Logger()
     {
         Directory.CreateDirectory(LogDir);
+        RotateOldLogs();
         Write("INFO", "Logger initialized");
+    }
+
+    private static void RotateOldLogs()
+    {
+        try
+        {
+            var files = Directory.GetFiles(LogDir, "pitlife_*.log")
+                .OrderByDescending(f => f).ToArray();
+            for (int i = 5; i < files.Length; i++)
+                File.Delete(files[i]);
+        }
+        catch { /* ignore rotation errors */ }
     }
 
     public static void Info(string message) => Write("INFO", message);

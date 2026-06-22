@@ -23,6 +23,7 @@ public abstract class Creature
     public bool IsPoisonous { get; set; }
     public float Toxicity { get; set; }
     public float NutritionalValue => Genome.Size * 5f * (1f - Toxicity * 0.7f);
+    public bool IsSleeping { get; private set; }
     public float LastReproductionTime { get; set; } = -60f;
     public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
     public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;
@@ -138,6 +139,7 @@ public abstract class Creature
         Position = ClampToWorld(Position, world);
 
         bool active = IsActive(ecosystem.CurrentDayPhase) || CreatureType == CreatureType.Plant;
+        IsSleeping = !active && CreatureType != CreatureType.Plant;
 
         if (active)
         {
@@ -147,7 +149,6 @@ public abstract class Creature
         else
         {
             dt *= 0.3f;
-            Wander(world, dt * 0.5f, ecosystem.Random, 40f);
         }
 
         ApplyClimateAndPopulationPressure(ecosystem);
