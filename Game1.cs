@@ -80,7 +80,7 @@ public class Game1 : Game
         _graphics.ApplyChanges();
 
         _ecosystem = new Ecosystem(200, 150, 42);
-        _ecosystem.Initialize(60, 20, 15, 150);
+        _ecosystem.Initialize(50, 15, 10, 200);
         _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
         {
             WorldWidth = _ecosystem.World.PixelWidth,

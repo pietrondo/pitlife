@@ -39,6 +39,11 @@ public class Ecosystem
     private ulong _nextIndividualId = 1;
 
     private static readonly string[] PlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant)];
+    private static readonly string[] AquaticPlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant).Where(s =>
+    {
+        var def = SpeciesRegistry.Get(s);
+        return def != null && def.IsAquatic;
+    })];
     private static readonly string[] HerbivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Herbivore)];
     private static readonly string[] CarnivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Carnivore)];
     private static readonly string[] OmnivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Omnivore)];
@@ -61,6 +66,7 @@ public class Ecosystem
     public void Initialize(int h, int c, int o, int p)
     {
         for (int i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");
+        for (int i = 0; i < p / 4; i++) SpawnSpecies<Plant>(AquaticPlantSpecies, "Seaweed");
         for (int i = 0; i < h; i++) SpawnSpecies<Herbivore>(HerbivoreSpecies, "Gazelle");
         for (int i = 0; i < c; i++) SpawnSpecies<Carnivore>(CarnivoreSpecies, "Wolf");
         for (int i = 0; i < o; i++) SpawnSpecies<Omnivore>(OmnivoreSpecies, "Bear");
