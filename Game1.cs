@@ -328,6 +328,17 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
+        // Cataclysm placement when selected
+        if (_inGameUi.SelectedCataclysm != null &&
+            mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released &&
+            !pointerOverUi)
+        {
+            var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
+            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            _worldRenderer.Invalidate();
+            _inGameUi.SelectedCataclysm = null;
+        }
+
         // Spawn creature only when panel is open, species selected, click is NOT on panel, and not consumed by UI
         if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
             !spawnPanelConsumed && !pointerOverUi &&
