@@ -22,6 +22,8 @@ public abstract class Creature
     public float LastReproductionTime { get; set; } = -60f;
     public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
     public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;
+    public float Defense => Genome.Size * 5f + Genome.Metabolism * 3f;
+    public float AttackPower => Genome.Speed * 4f + Genome.Size * 2f;
     public string Subspecies { get; set; } = "";
     private ActivityPattern? _activity;
     public ActivityPattern Activity

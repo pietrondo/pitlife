@@ -128,7 +128,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     if (self.DistanceTo(prey) < 10f)
                     {
                         float damage = carn.AttackDamage * dt;
-                        prey.Energy -= damage;
+                        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
                         self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
                         if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     }
@@ -152,7 +152,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     if (self.DistanceTo(prey) < 10f)
                     {
                         float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
-                        prey.Energy -= damage;
+                        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
                         self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
                         if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     }
@@ -209,7 +209,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 if (prey != null && self.DistanceTo(prey) < 10f)
                 {
                     float damage = carn.AttackDamage * dt;
-                    prey.Energy -= damage;
+                    prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
                     self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
                     if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     return true;
@@ -223,7 +223,7 @@ public sealed class BaseBehavior : ICreatureBehavior
             if (prey != null && self.DistanceTo(prey) < 10f)
             {
                 float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
-                prey.Energy -= damage;
+                prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
                 self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
                 if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                 return true;
@@ -446,8 +446,8 @@ public sealed class BaseBehavior : ICreatureBehavior
             // Combat for carnivores/omnivores when extremely close
             if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
             {
-                self.Energy -= 10f * dt;
-                neighbor.Energy -= 10f * dt;
+                self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f);
+                neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f);
 
                 if (self.Energy <= 0) self.Die(DeathCause.Combat);
                 if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);
