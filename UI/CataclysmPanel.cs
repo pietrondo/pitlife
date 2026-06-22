@@ -16,6 +16,12 @@ public sealed class CataclysmPanel
     private const int PanelW = 160;
     private const int PanelH = 200;
 
+    public CataclysmPanel()
+    {
+        int toggleY = Margin + 10 + ToggleSize + Margin + 10;
+        _toggleBounds = new Rectangle(Margin, toggleY, ToggleSize, ToggleSize);
+    }
+
     private readonly UiButton[] _buttons = new[]
     {
         new UiButton("Asteroid") { Tag = "Asteroid" },
@@ -27,13 +33,22 @@ public sealed class CataclysmPanel
     };
 
     public void Toggle() => IsOpen = !IsOpen;
-    public void Close() => IsOpen = false;
 
     public bool Update(MouseState mouse, MouseState prevMouse)
     {
+        // Toggle button click
+        if (_toggleBounds.Contains(mouse.Position) &&
+            mouse.LeftButton == ButtonState.Released &&
+            prevMouse.LeftButton == ButtonState.Pressed)
+        {
+            Toggle();
+            return true;
+        }
+
         if (!IsOpen) return false;
 
-        int y = _panelBounds.Y + 10;
+        // Cataclysm type buttons
+        int y = _panelBounds.Y + 28;
         foreach (var btn in _buttons)
         {
             btn.Bounds = new Rectangle(_panelBounds.X + 8, y, PanelW - 16, 22);
@@ -44,24 +59,23 @@ public sealed class CataclysmPanel
             }
             y += 26;
         }
-        return false;
+        return _panelBounds.Contains(mouse.Position);
     }
 
     public void Draw(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
     {
-        int toggleY = Margin + 10 + ToggleSize + Margin + 10;
-        _toggleBounds = new Rectangle(Margin, toggleY, ToggleSize, ToggleSize);
-
         bool hover = _toggleBounds.Contains(mouse.Position);
-        Color bg = IsOpen ? new Color(200, 60, 30, 230) : (hover ? new Color(80, 30, 20, 240) : new Color(60, 20, 10, 200));
+        Color bg = IsOpen ? new Color(200, 60, 30, 230)
+            : (hover ? new Color(80, 30, 20, 240) : new Color(60, 20, 10, 200));
         UiPrimitives.Fill(sb, pixel, _toggleBounds, bg);
         UiPrimitives.Border(sb, pixel, _toggleBounds, 2, IsOpen ? UiTheme.DangerClay : UiTheme.BarkEdge);
         var ts = font.MeasureString("C");
-        sb.DrawString(font, "C", new Vector2(_toggleBounds.Center.X - ts.X/2, _toggleBounds.Center.Y - ts.Y/2), IsOpen ? Color.White : UiTheme.DangerClay);
+        sb.DrawString(font, "C", new Vector2(_toggleBounds.Center.X - ts.X / 2, _toggleBounds.Center.Y - ts.Y / 2),
+            IsOpen ? Color.White : UiTheme.DangerClay);
 
         if (!IsOpen) return;
 
-        int panelY = toggleY + ToggleSize + 4;
+        int panelY = _toggleBounds.Y + ToggleSize + 4;
         _panelBounds = new Rectangle(Margin, panelY, PanelW, PanelH);
         UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(30, 15, 10, 235));
         UiPrimitives.Border(sb, pixel, _panelBounds, 2, UiTheme.DangerClay);
@@ -78,13 +92,13 @@ public sealed class CataclysmPanel
         }
 
         if (!string.IsNullOrEmpty(SelectedType))
-            sb.DrawString(font, "Clicca mappa", new Vector2(_panelBounds.X + 8, _panelBounds.Bottom - 18), UiTheme.MossSignal);
+            sb.DrawString(font, "Clicca mappa", new Vector2(_panelBounds.X + 8, _panelBounds.Bottom - 20),
+                UiTheme.MossSignal);
     }
 
     public bool HandleClick(MouseState mouse, MouseState prevMouse)
     {
         if (!IsOpen) return false;
-        return _toggleBounds.Contains(mouse.Position) ||
-               _panelBounds.Contains(mouse.Position);
+        return _toggleBounds.Contains(mouse.Position) || _panelBounds.Contains(mouse.Position);
     }
 }
