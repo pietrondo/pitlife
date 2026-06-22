@@ -42,10 +42,12 @@ public sealed class MainMenu
     private readonly UiTextInput _seedInput = new();
 
     private bool _showOptions;
+    private bool _showWorldGenPanel;
     private bool _inputReady;
     private int _focusedIndex;
 
     public int? Seed => _seedInput.Text.Length > 0 ? _seedInput.GetNumericValue() : null;
+    public bool IsWorldGenPanelOpen => _showWorldGenPanel;
 
     public MenuAction Update(
         MouseState mouse,
@@ -166,8 +168,8 @@ public sealed class MainMenu
         return activated switch
         {
             0 => MenuAction.StartGame,
-            1 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
-            2 => _seedInput.Text.Length > 0 ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld,
+            1 => OpenWorldGenPanel(),
+            2 => OpenWorldGenPanel(),
             3 => MenuAction.SaveGame,
             4 => MenuAction.LoadGame,
             5 => OpenOptions(),
@@ -222,6 +224,12 @@ public sealed class MainMenu
     {
         _showOptions = true;
         _focusedIndex = 0;
+        return MenuAction.None;
+    }
+
+    private MenuAction OpenWorldGenPanel()
+    {
+        _showWorldGenPanel = true;
         return MenuAction.None;
     }
 

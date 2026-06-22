@@ -60,6 +60,33 @@ public class MainMenuTests
     }
 
     [Fact]
+    public void NewWorldButton_OpensWorldGenPanel_WhenClicked()
+    {
+        var menu = new MainMenu();
+        MouseState released = MouseAt(400, 340, ButtonState.Released);
+        menu.Update(released, released, new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        menu.Update(MouseAt(400, 340, ButtonState.Pressed), released,
+            new KeyboardState(),
+            new KeyboardState(),
+            800,
+            720,
+            false);
+
+        MenuAction action = menu.Update(
+            released,
+            MouseAt(400, 340, ButtonState.Pressed),
+            new KeyboardState(),
+            new KeyboardState(),
+            800,
+            720,
+            false);
+
+        Assert.Equal(MenuAction.None, action);
+        Assert.True(menu.IsWorldGenPanelOpen);
+    }
+
+    [Fact]
     public void NewWorldButton_RequestsRandomWorld_WhenSeedIsEmpty()
     {
         var menu = new MainMenu();
@@ -81,7 +108,8 @@ public class MainMenuTests
             720,
             false);
 
-        Assert.Equal(MenuAction.NewWorld, action);
+        Assert.Equal(MenuAction.None, action);
+        Assert.True(menu.IsWorldGenPanelOpen);
     }
 
     [Fact]
@@ -115,7 +143,8 @@ public class MainMenuTests
             720,
             false);
 
-        Assert.Equal(MenuAction.NewWorldWithSeed, action);
+        Assert.Equal(MenuAction.None, action);
+        Assert.True(menu.IsWorldGenPanelOpen);
         Assert.Equal(42, menu.Seed);
     }
 
