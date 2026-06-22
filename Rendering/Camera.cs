@@ -57,15 +57,9 @@ public class Camera
 
     private Vector2 ClampPosition(Vector2 position)
     {
-        float halfWidth = ViewportWidth / (2f * Zoom);
-        float halfHeight = ViewportHeight / (2f * Zoom);
-        float minX = Math.Min(halfWidth, WorldWidth / 2f);
-        float minY = Math.Min(halfHeight, WorldHeight / 2f);
-        float maxX = Math.Max(minX, WorldWidth - halfWidth);
-        float maxY = Math.Max(minY, WorldHeight - halfHeight);
         return new Vector2(
-            MathHelper.Clamp(position.X, minX, maxX),
-            MathHelper.Clamp(position.Y, minY, maxY));
+            (position.X % WorldWidth + WorldWidth) % WorldWidth,
+            (position.Y % WorldHeight + WorldHeight) % WorldHeight);
     }
 
     public Vector2 ScreenToWorld(int screenX, int screenY)

@@ -6,34 +6,32 @@ namespace PitLife.Tests;
 public class CameraTests
 {
     [Fact]
-    public void ClampToWorldBounds_KeepsViewportInsideWorld()
+    public void ClampToWorldBounds_WrapsAround()
     {
         var camera = new Camera(800, 600)
         {
             WorldWidth = 3200,
             WorldHeight = 2400,
             Zoom = 1f,
-            Position = new Vector2(-100, 5000)
+            Position = new Vector2(3500, 2600)
         };
 
         camera.ClampToWorldBounds();
 
-        Assert.Equal(new Vector2(400, 2100), camera.Position);
+        Assert.Equal(new Vector2(300, 200), camera.Position);
     }
 
     [Fact]
-    public void ClampToWorldBounds_WhenViewportExceedsWorld_CentersCamera()
+    public void ClampToWorldBounds_WrapsLargePosition()
     {
-        var camera = new Camera(1600, 1200)
+        var camera = new Camera(800, 600)
         {
-            WorldWidth = 640,
-            WorldHeight = 480,
+            WorldWidth = 3200,
+            WorldHeight = 2400,
             Zoom = 1f,
-            Position = Vector2.Zero
+            Position = new Vector2(-500, 7200)
         };
-
         camera.ClampToWorldBounds();
-
-        Assert.Equal(new Vector2(320, 240), camera.Position);
+        Assert.Equal(new Vector2(2700, 0), camera.Position);
     }
 }
