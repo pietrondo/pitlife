@@ -35,6 +35,7 @@ public sealed class MainMenu
     private readonly UiButton[] _optionButtons =
     [
         new(I18n.Format("menu.fullscreen", I18n.T("common.no"))),
+        new("EN / IT"),
         new(I18n.T("common.back"))
     ];
 
@@ -66,7 +67,7 @@ public sealed class MainMenu
             return MenuAction.None;
         }
 
-        int totalElements = _showOptions ? 2 : 8;
+        int totalElements = _showOptions ? 3 : 8;
         int prevFocused = _focusedIndex;
 
         // Keyboard navigation
@@ -149,9 +150,15 @@ public sealed class MainMenu
         {
             if (activated == 0)
                 return MenuAction.ToggleFullscreen;
+            if (activated == 1)
+            {
+                I18n.SetLanguage(I18n.CurrentLanguage == "it" ? "en" : "it");
+                RefreshText(isFullscreen);
+                return MenuAction.None;
+            }
 
             _showOptions = false;
-            _focusedIndex = 4; // Focus Options button in main menu
+            _focusedIndex = 4;
             return MenuAction.None;
         }
 
@@ -220,7 +227,7 @@ public sealed class MainMenu
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showOptions ? 220 : 436; // Optimized grid height
+        int panelHeight = _showOptions ? 260 : 436;
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
