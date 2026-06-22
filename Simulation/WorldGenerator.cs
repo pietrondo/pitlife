@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using PitLife.Rendering;
 
 namespace PitLife.Simulation;
 
@@ -18,35 +19,42 @@ public sealed class WorldGenerator
 
     public void Generate()
     {
-        GenerateContinentMask(new Random(_rng.Next()));
-        float[,] warp = GenerateFBM(_world.Width, _world.Height, 2, 2f, 1f, new Random(_rng.Next()));
-        float[,] elevation = GenerateFBMWarped(_world.Width, _world.Height, 6, 1.4f, 0.55f, warp, 3f, new Random(_rng.Next()));
-        float[,] moisture = GenerateFBMWarped(_world.Width, _world.Height, 5, 1.0f, 0.50f, warp, 2f, new Random(_rng.Next()));
-        float[,] temperature = GenerateFBM(_world.Width, _world.Height, 3, 0.6f, 0.60f, new Random(_rng.Next()));
+        var noise = new FastNoiseLite(_rng.Next());
+        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+        noise.SetFrequency(0.8f);
 
-        for (int y = 0; y < _world.Height; y++)
+        int w = _world.Width, h = _world.Height;
+        for (int y = 0; y < h; y++)
         {
-            float latFactor = Math.Abs(y / (float)_world.Height - 0.5f) * 2f;
-            for (int x = 0; x < _world.Width; x++)
+            float phi = y / (float)h * MathF.PI;
+            for (int x = 0; x < w; x++)
             {
-                float e = elevation[x, y];
-                float m = moisture[x, y];
-                float t = temperature[x, y] * (1f - latFactor * 0.45f);
+                float theta = x / (float)w * MathF.PI * 2f;
+                float sx = MathF.Sin(theta) * 4f + phi * 2f;
+                float sy = MathF.Cos(theta) * 4f + phi * 2f;
 
-                float distX = x / (float)_world.Width - 0.5f;
-                float distY = y / (float)_world.Height - 0.5f;
-                e -= (distX * distX + distY * distY) * 0.55f;
+                float elev = (noise.GetNoise(sx, sy) + 1f) * 0.5f;
+                float cont = (noise.GetNoise(sx + 3f, sy + 3f) + 1f) * 0.5f;
+                float moist = (noise.GetNoise(sx + 7f, sy + 7f) + 1f) * 0.5f;
 
-                if (e < 0.22f && m > 0.3f) e = 0.18f;
+                float lat = MathF.Abs(phi / MathF.PI - 0.5f) * 2f;
+                elev = elev * (1f - lat * 0.3f);
+                if (cont < 0.35f) elev = cont * 0.3f;
 
-                float mask = _world.ContinentMask[y * _world.Width + x];
-                // Boost land elevation and reduce water areas
-                float elev = mask > 0.3f  // Lowered threshold from 0.5 to 0.3
-                    ? mask * _baseHeight * 1.2f + warp[x, y] * mask * 0.3f  // Boosted multipliers
-                    : mask * 0.15f;  // Give shallow water some elevation instead of 0
-                _world.ElevationField[y * _world.Width + x] = elev;
+                int idx = y * w + x;
+                _world.ElevationField[idx] = elev;
+                _world.ContinentMask[idx] = cont;
 
-                BiomeType biome = AssignBiome(elev, m, t);
+                BiomeType biome = elev switch
+                {
+                    < 0.15f => cont < 0.35f ? BiomeType.DeepOcean : BiomeType.ShallowWater,
+                    < 0.22f => BiomeType.Beach,
+                    < 0.35f => moist < 0.3f ? BiomeType.Desert : BiomeType.Grassland,
+                    < 0.50f => moist < 0.35f ? BiomeType.Savanna : BiomeType.Forest,
+                    < 0.65f => BiomeType.DenseForest,
+                    < 0.78f => lat > 0.65f ? BiomeType.Tundra : BiomeType.Mountain,
+                    _ => lat > 0.75f ? BiomeType.Snow : BiomeType.Mountain
+                };
                 _world.Tiles[x, y] = new Tile(biome);
             }
         }
@@ -58,7 +66,6 @@ public sealed class WorldGenerator
         CarveRivers(_rng.Next());
         SmoothTerrain();
         EnsureAllBiomesPresent();
-        BlendWorldEdges();
     }
 
     private void BlendWorldEdges()
