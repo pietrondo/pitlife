@@ -1,88 +1,126 @@
 # PitLife
 
-Una simulazione di ecosistema 2D con creature che vivono, si nutrono, si riproducono e interagiscono in un mondo dinamico.
+Simulatore di ecosistema 2D data-driven con creature che vivono, si nutrono, si riproducono, evolvono e interagiscono in un mondo dinamico con 15 biomi, 86+ specie, stagioni, clima e cataclismi.
 
 ## Come Giocare
 
-### Obiettivo
-PitLife è una simulazione sandbox: non c'è un obiettivo preciso, ma puoi osservare come l'ecosistema evolve nel tempo. Prova a mantenere l'equilibrio tra piante, erbivori, carnivori e onnivori!
+PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creature, scatena cataclismi e bilancia la vita.
 
 ### Controlli
 
-#### Movimento e Camera
-- **WASD** o **Frecce direzionali**: Muovi la camera nel mondo
-- **Rotella del mouse**: Zoom in/out
-- **Click sinistro su una creatura**: Seleziona la creatura per vedere i dettagli
+| Tasto | Azione |
+|-------|--------|
+| **WASD / Frecce** | Muovi camera |
+| **Rotella mouse** | Zoom |
+| **Click su creatura** | Seleziona e vedi dettagli |
+| **Click su terreno** | Vedi info bioma |
+| **Spazio** | Pausa/Riprendi |
+| **↑ / ↓** | Aumenta/Riduci velocità |
+| **1 / 2 / 3** | Velocità 1x / 2x / 4x |
+| **F1** | Mostra/Nascondi debug overlay |
+| **F2** | Finestra Statistiche |
+| **F3** | Finestra Dettagli Creatura |
+| **F4** | Pannello Spawn / Cataclismi |
+| **F6** | Editor Specie |
+| **F7** | Cataclisma casuale |
+| **F8** | Finestra Cataclismi |
+| **ESC** | Menu principale |
 
-#### Velocità di Simulazione
-- **1**: Velocità normale (1x)
-- **2**: Velocità doppia (2x)
-- **3**: Velocità quadrupla (4x)
-- **Spazio**: Pausa/Riprendi
+### Spawn Creature
+1. Premi **F4** per aprire il pannello
+2. Scegli la categoria (Piante, Erbivori, Carnivori, Onnivori)
+3. Clicca una specie (usa la barra di ricerca per filtrare)
+4. Clicca sulla mappa per spawnare (3 individui in gruppo)
+5. Icone: **~** = acquatico, **^** = volatile
 
-#### Interfaccia
-- **F2**: Apri/Chiudi finestra Statistiche
-- **F3**: Apri/Chiudi finestra Dettagli Creatura
-- **ESC**: Apri menu principale
+### Cataclismi
+1. Premi **F4** e clicca tab "Cataclysms"
+2. Seleziona: Asteroid, Ice Age, Supervolcano, Earthquake, Drought, Flood
+3. Clicca sulla mappa per piazzare l'evento
+4. **F7** per cataclisma casuale globale
 
-#### Spawn Creature
-1. Seleziona una specie dal pannello "Spawn" a destra
-2. Clicca sulla mappa dove vuoi far apparire la creatura
-3. Le creature si evolvono e si riproducono automaticamente!
+## Caratteristiche
 
-### Tipi di Creature
+### Simulazione
+- **15 biomi**: DeepOcean, ShallowWater, Beach, Desert, Savanna, Grassland, Forest, DenseForest, Swamp, Tundra, Mountain, Snow, CoralReef, Cave, Volcano
+- **86+ specie** tra piante, erbivori, carnivori, onnivori, insetti e preistorici
+- **Ciclo giorno/notte** con 4 fasi e overlay visivo
+- **4 stagioni** (480s = 1 anno) con effetti su crescita e metabolismo
+- **Clima**: temperatura per-tile, stress termico, eventi estremi
+- **Cataclismi**: asteroidi, ere glaciali, supervulcani, terremoti, siccità, inondazioni
 
-| Tipo | Comportamento | Esempi |
-|------|--------------|--------|
-| **Piante** | Crescono automaticamente, fonte di cibo | Erba, Fiori, Funghi, Cactus |
-| **Erbivori** | Mangiano piante, fuggono dai predatori | Conigli, Cervi, Pecore |
-| **Carnivori** | Cacciano altre creature | Lupi, Tigri, Aquile |
-| **Onnivori** | Mangiano piante e creature | Orsi, Procioni, Maiali |
+### Genetica ed Evoluzione
+- **Genoma diploide**: 11 loci con alleli, dominanza e ricombinazione
+- **Tratti ereditabili**: Speed, Size, Metabolism, Vision, adattamenti climatici
+- **Personalità**: Aggression, Sociability, Intelligence, MemorySpan, PlantRecognition
+- **Deriva genetica**: fluttuazioni casuali in popolazioni piccole
+- **Inbreeding**: coefficiente di parentela e depressione genetica
+- **Evoluzione visibile**: colore genome riflesso nello sprite
 
-### Sistema di Ecosistema
+### Ecologia
+- **Rete trofica**: 5 livelli trofici, efficienza energetica 10%
+- **Grazing**: erba sui tile, rigenerazione stagionale
+- **Nutrienti suolo**: ciclo NPK, decomposizione carogne fertilizza
+- **Atmosfera**: O₂/CO₂ globali, fotosintesi e respirazione
+- **Sete**: animali bevono da fiumi e oceani
+- **Tossicità**: piante e animali velenosi, apprendimento erbivori
+- **Malattie**: epidemie con trasmissione, immunità e recupero
+- **Simbiosi**: mutualismo implicito (api-fiori, pesci pulitori)
+- **Migrazioni**: home range, movimento stagionale
 
-- **Ciclo giorno/notte**: Le creature sono più attive durante il giorno
-- **Energia**: Ogni creatura ha bisogno di energia per sopravvivere
-- **Età**: Le creature invecchiano e muoiono di vecchiaia
-- **Riproduzione**: Le creature adulte si riproducono quando hanno abbastanza energia
-- **DNA**: Ogni creatura ha un genoma unico che influenza le sue caratteristiche
+### Comportamento
+- **Ciclo attività**: animali diurni/notturni/crepuscolari
+- **Memoria spaziale**: ricordo di cibo e pericoli
+- **Cuccioli**: infanti protetti dai genitori
+- **Corteggiamento**: combattimento tra maschi, selezione sessuale
+- **Territorialità**: difesa del branco, home range
+- **Socialità**: branchi, stormi, banchi con flocking
+- **Difese**: statistiche di attacco/difesa basate sul genoma
 
-### Consigli
+### UI
+- **Tema foresta**: palette verde/marrone con finestre draggable
+- **Statistiche**: popolazioni, specie, trophic levels, gas atmosferici
+- **Minimap**: angolo in basso a destra con biomes e creature
+- **I18n**: Italiano/Inglese con toggle nel menu
+- **Persistenza**: salvataggio/caricamento mondo, preferenze lingua
+- **Log rotation**: max 5 file di log
 
-- **Equilibrio**: Troppi erbivori esauriranno le piante; troppi carnivori decimeranno gli erbivori
-- **Seed**: Usa lo stesso seed per rigenerare un mondo identico
-- **Osserva**: Clicca su una creatura per vedere le sue statistiche dettagliate
-
-## Requisiti di Sistema
+## Requisiti
 
 - Windows, macOS o Linux
-- .NET 9.0 o superiore
-- Scheda video con supporto DirectX/OpenGL
+- .NET 9.0+
+- Scheda video con supporto OpenGL
 
 ## Installazione
 
-### Da Codice Sorgente
 ```bash
-git clone <repository-url>
+git clone https://github.com/pietrondo/pitlife.git
 cd PitLife
 dotnet build
 dotnet run
 ```
 
+Oppure esegui `bin/Debug/net9.0/PitLife.exe` direttamente.
+
+## Struttura
+
+| Directory | Contenuto |
+|-----------|-----------|
+| `Simulation/` | Ecosystem, Creature, Genome, Behaviors, Climate, Disease, Cataclysms |
+| `Rendering/` | PixelWorldRenderer, CreatureRenderer, Minimap, DayNightCycle |
+| `UI/` | MainMenu, SpawnPanel, InGameUi, SpeciesEditor, UiWindow |
+| `Core/` | Logger, AssetRegistry, SpeciesCatalog |
+| `Localization/` | I18n EN/IT |
+| `Content/` | Assets, sprites, font |
+| `tests/` | 228 test (stabilità, performance, property-based) |
+
 ## Sviluppo
 
-PitLife è sviluppato in C# con MonoGame framework.
-
-### Struttura del Progetto
-- `Simulation/`: Logica di simulazione (Ecosystem, Creature, World)
-- `UI/`: Interfaccia utente (Menu, Pannelli, Renderer)
-- `Rendering/`: Rendering grafico (Creature, World, Minimap)
-- `Localization/`: Supporto multilingua (Italiano/Inglese)
+PitLife usa C# con MonoGame. Per aggiungere specie o comportamenti:
+- **Specie**: modifica `Simulation/SpeciesRegistry.cs` o crea `Content/species.json`
+- **Comportamenti**: implementa `ICreatureBehavior` in `Simulation/Behaviors/`
+- **Biomi**: aggiungi a `BiomeType.cs`, `Tile.cs`, `WorldGenerator.cs`, renderer
 
 ## Licenza
 
-PitLife è distribuito con licenza [MIT](LICENSE).
-
-## Crediti
-
-Sviluppato con ❤️ usando MonoGame e .NET
+MIT - vedi [LICENSE](LICENSE)
