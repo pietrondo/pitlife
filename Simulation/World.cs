@@ -55,4 +55,12 @@ public class World
         if (tx < 0 || tx >= Width || ty < 0 || ty >= Height) return false;
         return RiverMask[ty * Width + tx];
     }
+
+    public float GetElevation(float worldX, float worldY)
+    {
+        int tx = (int)(worldX / TileSize);
+        int ty = (int)(worldY / TileSize);
+        if (tx < 0 || tx >= Width || ty < 0 || ty >= Height) return 0f;
+        return ElevationField[ty * Width + tx];
+    }
 }

@@ -64,7 +64,29 @@ public sealed class CataclysmSystem
                 break;
         }
         IsActive = true;
+        ApplyTerrainChange(ecosystem);
         Logger.Event("CATACLYSM", $"MASS EXTINCTION: {ActiveEvent} at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
+    }
+
+    private void ApplyTerrainChange(Ecosystem ecosystem)
+    {
+        int radius = ActiveEvent switch
+        {
+            "Asteroid Impact" => 8,
+            "Supervolcano" => 5,
+            _ => 0
+        };
+        if (radius <= 0) return;
+        int cx = ecosystem.Random.Next(radius, ecosystem.World.Width - radius);
+        int cy = ecosystem.Random.Next(radius, ecosystem.World.Height - radius);
+        for (int dy = -radius; dy <= radius; dy++)
+            for (int dx = -radius; dx <= radius; dx++)
+            {
+                var tile = ecosystem.World.GetTile(cx + dx, cy + dy);
+                tile.GrassAmount = 0f;
+                tile.SoilNutrients = 0.1f;
+            }
+        Logger.Event("TERRAIN", $"{ActiveEvent} crater at ({cx},{cy}) radius={radius}");
     }
 
     private void TriggerRandom(Ecosystem ecosystem, Random rng)

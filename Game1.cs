@@ -560,7 +560,7 @@ public class Game1 : Game
             new Vector2(10, 32), new Color(160, 160, 160));
         string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
         _spriteBatch.DrawString(_font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
-        string seasonLabel = $"{_ecosystem.Climate.CurrentSeason}";
+        string seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
         _spriteBatch.DrawString(_font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
         string seedLabel = $"Seed: {_ecosystem.Seed}";
         _spriteBatch.DrawString(_font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
