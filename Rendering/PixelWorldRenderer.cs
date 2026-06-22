@@ -145,6 +145,12 @@ public sealed class PixelWorldRenderer : IDisposable
                 }
 
                 data[y * width + x] = baseColor;
+                Color c = data[y * width + x];
+                int d = (x * 7 + y * 13) % 7 - 3;
+                data[y * width + x] = new Color(
+                    Math.Clamp(c.R + d, 0, 255),
+                    Math.Clamp(c.G + d, 0, 255),
+                    Math.Clamp(c.B + d, 0, 255));
             }
         }
 
