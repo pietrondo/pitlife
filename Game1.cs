@@ -309,6 +309,10 @@ public class Game1 : Game
         bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
 
         _camera.HandleInput(dt);
+        if (kbd.IsKeyDown(Keys.Up) && _prevKbd.IsKeyUp(Keys.Up))
+            _controller.SetSpeed(Math.Min(3, _controller.SpeedLevel + 1));
+        if (kbd.IsKeyDown(Keys.Down) && _prevKbd.IsKeyUp(Keys.Down))
+            _controller.SetSpeed(Math.Max(0, _controller.SpeedLevel - 1));
         if (kbd.IsKeyDown(Keys.D1) && !_prevKbd.IsKeyDown(Keys.D1)) _controller.SetSpeed(1);
         if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) _controller.SetSpeed(2);
         if (kbd.IsKeyDown(Keys.D3) && !_prevKbd.IsKeyDown(Keys.D3)) _controller.SetSpeed(3);
@@ -565,8 +569,8 @@ public class Game1 : Game
         }
 
         string speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
-        string hud = I18n.Format("hud.summary", _displayTime, _displayPlants, _displayHerbivores,
-            _displayCarnivores, _displayOmnivores, speed);
+        float years = _displayTime / 480f + 1;
+        string hud = $"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | {speed}";
         _spriteBatch.DrawString(_font, hud, new Vector2(10, 10), Color.White);
         _spriteBatch.DrawString(_font, I18n.T("hud.controls"),
             new Vector2(10, 32), new Color(160, 160, 160));
@@ -712,4 +716,8 @@ public class Game1 : Game
                 new Vector2(x, y), new Color(180, 120, 100));
         }
     }
+
+    
+
+    
 }

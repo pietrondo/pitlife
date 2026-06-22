@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Xna.Framework;
 using PitLife.Core;
 
 namespace PitLife.Simulation;
@@ -9,6 +10,9 @@ public sealed class CataclysmSystem
     public string ActiveEvent { get; private set; } = "";
     public float Timer { get; private set; }
     public float GrassMultiplier { get; private set; } = 1f;
+    public Vector2 ImpactPosition { get; private set; }
+    public float ImpactRadius { get; private set; }
+    public Color ImpactColor { get; private set; } = Color.Transparent;
 
     private float _cooldownTimer;
 
@@ -103,6 +107,18 @@ public sealed class CataclysmSystem
         int tx = (int)(position.X / ecosystem.World.TileSize);
         int ty = (int)(position.Y / ecosystem.World.TileSize);
         int radius = type switch { "Asteroid" => 6, "Supervolcano" => 5, "Earthquake" => 8, _ => 3 };
+        ImpactPosition = position;
+        ImpactRadius = radius * ecosystem.World.TileSize;
+        ImpactColor = type switch
+        {
+            "Asteroid" => new Color(255, 100, 30, 200),
+            "Supervolcano" => new Color(255, 50, 10, 200),
+            "Earthquake" => new Color(180, 140, 100, 150),
+            "IceAge" => new Color(100, 200, 255, 150),
+            "Drought" => new Color(255, 180, 40, 150),
+            "Flood" => new Color(40, 140, 255, 150),
+            _ => Color.Transparent
+        };
         for (int dy = -radius; dy <= radius; dy++)
             for (int dx = -radius; dx <= radius; dx++)
             {
