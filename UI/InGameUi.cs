@@ -140,6 +140,7 @@ public sealed class InGameUi
         _statisticsButton.Draw(spriteBatch, pixel, font, mouse, false);
         _creatureButton.Draw(spriteBatch, pixel, font, mouse, false);
         _arrangeButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _cataclysmButton.Draw(spriteBatch, pixel, font, mouse, false);
         _menuButton.Draw(spriteBatch, pixel, font, mouse, false);
 
         foreach (UiWindow window in _windowManager.Windows)
@@ -306,10 +307,11 @@ public sealed class InGameUi
     private void LayoutToolbar(int viewportHeight)
     {
         int y = viewportHeight - 56;
-        _statisticsButton.Bounds = new Rectangle(12, y, 120, 44);
-        _creatureButton.Bounds = new Rectangle(140, y, 120, 44);
-        _arrangeButton.Bounds = new Rectangle(268, y, 120, 44);
-        _menuButton.Bounds = new Rectangle(396, y, 120, 44);
+        _statisticsButton.Bounds = new Rectangle(12, y, 100, 44);
+        _creatureButton.Bounds = new Rectangle(118, y, 100, 44);
+        _arrangeButton.Bounds = new Rectangle(224, y, 100, 44);
+        _cataclysmButton.Bounds = new Rectangle(330, y, 100, 44);
+        _menuButton.Bounds = new Rectangle(436, y, 100, 44);
     }
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
