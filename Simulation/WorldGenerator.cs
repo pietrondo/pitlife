@@ -63,37 +63,39 @@ public sealed class WorldGenerator
 
     private void BlendWorldEdges()
     {
-        int blend = 8;
         int w = _world.Width, h = _world.Height;
+        int blend = Math.Max(w, h) / 4;
         for (int y = 0; y < h; y++)
             for (int x = 0; x < blend; x++)
             {
                 int il = y * w + x, ir = y * w + (w - 1 - x);
-                float elev = (_world.ElevationField[il] + _world.ElevationField[ir]) * 0.5f;
-                float cont = (_world.ContinentMask[il] + _world.ContinentMask[ir]) * 0.5f;
-                _world.ElevationField[il] = _world.ElevationField[ir] = elev;
-                _world.ContinentMask[il] = _world.ContinentMask[ir] = cont;
+                float avgElev = (_world.ElevationField[il] + _world.ElevationField[ir]) * 0.5f;
+                float avgCont = (_world.ContinentMask[il] + _world.ContinentMask[ir]) * 0.5f;
+                for (int bx = 0; bx <= x; bx++)
+                {
+                    int i = y * w + bx;
+                    _world.ElevationField[i] = avgElev;
+                    _world.ContinentMask[i] = avgCont;
+                    int j = y * w + (w - 1 - bx);
+                    _world.ElevationField[j] = avgElev;
+                    _world.ContinentMask[j] = avgCont;
+                }
             }
         for (int x = 0; x < w; x++)
             for (int y = 0; y < blend; y++)
             {
                 int it = y * w + x, ib = (h - 1 - y) * w + x;
-                float elev = (_world.ElevationField[it] + _world.ElevationField[ib]) * 0.5f;
-                float cont = (_world.ContinentMask[it] + _world.ContinentMask[ib]) * 0.5f;
-                _world.ElevationField[it] = _world.ElevationField[ib] = elev;
-                _world.ContinentMask[it] = _world.ContinentMask[ib] = cont;
-            }
-        for (int y = 0; y < blend; y++)
-            for (int x = 0; x < blend; x++)
-            {
-                int itl = y * w + x;
-                int ibr = (h - 1 - y) * w + (w - 1 - x);
-                int itr = y * w + (w - 1 - x);
-                int ibl = (h - 1 - y) * w + x;
-                float elev = (_world.ElevationField[itl] + _world.ElevationField[ibr]) * 0.5f;
-                float cont = (_world.ContinentMask[itl] + _world.ContinentMask[ibr]) * 0.5f;
-                _world.ElevationField[itl] = _world.ElevationField[ibr] = _world.ElevationField[itr] = _world.ElevationField[ibl] = elev;
-                _world.ContinentMask[itl] = _world.ContinentMask[ibr] = _world.ContinentMask[itr] = _world.ContinentMask[ibl] = cont;
+                float avgElev = (_world.ElevationField[it] + _world.ElevationField[ib]) * 0.5f;
+                float avgCont = (_world.ContinentMask[it] + _world.ContinentMask[ib]) * 0.5f;
+                for (int by = 0; by <= y; by++)
+                {
+                    int i = by * w + x;
+                    _world.ElevationField[i] = avgElev;
+                    _world.ContinentMask[i] = avgCont;
+                    int j = (h - 1 - by) * w + x;
+                    _world.ElevationField[j] = avgElev;
+                    _world.ContinentMask[j] = avgCont;
+                }
             }
     }
 
