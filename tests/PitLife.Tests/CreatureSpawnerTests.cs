@@ -14,7 +14,7 @@ public class CreatureSpawnerTests
 
         var landPos = FindLandPosition(eco);
         Assert.True(spawner.CanSpawn("Deer", landPos));
-        Assert.False(spawner.CanSpawn("Plant", FindBiomePosition(eco, BiomeType.DeepOcean)));
+        Assert.False(spawner.CanSpawn("Clover", FindBiomePosition(eco, BiomeType.DeepOcean)));
     }
 
     [Fact]
@@ -40,9 +40,9 @@ public class CreatureSpawnerTests
         var spawner = new CreatureSpawner(eco);
 
         var landPos = FindLandPosition(eco);
-        Assert.True(spawner.SpawnByName("Plant", landPos));
-        Assert.True(spawner.SpawnByName("Plant", landPos));
-        Assert.False(spawner.SpawnByName("Plant", landPos));
+        Assert.True(spawner.SpawnByName("Clover", landPos));
+        Assert.True(spawner.SpawnByName("Clover", landPos));
+        Assert.False(spawner.SpawnByName("Clover", landPos));
     }
 
     private static Vector2 FindLandPosition(Ecosystem eco)

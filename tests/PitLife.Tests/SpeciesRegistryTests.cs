@@ -50,16 +50,16 @@ public class SpeciesRegistryTests
     [Fact]
     public void IsValidBiome_PlantRejectedInOcean()
     {
-        Assert.False(SpeciesRegistry.IsValidBiome("Plant", BiomeType.DeepOcean));
-        Assert.False(SpeciesRegistry.IsValidBiome("Plant", BiomeType.ShallowWater));
-        Assert.True(SpeciesRegistry.IsValidBiome("Plant", BiomeType.Grassland));
+        Assert.False(SpeciesRegistry.IsValidBiome("Clover", BiomeType.DeepOcean));
+        Assert.False(SpeciesRegistry.IsValidBiome("Clover", BiomeType.ShallowWater));
+        Assert.True(SpeciesRegistry.IsValidBiome("Clover", BiomeType.Grassland));
     }
 
     [Fact]
     public void All_ContainsAllRegisteredSpecies()
     {
         Assert.Contains("Shark", SpeciesRegistry.All);
-        Assert.Contains("Plant", SpeciesRegistry.All);
+        Assert.Contains("Clover", SpeciesRegistry.All);
         Assert.Contains("Bear", SpeciesRegistry.All);
         Assert.Contains("Wolf", SpeciesRegistry.All);
     }

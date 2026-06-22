@@ -286,7 +286,7 @@ public class SaveSystemTests
   ""TotalTime"": 10,
   ""Creatures"": [
     {
-      ""Species"": ""Plant"",
+      ""Species"": ""Clover"",
       ""PositionX"": 100,
       ""PositionY"": 200,
       ""Energy"": -10,

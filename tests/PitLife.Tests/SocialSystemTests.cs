@@ -201,8 +201,8 @@ public class SocialSystemTests
         Assert.Equal("Hippopotamus", evolved4);
 
         // Fish stays fish
-        var evolvedFish = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, g1, "Fish", rng);
-        Assert.True(evolvedFish == "Fish" || evolvedFish == "Salmon");
+        var evolvedFish = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, g1, "Tuna", rng);
+        Assert.True(evolvedFish == "Tuna" || evolvedFish == "Salmon");
     }
 
     [Fact]

@@ -13,9 +13,9 @@ public class SpawnTests
 
         Vector2 landPos = FindLandPosition(eco);
         Assert.True(landPos != Vector2.Zero);
-        Assert.True(eco.SpawnByName("Plant", landPos));
+        Assert.True(eco.SpawnByName("Clover", landPos));
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
-        Assert.Contains(eco.Creatures, c => c.Species == "Plant");
+        Assert.Contains(eco.Creatures, c => c.Species == "Clover");
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class SpawnTests
 
         Vector2 oceanPos = FindBiomePosition(eco, BiomeType.DeepOcean);
         Assert.True(oceanPos != Vector2.Zero);
-        Assert.False(eco.SpawnByName("Plant", oceanPos));
+        Assert.False(eco.SpawnByName("Clover", oceanPos));
     }
 
     [Fact]
@@ -60,10 +60,10 @@ public class SpawnTests
         eco.Initialize(h: 0, c: 0, o: 0, p: 0);
         Vector2 pos = FindLandPosition(eco);
         Assert.True(pos != Vector2.Zero);
-        Assert.True(eco.SpawnByName("Plant", pos));
-        Assert.True(eco.SpawnByName("Plant", pos));
-        Assert.True(eco.SpawnByName("Plant", pos));
-        Assert.False(eco.SpawnByName("Plant", pos));
+        Assert.True(eco.SpawnByName("Clover", pos));
+        Assert.True(eco.SpawnByName("Clover", pos));
+        Assert.True(eco.SpawnByName("Clover", pos));
+        Assert.False(eco.SpawnByName("Clover", pos));
     }
 
     private static Vector2 FindLandPosition(Ecosystem eco)

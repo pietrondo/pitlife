@@ -30,7 +30,7 @@ public class SpawnPanelTests
         Click(panel, released, emptyKbd, 110, 370);
 
         Assert.Equal("Plants", panel.SelectedCategory);
-        Assert.Equal("Plant", panel.SelectedSpeciesKey);
+        Assert.Equal("Clover", panel.SelectedSpeciesKey);
     }
 
     private static void Click(SpawnPanel panel, MouseState released, KeyboardState emptyKbd, int x, int y)

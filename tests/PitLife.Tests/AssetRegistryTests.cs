@@ -63,7 +63,7 @@ public class AssetRegistryTests
     [InlineData("Pine")]
     [InlineData("Crocodile")]
     [InlineData("Fox")]
-    [InlineData("Fish")]
+    [InlineData("Tuna")]
     public void CriticalReplacementSprites_AreTransparent64PixelPngs(string species)
     {
         SpeciesAsset asset = Assert.Single(

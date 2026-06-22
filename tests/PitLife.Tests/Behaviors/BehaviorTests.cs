@@ -55,7 +55,7 @@ public class BehaviorTests
     [Fact]
     public void PlantBehavior_GrowsWithSunlight()
     {
-        var plant = new Plant(new Vector2(32, 32), Genome.Random(new Random(1)), "Plant");
+        var plant = new Plant(new Vector2(32, 32), Genome.Random(new Random(1)), "Clover");
         float energyBefore = plant.Energy;
 
         var eco = new Ecosystem(64, 48, 42);

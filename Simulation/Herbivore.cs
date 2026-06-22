@@ -7,7 +7,7 @@ public class Herbivore : Creature
 {
     public Herbivore(Vector2 position, Genome genome, string species = "Herbivore")
         : base(position, genome, CreatureType.Herbivore) { Species = species; Behavior = new BaseBehavior(); }
-    public override bool IsAquatic => Species is "Fish" or "Salmon";
+    public override bool IsAquatic => Species is "Tuna" or "Salmon";
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
     {

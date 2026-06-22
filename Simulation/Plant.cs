@@ -7,7 +7,7 @@ public class Plant : Creature
 {
     public float GrowthRate { get; }
 
-    public Plant(Vector2 position, Genome genome, string species = "Plant")
+    public Plant(Vector2 position, Genome genome, string species = "Clover")
         : base(position, genome, CreatureType.Plant)
     {
         Species = species;

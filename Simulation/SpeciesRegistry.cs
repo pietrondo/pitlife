@@ -193,7 +193,7 @@ public static class SpeciesRegistry
                 }
                 else
                 {
-                    return rng.Next(2) == 0 ? "Fish" : "Salmon";
+                    return rng.Next(2) == 0 ? "Tuna" : "Salmon";
                 }
             }
             if (genome.DesertAdaptation >= 0.45f && genome.Speed >= 1.2f && genome.Size >= 1.0f)
@@ -336,8 +336,8 @@ internal static class BuiltinSpecies
     public static void RegisterAll()
     {
         // Plants (Land)
-        RegisterPlant("Plant", PlantReproductionMode.Vegetative);
-        RegisterPlant("Flowers", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterPlant("Clover", PlantReproductionMode.Vegetative);
+        RegisterPlant("Poppy", PlantReproductionMode.Seeds, PollinationMode.Insects);
         RegisterPlant("Mushroom", PlantReproductionMode.Spores);
         RegisterPlant("GrassTuft", PlantReproductionMode.Seeds, PollinationMode.Wind);
         RegisterPlant("Cactus", PlantReproductionMode.Seeds, PollinationMode.Insects);
@@ -347,8 +347,8 @@ internal static class BuiltinSpecies
         RegisterPlant("Toadstool", PlantReproductionMode.Spores);
         RegisterPlant("OakTree", PlantReproductionMode.Seeds, PollinationMode.Wind);
         RegisterPlant("PineTree", PlantReproductionMode.Seeds, PollinationMode.Wind);
-        RegisterPlant("Bush", PlantReproductionMode.Seeds, PollinationMode.Insects);
-        RegisterPlant("Grass", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("Juniper", PlantReproductionMode.Seeds, PollinationMode.Insects);
+        RegisterPlant("Bamboo", PlantReproductionMode.Seeds, PollinationMode.Wind);
         RegisterPlant("Lavender", PlantReproductionMode.Seeds, PollinationMode.Insects,
             [BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland, BiomeType.Mountain]);
         RegisterPlant("Fern", PlantReproductionMode.Spores, biomes:
@@ -375,7 +375,7 @@ internal static class BuiltinSpecies
         RegisterAnimal("Sheep", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
         RegisterAnimal("Horse", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
         RegisterAnimal("Goat", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
-        RegisterAnimal("Fish", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow);
+        RegisterAnimal("Tuna", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow);
         RegisterAnimal("Lizard", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Turtle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Salmon", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow, size: 0.9f);
@@ -479,7 +479,7 @@ internal static class BuiltinSpecies
     private static float GetMaturityAge(string species) => species switch
     {
         "Beetle" or "Butterfly" or "Frog" or "Piranha" or "Rabbit" => 10f,
-        "Fish" or "Jellyfish" or "Lizard" or "Salmon" => 15f,
+        "Tuna" or "Jellyfish" or "Lizard" or "Salmon" => 15f,
         "Fox" or "Otter" or "Raccoon" => 20f,
         "Boar" or "Cheetah" or "Gazelle" or "Goat" or "Kangaroo" or "Seal" or
             "SeaLion" or "Sheep" => 25f,

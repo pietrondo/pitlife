@@ -42,12 +42,12 @@ public static class AssetRegistry
 
     private static readonly List<SpeciesAsset> SpeciesTextureEntries = new()
     {
-        new("Plant", "Content/assets/creatures/plants/shrubs/plant.png"),
+        new("Clover", "Content/assets/creatures/plants/shrubs/plant.png"),
         new("Deer", "Content/assets/creatures/mammals/herbivores/ungulates/deer.png"),
         new("Rabbit", "Content/assets/creatures/mammals/herbivores/lagomorphs/rabbit.png"),
         new("Fox", "Content/assets/creatures/mammals/canids/fox.png"),
         new("Boar", "Content/assets/creatures/mammals/omnivores/suids/boar.png"),
-        new("Flowers", "Content/assets/creatures/plants/flowers/flowers.png"),
+        new("Poppy", "Content/assets/creatures/plants/flowers/flowers.png"),
         new("Mushroom", "Content/assets/creatures/plants/fungi/mushroom.png"),
         new("Sheep", "Content/assets/creatures/mammals/herbivores/ungulates/sheep.png"),
         new("Lynx", "Content/assets/creatures/mammals/carnivores/felids/lynx.png"),
@@ -69,7 +69,7 @@ public static class AssetRegistry
         new("Eagle", "Content/assets/creatures/birds/raptors/eagle.png"),
         new("Frog", "Content/assets/creatures/amphibians/anurans/frog.png"),
         new("Beetle", "Content/assets/creatures/invertebrates/insects/beetle.png"),
-        new("Fish", "Content/assets/creatures/fish/tropical/fish.png"),
+        new("Tuna", "Content/assets/creatures/fish/tropical/fish.png"),
         new("Lizard", "Content/assets/creatures/reptiles/squamates/lizard.png"),
         new("Wolf", "Content/assets/creatures/mammals/carnivores/canids/wolf.png"),
         new("Bear", "Content/assets/creatures/mammals/omnivores/ursids/bear.png"),
@@ -96,8 +96,8 @@ public static class AssetRegistry
         // Nuove texture piante pixel art
         new("OakTree", "Content/assets/plants/trees/oak_tree.png"),
         new("PineTree", "Content/assets/plants/trees/pine_tree.png"),
-        new("Bush", "Content/assets/plants/bushes/bush.png"),
-        new("Grass", "Content/assets/plants/grass/grass.png"),
+        new("Juniper", "Content/assets/plants/bushes/bush.png"),
+        new("Bamboo", "Content/assets/plants/grass/grass.png"),
         new("Seaweed", "Content/assets/plants/aquatic/seaweed.png"),
         new("Kelp", "Content/assets/plants/aquatic/kelp.png"),
         new("WaterLily", "Content/assets/plants/aquatic/water_lily.png"),

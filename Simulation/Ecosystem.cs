@@ -60,7 +60,7 @@ public class Ecosystem
 
     public void Initialize(int h, int c, int o, int p)
     {
-        for (int i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Plant");
+        for (int i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");
         for (int i = 0; i < h; i++) SpawnSpecies<Herbivore>(HerbivoreSpecies, "Gazelle");
         for (int i = 0; i < c; i++) SpawnSpecies<Carnivore>(CarnivoreSpecies, "Wolf");
         for (int i = 0; i < o; i++) SpawnSpecies<Omnivore>(OmnivoreSpecies, "Bear");
