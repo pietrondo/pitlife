@@ -29,9 +29,8 @@ public sealed class WorldGenerator
             float phi = y / (float)h * MathF.PI;
             for (int x = 0; x < w; x++)
             {
-                float theta = x / (float)w * MathF.PI * 2f;
-                float sx = MathF.Cos(theta) * 5f + y * 0.3f;
-                float sy = MathF.Sin(theta) * 5f + y * 0.3f;
+                float sx = x * 0.15f;
+                float sy = y * 0.15f;
 
                 float elev = (noise.GetNoise(sx, sy) + 1f) * 0.5f;
                 float cont = (noise.GetNoise(sx + 3f, sy + 3f) + 1f) * 0.5f;
@@ -66,6 +65,30 @@ public sealed class WorldGenerator
         CarveRivers(_rng.Next());
         SmoothTerrain();
         EnsureAllBiomesPresent();
+        CopyEdgesForWrap();
+    }
+
+    private void CopyEdgesForWrap()
+    {
+        int w = _world.Width, h = _world.Height;
+        for (int y = 0; y < h; y++)
+        {
+            int iLeft = y * w + 0;
+            int iRight = y * w + (w - 1);
+            _world.Tiles[w - 1, y] = _world.Tiles[0, y];
+            _world.ElevationField[iRight] = _world.ElevationField[iLeft];
+            _world.ContinentMask[iRight] = _world.ContinentMask[iLeft];
+            _world.RiverMask[iRight] = _world.RiverMask[iLeft];
+        }
+        for (int x = 0; x < w; x++)
+        {
+            int iTop = 0 * w + x;
+            int iBot = (h - 1) * w + x;
+            _world.Tiles[x, h - 1] = _world.Tiles[x, 0];
+            _world.ElevationField[iBot] = _world.ElevationField[iTop];
+            _world.ContinentMask[iBot] = _world.ContinentMask[iTop];
+            _world.RiverMask[iBot] = _world.RiverMask[iTop];
+        }
     }
 
     private void BlendWorldEdges()
