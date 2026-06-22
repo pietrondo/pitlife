@@ -15,6 +15,10 @@ public struct Genome
     public float ColdAdaptation;
     public float ForestAdaptation;
     public float WaterAdaptation;
+    public float MemorySpan;
+    public float Aggression;
+    public float Sociability;
+    public float Intelligence;
     public GeneticProfile Genetics;
 
     public float Heterozygosity => EnsureGeneticProfile().Heterozygosity;
@@ -40,4 +44,15 @@ public struct Genome
 
     public GeneticProfile EnsureGeneticProfile() =>
         Genetics.IsInitialized ? Genetics : GeneticProfile.FromPhenotype(this);
+
+    public void ApplyGeneticDrift(Random rng)
+    {
+        float drift = (float)(rng.NextDouble() - 0.5) * 0.02f;
+        Speed = MathHelper.Clamp(Speed + drift, 0.5f, 2f);
+        Size = MathHelper.Clamp(Size + drift, 0.5f, 2f);
+        Metabolism = MathHelper.Clamp(Metabolism + drift, 0.5f, 2f);
+        float adaptDrift = (float)(rng.NextDouble() - 0.5) * 0.01f;
+        DesertAdaptation = MathHelper.Clamp(DesertAdaptation + adaptDrift, 0f, 1f);
+        ColdAdaptation = MathHelper.Clamp(ColdAdaptation + adaptDrift, 0f, 1f);
+    }
 }

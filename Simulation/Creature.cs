@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using PitLife.Core;
 using PitLife.Rendering;
@@ -25,6 +26,33 @@ public abstract class Creature
     public float Defense => Genome.Size * 5f + Genome.Metabolism * 3f;
     public float AttackPower => Genome.Speed * 4f + Genome.Size * 2f;
     public string Subspecies { get; set; } = "";
+
+    // Memory
+    public List<Vector2> RememberedFood { get; } = new();
+    public List<Vector2> RememberedDanger { get; } = new();
+    private const int MaxMemories = 5;
+    private const float MemoryDecayChance = 0.001f;
+
+    public void RememberFood(Vector2 pos)
+    {
+        if (RememberedFood.Count >= MaxMemories) RememberedFood.RemoveAt(0);
+        RememberedFood.Add(pos);
+    }
+
+    public void RememberDanger(Vector2 pos)
+    {
+        if (RememberedDanger.Count >= MaxMemories) RememberedDanger.RemoveAt(0);
+        RememberedDanger.Add(pos);
+    }
+
+    public void DecayMemories(Random rng)
+    {
+        float decayRate = 0.002f * (1f - Genome.MemorySpan * 0.8f);
+        if (rng.NextDouble() < decayRate && RememberedFood.Count > 0)
+            RememberedFood.RemoveAt(rng.Next(RememberedFood.Count));
+        if (rng.NextDouble() < decayRate && RememberedDanger.Count > 0)
+            RememberedDanger.RemoveAt(rng.Next(RememberedDanger.Count));
+    }
     private ActivityPattern? _activity;
     public ActivityPattern Activity
     {
@@ -152,6 +180,17 @@ public abstract class Creature
         var mate = ecosystem.FindNearestMate(this);
         if (mate != null && DistanceTo(mate) < VisionPixels * 0.5f)
         {
+            if (Gender == Gender.Male)
+            {
+                var rivals = ecosystem.FindNeighbors(this, VisionPixels * 0.3f,
+                    c => c != this && c.Species == Species && c.Gender == Gender.Male && c.IsAdult);
+                foreach (var rival in rivals)
+                {
+                    if (rival.AttackPower * rival.Genome.Aggression > AttackPower * Genome.Aggression)
+                        return;
+                }
+            }
+
             if (timeSinceLastReproduction < ReproductionCooldown ||
                 ecosystem.TotalTime - mate.LastReproductionTime < mate.ReproductionCooldown)
                 return;
@@ -259,21 +298,41 @@ public abstract class Creature
 
     public void Wander(World world, float dt, Random random, float radius)
     {
+        DecayMemories(random);
+
         if (Waypoint == null || Vector2.Distance(Position, Waypoint.Value) < WaypointReachedDistance)
         {
             float distFromHome = Vector2.Distance(Position, HomePosition);
             if (distFromHome > radius * 3f)
+            {
                 Waypoint = HomePosition;
+            }
+            else if (RememberedFood.Count > 0 && random.NextDouble() < Genome.Intelligence * 0.5f)
+            {
+                Waypoint = RememberedFood[random.Next(RememberedFood.Count)];
+            }
+            else if (RememberedDanger.Count > 0 && random.NextDouble() < 0.15f)
+            {
+                var danger = RememberedDanger[random.Next(RememberedDanger.Count)];
+                Waypoint = new Vector2(Position.X + (Position.X - danger.X), Position.Y + (Position.Y - danger.Y));
+            }
             else
+            {
                 Waypoint = PickWaypoint(world, random, radius);
+            }
         }
 
-        // Migrate if home area depleted
         if (CreatureType != CreatureType.Plant)
         {
             var homeTile = world.GetTileAtPosition(HomePosition.X, HomePosition.Y);
             if (homeTile.GrassAmount < 0.05f && random.NextDouble() < 0.0005f)
                 HomePosition = Position;
+        }
+
+        // Genetic drift: small populations get random gene fluctuations
+        if (random.NextDouble() < 0.0001f)
+        {
+            Genome.ApplyGeneticDrift(random);
         }
 
         if (Waypoint.HasValue)

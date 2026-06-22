@@ -18,6 +18,7 @@ public sealed class BaseBehavior : ICreatureBehavior
         if (threat != null && self.DistanceTo(threat) < self.VisionPixels * PredatorVisionScale(self))
         {
             self.MoveAwayFrom(threat.Position, dt, world);
+            self.RememberDanger(threat.Position);
             return;
         }
 
@@ -108,6 +109,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     food.Energy -= eaten;
                     self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
                     if (food.Energy <= 0) food.Die(DeathCause.Predation);
+                    self.RememberFood(food.Position);
                 }
                 else
                 {
@@ -299,10 +301,11 @@ public sealed class BaseBehavior : ICreatureBehavior
         if (behavior == SocialBehavior.None)
             return false;
 
+        float s = self.Genome.Sociability;
         switch (behavior)
         {
             case SocialBehavior.Herd:
-                return ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.5f, separationWeight: 2.0f, alignmentWeight: 0.5f, separationDist: 30f);
+                return ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.5f * s, separationWeight: 2.0f * s, alignmentWeight: 0.5f * s, separationDist: 30f);
             
             case SocialBehavior.Pack:
                 {
@@ -446,8 +449,8 @@ public sealed class BaseBehavior : ICreatureBehavior
             // Combat for carnivores/omnivores when extremely close
             if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
             {
-                self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f);
-                neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f);
+                self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f) * (0.5f + self.Genome.Aggression);
+                neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f) * (0.5f + neighbor.Genome.Aggression);
 
                 if (self.Energy <= 0) self.Die(DeathCause.Combat);
                 if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);
