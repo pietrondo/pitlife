@@ -23,6 +23,7 @@ public class Ecosystem
     public int OmnivoreCount { get; private set; }
     public EcosystemMetrics Metrics { get; } = new();
     public float PopulationPressure { get; private set; } = 1f;
+    public ClimateSystem Climate { get; } = new();
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
 
@@ -191,7 +192,8 @@ public class Ecosystem
 
         FlushPending();
         ProcessDeaths(dt);
-        World.RegenerateGrass(dt);
+        Climate.Update(TotalTime, Random);
+        World.RegenerateGrass(dt * Climate.GrassRegenModifier);
         UpdateStats();
     }
 

@@ -57,7 +57,7 @@ public abstract class Creature
         Behavior.Update(this, world, ecosystem, gameTime);
         if (!IsAlive) return;
 
-        ApplyPopulationPressure(ecosystem);
+        ApplyClimateAndPopulationPressure(ecosystem);
         ConsumeEnergy(dt);
         if (Energy <= 0 || Age > 300f)
         {
@@ -99,10 +99,12 @@ public abstract class Creature
         Energy -= EnergyConsumption * CurrentEnergyMultiplier * dt;
     }
 
-    internal void ApplyPopulationPressure(Ecosystem ecosystem)
+    internal void ApplyClimateAndPopulationPressure(Ecosystem ecosystem)
     {
         if (CreatureType == CreatureType.Plant) return;
-        Energy -= EnergyConsumption * (ecosystem.PopulationPressure - 1f) * 0.5f * (1f / 60f);
+        float seasonalFactor = ecosystem.Climate.EnergyModifier;
+        float pressureFactor = ecosystem.PopulationPressure;
+        Energy -= EnergyConsumption * (seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f) * (1f / 60f);
     }
 
     private void UpdateEnvironmentalMultipliers(World world)

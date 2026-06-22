@@ -484,6 +484,15 @@ public class Game1 : Game
         _ => Color.White
     };
 
+    private static Color GetSeasonColor(Season season) => season switch
+    {
+        Season.Spring => new Color(140, 220, 100),
+        Season.Summer => new Color(255, 200, 60),
+        Season.Autumn => new Color(220, 140, 40),
+        Season.Winter => new Color(160, 200, 240),
+        _ => Color.White
+    };
+
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.Black);
@@ -532,6 +541,8 @@ public class Game1 : Game
             new Vector2(10, 32), new Color(160, 160, 160));
         string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
         _spriteBatch.DrawString(_font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
+        string seasonLabel = $"{_ecosystem.Climate.CurrentSeason}";
+        _spriteBatch.DrawString(_font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
         string seedLabel = $"Seed: {_ecosystem.Seed}";
         _spriteBatch.DrawString(_font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
 
