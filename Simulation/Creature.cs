@@ -14,6 +14,10 @@ public abstract class Creature
     public DeathCause DeathCause { get; private set; }
     public CreatureType CreatureType { get; protected set; }
     public DietType Diet { get; protected set; }
+    public bool IsInfected { get; set; }
+    public float DiseaseTimer { get; set; }
+    public string DiseaseName { get; set; } = "";
+    public float Immunity { get; set; }
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
     public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();

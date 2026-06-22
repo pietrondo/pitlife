@@ -24,6 +24,7 @@ public class Ecosystem
     public EcosystemMetrics Metrics { get; } = new();
     public float PopulationPressure { get; private set; } = 1f;
     public ClimateSystem Climate { get; } = new();
+    public DiseaseSystem Disease { get; } = new();
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
 
@@ -193,6 +194,7 @@ public class Ecosystem
         FlushPending();
         ProcessDeaths(dt);
         Climate.Update(TotalTime, Random);
+        Disease.Update(this, dt, Random);
         World.RegenerateGrass(dt * Climate.GrassRegenModifier);
         UpdateStats();
     }

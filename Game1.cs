@@ -638,5 +638,11 @@ public class Game1 : Game
             sb.DrawString(font, $"Last death: {m.LastDeathSpecies} ({m.LastDeathCause})",
                 new Vector2(x, y), new Color(180, 120, 100));
         }
+        if (_ecosystem.Disease.HasOutbreak)
+        {
+            y += (int)lineH;
+            sb.DrawString(font, $"Disease: {_ecosystem.Disease.ActiveDiseaseName}",
+                new Vector2(x, y), new Color(220, 60, 60));
+        }
     }
 }
