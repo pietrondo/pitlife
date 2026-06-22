@@ -67,13 +67,25 @@ public class Ecosystem
     {
         for (int i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");
         for (int i = 0; i < p / 4; i++) SpawnSpecies<Plant>(AquaticPlantSpecies, "Seaweed");
-        for (int i = 0; i < h; i++) SpawnSpecies<Herbivore>(HerbivoreSpecies, "Gazelle");
-        for (int i = 0; i < c; i++) SpawnSpecies<Carnivore>(CarnivoreSpecies, "Wolf");
-        for (int i = 0; i < o; i++) SpawnSpecies<Omnivore>(OmnivoreSpecies, "Bear");
+        SpawnSubset<Herbivore>(HerbivoreSpecies, h, "Gazelle");
+        SpawnSubset<Carnivore>(CarnivoreSpecies, c, "Wolf");
+        SpawnSubset<Omnivore>(OmnivoreSpecies, o, "Bear");
         FlushPending();
         StaggerPlantAges();
         UpdateStats();
         Logger.Event("ECO", $"Initialized: P={p} H={h} C={c} O={o} | Total={Creatures.Count}");
+    }
+
+    private void SpawnSubset<T>(string[] species, int count, string fallback) where T : Creature
+    {
+        int maxSpecies = Math.Max(2, count / 5);
+        var selected = species.OrderBy(_ => Random.Next()).Take(Math.Min(maxSpecies, species.Length)).ToArray();
+        for (int i = 0; i < count; i++)
+        {
+            string name = selected[Random.Next(selected.Length)];
+            var pos = RandomPassablePosition(name);
+            _spawner.SpawnByName(name, pos);
+        }
     }
 
     private void StaggerPlantAges()
