@@ -9,7 +9,7 @@ public class SpawnPanelTests
     [Fact]
     public void Categories_ContainEveryRegisteredSpecies()
     {
-        string[] categories = ["Plants", "AquaticPlants", "LandHerbivores", "LandCarnivores", "LandOmnivores", "Birds", "Fish", "MarineMammals"];
+        string[] categories = ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
         var panelSpecies = categories.SelectMany(SpawnPanel.SpeciesForCategory).ToHashSet();
 
         Assert.Equal(SpeciesRegistry.All.ToHashSet(), panelSpecies);
@@ -27,7 +27,7 @@ public class SpawnPanelTests
 
         panel.Update(released, released, emptyKbd, emptyKbd);
         Click(panel, released, emptyKbd, 110, 118);
-        Click(panel, released, emptyKbd, 110, 370);
+        Click(panel, released, emptyKbd, 110, 282);
 
         Assert.Equal("Plants", panel.SelectedCategory);
         Assert.Equal("Clover", panel.SelectedSpeciesKey);

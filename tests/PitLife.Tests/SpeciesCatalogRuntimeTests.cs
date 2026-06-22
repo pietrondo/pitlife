@@ -26,7 +26,7 @@ public class SpeciesCatalogRuntimeTests
                 asset.Species == "RuntimeBadger" && asset.Path.EndsWith("badger.png", StringComparison.Ordinal));
             I18n.SetLanguage("it");
             Assert.Equal("Tasso runtime", I18n.Species("RuntimeBadger"));
-            Assert.Contains("RuntimeBadger", SpawnPanel.SpeciesForCategory("LandOmnivores"));
+            Assert.Contains("RuntimeBadger", SpawnPanel.SpeciesForCategory("Omnivores"));
             Assert.Equal(1, changeNotifications);
         }
         finally

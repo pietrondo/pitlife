@@ -16,7 +16,7 @@ public sealed class SpawnPanel
     public string? SelectedCategory { get; private set; }
 
     private static readonly string[] CategoryOrder =
-        ["Plants", "AquaticPlants", "LandHerbivores", "LandCarnivores", "LandOmnivores", "Birds", "Fish", "MarineMammals"];
+        ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
     private Dictionary<string, string[]> _speciesByCategory = BuildSpeciesByCategory();
 
     public const int PanelWidth = 200;
@@ -301,10 +301,14 @@ public sealed class SpawnPanel
         foreach (var s in species)
         {
             string displayName = I18n.Species(s);
+            var def = SpeciesRegistry.Get(s);
+            string prefix = "";
+            if (def != null && def.IsAquatic) prefix = "~ ";
+            else if (s is "Eagle" or "Owl") prefix = "^ ";
             if (filter.Length > 0 && !displayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
                 && !s.Contains(filter, StringComparison.OrdinalIgnoreCase))
                 continue;
-            _speciesButtons.Add(new UiButton(displayName)
+            _speciesButtons.Add(new UiButton(prefix + displayName)
             {
                 Tag = s
             });
@@ -350,11 +354,6 @@ public sealed class SpawnPanel
     private static bool WasClicked(MouseState current, MouseState previous) =>
         current.LeftButton == ButtonState.Pressed && previous.LeftButton == ButtonState.Released;
 
-    private static readonly HashSet<string> BirdSpecies = new(StringComparer.Ordinal)
-    {
-        "Eagle", "Owl"
-    };
-
     private static readonly HashSet<string> MarineMammalSpecies = new(StringComparer.Ordinal)
     {
         "Dolphin", "Whale", "Manatee", "Orca", "Seal", "SeaLion", "Otter", "Walrus"
@@ -374,13 +373,10 @@ public sealed class SpawnPanel
         {
             CreatureType.Plant when definition.IsAquatic => "AquaticPlants",
             CreatureType.Plant => "Plants",
-            _ when BirdSpecies.Contains(species) => "Birds",
-            _ when MarineMammalSpecies.Contains(species) => "MarineMammals",
-            _ when definition.IsAquatic => "Fish",
-            CreatureType.Herbivore => "LandHerbivores",
-            CreatureType.Carnivore => "LandCarnivores",
-            CreatureType.Omnivore => "LandOmnivores",
-            _ => throw new InvalidOperationException($"Unsupported creature type: {definition.Kind}")
+            CreatureType.Herbivore => "Herbivores",
+            CreatureType.Carnivore => "Carnivores",
+            CreatureType.Omnivore => "Omnivores",
+            _ => "Omnivores"
         };
             categories[category].Add(species);
         }
