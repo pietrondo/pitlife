@@ -36,7 +36,8 @@ public sealed class SimulationController
     {
         if (_paused)
         {
-            _dayNight.Update(_ecosystem.TotalTime);
+        _dayNight.Update(_ecosystem.TotalTime);
+        _ecosystem.CurrentDayPhase = _dayNight.Phase;
             return;
         }
 
@@ -48,6 +49,7 @@ public sealed class SimulationController
             _timeAccumulator -= TickInterval;
         }
         _dayNight.Update(_ecosystem.TotalTime);
+        _ecosystem.CurrentDayPhase = _dayNight.Phase;
     }
 
     public void SetSpeed(int level)

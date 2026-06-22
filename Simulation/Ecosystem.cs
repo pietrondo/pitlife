@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using PitLife.Core;
+using PitLife.Rendering;
 
 namespace PitLife.Simulation;
 
@@ -26,6 +27,7 @@ public class Ecosystem
     public ClimateSystem Climate { get; } = new();
     public DiseaseSystem Disease { get; } = new();
     public PhylogeneticGraph Phylogeny { get; } = new();
+    public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
 

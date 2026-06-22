@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using PitLife.Core;
+using PitLife.Rendering;
 
 namespace PitLife.Simulation;
 
@@ -22,6 +23,31 @@ public abstract class Creature
     public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
     public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;
     public string Subspecies { get; set; } = "";
+    private ActivityPattern? _activity;
+    public ActivityPattern Activity
+    {
+        get
+        {
+            _activity ??= GetDefaultActivity(Species);
+            return _activity.Value;
+        }
+        set => _activity = value;
+    }
+
+    public bool IsActive(DayPhase phase) => Activity switch
+    {
+        ActivityPattern.Diurnal => phase is DayPhase.Day or DayPhase.Dawn or DayPhase.Dusk,
+        ActivityPattern.Nocturnal => phase is DayPhase.Night or DayPhase.Dusk or DayPhase.Dawn,
+        ActivityPattern.Crepuscular => phase is DayPhase.Dawn or DayPhase.Dusk,
+        _ => true
+    };
+
+    private static ActivityPattern GetDefaultActivity(string species) => species switch
+    {
+        "Owl" or "Bat" or "Badger" or "Fox" or "Raccoon" or "Wolf" => ActivityPattern.Nocturnal,
+        "Deer" or "Rabbit" or "Boar" => ActivityPattern.Crepuscular,
+        _ => ActivityPattern.Diurnal
+    };
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
     public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();
@@ -71,8 +97,17 @@ public abstract class Creature
         UpdateEnvironmentalMultipliers(world);
         Position = ClampToWorld(Position, world);
 
-        Behavior.Update(this, world, ecosystem, gameTime);
-        if (!IsAlive) return;
+        bool active = IsActive(ecosystem.CurrentDayPhase) || CreatureType == CreatureType.Plant;
+
+        if (active)
+        {
+            Behavior.Update(this, world, ecosystem, gameTime);
+            if (!IsAlive) return;
+        }
+        else
+        {
+            dt *= 0.3f;
+        }
 
         ApplyClimateAndPopulationPressure(ecosystem);
         ConsumeEnergy(dt);

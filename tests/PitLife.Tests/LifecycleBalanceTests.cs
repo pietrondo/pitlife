@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using PitLife.Rendering;
 using PitLife.Simulation;
 using Xunit.Abstractions;
 
@@ -69,6 +70,7 @@ public class LifecycleBalanceTests
             ecosystem.AddCreature(deer);
         }
         ecosystem.FlushPending();
+        ecosystem.CurrentDayPhase = DayPhase.Dusk;
 
         Advance(ecosystem, 10f);
         Creature[] herd = ecosystem.Creatures.Where(creature => creature.IsAlive).ToArray();

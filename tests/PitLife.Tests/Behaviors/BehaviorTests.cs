@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using PitLife.Rendering;
 using PitLife.Simulation;
 
 namespace PitLife.Tests.Behaviors;
@@ -36,10 +37,12 @@ public class BehaviorTests
     {
         var eco = new Ecosystem(64, 48, 42);
         eco.Initialize(h: 0, c: 0, o: 0, p: 5);
+        eco.CurrentDayPhase = DayPhase.Dusk;
 
         var plant = eco.Creatures.OfType<Plant>().First();
         var herbivore = new Herbivore(plant.Position + new Vector2(2, 0),
             Genome.Random(new Random(1)), "Rabbit");
+        herbivore.Activity = ActivityPattern.Diurnal;
         float energyBefore = herbivore.Energy;
         eco.AddCreature(herbivore);
 
