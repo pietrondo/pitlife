@@ -61,14 +61,15 @@ public abstract class Creature
     public float EnergyConsumption => Genome.Metabolism * 0.5f * Genome.Size;
     public float CurrentSpeedMultiplier { get; protected set; } = 1f;
     public float CurrentEnergyMultiplier { get; protected set; } = 1f;
-    public float Speed => Genome.Speed * 30f * CurrentSpeedMultiplier * GeneticFitness;
-    public float VisionPixels => Genome.VisionRange * 32f;
+    public float Speed => Genome.Speed * 30f * CurrentSpeedMultiplier * GeneticFitness * (IsBaby ? 0.5f : 1f);
+    public float VisionPixels => Genome.VisionRange * 32f * (IsBaby ? 0.5f : 1f);
     public float ReproductionThreshold => MaxEnergy * 0.7f;
     public virtual bool IsAquatic => false;
 
     public Vector2 Facing { get; set; } = new(0, 1);
     public Vector2? Waypoint { get; set; }
     public ICreatureBehavior Behavior { get; set; } = new BaseBehavior();
+    public Creature? Parent { get; set; }
     private const float WaypointReachedDistance = 14f;
 
     protected Creature(Vector2 position, Genome genome, CreatureType type)
@@ -317,6 +318,7 @@ public abstract class Creature
             child.Lineage = LineageRecord.CreateChild(Lineage, partner.Lineage);
             child.InbreedingCoefficient = LineageRecord.CalculateOffspringInbreeding(Lineage, partner.Lineage);
             child.Energy = child.MaxEnergy * 0.5f;
+            child.Parent = Gender == Gender.Female ? this : partner;
             if (child.CreatureType != CreatureType.Plant)
             {
                 child.Gender = rng.Next(2) == 0 ? Gender.Male : Gender.Female;

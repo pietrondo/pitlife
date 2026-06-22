@@ -21,6 +21,20 @@ public sealed class BaseBehavior : ICreatureBehavior
             return;
         }
 
+        // 1b. Infant follows parent
+        if (self.IsBaby && self.Parent != null && self.Parent.IsAlive)
+        {
+            self.MoveToward(self.Parent.Position, dt, world);
+            TryGraze(self, world, dt);
+            return;
+        }
+
+        // 1c. Parent defends nearby infants
+        if (self.IsAdult && self.CreatureType != CreatureType.Plant)
+        {
+            DefendInfants(self, ecosystem, dt);
+        }
+
         // 2. Food search if hungry
         if (IsHungry(self) && TryFeed(self, ecosystem, dt, world))
         {
@@ -225,6 +239,26 @@ public sealed class BaseBehavior : ICreatureBehavior
             return true;
         }
         return false;
+    }
+
+    private static void DefendInfants(Creature self, Ecosystem ecosystem, float dt)
+    {
+        var infants = ecosystem.FindNeighbors(self, 40f,
+            c => c.IsBaby && c.Parent == self && c.IsAlive);
+        if (infants.Count == 0) return;
+
+        var infant = infants[0];
+        var predator = ecosystem.FindNearestPredator(infant);
+        if (predator != null && infant.DistanceTo(predator) < 40f)
+        {
+            self.MoveToward(predator.Position, dt, null);
+            if (self.DistanceTo(predator) < 10f)
+            {
+                float damage = 15f * dt;
+                predator.Energy -= damage;
+                if (predator.Energy <= 0) predator.Die(DeathCause.Combat);
+            }
+        }
     }
 
     private static bool ApplySocialBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
