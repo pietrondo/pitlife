@@ -139,8 +139,11 @@ public sealed class InGameUi
 
             if (window.Id == StatisticsWindowId)
             {
-                DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
+                int neededHeight = DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
                     plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
+                int totalNeeded = neededHeight + 46;
+                if (totalNeeded > window.Bounds.Height)
+                    window.Bounds = new Rectangle(window.Bounds.X, window.Bounds.Y, window.Bounds.Width, totalNeeded);
             }
             else if (window.Id == CreatureWindowId)
             {
@@ -153,7 +156,7 @@ public sealed class InGameUi
         }
     }
 
-    private static void DrawStatistics(
+    private static int DrawStatistics(
         SpriteBatch spriteBatch,
         Texture2D pixel,
         SpriteFont font,
@@ -200,6 +203,7 @@ public sealed class InGameUi
         DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.carnivores", carnivores), carnivores, total, UiTheme.DangerClay);
         y += 30;
         DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.omnivores", omnivores), omnivores, total, UiTheme.WarmParchment);
+        return y - content.Y + 8;
     }
 
     private static void DrawPopulationRow(
