@@ -21,6 +21,7 @@ public abstract class Creature
     public float LastReproductionTime { get; set; } = -60f;
     public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
     public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;
+    public string Subspecies { get; set; } = "";
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
     public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();
@@ -298,6 +299,14 @@ public abstract class Creature
         if (Gender is not (Gender.Male or Gender.Female)) return false;
         if (partner.Gender is not (Gender.Male or Gender.Female)) return false;
         return Gender != partner.Gender;
+    }
+
+    public bool CanMateWithSubspecies(Creature? partner)
+    {
+        if (!CanMateWith(partner) || partner == null) return false;
+        if (string.IsNullOrEmpty(Subspecies) || string.IsNullOrEmpty(partner.Subspecies))
+            return true;
+        return true;
     }
 
     public float RelatednessTo(Creature? other) =>

@@ -28,6 +28,8 @@ public sealed class EcosystemMetrics
     public int TrophicLevel1 { get; private set; }
     public int TrophicLevel2 { get; private set; }
     public int TrophicLevel3Plus { get; private set; }
+    public Dictionary<string, int> SubspeciesCounts { get; } = new(StringComparer.Ordinal);
+    public int TotalSubspecies { get; private set; }
 
     private int _totalBirths;
     private int _totalDeaths;
@@ -82,6 +84,19 @@ public sealed class EcosystemMetrics
             SpeciesPopulations[kvp.Key] = kvp.Value;
 
         SpeciesCount = aliveBySpecies.Count;
+
+        var subspeciesByKey = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var c in aliveCreatures)
+        {
+            if (string.IsNullOrEmpty(c.Subspecies)) continue;
+            string key = $"{c.Species}/{c.Subspecies}";
+            subspeciesByKey.TryGetValue(key, out int sc);
+            subspeciesByKey[key] = sc + 1;
+        }
+        SubspeciesCounts.Clear();
+        foreach (var kvp in subspeciesByKey.OrderByDescending(kvp => kvp.Value))
+            SubspeciesCounts[kvp.Key] = kvp.Value;
+        TotalSubspecies = subspeciesByKey.Count;
 
         if (aliveCreatures.Count > 0)
         {

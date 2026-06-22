@@ -630,7 +630,7 @@ public class Game1 : Game
         sb.DrawString(font, $"Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}",
             new Vector2(x, y), c);
         y += (int)lineH;
-        sb.DrawString(font, $"Species:{m.SpeciesCount} H:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2}",
+        sb.DrawString(font, $"Species:{m.SpeciesCount} H:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2} Subsp:{m.TotalSubspecies}",
             new Vector2(x, y), c);
         if (m.LastDeathSpecies.Length > 0)
         {
