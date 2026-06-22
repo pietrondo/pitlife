@@ -58,6 +58,41 @@ public sealed class WorldGenerator
         CarveRivers(_rng.Next());
         SmoothTerrain();
         EnsureAllBiomesPresent();
+        BlendWorldEdges();
+    }
+
+    private void BlendWorldEdges()
+    {
+        int blend = 4;
+        int w = _world.Width, h = _world.Height;
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < blend; x++)
+            {
+                float t = x / (float)blend;
+                if (_world.RiverMask[y * w + x] || _world.RiverMask[y * w + (w - 1 - x)]) continue;
+                var left = _world.Tiles[x, y];
+                var right = _world.Tiles[w - 1 - x, y];
+                if (left.Biome != right.Biome && _rng.NextDouble() < t)
+                    _world.Tiles[x, y] = new Tile(right.Biome);
+                if (right.Biome != left.Biome && _rng.NextDouble() < t)
+                    _world.Tiles[w - 1 - x, y] = new Tile(left.Biome);
+            }
+        }
+        for (int x = 0; x < w; x++)
+        {
+            for (int y = 0; y < blend; y++)
+            {
+                if (_world.RiverMask[y * w + x] || _world.RiverMask[(h - 1 - y) * w + x]) continue;
+                float t = y / (float)blend;
+                var top = _world.Tiles[x, y];
+                var bottom = _world.Tiles[x, h - 1 - y];
+                if (top.Biome != bottom.Biome && _rng.NextDouble() < t)
+                    _world.Tiles[x, y] = new Tile(bottom.Biome);
+                if (bottom.Biome != top.Biome && _rng.NextDouble() < t)
+                    _world.Tiles[x, h - 1 - y] = new Tile(top.Biome);
+            }
+        }
     }
 
     private void EnsureAllBiomesPresent()
