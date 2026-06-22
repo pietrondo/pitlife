@@ -204,16 +204,22 @@ public class Ecosystem
 
     private void ProcessDeaths(float dt)
     {
-        double decomposeChance = 1.0 - Math.Exp(-0.05 * dt);
+        double decomposeChance = 1.0 - Math.Exp(-0.02 * dt);
         for (int i = Creatures.Count - 1; i >= 0; i--)
         {
             if (i >= Creatures.Count) continue;
             var c = Creatures[i];
             if (c == null) continue;
-            if (!c.IsAlive && Random.NextDouble() < decomposeChance)
+            if (!c.IsAlive)
             {
-                _spatialGrid.Remove(c);
-                Creatures.RemoveAt(i);
+                if (Random.NextDouble() < decomposeChance)
+                {
+                    var tile = World.GetTileAtPosition(c.Position.X, c.Position.Y);
+                    if (tile.GrassAmount < tile.MaxGrass)
+                        tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
+                    _spatialGrid.Remove(c);
+                    Creatures.RemoveAt(i);
+                }
             }
         }
         FlushPending();

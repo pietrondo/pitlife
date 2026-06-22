@@ -116,7 +116,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 }
                 return true;
             }
-            if (TryGraze(self, world, dt)) return true;
+            if (TryEatCarcass(self, ecosystem, dt)) return true;
         }
         else if (self.CreatureType == CreatureType.Carnivore)
         {
@@ -138,6 +138,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     }
                     return true;
                 }
+                if (TryEatCarcass(self, ecosystem, dt)) return true;
             }
         }
         else if (self.CreatureType == CreatureType.Omnivore)
@@ -214,6 +215,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     return true;
                 }
             }
+            return TryEatCarcass(self, ecosystem, dt);
         }
         else if (self.CreatureType == CreatureType.Omnivore)
         {
@@ -236,6 +238,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 if (food.Energy <= 0) food.Die(DeathCause.Predation);
                 return true;
             }
+            return TryEatCarcass(self, ecosystem, dt);
         }
         return false;
     }
@@ -272,6 +275,22 @@ public sealed class BaseBehavior : ICreatureBehavior
                 if (predator.Energy <= 0) predator.Die(DeathCause.Combat);
             }
         }
+    }
+
+    private static bool TryEatCarcass(Creature self, Ecosystem ecosystem, float dt)
+    {
+        foreach (var c in ecosystem.Creatures)
+        {
+            if (c == null || c.IsAlive || c.CreatureType == CreatureType.Plant) continue;
+            if (self.DistanceTo(c) < 10f && c.Energy > 0)
+            {
+                float eaten = Math.Min(c.Energy, 8f * dt);
+                c.Energy -= eaten;
+                self.Energy = Math.Min(self.Energy + eaten * 1.2f, self.MaxEnergy);
+                return true;
+            }
+        }
+        return false;
     }
 
     private static bool ApplySocialBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
