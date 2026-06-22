@@ -29,6 +29,7 @@ public class Ecosystem
     public PhylogeneticGraph Phylogeny { get; } = new();
     public AtmosphereSystem Atmosphere { get; } = new();
     public CataclysmSystem Cataclysms { get; } = new();
+    public FlowSimulation? Flow { get; private set; }
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
@@ -63,6 +64,7 @@ public class Ecosystem
         _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
         Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
+        Flow = new FlowSimulation(World);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -221,6 +223,7 @@ public class Ecosystem
         Atmosphere.Update(PlantCount, HerbivoreCount + CarnivoreCount + OmnivoreCount, dt);
         Cataclysms.Update(this, dt, Random);
         Cataclysms.UpdateVolcanoes(this, dt, Random);
+        Flow?.Update(dt, Random);
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         UpdateStats();

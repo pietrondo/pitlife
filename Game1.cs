@@ -30,6 +30,7 @@ public class Game1 : Game
     private readonly HelpScreen _helpScreen = new();
     private readonly InGameUi _inGameUi = new();
     private readonly SpawnPanel _spawnPanel = new();
+    private readonly CataclysmPanel _cataclysmPanel = new();
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
     private float _currentFPS;
@@ -302,11 +303,14 @@ public class Game1 : Game
         }
 
         _spawnPanel.SetViewportHeight(GraphicsDevice.Viewport.Height);
+        if (kbd.IsKeyDown(Keys.F8) && !_prevKbd.IsKeyDown(Keys.F8))
+            _cataclysmPanel.Toggle();
         if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
         {
             _spawnPanel.Toggle();
         }
         bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
+        bool cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
 
         _camera.HandleInput(dt);
@@ -329,14 +333,14 @@ public class Game1 : Game
         _displayTime = _controller.TotalTime;
 
         // Cataclysm placement when selected
-        if (_inGameUi.SelectedCataclysm != null &&
+        if (_cataclysmPanel.SelectedType != null &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released &&
-            !pointerOverUi)
+            !_spawnPanel.IsOpen && !_cataclysmPanel.IsOpen)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _cataclysmPanel.SelectedType!, catPos);
             _worldRenderer.Invalidate();
-            _inGameUi.SelectedCataclysm = null;
+            _cataclysmPanel.SelectedType = null;
         }
 
         // Spawn creature only when panel is open, species selected, click is NOT on panel, and not consumed by UI
@@ -546,6 +550,7 @@ public class Game1 : Game
         // Draw the map with Point Clamp (for crisp pixel art matching the minimap)
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
+        _ecosystem.Flow?.DrawOverlay(_spriteBatch, _ecosystem.World.TileSize, 16);
         _spriteBatch.End();
 
         // Draw the creatures with Point Clamp (for crisp pixel art)
@@ -622,6 +627,7 @@ public class Game1 : Game
         _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
         _minimap.Draw(_spriteBatch, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         _spawnPanel.Draw(_spriteBatch, _uiPixel, _font, Mouse.GetState());
+        _cataclysmPanel.Draw(_spriteBatch, _uiPixel, _font, Mouse.GetState());
         _speciesEditor.Draw(
             _spriteBatch,
             _uiPixel,
