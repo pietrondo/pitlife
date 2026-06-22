@@ -36,8 +36,7 @@ public sealed class SpeciesEditorPanel
     private readonly UiWindow _window = new("Species Editor", "species-editor")
     {
         Bounds = new Rectangle(300, 90, 680, 610),
-        ShowCloseButton = true,
-        IsDraggable = false
+        ShowCloseButton = true
     };
     private readonly UiTextInput _key = new() { Placeholder = "SpeciesKey", MaxLength = 40 };
     private readonly UiTextInput _englishName = new() { Placeholder = "English name", MaxLength = 40 };
