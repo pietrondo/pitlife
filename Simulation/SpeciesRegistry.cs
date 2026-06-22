@@ -325,7 +325,7 @@ internal static class BuiltinSpecies
 
     private static readonly BiomeType[] Shallow = [BiomeType.ShallowWater];
     private static readonly BiomeType[] Deep = [BiomeType.DeepOcean];
-    private static readonly BiomeType[] ShallowOrDeep = [BiomeType.ShallowWater, BiomeType.DeepOcean];
+    private static readonly BiomeType[] ShallowOrDeep = [BiomeType.ShallowWater, BiomeType.DeepOcean, BiomeType.CoralReef];
     private static readonly BiomeType[] LandAndShallow =
     [
         BiomeType.Beach, BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland,

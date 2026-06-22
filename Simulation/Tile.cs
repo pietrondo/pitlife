@@ -22,10 +22,11 @@ public class Tile
     public float GrassAmount { get; set; }
     public bool IsPassable => Biome != BiomeType.DeepOcean
                             && Biome != BiomeType.ShallowWater
-                            && Biome != BiomeType.Snow;
+                            && Biome != BiomeType.Snow
+                            && Biome != BiomeType.CoralReef;
 
     public bool IsPassableFor(bool isAquatic) => isAquatic
-        ? Biome is BiomeType.DeepOcean or BiomeType.ShallowWater
+        ? Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef
         : IsPassable;
 
     public Tile(BiomeType biome)
@@ -57,6 +58,7 @@ public class Tile
             BiomeType.Tundra => 0.2f,
             BiomeType.Desert => 0.1f,
             BiomeType.Beach => 0.1f,
+            BiomeType.CoralReef => 0.9f,
             _ => 0.0f
         };
 

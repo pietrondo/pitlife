@@ -185,7 +185,7 @@ public abstract class Creature
 
         if (IsAquatic)
         {
-            bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater;
+            bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
             if (inWater)
             {
                 CurrentSpeedMultiplier = 1.0f;

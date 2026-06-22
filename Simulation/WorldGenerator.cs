@@ -51,6 +51,7 @@ public sealed class WorldGenerator
             }
         }
 
+        PlaceCoralReefs();
         CarveRivers(_rng.Next());
         SmoothTerrain();
         EnsureAllBiomesPresent();
@@ -63,7 +64,8 @@ public sealed class WorldGenerator
             BiomeType.DeepOcean, BiomeType.ShallowWater, BiomeType.Beach,
             BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest,
             BiomeType.Desert, BiomeType.Savanna, BiomeType.Swamp,
-            BiomeType.Mountain, BiomeType.Snow, BiomeType.Tundra
+            BiomeType.Mountain, BiomeType.Snow, BiomeType.Tundra,
+            BiomeType.CoralReef
         };
 
         var present = new HashSet<BiomeType>();
@@ -84,6 +86,21 @@ public sealed class WorldGenerator
                     _world.Tiles[x, y] = new Tile(biome);
                     present.Add(biome);
                 }
+            }
+        }
+    }
+
+    private void PlaceCoralReefs()
+    {
+        for (int y = 0; y < _world.Height; y++)
+        {
+            float latFactor = Math.Abs(y / (float)_world.Height - 0.5f) * 2f;
+            if (latFactor > 0.7f) continue;
+            for (int x = 0; x < _world.Width; x++)
+            {
+                if (_world.Tiles[x, y].Biome != BiomeType.ShallowWater) continue;
+                if (_rng.NextDouble() < 0.25f)
+                    _world.Tiles[x, y] = new Tile(BiomeType.CoralReef);
             }
         }
     }

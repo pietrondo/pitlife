@@ -132,6 +132,7 @@ public class Minimap
         BiomeType.Tundra => new Color(180, 185, 170),
         BiomeType.Mountain => new Color(120, 110, 100),
         BiomeType.Snow => new Color(235, 240, 245),
+        BiomeType.CoralReef => new Color(0, 180, 160),
         _ => Color.Magenta
     };
 
@@ -150,6 +151,7 @@ public class Minimap
         new Color(180, 185, 170),   // Tundra
         new Color(120, 110, 100),  // Mountain
         new Color(235, 240, 245),  // Snow
+        new Color(0, 180, 160),    // CoralReef
     ];
 
     private static Color GetCreatureColor(CreatureType type) => type switch

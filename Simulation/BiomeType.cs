@@ -13,5 +13,6 @@ public enum BiomeType
     Swamp,
     Tundra,
     Mountain,
-    Snow
+    Snow,
+    CoralReef
 }

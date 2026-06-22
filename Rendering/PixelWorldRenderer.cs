@@ -28,6 +28,7 @@ public sealed class PixelWorldRenderer : IDisposable
         new(180, 185, 170),  // Tundra
         new(120, 110, 100),  // Mountain
         new(235, 240, 245),  // Snow
+        new(0, 180, 160),     // CoralReef
     };
 
     // Slightly darker variation for subtle texture
@@ -45,6 +46,7 @@ public sealed class PixelWorldRenderer : IDisposable
         new(160, 165, 150),  // Tundra dark
         new(105, 95, 85),    // Mountain dark
         new(220, 225, 230),  // Snow dark
+        new(0, 160, 140),     // CoralReef dark
     };
 
     // Slightly lighter variation for subtle highlights
@@ -62,6 +64,7 @@ public sealed class PixelWorldRenderer : IDisposable
         new(195, 200, 185),  // Tundra light
         new(140, 125, 115),  // Mountain light
         new(250, 255, 255),  // Snow light
+        new(0, 210, 190),     // CoralReef light
     };
 
     public PixelWorldRenderer(World world, int seed)
