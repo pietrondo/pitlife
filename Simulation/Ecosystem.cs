@@ -14,7 +14,7 @@ public class Ecosystem
     public int MaxCreatures { get; set; } = 3000;
     public bool IsFull => Creatures.Count + _pendingAdd.Count >= MaxCreatures;
     public int PlantCarryingCapacity => Math.Max(1,
-        Math.Min((int)(MaxCreatures * 0.6f), World.Width * World.Height / 8));
+        Math.Min((int)(MaxCreatures * 0.5f), World.Width * World.Height / 8));
 
     public int PlantCount { get; private set; }
     public int HerbivoreCount { get; private set; }
@@ -27,6 +27,7 @@ public class Ecosystem
     private readonly object _lock = new();
     private readonly SpatialGrid _spatialGrid;
     private CreatureSpawner _spawner = null!;
+    private ulong _nextIndividualId = 1;
 
     private static readonly string[] PlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant)];
     private static readonly string[] HerbivoreSpecies = [.. SpeciesRegistry.OfType(CreatureType.Herbivore)];
@@ -55,13 +56,30 @@ public class Ecosystem
         for (int i = 0; i < c; i++) SpawnSpecies<Carnivore>(CarnivoreSpecies, "Wolf");
         for (int i = 0; i < o; i++) SpawnSpecies<Omnivore>(OmnivoreSpecies, "Bear");
         FlushPending();
+        StaggerPlantAges();
         UpdateStats();
         Logger.Event("ECO", $"Initialized: P={p} H={h} C={c} O={o} | Total={Creatures.Count}");
     }
 
+    private void StaggerPlantAges()
+    {
+        foreach (var c in Creatures)
+        {
+            if (c is Plant && c.IsAlive)
+                c.GrowFor((float)Random.NextDouble() * 120f);
+        }
+    }
+
     public void AddCreature(Creature c)
     {
-        lock (_lock) { _pendingAdd.Add(c); }
+        lock (_lock)
+        {
+            if (c.Lineage.IndividualId == 0)
+                c.AssignIndividualId(_nextIndividualId++);
+            else
+                _nextIndividualId = Math.Max(_nextIndividualId, c.Lineage.IndividualId + 1);
+            _pendingAdd.Add(c);
+        }
         Logger.Event("SPAWN", $"{c.Species} at ({c.Position.X:F0},{c.Position.Y:F0})");
     }
 
@@ -168,6 +186,7 @@ public class Ecosystem
 
         FlushPending();
         ProcessDeaths(dt);
+        World.RegenerateGrass(dt);
         UpdateStats();
     }
 
@@ -261,9 +280,14 @@ public class Ecosystem
         var tile = World.GetTileAtPosition(newPos.X, newPos.Y);
         if (!tile.IsPassable) return;
 
+        var sameSpeciesNearby = FindNeighbors(plant, 80f, c => c is Plant p && p.Species == plant.Species);
+        if (sameSpeciesNearby.Count >= 4)
+            return;
+
         Genome childGenome = Genome.Reproduce(plant.Genome, plant.Genome, Random);
         var child = new Plant(newPos, childGenome, plant.Species);
-        child.Energy = child.MaxEnergy * 0.3f;
+        child.InheritAsexualLineage(plant);
+        child.Energy = child.MaxEnergy * 0.5f;
         AddCreature(child);
         plant.Energy -= plant.MaxEnergy * 0.2f;
     }
@@ -303,6 +327,7 @@ public class Ecosystem
             CarnivoreCount = 0;
             OmnivoreCount = 0;
             _spatialGrid.Rebuild(Array.Empty<Creature>());
+            _nextIndividualId = 1;
         }
     }
 }

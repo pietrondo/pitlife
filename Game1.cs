@@ -191,13 +191,20 @@ public class Game1 : Game
                     _menuInputCooldown = 0.5f;
                     break;
                 case MenuAction.LoadGame:
-                    var saveData = SaveSystem.Load("savegame.json");
-                    if (saveData != null)
+                    try
                     {
-                        RestoreLoadedEcosystem(saveData);
-                        _screen = GameScreen.Playing;
-                        _paused = false;
-                        _controller.SetPause(false);
+                        var saveData = SaveSystem.Load("savegame.json");
+                        if (saveData != null)
+                        {
+                            RestoreLoadedEcosystem(saveData);
+                            _screen = GameScreen.Playing;
+                            _paused = false;
+                            _controller.SetPause(false);
+                        }
+                    }
+                    catch (InvalidDataException ex)
+                    {
+                        Logger.Error($"Failed to load save: {ex.Message}");
                     }
                     _menuInputCooldown = 0.5f;
                     break;
@@ -280,7 +287,7 @@ public class Game1 : Game
         {
             _spawnPanel.Toggle();
         }
-        bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse);
+        bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
 
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.D1) && !_prevKbd.IsKeyDown(Keys.D1)) _controller.SetSpeed(1);
@@ -402,7 +409,8 @@ public class Game1 : Game
                 DesertAdaptation = cData.Genome.DesertAdaptation,
                 ColdAdaptation = cData.Genome.ColdAdaptation,
                 ForestAdaptation = cData.Genome.ForestAdaptation,
-                WaterAdaptation = cData.Genome.WaterAdaptation
+                WaterAdaptation = cData.Genome.WaterAdaptation,
+                Genetics = cData.Genome.Genetics ?? default
             };
 
             Creature c = (Creature)Activator.CreateInstance(
@@ -415,6 +423,13 @@ public class Game1 : Game
             c.Gender = cData.Gender;
             c.Facing = new Vector2(cData.FacingX, cData.FacingY);
             c.GrowFor(cData.Age);
+            c.RestoreGeneticHistory(
+                LineageRecord.Restore(
+                    cData.IndividualId,
+                    cData.ParentAId,
+                    cData.ParentBId,
+                    cData.AncestorDepths),
+                cData.InbreedingCoefficient);
 
             _ecosystem.AddCreature(c);
         }

@@ -131,7 +131,7 @@ public class LifecycleBalanceTests
         DesertAdaptation = 1f,
         ColdAdaptation = 1f,
         ForestAdaptation = 1f,
-        WaterAdaptation = 1f
+        WaterAdaptation = 0f
     };
 
     private readonly record struct LifecycleMetrics(

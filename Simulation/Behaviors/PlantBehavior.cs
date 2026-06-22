@@ -19,6 +19,6 @@ public sealed class PlantBehavior : ICreatureBehavior
         if (self.Energy >= self.ReproductionThreshold)
             ecosystem.TrySpreadPlant(plant);
 
-        if (self.Age > 120f) self.Die();
+        if (self.Age > 240f) self.Die();
     }
 }

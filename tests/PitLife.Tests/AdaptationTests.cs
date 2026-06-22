@@ -68,14 +68,14 @@ public class AdaptationTests
         Assert.True(adaptedCreature.CurrentEnergyMultiplier < unadaptedCreature.CurrentEnergyMultiplier);
         
         // Exact expected values:
-        // Unadapted energy multiplier: 1.0 + (1.0 - 0.0) * 1.5 = 2.5
-        // Adapted energy multiplier: 1.0 + (1.0 - 1.0) * 1.5 = 1.0
-        Assert.Equal(2.5f, unadaptedCreature.CurrentEnergyMultiplier);
+        // Unadapted energy multiplier: 1.0 + (1.0 - 0.0) * 1.0 = 2.0
+        // Adapted energy multiplier: 1.0 + (1.0 - 1.0) * 1.0 = 1.0
+        Assert.Equal(2.0f, unadaptedCreature.CurrentEnergyMultiplier);
         Assert.Equal(1.0f, adaptedCreature.CurrentEnergyMultiplier);
 
-        // Unadapted speed multiplier: 0.5 + 0.0 * 0.5 = 0.5
-        // Adapted speed multiplier: 0.5 + 1.0 * 0.5 = 1.0
-        Assert.Equal(0.5f, unadaptedCreature.CurrentSpeedMultiplier);
+        // Unadapted speed multiplier: 0.6 + 0.0 * 0.4 = 0.6
+        // Adapted speed multiplier: 0.6 + 1.0 * 0.4 = 1.0
+        Assert.Equal(0.6f, unadaptedCreature.CurrentSpeedMultiplier);
         Assert.Equal(1.0f, adaptedCreature.CurrentSpeedMultiplier);
     }
 
@@ -99,7 +99,7 @@ public class AdaptationTests
     }
 
     [Fact]
-    public void Genome_Reproduce_InheritsTraitsFromBothParents()
+    public void Genome_Reproduce_InheritsOneAlleleFromEachParent()
     {
         var first = new Genome
         {
@@ -115,11 +115,12 @@ public class AdaptationTests
         };
 
         Genome child = Genome.Reproduce(first, second, new Random(7));
-        float[] traits = [child.Speed, child.Size, child.Metabolism, child.VisionRange,
-            child.DesertAdaptation, child.ColdAdaptation, child.ForestAdaptation, child.WaterAdaptation];
-
-        Assert.Contains(traits, value => value is 0.51f or 0.61f or 0.71f or 1.1f or 0.11f or 0.21f or 0.31f or 0.41f);
-        Assert.Contains(traits, value => value is 1.51f or 1.61f or 1.71f or 9.1f or 0.91f or 0.81f or 0.72f or 0.62f);
+        Assert.Equal(first.Speed, child.Genetics.Speed.AlleleA.Value);
+        Assert.Equal(second.Speed, child.Genetics.Speed.AlleleB.Value);
+        Assert.Equal(first.Size, child.Genetics.Size.AlleleA.Value);
+        Assert.Equal(second.Size, child.Genetics.Size.AlleleB.Value);
+        Assert.InRange(child.Speed, first.Speed, second.Speed);
+        Assert.InRange(child.Size, first.Size, second.Size);
     }
 
     [Fact]

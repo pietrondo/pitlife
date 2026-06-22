@@ -1,3 +1,5 @@
+using System;
+
 namespace PitLife.Simulation;
 
 public class Tile
@@ -11,12 +13,16 @@ public class Tile
         {
             _biome = value;
             Vegetation = VegetationFor(value);
+            MaxGrass = GrassFor(value);
+            GrassAmount = MaxGrass;
         }
     }
     public float Vegetation { get; set; }
+    public float MaxGrass { get; set; }
+    public float GrassAmount { get; set; }
     public bool IsPassable => Biome != BiomeType.DeepOcean
-                           && Biome != BiomeType.ShallowWater
-                           && Biome != BiomeType.Snow;
+                            && Biome != BiomeType.ShallowWater
+                            && Biome != BiomeType.Snow;
 
     public bool IsPassableFor(bool isAquatic) => isAquatic
         ? Biome is BiomeType.DeepOcean or BiomeType.ShallowWater
@@ -25,6 +31,20 @@ public class Tile
     public Tile(BiomeType biome)
     {
         Biome = biome;
+    }
+
+    public float EatGrass(float amount)
+    {
+        if (GrassAmount <= 0) return 0f;
+        float eaten = Math.Min(GrassAmount, amount);
+        GrassAmount -= eaten;
+        return eaten;
+    }
+
+    public void RegenerateGrass(float dt)
+    {
+        float regenRate = 0.02f;
+        GrassAmount = Math.Min(MaxGrass, GrassAmount + regenRate * dt);
     }
 
     private static float VegetationFor(BiomeType biome) => biome switch
@@ -39,4 +59,17 @@ public class Tile
             BiomeType.Beach => 0.1f,
             _ => 0.0f
         };
+
+    private static float GrassFor(BiomeType biome) => biome switch
+    {
+        BiomeType.Grassland => 0.8f,
+        BiomeType.Forest => 0.4f,
+        BiomeType.Savanna => 0.35f,
+        BiomeType.Swamp => 0.25f,
+        BiomeType.DenseForest => 0.2f,
+        BiomeType.Tundra => 0.1f,
+        BiomeType.Desert => 0.05f,
+        BiomeType.Beach => 0.05f,
+        _ => 0f
+    };
 }

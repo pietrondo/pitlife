@@ -14,15 +14,18 @@ public abstract class Creature
     public CreatureType CreatureType { get; protected set; }
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
+    public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();
+    public float InbreedingCoefficient { get; private set; }
+    public float GeneticFitness => MathHelper.Clamp(1f - InbreedingCoefficient * 0.5f, 0.5f, 1f);
     public float MaturityAge => SpeciesRegistry.Get(Species)?.MaturityAge ?? 30f;
     public LifeStage LifeStage => Age >= MaturityAge ? LifeStage.Adult : LifeStage.Infant;
     public bool IsAdult => LifeStage == LifeStage.Adult;
     public bool IsBaby => LifeStage == LifeStage.Infant;
-    public float MaxEnergy => 50f * Genome.Size;
+    public float MaxEnergy => 50f * Genome.Size * GeneticFitness;
     public float EnergyConsumption => Genome.Metabolism * 0.5f * Genome.Size;
     public float CurrentSpeedMultiplier { get; protected set; } = 1f;
     public float CurrentEnergyMultiplier { get; protected set; } = 1f;
-    public float Speed => Genome.Speed * 30f * CurrentSpeedMultiplier;
+    public float Speed => Genome.Speed * 30f * CurrentSpeedMultiplier * GeneticFitness;
     public float VisionPixels => Genome.VisionRange * 32f;
     public float ReproductionThreshold => MaxEnergy * 0.7f;
     public virtual bool IsAquatic => false;
@@ -30,7 +33,7 @@ public abstract class Creature
     public Vector2 Facing { get; set; } = new(0, 1);
     public Vector2? Waypoint { get; set; }
     public ICreatureBehavior Behavior { get; set; } = new BaseBehavior();
-    private const float WaypointReachedDistance = 8f;
+    private const float WaypointReachedDistance = 14f;
 
     protected Creature(Vector2 position, Genome genome, CreatureType type)
     {
@@ -48,6 +51,10 @@ public abstract class Creature
         Age += dt;
 
         UpdateEnvironmentalMultipliers(world);
+        Position = ClampToWorld(Position, world);
+
+        Behavior.Update(this, world, ecosystem, gameTime);
+        if (!IsAlive) return;
 
         ConsumeEnergy(dt);
         if (Energy <= 0 || Age > 300f)
@@ -55,12 +62,8 @@ public abstract class Creature
             Die();
             return;
         }
-        Position = ClampToWorld(Position, world);
 
-        Behavior.Update(this, world, ecosystem, gameTime);
-
-        if (IsAlive)
-            TryReproduce(ecosystem, dt);
+        TryReproduce(ecosystem, dt);
     }
 
     private void TryReproduce(Ecosystem ecosystem, float dt)
@@ -104,8 +107,8 @@ public abstract class Creature
             }
             else
             {
-                CurrentSpeedMultiplier = 0.2f;
-                CurrentEnergyMultiplier = 3.0f;
+                CurrentSpeedMultiplier = 0.3f;
+                CurrentEnergyMultiplier = 2.5f;
             }
             return;
         }
@@ -116,28 +119,28 @@ public abstract class Creature
             case BiomeType.Desert:
             case BiomeType.Savanna:
             case BiomeType.Beach:
-                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.DesertAdaptation) * 1.5f;
-                CurrentSpeedMultiplier = 0.5f + Genome.DesertAdaptation * 0.5f;
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.DesertAdaptation) * 1.0f;
+                CurrentSpeedMultiplier = 0.6f + Genome.DesertAdaptation * 0.4f;
                 break;
 
             case BiomeType.Tundra:
             case BiomeType.Snow:
             case BiomeType.Mountain:
-                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.ColdAdaptation) * 2.0f;
-                CurrentSpeedMultiplier = 0.4f + Genome.ColdAdaptation * 0.6f;
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.ColdAdaptation) * 1.5f;
+                CurrentSpeedMultiplier = 0.5f + Genome.ColdAdaptation * 0.5f;
                 break;
 
             case BiomeType.Forest:
             case BiomeType.DenseForest:
             case BiomeType.Swamp:
-                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.ForestAdaptation) * 0.5f;
-                CurrentSpeedMultiplier = 0.5f + Genome.ForestAdaptation * 0.5f;
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.ForestAdaptation) * 0.3f;
+                CurrentSpeedMultiplier = 0.6f + Genome.ForestAdaptation * 0.4f;
                 break;
 
             case BiomeType.DeepOcean:
             case BiomeType.ShallowWater:
-                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.WaterAdaptation) * 1.0f;
-                CurrentSpeedMultiplier = 0.3f + Genome.WaterAdaptation * 0.7f;
+                CurrentEnergyMultiplier = 1.0f + (1.0f - Genome.WaterAdaptation) * 0.8f;
+                CurrentSpeedMultiplier = 0.4f + Genome.WaterAdaptation * 0.6f;
                 break;
 
             default: // Grassland or others with no penalty
@@ -164,11 +167,18 @@ public abstract class Creature
 
     protected Vector2 PickWaypoint(World world, Random random, float radius)
     {
-        float rx = (float)(random.NextDouble() - 0.5) * radius * 2;
-        float ry = (float)(random.NextDouble() - 0.5) * radius * 2;
-        var target = Position + new Vector2(rx, ry);
-        target.X = Math.Clamp(target.X, 1, world.PixelWidth - 1);
-        target.Y = Math.Clamp(target.Y, 1, world.PixelHeight - 1);
+        float minDist = radius * 0.35f;
+        Vector2 target;
+        int attempts = 0;
+        do
+        {
+            float rx = (float)(random.NextDouble() - 0.5) * radius * 2;
+            float ry = (float)(random.NextDouble() - 0.5) * radius * 2;
+            target = Position + new Vector2(rx, ry);
+            target.X = Math.Clamp(target.X, 1, world.PixelWidth - 1);
+            target.Y = Math.Clamp(target.Y, 1, world.PixelHeight - 1);
+            attempts++;
+        } while (Vector2.Distance(Position, target) < minDist && attempts < 10);
         return target;
     }
 
@@ -218,6 +228,9 @@ public abstract class Creature
         var child = CreateChild(ClampToWorld(Position + offset), childGenome, rng);
         if (child != null)
         {
+            child.Lineage = LineageRecord.CreateChild(Lineage, partner.Lineage);
+            child.InbreedingCoefficient = LineageRecord.CalculateOffspringInbreeding(Lineage, partner.Lineage);
+            child.Energy = child.MaxEnergy * 0.5f;
             if (child.CreatureType != CreatureType.Plant)
             {
                 child.Gender = rng.Next(2) == 0 ? Gender.Male : Gender.Female;
@@ -235,6 +248,28 @@ public abstract class Creature
         if (Gender is not (Gender.Male or Gender.Female)) return false;
         if (partner.Gender is not (Gender.Male or Gender.Female)) return false;
         return Gender != partner.Gender;
+    }
+
+    public float RelatednessTo(Creature? other) =>
+        other is null ? 0f : LineageRecord.CalculateRelatedness(Lineage, other.Lineage);
+
+    internal void AssignIndividualId(ulong individualId)
+    {
+        if (individualId == 0)
+            throw new ArgumentOutOfRangeException(nameof(individualId));
+        Lineage = Lineage.WithIndividualId(individualId);
+    }
+
+    internal void RestoreGeneticHistory(LineageRecord lineage, float inbreedingCoefficient)
+    {
+        Lineage = lineage;
+        InbreedingCoefficient = MathHelper.Clamp(inbreedingCoefficient, 0f, 1f);
+    }
+
+    internal void InheritAsexualLineage(Creature parent)
+    {
+        Lineage = LineageRecord.CreateAsexualChild(parent.Lineage);
+        InbreedingCoefficient = parent.InbreedingCoefficient;
     }
 
     public Creature? FindNearestSameSpecies(Ecosystem ecosystem)

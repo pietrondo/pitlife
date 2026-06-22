@@ -85,9 +85,11 @@ public sealed class BaseBehavior : ICreatureBehavior
                 else
                 {
                     self.MoveToward(food.Position, dt, world);
+                    TryGraze(self, world, dt);
                 }
                 return true;
             }
+            if (TryGraze(self, world, dt)) return true;
         }
         else if (self.CreatureType == CreatureType.Carnivore)
         {
@@ -169,6 +171,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 if (food.Energy <= 0) food.Die();
                 return true;
             }
+            return TryGraze(self, world, dt);
         }
         else if (self.CreatureType == CreatureType.Carnivore)
         {
@@ -206,6 +209,20 @@ public sealed class BaseBehavior : ICreatureBehavior
                 if (food.Energy <= 0) food.Die();
                 return true;
             }
+        }
+        return false;
+    }
+
+    private static bool TryGraze(Creature self, World world, float dt)
+    {
+        var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
+        if (tile.GrassAmount <= 0.001f) return false;
+        float grazeRate = 3f * dt;
+        float eaten = tile.EatGrass(grazeRate);
+        if (eaten > 0)
+        {
+            self.Energy = Math.Min(self.Energy + eaten * 8f, self.MaxEnergy);
+            return true;
         }
         return false;
     }

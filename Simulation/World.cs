@@ -40,4 +40,11 @@ public class World
         int ty = (int)(worldY / TileSize);
         return GetTile(tx, ty);
     }
+
+    public void RegenerateGrass(float dt)
+    {
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+                Tiles[x, y].RegenerateGrass(dt);
+    }
 }

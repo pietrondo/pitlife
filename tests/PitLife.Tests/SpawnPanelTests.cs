@@ -23,19 +23,20 @@ public class SpawnPanelTests
         panel.Open();
         var released = new MouseState(0, 0, 0, ButtonState.Released, ButtonState.Released,
             ButtonState.Released, ButtonState.Released, ButtonState.Released);
+        var emptyKbd = new KeyboardState();
 
-        panel.Update(released, released);
-        Click(panel, released, 30, 110);
-        Click(panel, released, 40, 270);
+        panel.Update(released, released, emptyKbd, emptyKbd);
+        Click(panel, released, emptyKbd, 30, 110);
+        Click(panel, released, emptyKbd, 40, 270);
 
         Assert.Equal("Plants", panel.SelectedCategory);
         Assert.Equal("Plant", panel.SelectedSpeciesKey);
     }
 
-    private static void Click(SpawnPanel panel, MouseState released, int x, int y)
+    private static void Click(SpawnPanel panel, MouseState released, KeyboardState emptyKbd, int x, int y)
     {
         var pressed = new MouseState(x, y, 0, ButtonState.Pressed, ButtonState.Released,
             ButtonState.Released, ButtonState.Released, ButtonState.Released);
-        Assert.True(panel.Update(pressed, released));
+        Assert.True(panel.Update(pressed, released, emptyKbd, emptyKbd));
     }
 }
