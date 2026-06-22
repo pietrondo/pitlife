@@ -25,6 +25,9 @@ public sealed class EcosystemMetrics
     public Dictionary<string, int> SpeciesPopulations { get; } = new(StringComparer.Ordinal);
     public DeathCause LastDeathCause { get; private set; }
     public string LastDeathSpecies { get; private set; } = "";
+    public int TrophicLevel1 { get; private set; }
+    public int TrophicLevel2 { get; private set; }
+    public int TrophicLevel3Plus { get; private set; }
 
     private int _totalBirths;
     private int _totalDeaths;
@@ -82,6 +85,17 @@ public sealed class EcosystemMetrics
 
         if (aliveCreatures.Count > 0)
         {
+            int t1 = 0, t2 = 0, t3p = 0;
+            foreach (var c in aliveCreatures)
+            {
+                int level = FoodWeb.TrophicLevel(c.CreatureType);
+                if (level == 1) t1++;
+                else if (level == 2) t2++;
+                else t3p++;
+            }
+            TrophicLevel1 = t1;
+            TrophicLevel2 = t2;
+            TrophicLevel3Plus = t3p;
             float totalHet = 0f;
             float totalInb = 0f;
             int geneticCount = 0;

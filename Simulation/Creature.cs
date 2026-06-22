@@ -13,6 +13,7 @@ public abstract class Creature
     public bool IsAlive { get; protected set; } = true;
     public DeathCause DeathCause { get; private set; }
     public CreatureType CreatureType { get; protected set; }
+    public DietType Diet { get; protected set; }
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
     public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();
@@ -42,6 +43,14 @@ public abstract class Creature
         Genome = genome;
         Energy = MaxEnergy * 0.5f;
         CreatureType = type;
+        Diet = type switch
+        {
+            CreatureType.Plant => DietType.Herbivore,
+            CreatureType.Herbivore => DietType.Herbivore,
+            CreatureType.Carnivore => DietType.Carnivore,
+            CreatureType.Omnivore => DietType.Omnivore,
+            _ => DietType.Omnivore
+        };
     }
 
     public virtual void Update(World world, Ecosystem ecosystem, GameTime gameTime)

@@ -624,6 +624,9 @@ public class Game1 : Game
         sb.DrawString(font, $"FPS: {_currentFPS:F0} ({_frametimeMS:F1}ms) | B:{m.TotalBirths} D:{m.TotalDeaths}",
             new Vector2(x, y), c);
         y += (int)lineH;
+        sb.DrawString(font, $"Trophic: L1={m.TrophicLevel1} L2={m.TrophicLevel2} L3+={m.TrophicLevel3Plus}",
+            new Vector2(x, y), c);
+        y += (int)lineH;
         sb.DrawString(font, $"Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}",
             new Vector2(x, y), c);
         y += (int)lineH;
