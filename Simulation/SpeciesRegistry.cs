@@ -320,7 +320,7 @@ internal static class BuiltinSpecies
     [
         BiomeType.Beach, BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland,
         BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp, BiomeType.Tundra,
-        BiomeType.Mountain, BiomeType.Snow
+        BiomeType.Mountain, BiomeType.Snow, BiomeType.Cave
     ];
 
     private static readonly BiomeType[] Shallow = [BiomeType.ShallowWater];

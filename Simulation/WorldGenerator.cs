@@ -52,6 +52,7 @@ public sealed class WorldGenerator
         }
 
         PlaceCoralReefs();
+        PlaceCaves();
         CarveRivers(_rng.Next());
         SmoothTerrain();
         EnsureAllBiomesPresent();
@@ -65,7 +66,7 @@ public sealed class WorldGenerator
             BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest,
             BiomeType.Desert, BiomeType.Savanna, BiomeType.Swamp,
             BiomeType.Mountain, BiomeType.Snow, BiomeType.Tundra,
-            BiomeType.CoralReef
+            BiomeType.CoralReef, BiomeType.Cave
         };
 
         var present = new HashSet<BiomeType>();
@@ -101,6 +102,24 @@ public sealed class WorldGenerator
                 if (_world.Tiles[x, y].Biome != BiomeType.ShallowWater) continue;
                 if (_rng.NextDouble() < 0.25f)
                     _world.Tiles[x, y] = new Tile(BiomeType.CoralReef);
+            }
+        }
+    }
+
+    private void PlaceCaves()
+    {
+        for (int y = 1; y < _world.Height - 1; y++)
+        {
+            for (int x = 1; x < _world.Width - 1; x++)
+            {
+                if (_world.Tiles[x, y].Biome != BiomeType.Mountain) continue;
+                int mountainNeighbors = 0;
+                for (int dy = -1; dy <= 1; dy++)
+                    for (int dx = -1; dx <= 1; dx++)
+                        if (_world.Tiles[x + dx, y + dy].Biome == BiomeType.Mountain)
+                            mountainNeighbors++;
+                if (mountainNeighbors >= 7 && _rng.NextDouble() < 0.15f)
+                    _world.Tiles[x, y] = new Tile(BiomeType.Cave);
             }
         }
     }

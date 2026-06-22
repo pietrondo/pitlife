@@ -12,7 +12,7 @@ public class WorldGeneratorTests
         var biomes = Enumerable.Range(0, world.Width * world.Height)
             .Select(i => world.Tiles[i % world.Width, i / world.Width].Biome)
             .Distinct().ToList();
-        Assert.Equal(13, biomes.Count);
+        Assert.Equal(14, biomes.Count);
     }
 
     [Fact]

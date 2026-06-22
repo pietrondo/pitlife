@@ -27,7 +27,8 @@ public class Tile
 
     public bool IsPassableFor(bool isAquatic) => isAquatic
         ? Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef
-        : IsPassable;
+        : Biome != BiomeType.DeepOcean && Biome != BiomeType.ShallowWater
+            && Biome != BiomeType.Snow && Biome != BiomeType.CoralReef;
 
     public Tile(BiomeType biome)
     {
@@ -59,6 +60,7 @@ public class Tile
             BiomeType.Desert => 0.1f,
             BiomeType.Beach => 0.1f,
             BiomeType.CoralReef => 0.9f,
+            BiomeType.Cave => 0f,
             _ => 0.0f
         };
 
