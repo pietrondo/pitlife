@@ -36,6 +36,35 @@ public sealed class CataclysmSystem
         {
             TriggerRandom(ecosystem, rng);
         }
+        else if (rng.NextDouble() < 0.05f && ecosystem.TotalTime > 120f)
+        {
+            TriggerMassExtinction(ecosystem, rng);
+        }
+    }
+
+    private void TriggerMassExtinction(Ecosystem ecosystem, Random rng)
+    {
+        int type = rng.Next(3);
+        switch (type)
+        {
+            case 0:
+                ActiveEvent = "Asteroid Impact";
+                GrassMultiplier = 0f;
+                Timer = 60f;
+                break;
+            case 1:
+                ActiveEvent = "Ice Age";
+                GrassMultiplier = 0.1f;
+                Timer = 120f;
+                break;
+            case 2:
+                ActiveEvent = "Supervolcano";
+                GrassMultiplier = 0.05f;
+                Timer = 90f;
+                break;
+        }
+        IsActive = true;
+        Logger.Event("CATACLYSM", $"MASS EXTINCTION: {ActiveEvent} at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
     }
 
     private void TriggerRandom(Ecosystem ecosystem, Random rng)

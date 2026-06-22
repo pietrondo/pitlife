@@ -26,7 +26,7 @@ public sealed class InGameUi
     {
         _windowManager.Add(new UiWindow(I18n.T("window.statistics"), StatisticsWindowId)
         {
-            Bounds = new Rectangle(32, 88, 320, 380),
+            Bounds = new Rectangle(32, 88, 300, 380),
             IsOpen = true,
             ShowCloseButton = true
         });
@@ -173,59 +173,54 @@ public sealed class InGameUi
         int total = plants + herbivores + carnivores + omnivores;
         int y = content.Y;
         DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
-        y += 22;
+        y += 18;
         DrawLine(spriteBatch, font, content.X, y,
             paused ? I18n.T("stats.paused") : I18n.Format("stats.speed", speed),
             paused ? UiTheme.DangerClay : UiTheme.MossSignal);
-        y += 32;
+        y += 18;
         DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.total", total), UiTheme.WarmParchment);
-        y += 30;
-        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.plants", plants), plants, total, UiTheme.MossSignal);
-        y += 30;
-        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.herbivores", herbivores), herbivores, total, UiTheme.LakeBlue);
-        y += 30;
-        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.carnivores", carnivores), carnivores, total, UiTheme.DangerClay);
-        y += 30;
-        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.omnivores", omnivores), omnivores, total, UiTheme.WarmParchment);
+        y += 22;
+
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "P", plants, total, UiTheme.MossSignal);
+        y += 16;
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "H", herbivores, total, UiTheme.LakeBlue);
+        y += 16;
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "C", carnivores, total, UiTheme.DangerClay);
+        y += 16;
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "O", omnivores, total, UiTheme.WarmParchment);
 
         if (metrics != null && metrics.SpeciesPopulations.Count > 0)
         {
-            y += 34;
-            DrawLine(spriteBatch, font, content.X, y, I18n.T("stats.speciesList"), UiTheme.MossSignal);
-            y += 18;
-            int shown = 0;
+            y += 22;
+            spriteBatch.DrawString(font, I18n.T("stats.speciesList"),
+                new Vector2(content.X, y), UiTheme.MossSignal);
+            y += 14;
             foreach (var kvp in metrics.SpeciesPopulations)
             {
-                if (shown >= 10) break;
                 Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
-                spriteBatch.DrawString(font, $"{I18n.Species(kvp.Key)}: {kvp.Value}",
+                spriteBatch.DrawString(font, $"{kvp.Value} {I18n.Species(kvp.Key)}",
                     new Vector2(content.X, y), col);
-                y += 15;
-                shown++;
+                y += 13;
             }
         }
 
         return y - content.Y + 8;
     }
 
-    private static void DrawPopulationRow(
-        SpriteBatch spriteBatch,
-        Texture2D pixel,
-        SpriteFont font,
-        Rectangle content,
-        int y,
-        string label,
-        int value,
-        int total,
-        Color color)
+    
+
+    private static void DrawInlineBar(SpriteBatch sb, Texture2D pixel, SpriteFont font,
+        int x, int y, string label, int value, int total, Color color)
     {
-        DrawLine(spriteBatch, font, content.X, y, label, UiTheme.MutedStone);
-        var track = new Rectangle(content.X + 112, y + 3, content.Width - 112, 10);
-        UiPrimitives.Fill(spriteBatch, pixel, track, UiTheme.DeepGrove);
-        int width = total == 0 ? 0 : (int)(track.Width * (value / (float)total));
-        if (width > 0)
-            UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(track.X, track.Y, width, track.Height), color);
-        UiPrimitives.Border(spriteBatch, pixel, track, 1, UiTheme.BarkEdge);
+        int barW = (int)(120f * (total > 0 ? value / (float)total : 0));
+        int barH = 10;
+        sb.DrawString(font, label, new Vector2(x, y - 2), color);
+        var bg = new Rectangle(x + 14, y + 1, 122, barH);
+        UiPrimitives.Fill(sb, pixel, bg, UiTheme.DeepGrove);
+        if (barW > 0)
+            UiPrimitives.Fill(sb, pixel, new Rectangle(bg.X, bg.Y, barW, barH), color);
+        UiPrimitives.Border(sb, pixel, bg, 1, UiTheme.BarkEdge);
+        sb.DrawString(font, value.ToString(), new Vector2(bg.Right + 4, y - 2), UiTheme.WarmParchment);
     }
 
     private static void DrawCreature(
