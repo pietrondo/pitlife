@@ -220,6 +220,7 @@ public class Ecosystem
         Disease.Update(this, dt, Random);
         Atmosphere.Update(PlantCount, HerbivoreCount + CarnivoreCount + OmnivoreCount, dt);
         Cataclysms.Update(this, dt, Random);
+        Cataclysms.UpdateVolcanoes(this, dt, Random);
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         UpdateStats();

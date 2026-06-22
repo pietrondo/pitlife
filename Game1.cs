@@ -245,6 +245,8 @@ public class Game1 : Game
 
         if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
             _showDebugOverlay = !_showDebugOverlay;
+        if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
+            _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
             _speciesEditor.Toggle();
 

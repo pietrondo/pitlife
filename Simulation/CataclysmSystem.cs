@@ -89,6 +89,31 @@ public sealed class CataclysmSystem
         Logger.Event("TERRAIN", $"{ActiveEvent} crater at ({cx},{cy}) radius={radius}");
     }
 
+    public void TriggerManual(Ecosystem ecosystem, Random rng)
+    {
+        TriggerMassExtinction(ecosystem, rng);
+    }
+
+    public void UpdateVolcanoes(Ecosystem ecosystem, float dt, Random rng)
+    {
+        for (int y = 0; y < ecosystem.World.Height; y++)
+            for (int x = 0; x < ecosystem.World.Width; x++)
+            {
+                if (ecosystem.World.Tiles[x, y].Biome != BiomeType.Volcano) continue;
+                if (rng.NextDouble() < 0.0005f * dt)
+                {
+                    int r = rng.Next(2, 4);
+                    for (int dy = -r; dy <= r; dy++)
+                        for (int dx = -r; dx <= r; dx++)
+                        {
+                            var t = ecosystem.World.GetTile(x + dx, y + dy);
+                            if (t.Biome != BiomeType.DeepOcean && t.Biome != BiomeType.ShallowWater)
+                            { t.GrassAmount = 0f; t.SoilNutrients = Math.Min(2f, t.SoilNutrients + 0.4f); }
+                        }
+                }
+            }
+    }
+
     private void TriggerRandom(Ecosystem ecosystem, Random rng)
     {
         int type = rng.Next(4);
