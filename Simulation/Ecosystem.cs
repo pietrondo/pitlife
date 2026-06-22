@@ -25,6 +25,7 @@ public class Ecosystem
     public float PopulationPressure { get; private set; } = 1f;
     public ClimateSystem Climate { get; } = new();
     public DiseaseSystem Disease { get; } = new();
+    public PhylogeneticGraph Phylogeny { get; } = new();
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
 
