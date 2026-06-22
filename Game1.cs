@@ -215,6 +215,7 @@ public class Game1 : Game
                     break;
                 case MenuAction.ToggleFullscreen:
                     _graphics.ToggleFullScreen();
+                    _menuInputCooldown = 0.5f;
                     break;
                 case MenuAction.ShowHelp:
                     _helpScreen.Show();

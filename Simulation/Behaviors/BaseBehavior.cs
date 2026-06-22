@@ -21,6 +21,19 @@ public sealed class BaseBehavior : ICreatureBehavior
             return;
         }
 
+        // 1a. Drink if thirsty and near water
+        if (self.Thirst > 30f && self.CreatureType != CreatureType.Plant)
+        {
+            var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
+            bool nearWater = tile.Biome is BiomeType.ShallowWater or BiomeType.DeepOcean or BiomeType.CoralReef
+                || world.IsRiverAt(self.Position.X, self.Position.Y);
+            if (nearWater)
+            {
+                self.Thirst = 0f;
+                return;
+            }
+        }
+
         // 1b. Infant follows parent
         if (self.IsBaby && self.Parent != null && self.Parent.IsAlive)
         {

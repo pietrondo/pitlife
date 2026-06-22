@@ -70,6 +70,8 @@ public abstract class Creature
     public Vector2? Waypoint { get; set; }
     public ICreatureBehavior Behavior { get; set; } = new BaseBehavior();
     public Creature? Parent { get; set; }
+    public float Thirst { get; set; }
+    private const float MaxThirst = 100f;
     private const float WaypointReachedDistance = 14f;
 
     protected Creature(Vector2 position, Genome genome, CreatureType type)
@@ -112,6 +114,13 @@ public abstract class Creature
 
         ApplyClimateAndPopulationPressure(ecosystem);
         ConsumeEnergy(dt);
+
+        float thirstRate = 2f + CurrentEnergyMultiplier * 4f;
+        if (CreatureType == CreatureType.Plant) thirstRate = 0f;
+        Thirst = Math.Min(MaxThirst, Thirst + thirstRate * dt);
+        if (Thirst >= MaxThirst * 0.9f)
+            Energy -= EnergyConsumption * 3f * dt;
+
         if (Energy <= 0 || Age > 300f)
         {
             Die(Energy <= 0 ? DeathCause.Starvation : DeathCause.OldAge);

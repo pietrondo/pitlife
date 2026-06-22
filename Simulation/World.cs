@@ -47,4 +47,12 @@ public class World
             for (int y = 0; y < Height; y++)
                 Tiles[x, y].RegenerateGrass(dt);
     }
+
+    public bool IsRiverAt(float worldX, float worldY)
+    {
+        int tx = (int)(worldX / TileSize);
+        int ty = (int)(worldY / TileSize);
+        if (tx < 0 || tx >= Width || ty < 0 || ty >= Height) return false;
+        return RiverMask[ty * Width + tx];
+    }
 }
