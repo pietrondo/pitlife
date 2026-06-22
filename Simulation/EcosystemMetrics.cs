@@ -30,6 +30,8 @@ public sealed class EcosystemMetrics
     public int TrophicLevel3Plus { get; private set; }
     public Dictionary<string, int> SubspeciesCounts { get; } = new(StringComparer.Ordinal);
     public int TotalSubspecies { get; private set; }
+    public Dictionary<string, float> SpeciesFirstAppearance { get; } = new(StringComparer.Ordinal);
+    public Dictionary<string, int> SpeciesMaxPopulation { get; } = new(StringComparer.Ordinal);
 
     private int _totalBirths;
     private int _totalDeaths;
@@ -84,6 +86,15 @@ public sealed class EcosystemMetrics
             SpeciesPopulations[kvp.Key] = kvp.Value;
 
         SpeciesCount = aliveBySpecies.Count;
+
+        foreach (var (species, count) in aliveBySpecies)
+        {
+            if (!SpeciesFirstAppearance.ContainsKey(species))
+                SpeciesFirstAppearance[species] = TotalTime;
+            SpeciesMaxPopulation.TryGetValue(species, out int prevMax);
+            if (count > prevMax)
+                SpeciesMaxPopulation[species] = count;
+        }
 
         var subspeciesByKey = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var c in aliveCreatures)

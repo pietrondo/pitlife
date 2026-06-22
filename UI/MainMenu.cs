@@ -153,6 +153,7 @@ public sealed class MainMenu
             if (activated == 1)
             {
                 I18n.SetLanguage(I18n.CurrentLanguage == "it" ? "en" : "it");
+                Game1.SaveLanguagePref();
                 RefreshText(isFullscreen);
                 return MenuAction.None;
             }

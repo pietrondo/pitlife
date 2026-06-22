@@ -69,6 +69,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
+        LoadSettings();
         _speciesCatalogRuntime.CatalogChanged += OnSpeciesCatalogChanged;
         string bundledCatalog = Path.Combine(Content.RootDirectory, "species.json");
         if (File.Exists(bundledCatalog))
@@ -604,6 +605,37 @@ public class Game1 : Game
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private void LoadSettings()
+    {
+        try
+        {
+            if (File.Exists("settings.json"))
+            {
+                var json = File.ReadAllText("settings.json");
+                var doc = System.Text.Json.JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("language", out var lang))
+                    I18n.SetLanguage(lang.GetString() ?? "it");
+            }
+        }
+        catch { }
+    }
+
+    private void SaveSettings()
+    {
+        try
+        {
+            var settings = new { language = I18n.CurrentLanguage, fullscreen = _graphics.IsFullScreen };
+            File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(settings));
+        }
+        catch { }
+    }
+
+    internal static void SaveLanguagePref()
+    {
+        try { File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(new { language = I18n.CurrentLanguage })); }
+        catch { }
     }
 
     private void OnSpeciesCatalogChanged()
