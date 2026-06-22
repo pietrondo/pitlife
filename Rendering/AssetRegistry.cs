@@ -109,6 +109,10 @@ public static class AssetRegistry
         new("Chanterelle", "Content/assets/creatures/plants/fungi/chanterelle.png"),
         new("Morel", "Content/assets/creatures/plants/fungi/morel.png"),
         new("OysterMushroom", "Content/assets/creatures/plants/fungi/oyster_mushroom.png"),
+        new("Mammoth", "Content/assets/creatures/mammals/herbivores/ungulates/moose.png"),
+        new("Sabertooth", "Content/assets/creatures/mammals/carnivores/felids/tiger.png"),
+        new("Dodo", "Content/assets/creatures/birds/owls/owl.png"),
+        new("Trilobite", "Content/assets/creatures/fish/tropical/fish.png"),
     };
 
     public static IReadOnlyList<SpeciesAsset> SpeciesTextures
