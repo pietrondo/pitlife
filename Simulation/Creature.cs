@@ -75,6 +75,8 @@ public abstract class Creature
         _ => true
     };
 
+    public float TemperaturePreference => Genome.ColdAdaptation > 0.5f ? 10f : Genome.DesertAdaptation > 0.5f ? 35f : 22f;
+
     private static ActivityPattern GetDefaultActivity(string species) => species switch
     {
         "Owl" or "Bat" or "Badger" or "Fox" or "Raccoon" or "Wolf" => ActivityPattern.Nocturnal,
@@ -132,7 +134,7 @@ public abstract class Creature
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
 
-        UpdateEnvironmentalMultipliers(world);
+        UpdateEnvironmentalMultipliers(world, ecosystem);
         Position = ClampToWorld(Position, world);
 
         bool active = IsActive(ecosystem.CurrentDayPhase) || CreatureType == CreatureType.Plant;
@@ -229,7 +231,7 @@ public abstract class Creature
         Energy -= EnergyConsumption * (seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f) * (1f / 60f);
     }
 
-    private void UpdateEnvironmentalMultipliers(World world)
+    private void UpdateEnvironmentalMultipliers(World world, Ecosystem ecosystem)
     {
         var tile = world.GetTileAtPosition(Position.X, Position.Y);
         if (tile == null)
@@ -290,6 +292,11 @@ public abstract class Creature
                 CurrentEnergyMultiplier = 1.0f;
                 break;
         }
+
+        float tileTemp = tile.Temperature + ecosystem.Climate.TemperatureModifier * 20f;
+        float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
+        if (tempDiff > 15f && CreatureType != CreatureType.Plant)
+            CurrentEnergyMultiplier += tempDiff * 0.02f;
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Unknown)

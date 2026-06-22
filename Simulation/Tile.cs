@@ -15,12 +15,14 @@ public class Tile
             Vegetation = VegetationFor(value);
             MaxGrass = GrassFor(value);
             GrassAmount = MaxGrass;
+            Temperature = BaseTemperatureFor(value);
         }
     }
     public float Vegetation { get; set; }
     public float MaxGrass { get; set; }
     public float GrassAmount { get; set; }
     public float SoilNutrients { get; set; } = 1f;
+    public float Temperature { get; set; } = 20f;
     public bool IsPassable => Biome != BiomeType.DeepOcean
                             && Biome != BiomeType.ShallowWater
                             && Biome != BiomeType.Snow
@@ -77,5 +79,25 @@ public class Tile
         BiomeType.Desert => 0.05f,
         BiomeType.Beach => 0.05f,
         _ => 0f
+    };
+
+    private static float BaseTemperatureFor(BiomeType biome) => biome switch
+    {
+        BiomeType.Desert => 38f,
+        BiomeType.Savanna => 32f,
+        BiomeType.Grassland => 24f,
+        BiomeType.Forest => 20f,
+        BiomeType.DenseForest => 18f,
+        BiomeType.Swamp => 22f,
+        BiomeType.Tundra => 5f,
+        BiomeType.Snow => -10f,
+        BiomeType.Mountain => 10f,
+        BiomeType.Beach => 25f,
+        BiomeType.ShallowWater => 22f,
+        BiomeType.DeepOcean => 15f,
+        BiomeType.CoralReef => 26f,
+        BiomeType.Cave => 12f,
+        BiomeType.Volcano => 45f,
+        _ => 20f
     };
 }
