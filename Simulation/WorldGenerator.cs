@@ -65,36 +65,35 @@ public sealed class WorldGenerator
     {
         int blend = 8;
         int w = _world.Width, h = _world.Height;
-        // Left-Right edges
         for (int y = 0; y < h; y++)
             for (int x = 0; x < blend; x++)
             {
-                if (_world.RiverMask[y * w + x] || _world.RiverMask[y * w + (w - 1 - x)]) continue;
-                var b = _world.Tiles[w - 1 - x, y].Biome;
-                _world.Tiles[x, y] = new Tile(b);
-                _world.Tiles[w - 1 - x, y] = new Tile(b);
+                int il = y * w + x, ir = y * w + (w - 1 - x);
+                float elev = (_world.ElevationField[il] + _world.ElevationField[ir]) * 0.5f;
+                float cont = (_world.ContinentMask[il] + _world.ContinentMask[ir]) * 0.5f;
+                _world.ElevationField[il] = _world.ElevationField[ir] = elev;
+                _world.ContinentMask[il] = _world.ContinentMask[ir] = cont;
             }
-        // Top-Bottom edges
         for (int x = 0; x < w; x++)
             for (int y = 0; y < blend; y++)
             {
-                if (_world.RiverMask[y * w + x] || _world.RiverMask[(h - 1 - y) * w + x]) continue;
-                var b = _world.Tiles[x, h - 1 - y].Biome;
-                _world.Tiles[x, y] = new Tile(b);
-                _world.Tiles[x, h - 1 - y] = new Tile(b);
+                int it = y * w + x, ib = (h - 1 - y) * w + x;
+                float elev = (_world.ElevationField[it] + _world.ElevationField[ib]) * 0.5f;
+                float cont = (_world.ContinentMask[it] + _world.ContinentMask[ib]) * 0.5f;
+                _world.ElevationField[it] = _world.ElevationField[ib] = elev;
+                _world.ContinentMask[it] = _world.ContinentMask[ib] = cont;
             }
-        // Corners
         for (int y = 0; y < blend; y++)
             for (int x = 0; x < blend; x++)
             {
-                int idxTL = y * w + x;
-                int idxBR = (h - 1 - y) * w + (w - 1 - x);
-                if (_world.RiverMask[idxTL] || _world.RiverMask[idxBR]) continue;
-                var b = _world.Tiles[w - 1, h - 1].Biome;
-                _world.Tiles[x, y] = new Tile(b);
-                _world.Tiles[w - 1, h - 1] = new Tile(b);
-                _world.Tiles[w - 1 - x, y] = new Tile(b);
-                _world.Tiles[x, h - 1 - y] = new Tile(b);
+                int itl = y * w + x;
+                int ibr = (h - 1 - y) * w + (w - 1 - x);
+                int itr = y * w + (w - 1 - x);
+                int ibl = (h - 1 - y) * w + x;
+                float elev = (_world.ElevationField[itl] + _world.ElevationField[ibr]) * 0.5f;
+                float cont = (_world.ContinentMask[itl] + _world.ContinentMask[ibr]) * 0.5f;
+                _world.ElevationField[itl] = _world.ElevationField[ibr] = _world.ElevationField[itr] = _world.ElevationField[ibl] = elev;
+                _world.ContinentMask[itl] = _world.ContinentMask[ibr] = _world.ContinentMask[itr] = _world.ContinentMask[ibl] = cont;
             }
     }
 
