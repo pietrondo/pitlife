@@ -326,11 +326,18 @@ public class Game1 : Game
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var spawnPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            bool spawned = _ecosystem.SpawnByName(_spawnPanel.SelectedSpeciesKey, spawnPos);
-            if (spawned)
+            int spawned = 0;
+            for (int i = 0; i < 3; i++)
             {
-                Logger.Event("SPAWN", $"Player spawned {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
-                _spawnPanel.DeselectSpecies(); // Deselect after successful spawn (one-shot behavior)
+                var offset = new Vector2((float)(_ecosystem.Random.NextDouble() - 0.5) * 40,
+                    (float)(_ecosystem.Random.NextDouble() - 0.5) * 40);
+                if (_ecosystem.SpawnByName(_spawnPanel.SelectedSpeciesKey, spawnPos + offset))
+                    spawned++;
+            }
+            if (spawned > 0)
+            {
+                Logger.Event("SPAWN", $"Player spawned {spawned}x {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
+                _spawnPanel.DeselectSpecies();
             }
             else
             {

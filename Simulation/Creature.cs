@@ -147,6 +147,7 @@ public abstract class Creature
         else
         {
             dt *= 0.3f;
+            Wander(world, dt * 0.5f, ecosystem.Random, 40f);
         }
 
         ApplyClimateAndPopulationPressure(ecosystem);

@@ -139,11 +139,11 @@ public sealed class InGameUi
 
             if (window.Id == StatisticsWindowId)
             {
-                int baseHeight = metrics != null ? 340 : 280;
-                if (window.Bounds.Height < baseHeight)
-                    window.Bounds = new Rectangle(window.Bounds.X, window.Bounds.Y, window.Bounds.Width, baseHeight);
-                DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
+                int needed = DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
                     plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
+                int totalH = needed + 72;
+                if (totalH != window.Bounds.Height)
+                    window.Bounds = new Rectangle(window.Bounds.X, window.Bounds.Y, window.Bounds.Width, totalH);
             }
             else if (window.Id == CreatureWindowId)
             {
@@ -195,12 +195,15 @@ public sealed class InGameUi
             spriteBatch.DrawString(font, I18n.T("stats.speciesList"),
                 new Vector2(content.X, y), UiTheme.MossSignal);
             y += 14;
+            int shown = 0;
             foreach (var kvp in metrics.SpeciesPopulations)
             {
+                if (shown >= 14) break;
                 Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
                 spriteBatch.DrawString(font, $"{kvp.Value} {I18n.Species(kvp.Key)}",
                     new Vector2(content.X, y), col);
                 y += 13;
+                shown++;
             }
         }
 

@@ -113,23 +113,46 @@ public sealed class PixelWorldRenderer : IDisposable
     {
         if (_worldTexture == null) return;
 
-        // Get color data for the texture
         int width = _worldTexture.Width;
         int height = _worldTexture.Height;
         Color[] data = new Color[width * height];
+        float noiseScale = 0.3f;
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                // Map pixel to tile coordinates
-                int tileX = x / _renderScale;
-                int tileY = y / _renderScale;
+                float fx = x / (float)_renderScale;
+                float fy = y / (float)_renderScale;
+                int tileX = (int)fx;
+                int tileY = (int)fy;
+                float fracX = fx - tileX;
+                float fracY = fy - tileY;
 
-                // Get biome at this tile
-                BiomeType biome = _world.GetTile(tileX, tileY).Biome;
-                int biomeIdx = (int)biome;                // Use clean solid base color to match the minimap and ensure readability
-                data[y * width + x] = BiomeBaseColors[biomeIdx];
+                Color baseColor = BiomeBaseColors[(int)_world.GetTile(tileX, tileY).Biome];
+
+                // Edge smoothing: blend with neighboring tile colors
+                if (fracX < 0.15f && tileX > 0)
+                {
+                    Color left = BiomeBaseColors[(int)_world.GetTile(tileX - 1, tileY).Biome];
+                    float t = (0.15f - fracX) / 0.15f;
+                    baseColor = Color.Lerp(baseColor, left, t * 0.6f);
+                }
+                if (fracY < 0.15f && tileY > 0)
+                {
+                    Color top = BiomeBaseColors[(int)_world.GetTile(tileX, tileY - 1).Biome];
+                    float t = (0.15f - fracY) / 0.15f;
+                    baseColor = Color.Lerp(baseColor, top, t * 0.6f);
+                }
+
+                // Noise variation for texture
+                float noise = (_noise.GetNoise(x * 0.5f, y * 0.5f) + 1f) * 0.5f;
+                float brightness = 0.85f + noise * noiseScale;
+                int r = (int)(baseColor.R * brightness);
+                int g = (int)(baseColor.G * brightness);
+                int b = (int)(baseColor.B * brightness);
+                data[y * width + x] = new Color(
+                    Math.Clamp(r, 0, 255), Math.Clamp(g, 0, 255), Math.Clamp(b, 0, 255));
             }
         }
 

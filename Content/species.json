@@ -1,8 +1,0 @@
-{
-  "schemaVersion": 1,
-  "species": [
-    {"key":"Clover","englishName":"Clover","italianName":"Trifoglio","kind":"Plant","isAquatic":false,"socialBehavior":"None","validBiomes":["Beach","Desert","Savanna","Grassland","Forest","DenseForest","Swamp","Tundra","Mountain","Snow","Cave","Volcano"],"defaultSize":1.0,"maturityAge":30.0,"texturePath":"Content/assets/creatures/plants/shrubs/plant.png","plantReproduction":"Vegetative","pollination":"None"},
-    {"key":"Poppy","englishName":"Poppy","italianName":"Papavero","kind":"Plant","isAquatic":false,"socialBehavior":"None","validBiomes":["Beach","Desert","Savanna","Grassland","Forest","DenseForest","Swamp","Tundra","Mountain","Snow","Cave","Volcano"],"defaultSize":1.0,"maturityAge":30.0,"texturePath":"Content/assets/creatures/plants/flowers/flowers.png","plantReproduction":"Seeds","pollination":"Insects"},
-    {"key":"Mushroom","englishName":"Mushroom","italianName":"Fungo","kind":"Plant","isAquatic":false,"socialBehavior":"None","validBiomes":["Beach","Desert","Savanna","Grassland","Forest","DenseForest","Swamp","Tundra","Mountain","Snow","Cave","Volcano"],"defaultSize":1.0,"maturityAge":30.0,"texturePath":"Content/assets/creatures/plants/fungi/mushroom.png","plantReproduction":"Spores","pollination":"None"}
-  ]
-}
