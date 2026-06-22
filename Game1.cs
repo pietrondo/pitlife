@@ -649,5 +649,11 @@ public class Game1 : Game
             sb.DrawString(font, $"{I18n.T("stats.disease")}: {_ecosystem.Disease.ActiveDiseaseName}",
                 new Vector2(x, y), new Color(220, 60, 60));
         }
+        if (_ecosystem.Cataclysms.IsActive)
+        {
+            y += (int)lineH;
+            sb.DrawString(font, $"Cataclysm: {_ecosystem.Cataclysms.ActiveEvent} ({_ecosystem.Cataclysms.Timer:F0}s)",
+                new Vector2(x, y), new Color(255, 140, 0));
+        }
     }
 }

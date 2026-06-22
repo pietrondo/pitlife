@@ -26,8 +26,8 @@ public class StabilityTests
     [Fact]
     public void DeterministicReplay_DifferentSeedDifferentResult()
     {
-        var state1 = RunSimulation(42, 30, out _);
-        var state2 = RunSimulation(99, 30, out _);
+        var state1 = RunSimulation(42, 30, out _, 80, 40, 15, 5);
+        var state2 = RunSimulation(99, 30, out _, 80, 40, 15, 5);
 
         bool anyDifferent = state1.PlantCount != state2.PlantCount
             || state1.HerbivoreCount != state2.HerbivoreCount

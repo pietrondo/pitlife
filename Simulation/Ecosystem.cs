@@ -28,6 +28,7 @@ public class Ecosystem
     public DiseaseSystem Disease { get; } = new();
     public PhylogeneticGraph Phylogeny { get; } = new();
     public AtmosphereSystem Atmosphere { get; } = new();
+    public CataclysmSystem Cataclysms { get; } = new();
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
@@ -218,7 +219,9 @@ public class Ecosystem
         Climate.Update(TotalTime, Random);
         Disease.Update(this, dt, Random);
         Atmosphere.Update(PlantCount, HerbivoreCount + CarnivoreCount + OmnivoreCount, dt);
-        World.RegenerateGrass(dt * Climate.GrassRegenModifier);
+        Cataclysms.Update(this, dt, Random);
+        float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
+        World.RegenerateGrass(dt * grassFactor);
         UpdateStats();
     }
 
