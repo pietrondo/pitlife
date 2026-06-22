@@ -307,6 +307,7 @@ public class Game1 : Game
             _spawnPanel.Toggle();
         }
         bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
+        spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
 
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.Up) && _prevKbd.IsKeyUp(Keys.Up))
@@ -354,14 +355,13 @@ public class Game1 : Game
             }
         }
         else if (!pointerOverUi && !spawnPanelConsumed &&
-            _inGameUi.SelectedCataclysm != null &&
+            _spawnPanel.SelectedCataclysm != null &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _spawnPanel.SelectedCataclysm, catPos);
             _worldRenderer.Invalidate();
-            Logger.Event("CATACLYSM", $"Player triggered {_inGameUi.SelectedCataclysm} at ({catPos.X:F0},{catPos.Y:F0})");
-            _inGameUi.SelectedCataclysm = null;
+            _spawnPanel.SelectedCataclysm = null;
         }
         else if (!pointerOverUi && !spawnPanelConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)

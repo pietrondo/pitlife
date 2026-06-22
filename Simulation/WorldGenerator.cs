@@ -53,6 +53,7 @@ public sealed class WorldGenerator
 
         PlaceCoralReefs();
         PlaceCaves();
+        PlaceFaultLines();
         PlaceVolcanoes();
         CarveRivers(_rng.Next());
         SmoothTerrain();
@@ -121,6 +122,30 @@ public sealed class WorldGenerator
                             mountainNeighbors++;
                 if (mountainNeighbors >= 7 && _rng.NextDouble() < 0.15f)
                     _world.Tiles[x, y] = new Tile(BiomeType.Cave);
+            }
+        }
+    }
+
+    private bool[,] _faultMask = null!;
+
+    private void PlaceFaultLines()
+    {
+        _faultMask = new bool[_world.Width, _world.Height];
+        int numFaults = 2 + _rng.Next(3);
+        for (int f = 0; f < numFaults; f++)
+        {
+            float angle = (float)(_rng.NextDouble() * Math.PI);
+            float offset = _rng.Next(_world.Width + _world.Height);
+            float dx = (float)Math.Cos(angle);
+            float dy = (float)Math.Sin(angle);
+            for (int y = 0; y < _world.Height; y++)
+            {
+                for (int x = 0; x < _world.Width; x++)
+                {
+                    float dist = Math.Abs(x * dx + y * dy - offset) / (float)Math.Sqrt(dx * dx + dy * dy);
+                    if (dist < 2f + _rng.NextDouble() * 3f)
+                        _faultMask[x, y] = true;
+                }
             }
         }
     }

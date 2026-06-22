@@ -14,6 +14,8 @@ public sealed class SpawnPanel
     public bool IsOpen { get; private set; }
     public string? SelectedSpeciesKey { get; private set; }
     public string? SelectedCategory { get; private set; }
+    public string? SelectedCataclysm { get; set; }
+    public bool ShowCataclysms { get; set; }
 
     private static readonly string[] CategoryOrder =
         ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
@@ -181,6 +183,22 @@ public sealed class SpawnPanel
         sb.DrawString(font, I18n.T("spawn.title"),
             new Vector2(_panelBounds.X + 10, _panelBounds.Y + 6), UiTheme.MossSignal);
 
+        // Tab: Spawn / Cataclysms
+        var tabSpawn = new UiButton("Spawn");
+        var tabCata = new UiButton("Cataclysms");
+        tabSpawn.Bounds = new Rectangle(_panelBounds.X + 60, _panelBounds.Y + 6, 60, 20);
+        tabCata.Bounds = new Rectangle(_panelBounds.X + 124, _panelBounds.Y + 6, 70, 20);
+        tabSpawn.Draw(sb, pixel, font, mouse, !ShowCataclysms);
+        tabCata.Draw(sb, pixel, font, mouse, ShowCataclysms);
+        if (WasClicked(mouse, previousMouseState) && tabSpawn.Bounds.Contains(mouse.Position)) ShowCataclysms = false;
+        if (WasClicked(mouse, previousMouseState) && tabCata.Bounds.Contains(mouse.Position)) ShowCataclysms = true;
+
+        if (ShowCataclysms)
+        {
+            DrawCataclysmButtons(sb, pixel, font, mouse);
+            return;
+        }
+
         foreach (var btn in _categoryButtons)
         {
             bool isSelected = btn.Tag as string == SelectedCategory;
@@ -264,6 +282,46 @@ public sealed class SpawnPanel
             sb.DrawString(font, "+", new Vector2(_toggleBounds.X + 16, _toggleBounds.Y + 12),
                 IsOpen ? Color.White : UiTheme.MossSignal);
         }
+    }
+
+    private readonly UiButton[] _cataButtons = new[]
+    {
+        new UiButton("Asteroid") { Tag = "Asteroid" },
+        new UiButton("Ice Age") { Tag = "IceAge" },
+        new UiButton("Supervolcano") { Tag = "Supervolcano" },
+        new UiButton("Earthquake") { Tag = "Earthquake" },
+        new UiButton("Drought") { Tag = "Drought" },
+        new UiButton("Flood") { Tag = "Flood" }
+    };
+    private MouseState previousMouseState;
+
+    private void DrawCataclysmButtons(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
+    {
+        int y = _panelBounds.Y + 34;
+        foreach (var btn in _cataButtons)
+        {
+            btn.Bounds = new Rectangle(_panelBounds.X + 10, y, PanelWidth - 20, 22);
+            bool sel = SelectedCataclysm == (string)btn.Tag!;
+            btn.Draw(sb, pixel, font, mouse, sel);
+            y += 26;
+        }
+        if (!string.IsNullOrEmpty(SelectedCataclysm))
+            sb.DrawString(font, "Click map", new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 30), UiTheme.MossSignal);
+    }
+
+    public bool HandleCataclysmClick(MouseState mouse, MouseState prevMouse)
+    {
+        previousMouseState = mouse;
+        if (!IsOpen || !ShowCataclysms) return false;
+        foreach (var btn in _cataButtons)
+        {
+            if (btn.WasClicked(mouse, prevMouse))
+            {
+                SelectedCataclysm = (string)btn.Tag!;
+                return true;
+            }
+        }
+        return false;
     }
 
     private void RebuildCategoryButtons()
