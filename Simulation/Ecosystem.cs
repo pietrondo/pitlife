@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using PitLife.Core;
 
@@ -20,6 +21,9 @@ public class Ecosystem
     public int HerbivoreCount { get; private set; }
     public int CarnivoreCount { get; private set; }
     public int OmnivoreCount { get; private set; }
+    public EcosystemMetrics Metrics { get; } = new();
+    public float PopulationPressure { get; private set; } = 1f;
+    private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
 
     private readonly List<Creature> _pendingAdd = new();
@@ -86,7 +90,8 @@ public class Ecosystem
     public void QueueRemove(Creature c)
     {
         lock (_lock) { _pendingRemove.Add(c); }
-        Logger.Event("DEATH", $"{c.Species} age={c.Age:F1}s energy={c.Energy:F1}");
+        Metrics.RecordDeath(c.Species, c.DeathCause);
+        Logger.Event("DEATH", $"{c.Species} age={c.Age:F1}s energy={c.Energy:F1} cause={c.DeathCause}");
     }
 
     public void FlushPending()
@@ -227,6 +232,24 @@ public class Ecosystem
         HerbivoreCount = herbivores;
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
+        Metrics.Update(this);
+
+        foreach (var species in _knownSpecies.ToArray())
+        {
+            if (!Metrics.SpeciesPopulations.ContainsKey(species) && !string.IsNullOrEmpty(species))
+            {
+                Logger.Event("EXTINCT", $"Species '{species}' has gone extinct at T={TotalTime:F1}s");
+                _knownSpecies.Remove(species);
+            }
+        }
+        foreach (var species in Metrics.SpeciesPopulations.Keys)
+            _knownSpecies.Add(species);
+
+        float softCap = MaxCreatures * 0.7f;
+        int aliveCount = plants + herbivores + carnivores + omnivores;
+        PopulationPressure = aliveCount > softCap
+            ? 1f + (aliveCount - softCap) / (MaxCreatures * 0.3f) * 1.5f
+            : 1f;
         
         _logCounter++;
         if (_logCounter % 60 == 0) // Log every ~1 second at 60 FPS

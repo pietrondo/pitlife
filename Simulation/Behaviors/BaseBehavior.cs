@@ -80,7 +80,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     float eaten = Math.Min(food.Energy, 10f * dt);
                     food.Energy -= eaten;
                     self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
-                    if (food.Energy <= 0) food.Die();
+                    if (food.Energy <= 0) food.Die(DeathCause.Predation);
                 }
                 else
                 {
@@ -103,7 +103,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                         float damage = carn.AttackDamage * dt;
                         prey.Energy -= damage;
                         self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
-                        if (prey.Energy <= 0) prey.Die();
+                        if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     }
                     else
                     {
@@ -126,7 +126,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                         float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
                         prey.Energy -= damage;
                         self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
-                        if (prey.Energy <= 0) prey.Die();
+                        if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     }
                     else
                     {
@@ -144,7 +144,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     float eaten = Math.Min(food.Energy, 8f * dt);
                     food.Energy -= eaten;
                     self.Energy = Math.Min(self.Energy + eaten * 1.5f, self.MaxEnergy);
-                    if (food.Energy <= 0) food.Die();
+                    if (food.Energy <= 0) food.Die(DeathCause.Predation);
                 }
                 else
                 {
@@ -168,7 +168,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 float eaten = Math.Min(food.Energy, 10f * dt);
                 food.Energy -= eaten;
                 self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
-                if (food.Energy <= 0) food.Die();
+                if (food.Energy <= 0) food.Die(DeathCause.Predation);
                 return true;
             }
             return TryGraze(self, world, dt);
@@ -183,7 +183,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     float damage = carn.AttackDamage * dt;
                     prey.Energy -= damage;
                     self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
-                    if (prey.Energy <= 0) prey.Die();
+                    if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     return true;
                 }
             }
@@ -196,7 +196,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
                 prey.Energy -= damage;
                 self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
-                if (prey.Energy <= 0) prey.Die();
+                if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                 return true;
             }
 
@@ -206,7 +206,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 float eaten = Math.Min(food.Energy, 8f * dt);
                 food.Energy -= eaten;
                 self.Energy = Math.Min(self.Energy + eaten * 1.5f, self.MaxEnergy);
-                if (food.Energy <= 0) food.Die();
+                if (food.Energy <= 0) food.Die(DeathCause.Predation);
                 return true;
             }
         }
@@ -382,6 +382,9 @@ public sealed class BaseBehavior : ICreatureBehavior
             {
                 self.Energy -= 10f * dt;
                 neighbor.Energy -= 10f * dt;
+
+                if (self.Energy <= 0) self.Die(DeathCause.Combat);
+                if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);
 
                 if (ecosystem.Random.NextDouble() < 0.1 * dt)
                 {

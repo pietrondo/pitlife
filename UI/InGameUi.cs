@@ -114,7 +114,8 @@ public sealed class InGameUi
         float totalTime,
         bool paused,
         float speed,
-        int viewportHeight)
+        int viewportHeight,
+        EcosystemMetrics? metrics = null)
     {
         LayoutToolbar(viewportHeight);
         var toolbar = new Rectangle(8, viewportHeight - 60, 522, 52);
@@ -139,7 +140,7 @@ public sealed class InGameUi
             if (window.Id == StatisticsWindowId)
             {
                 DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
-                    plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed);
+                    plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
             }
             else if (window.Id == CreatureWindowId)
             {
@@ -163,18 +164,42 @@ public sealed class InGameUi
         int omnivores,
         float time,
         bool paused,
-        float speed)
+        float speed,
+        EcosystemMetrics? metrics)
     {
         int total = plants + herbivores + carnivores + omnivores;
-        DrawLine(spriteBatch, font, content.X, content.Y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 22,
+        int y = content.Y;
+        DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
+        y += 22;
+        DrawLine(spriteBatch, font, content.X, y,
             paused ? I18n.T("stats.paused") : I18n.Format("stats.speed", speed),
             paused ? UiTheme.DangerClay : UiTheme.MossSignal);
-        DrawLine(spriteBatch, font, content.X, content.Y + 54, I18n.Format("stats.total", total), UiTheme.WarmParchment);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 82, I18n.Format("stats.plants", plants), plants, total, UiTheme.MossSignal);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 112, I18n.Format("stats.herbivores", herbivores), herbivores, total, UiTheme.LakeBlue);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 142, I18n.Format("stats.carnivores", carnivores), carnivores, total, UiTheme.DangerClay);
-        DrawPopulationRow(spriteBatch, pixel, font, content, content.Y + 172, I18n.Format("stats.omnivores", omnivores), omnivores, total, UiTheme.WarmParchment);
+        y += 32;
+        DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.total", total), UiTheme.WarmParchment);
+
+        if (metrics != null)
+        {
+            y += 22;
+            DrawLine(spriteBatch, font, content.X, y,
+                $"Births: {metrics.TotalBirths}  Deaths: {metrics.TotalDeaths}", UiTheme.MutedStone);
+            y += 18;
+            DrawLine(spriteBatch, font, content.X, y,
+                $"Starve: {metrics.StarvationDeaths}  Age: {metrics.OldAgeDeaths}  Pred: {metrics.PredationDeaths}  Comb: {metrics.CombatDeaths}",
+                new Color(180, 150, 130));
+            y += 18;
+            DrawLine(spriteBatch, font, content.X, y,
+                $"Species: {metrics.SpeciesCount}  Het: {metrics.MeanHeterozygosity:F3}  Inb: {metrics.MeanInbreeding:F3}",
+                UiTheme.MutedStone);
+        }
+
+        y += 30;
+        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.plants", plants), plants, total, UiTheme.MossSignal);
+        y += 30;
+        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.herbivores", herbivores), herbivores, total, UiTheme.LakeBlue);
+        y += 30;
+        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.carnivores", carnivores), carnivores, total, UiTheme.DangerClay);
+        y += 30;
+        DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.omnivores", omnivores), omnivores, total, UiTheme.WarmParchment);
     }
 
     private static void DrawPopulationRow(

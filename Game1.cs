@@ -32,6 +32,10 @@ public class Game1 : Game
     private readonly SpawnPanel _spawnPanel = new();
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
+    private float _currentFPS;
+    private float _frametimeMS;
+    private int _frameCount;
+    private double _fpsTimer;
     private bool _contentLoaded;
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
@@ -124,6 +128,7 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        UpdateFPS(gameTime);
         var kbd = Keyboard.GetState();
         var mouse = Mouse.GetState();
         bool escapePressed = kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape);
@@ -530,6 +535,8 @@ public class Game1 : Game
         string seedLabel = $"Seed: {_ecosystem.Seed}";
         _spriteBatch.DrawString(_font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
 
+        DrawDebugOverlay(_spriteBatch, _font);
+
         if (_logo != null)
         {
             const int logoSize = 96;
@@ -551,7 +558,8 @@ public class Game1 : Game
             _displayTime,
             _paused,
             _controller.CurrentSpeed,
-            GraphicsDevice.Viewport.Height);
+            GraphicsDevice.Viewport.Height,
+            _ecosystem.Metrics);
 
         _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
         _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
@@ -578,5 +586,43 @@ public class Game1 : Game
         var customAssets = AssetRegistry.SpeciesTextures
             .Where(asset => _speciesCatalogRuntime.CustomKeys.Contains(asset.Species));
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, customAssets);
+    }
+
+    private void UpdateFPS(GameTime gameTime)
+    {
+        _frameCount++;
+        _fpsTimer += gameTime.ElapsedGameTime.TotalSeconds;
+        if (_fpsTimer >= 0.5)
+        {
+            _currentFPS = _frameCount / (float)_fpsTimer;
+            _frametimeMS = (float)(_fpsTimer / _frameCount * 1000.0);
+            _frameCount = 0;
+            _fpsTimer = 0;
+        }
+    }
+
+    private void DrawDebugOverlay(SpriteBatch sb, SpriteFont font)
+    {
+        var m = _ecosystem.Metrics;
+        m.FPS = _currentFPS;
+        int y = GraphicsDevice.Viewport.Height - 100;
+        int x = 8;
+        float lineH = 14f;
+        Color c = UiTheme.MutedStone;
+
+        sb.DrawString(font, $"FPS: {_currentFPS:F0} ({_frametimeMS:F1}ms) | B:{m.TotalBirths} D:{m.TotalDeaths}",
+            new Vector2(x, y), c);
+        y += (int)lineH;
+        sb.DrawString(font, $"Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}",
+            new Vector2(x, y), c);
+        y += (int)lineH;
+        sb.DrawString(font, $"Species:{m.SpeciesCount} H:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2}",
+            new Vector2(x, y), c);
+        if (m.LastDeathSpecies.Length > 0)
+        {
+            y += (int)lineH;
+            sb.DrawString(font, $"Last death: {m.LastDeathSpecies} ({m.LastDeathCause})",
+                new Vector2(x, y), new Color(180, 120, 100));
+        }
     }
 }

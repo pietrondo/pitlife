@@ -11,6 +11,7 @@ public abstract class Creature
     public float Energy { get; set; }
     public float Age { get; protected set; }
     public bool IsAlive { get; protected set; } = true;
+    public DeathCause DeathCause { get; private set; }
     public CreatureType CreatureType { get; protected set; }
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
@@ -56,10 +57,11 @@ public abstract class Creature
         Behavior.Update(this, world, ecosystem, gameTime);
         if (!IsAlive) return;
 
+        ApplyPopulationPressure(ecosystem);
         ConsumeEnergy(dt);
         if (Energy <= 0 || Age > 300f)
         {
-            Die();
+            Die(Energy <= 0 ? DeathCause.Starvation : DeathCause.OldAge);
             return;
         }
 
@@ -72,11 +74,21 @@ public abstract class Creature
         if (Energy < ReproductionThreshold) return;
         if (CreatureType == CreatureType.Plant) return;
 
+        int sameSpeciesCount = 0;
+        ecosystem.Metrics.SpeciesPopulations.TryGetValue(Species, out sameSpeciesCount);
+        int totalAnimals = ecosystem.HerbivoreCount + ecosystem.CarnivoreCount + ecosystem.OmnivoreCount;
+        if (totalAnimals > 10 && sameSpeciesCount > totalAnimals / 3 && ecosystem.Random.NextDouble() > 0.3f)
+            return;
+
         var mate = ecosystem.FindNearestMate(this);
         if (mate != null && DistanceTo(mate) < VisionPixels * 0.5f)
         {
             var child = ReproduceWith(mate, ecosystem.Random);
-            if (child != null) ecosystem.AddCreature(child);
+            if (child != null)
+            {
+                ecosystem.AddCreature(child);
+                ecosystem.Metrics.RecordBirth();
+            }
         }
     }
 
@@ -85,6 +97,12 @@ public abstract class Creature
     protected virtual void ConsumeEnergy(float dt)
     {
         Energy -= EnergyConsumption * CurrentEnergyMultiplier * dt;
+    }
+
+    internal void ApplyPopulationPressure(Ecosystem ecosystem)
+    {
+        if (CreatureType == CreatureType.Plant) return;
+        Energy -= EnergyConsumption * (ecosystem.PopulationPressure - 1f) * 0.5f * (1f / 60f);
     }
 
     private void UpdateEnvironmentalMultipliers(World world)
@@ -150,10 +168,11 @@ public abstract class Creature
         }
     }
 
-    public virtual void Die()
+    public virtual void Die(DeathCause cause = DeathCause.Unknown)
     {
         IsAlive = false;
-        Logger.Event("DEATH", $"{Species} died at age {Age:F1}s, energy {Energy:F1}");
+        DeathCause = cause;
+        Logger.Event("DEATH", $"{Species} died at age {Age:F1}s, energy {Energy:F1}, cause={cause}");
     }
 
     public void Wander(World world, float dt, Random random, float radius)
