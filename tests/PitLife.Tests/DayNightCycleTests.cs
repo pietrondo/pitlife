@@ -41,7 +41,7 @@ public class DayNightCycleTests
     {
         var cycle = new DayNightCycle();
         cycle.Update(DayNightCycle.DayLength * 0.75f);
-        Assert.True(cycle.GetOverlayColor().A > 100);
+        Assert.True(cycle.GetOverlayColor().A >= 80);
     }
 
     [Fact]

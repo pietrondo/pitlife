@@ -42,7 +42,7 @@ public class DayNightCycle
         };
     }
 
-    private static readonly Color NightColor = new(15, 25, 70, 180);
+    private static readonly Color NightColor = new(20, 30, 80, 100);
     private static readonly Color DawnColor = new(255, 180, 100, 50);
     private static readonly Color DuskColor = new(255, 120, 60, 70);
 
