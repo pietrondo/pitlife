@@ -26,7 +26,7 @@ public sealed class InGameUi
     {
         _windowManager.Add(new UiWindow(I18n.T("window.statistics"), StatisticsWindowId)
         {
-            Bounds = new Rectangle(32, 88, 320, 288),
+            Bounds = new Rectangle(32, 88, 320, 380),
             IsOpen = true,
             ShowCloseButton = true
         });
@@ -179,22 +179,6 @@ public sealed class InGameUi
             paused ? UiTheme.DangerClay : UiTheme.MossSignal);
         y += 32;
         DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.total", total), UiTheme.WarmParchment);
-
-        if (metrics != null)
-        {
-            y += 22;
-            DrawLine(spriteBatch, font, content.X, y,
-                $"{I18n.T("stats.births")}: {metrics.TotalBirths}  {I18n.T("stats.deaths")}: {metrics.TotalDeaths}", UiTheme.MutedStone);
-            y += 18;
-            DrawLine(spriteBatch, font, content.X, y,
-                $"{I18n.T("stats.starve")}: {metrics.StarvationDeaths}  {I18n.T("stats.oldage")}: {metrics.OldAgeDeaths}  {I18n.T("stats.pred")}: {metrics.PredationDeaths}  {I18n.T("stats.comb")}: {metrics.CombatDeaths}",
-                new Color(180, 150, 130));
-            y += 18;
-            DrawLine(spriteBatch, font, content.X, y,
-                $"{I18n.T("stats.species")}: {metrics.SpeciesCount}  {I18n.T("stats.het")}: {metrics.MeanHeterozygosity:F3}  {I18n.T("stats.inb")}: {metrics.MeanInbreeding:F3}",
-                UiTheme.MutedStone);
-        }
-
         y += 30;
         DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.plants", plants), plants, total, UiTheme.MossSignal);
         y += 30;
@@ -203,6 +187,24 @@ public sealed class InGameUi
         DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.carnivores", carnivores), carnivores, total, UiTheme.DangerClay);
         y += 30;
         DrawPopulationRow(spriteBatch, pixel, font, content, y, I18n.Format("stats.omnivores", omnivores), omnivores, total, UiTheme.WarmParchment);
+
+        if (metrics != null && metrics.SpeciesPopulations.Count > 0)
+        {
+            y += 34;
+            DrawLine(spriteBatch, font, content.X, y, I18n.T("stats.speciesList"), UiTheme.MossSignal);
+            y += 18;
+            int shown = 0;
+            foreach (var kvp in metrics.SpeciesPopulations)
+            {
+                if (shown >= 10) break;
+                Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
+                spriteBatch.DrawString(font, $"{I18n.Species(kvp.Key)}: {kvp.Value}",
+                    new Vector2(content.X, y), col);
+                y += 15;
+                shown++;
+            }
+        }
+
         return y - content.Y + 8;
     }
 

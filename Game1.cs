@@ -36,6 +36,7 @@ public class Game1 : Game
     private float _frametimeMS;
     private int _frameCount;
     private double _fpsTimer;
+    private bool _showDebugOverlay;
     private bool _contentLoaded;
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
@@ -241,6 +242,8 @@ public class Game1 : Game
             return;
         }
 
+        if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
+            _showDebugOverlay = !_showDebugOverlay;
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
             _speciesEditor.Toggle();
 
@@ -626,41 +629,36 @@ public class Game1 : Game
         m.FPS = _currentFPS;
         int y = GraphicsDevice.Viewport.Height - 100;
         int x = 8;
-        float lineH = 14f;
-        Color c = UiTheme.MutedStone;
+        int lineH = 14;
 
-        sb.DrawString(font, $"FPS: {_currentFPS:F0} ({_frametimeMS:F1}ms) | {I18n.T("stats.births")[0]}:{m.TotalBirths} {I18n.T("stats.deaths")[0]}:{m.TotalDeaths}",
-            new Vector2(x, y), c);
-        y += (int)lineH;
-        sb.DrawString(font, $"{I18n.T("stats.trophic")}: L1={m.TrophicLevel1} L2={m.TrophicLevel2} L3+={m.TrophicLevel3Plus}",
-            new Vector2(x, y), c);
-        y += (int)lineH;
-        sb.DrawString(font, $"{I18n.T("stats.starve")}:{m.StarvationDeaths} {I18n.T("stats.oldage")}:{m.OldAgeDeaths} {I18n.T("stats.pred")}:{m.PredationDeaths} {I18n.T("stats.comb")}:{m.CombatDeaths}",
-            new Vector2(x, y), c);
-        y += (int)lineH;
-        sb.DrawString(font, $"{I18n.T("stats.species")}:{m.SpeciesCount} {I18n.T("stats.het")}:{m.MeanHeterozygosity:F2} {I18n.T("stats.inb")}:{m.MeanInbreeding:F2} {I18n.T("stats.subsp")}:{m.TotalSubspecies}",
-            new Vector2(x, y), c);
-        y += (int)lineH;
-        var atm = _ecosystem.Atmosphere;
-        sb.DrawString(font, $"O2:{atm.Oxygen:F0}% CO2:{atm.CO2:F0}%",
-            new Vector2(x, y), c);
-        if (m.LastDeathSpecies.Length > 0)
-        {
-            y += (int)lineH;
-            sb.DrawString(font, $"{I18n.T("stats.lastdeath")}: {m.LastDeathSpecies} ({m.LastDeathCause})",
-                new Vector2(x, y), new Color(180, 120, 100));
-        }
         if (_ecosystem.Disease.HasOutbreak)
         {
-            y += (int)lineH;
-            sb.DrawString(font, $"{I18n.T("stats.disease")}: {_ecosystem.Disease.ActiveDiseaseName}",
+            sb.DrawString(font, $"Disease: {_ecosystem.Disease.ActiveDiseaseName}",
                 new Vector2(x, y), new Color(220, 60, 60));
+            y += lineH;
         }
         if (_ecosystem.Cataclysms.IsActive)
         {
-            y += (int)lineH;
-            sb.DrawString(font, $"Cataclysm: {_ecosystem.Cataclysms.ActiveEvent} ({_ecosystem.Cataclysms.Timer:F0}s)",
+            sb.DrawString(font, $"{_ecosystem.Cataclysms.ActiveEvent} ({_ecosystem.Cataclysms.Timer:F0}s)",
                 new Vector2(x, y), new Color(255, 140, 0));
+            y += lineH;
+        }
+
+        if (!_showDebugOverlay) return;
+
+        sb.DrawString(font, $"FPS:{_currentFPS:F0} B:{m.TotalBirths} D:{m.TotalDeaths} Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}",
+            new Vector2(x, y), UiTheme.MutedStone);
+        y += lineH;
+        sb.DrawString(font, $"Sp:{m.SpeciesCount} Het:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2} Sub:{m.TotalSubspecies} Trophic:L1={m.TrophicLevel1}/L2={m.TrophicLevel2}/L3+={m.TrophicLevel3Plus}",
+            new Vector2(x, y), UiTheme.MutedStone);
+        y += lineH;
+        sb.DrawString(font, $"O2:{_ecosystem.Atmosphere.Oxygen:F0}% CO2:{_ecosystem.Atmosphere.CO2:F0}%",
+            new Vector2(x, y), UiTheme.MutedStone);
+        if (m.LastDeathSpecies.Length > 0)
+        {
+            y += lineH;
+            sb.DrawString(font, $"{m.LastDeathSpecies}: {m.LastDeathCause}",
+                new Vector2(x, y), new Color(180, 120, 100));
         }
     }
 }
