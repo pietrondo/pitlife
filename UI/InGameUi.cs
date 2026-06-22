@@ -42,8 +42,8 @@ public sealed class InGameUi
         });
     }
 
-    public void OpenCreatureWindow() => _windowManager.Open(CreatureWindowId);
-    public void OpenTerrainWindow() => _windowManager.Open(TerrainWindowId);
+    public void OpenCreatureWindow(int vpw, int vph) => _windowManager.Open(CreatureWindowId, vpw, vph);
+    public void OpenTerrainWindow(int vpw, int vph) => _windowManager.Open(TerrainWindowId, vpw, vph);
 
     public void ResetForWorld(World world)
     {
@@ -66,21 +66,21 @@ public sealed class InGameUi
         LayoutToolbar(viewportHeight);
 
         if (Pressed(keyboard, previousKeyboard, Keys.F2))
-            _windowManager.Toggle(StatisticsWindowId);
+            _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
         if (Pressed(keyboard, previousKeyboard, Keys.F3))
-            _windowManager.Toggle(CreatureWindowId);
+            _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
         if (Pressed(keyboard, previousKeyboard, Keys.F5))
             _windowManager.TileWindows(viewportWidth, viewportHeight);
 
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
         {
-            _windowManager.Toggle(StatisticsWindowId);
+            _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
         }
         if (_creatureButton.WasClicked(mouse, previousMouse))
         {
-            _windowManager.Toggle(CreatureWindowId);
+            _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
         }
         if (_arrangeButton.WasClicked(mouse, previousMouse))

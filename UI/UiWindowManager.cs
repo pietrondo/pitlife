@@ -60,7 +60,7 @@ public sealed class UiWindowManager
         ClampWindows(viewportWidth, viewportHeight);
     }
 
-    public void Toggle(string id)
+    public void Toggle(string id, int viewportWidth = 0, int viewportHeight = 0)
     {
         UiWindow? window = Find(id);
         if (window == null)
@@ -74,10 +74,12 @@ public sealed class UiWindowManager
         {
             window.IsOpen = true;
             BringToFront(window);
+            if (viewportWidth > 0 && viewportHeight > 0)
+                TileWindows(viewportWidth, viewportHeight);
         }
     }
 
-    public void Open(string id)
+    public void Open(string id, int viewportWidth = 0, int viewportHeight = 0)
     {
         UiWindow? window = Find(id);
         if (window == null)
@@ -85,6 +87,9 @@ public sealed class UiWindowManager
 
         window.IsOpen = true;
         BringToFront(window);
+
+        if (viewportWidth > 0 && viewportHeight > 0)
+            TileWindows(viewportWidth, viewportHeight);
     }
 
     public bool CloseTopWindow()

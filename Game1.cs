@@ -335,7 +335,7 @@ public class Game1 : Game
             _selectedCreature = FindClosestCreature(_ecosystem.Creatures, worldPos);
             if (_selectedCreature != null)
             {
-                _inGameUi.OpenCreatureWindow();
+                _inGameUi.OpenCreatureWindow(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
             else
             {
@@ -344,7 +344,7 @@ public class Game1 : Game
                 tileX = Math.Clamp(tileX, 0, _ecosystem.World.Width - 1);
                 tileY = Math.Clamp(tileY, 0, _ecosystem.World.Height - 1);
                 _inGameUi.SelectedTile = new Point(tileX, tileY);
-                _inGameUi.OpenTerrainWindow();
+                _inGameUi.OpenTerrainWindow(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
         }
         _prevMouse = mouse;
