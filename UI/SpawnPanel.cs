@@ -16,7 +16,7 @@ public sealed class SpawnPanel
     public string? SelectedCategory { get; private set; }
 
     private static readonly string[] CategoryOrder =
-        ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
+        ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores", "MarineAnimals"];
     private Dictionary<string, string[]> _speciesByCategory = BuildSpeciesByCategory();
 
     public const int PanelWidth = 200;
@@ -359,15 +359,16 @@ public sealed class SpawnPanel
         foreach (string species in SpeciesRegistry.All)
         {
             SpeciesDefinition definition = SpeciesRegistry.Get(species)!;
-            string category = definition.Kind switch
-            {
-                CreatureType.Plant when definition.IsAquatic => "AquaticPlants",
-                CreatureType.Plant => "Plants",
-                CreatureType.Herbivore => "Herbivores",
-                CreatureType.Carnivore => "Carnivores",
-                CreatureType.Omnivore => "Omnivores",
-                _ => throw new InvalidOperationException($"Unsupported creature type: {definition.Kind}")
-            };
+        string category = definition.Kind switch
+        {
+            CreatureType.Plant when definition.IsAquatic => "AquaticPlants",
+            CreatureType.Plant => "Plants",
+            _ when definition.IsAquatic => "MarineAnimals",
+            CreatureType.Herbivore => "Herbivores",
+            CreatureType.Carnivore => "Carnivores",
+            CreatureType.Omnivore => "Omnivores",
+            _ => throw new InvalidOperationException($"Unsupported creature type: {definition.Kind}")
+        };
             categories[category].Add(species);
         }
 
