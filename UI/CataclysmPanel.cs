@@ -36,10 +36,10 @@ public sealed class CataclysmPanel
 
     public bool Update(MouseState mouse, MouseState prevMouse)
     {
-        // Toggle button click
+        // Toggle button click - use direct press detection
         if (_toggleBounds.Contains(mouse.Position) &&
-            mouse.LeftButton == ButtonState.Released &&
-            prevMouse.LeftButton == ButtonState.Pressed)
+            mouse.LeftButton == ButtonState.Pressed &&
+            prevMouse.LeftButton == ButtonState.Released)
         {
             Toggle();
             return true;
@@ -47,17 +47,21 @@ public sealed class CataclysmPanel
 
         if (!IsOpen) return false;
 
-        // Cataclysm type buttons
-        int y = _panelBounds.Y + 28;
-        foreach (var btn in _buttons)
+        // Cataclysm type buttons - direct press detection
+        if (mouse.LeftButton == ButtonState.Pressed &&
+            prevMouse.LeftButton == ButtonState.Released)
         {
-            btn.Bounds = new Rectangle(_panelBounds.X + 8, y, PanelW - 16, 22);
-            if (btn.WasClicked(mouse, prevMouse))
+            int y = _panelBounds.Y + 28;
+            foreach (var btn in _buttons)
             {
-                SelectedType = (string)btn.Tag!;
-                return true;
+                var b = new Rectangle(_panelBounds.X + 8, y, PanelW - 16, 22);
+                if (b.Contains(mouse.Position))
+                {
+                    SelectedType = (string)btn.Tag!;
+                    return true;
+                }
+                y += 26;
             }
-            y += 26;
         }
         return _panelBounds.Contains(mouse.Position);
     }
