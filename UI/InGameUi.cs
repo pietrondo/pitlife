@@ -19,6 +19,7 @@ public sealed class InGameUi
     private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
     private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange"));
     private readonly UiButton _menuButton = new(I18n.T("toolbar.menu"));
+    private readonly UiButton _cataclysmButton = new("CATA");
 
     public bool WantsToGoToMainMenu { get; set; } = false;
     public World? World { get; set; }
@@ -102,11 +103,17 @@ public sealed class InGameUi
             WantsToGoToMainMenu = true;
             toolbarConsumed = true;
         }
+        if (_cataclysmButton.WasClicked(mouse, previousMouse))
+        {
+            _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
+            toolbarConsumed = true;
+        }
 
         bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || 
                            _creatureButton.Bounds.Contains(mouse.Position) ||
                            _arrangeButton.Bounds.Contains(mouse.Position) ||
-                           _menuButton.Bounds.Contains(mouse.Position);
+                           _menuButton.Bounds.Contains(mouse.Position) ||
+                           _cataclysmButton.Bounds.Contains(mouse.Position);
         return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
     }
 
