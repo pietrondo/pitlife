@@ -18,6 +18,9 @@ public abstract class Creature
     public float DiseaseTimer { get; set; }
     public string DiseaseName { get; set; } = "";
     public float Immunity { get; set; }
+    public float LastReproductionTime { get; set; } = -60f;
+    public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
+    public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;
     public string Species { get; set; } = "";
     public Gender Gender { get; set; } = Gender.None;
     public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();
@@ -87,6 +90,9 @@ public abstract class Creature
         if (Energy < ReproductionThreshold) return;
         if (CreatureType == CreatureType.Plant) return;
 
+        float timeSinceLastReproduction = ecosystem.TotalTime - LastReproductionTime;
+        if (timeSinceLastReproduction < ReproductionCooldown) return;
+
         int sameSpeciesCount = 0;
         ecosystem.Metrics.SpeciesPopulations.TryGetValue(Species, out sameSpeciesCount);
         int totalAnimals = ecosystem.HerbivoreCount + ecosystem.CarnivoreCount + ecosystem.OmnivoreCount;
@@ -96,12 +102,22 @@ public abstract class Creature
         var mate = ecosystem.FindNearestMate(this);
         if (mate != null && DistanceTo(mate) < VisionPixels * 0.5f)
         {
-            var child = ReproduceWith(mate, ecosystem.Random);
-            if (child != null)
+            if (timeSinceLastReproduction < ReproductionCooldown ||
+                ecosystem.TotalTime - mate.LastReproductionTime < mate.ReproductionCooldown)
+                return;
+
+            int litter = Math.Min(LitterSize, mate.LitterSize);
+            for (int i = 0; i < litter && IsAlive && mate.IsAlive; i++)
             {
-                ecosystem.AddCreature(child);
-                ecosystem.Metrics.RecordBirth();
+                var child = ReproduceWith(mate, ecosystem.Random);
+                if (child != null)
+                {
+                    ecosystem.AddCreature(child);
+                    ecosystem.Metrics.RecordBirth();
+                }
             }
+            LastReproductionTime = ecosystem.TotalTime;
+            mate.LastReproductionTime = ecosystem.TotalTime;
         }
     }
 
