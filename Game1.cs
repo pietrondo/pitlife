@@ -89,7 +89,7 @@ public class Game1 : Game
         _graphics.PreferredBackBufferHeight = 800;
         _graphics.ApplyChanges();
 
-        _ecosystem = new Ecosystem(200, 150, 42);
+        _ecosystem = new Ecosystem(400, 300, 42);
         _ecosystem.Initialize(50, 15, 10, 200);
         _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
         {
@@ -334,8 +334,7 @@ public class Game1 : Game
 
         // Cataclysm placement when selected
         if (_cataclysmPanel.SelectedType != null &&
-            mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released &&
-            !_spawnPanel.IsOpen && !_cataclysmPanel.IsOpen)
+            mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
             _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _cataclysmPanel.SelectedType!, catPos);
@@ -427,7 +426,7 @@ public class Game1 : Game
     private void GenerateNewWorld(int? seedOverride)
     {
         int seed = seedOverride ?? new Random().Next();
-        _ecosystem = new Ecosystem(200, 150, seed);
+        _ecosystem = new Ecosystem(400, 300, seed);
         _ecosystem.Initialize(60, 20, 15, 150);
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World, seed);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
