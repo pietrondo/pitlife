@@ -184,14 +184,14 @@ public sealed class InGameUi
         {
             y += 22;
             DrawLine(spriteBatch, font, content.X, y,
-                $"Births: {metrics.TotalBirths}  Deaths: {metrics.TotalDeaths}", UiTheme.MutedStone);
+                $"{I18n.T("stats.births")}: {metrics.TotalBirths}  {I18n.T("stats.deaths")}: {metrics.TotalDeaths}", UiTheme.MutedStone);
             y += 18;
             DrawLine(spriteBatch, font, content.X, y,
-                $"Starve: {metrics.StarvationDeaths}  Age: {metrics.OldAgeDeaths}  Pred: {metrics.PredationDeaths}  Comb: {metrics.CombatDeaths}",
+                $"{I18n.T("stats.starve")}: {metrics.StarvationDeaths}  {I18n.T("stats.oldage")}: {metrics.OldAgeDeaths}  {I18n.T("stats.pred")}: {metrics.PredationDeaths}  {I18n.T("stats.comb")}: {metrics.CombatDeaths}",
                 new Color(180, 150, 130));
             y += 18;
             DrawLine(spriteBatch, font, content.X, y,
-                $"Species: {metrics.SpeciesCount}  Het: {metrics.MeanHeterozygosity:F3}  Inb: {metrics.MeanInbreeding:F3}",
+                $"{I18n.T("stats.species")}: {metrics.SpeciesCount}  {I18n.T("stats.het")}: {metrics.MeanHeterozygosity:F3}  {I18n.T("stats.inb")}: {metrics.MeanInbreeding:F3}",
                 UiTheme.MutedStone);
         }
 

@@ -622,27 +622,27 @@ public class Game1 : Game
         float lineH = 14f;
         Color c = UiTheme.MutedStone;
 
-        sb.DrawString(font, $"FPS: {_currentFPS:F0} ({_frametimeMS:F1}ms) | B:{m.TotalBirths} D:{m.TotalDeaths}",
+        sb.DrawString(font, $"FPS: {_currentFPS:F0} ({_frametimeMS:F1}ms) | {I18n.T("stats.births")[0]}:{m.TotalBirths} {I18n.T("stats.deaths")[0]}:{m.TotalDeaths}",
             new Vector2(x, y), c);
         y += (int)lineH;
-        sb.DrawString(font, $"Trophic: L1={m.TrophicLevel1} L2={m.TrophicLevel2} L3+={m.TrophicLevel3Plus}",
+        sb.DrawString(font, $"{I18n.T("stats.trophic")}: L1={m.TrophicLevel1} L2={m.TrophicLevel2} L3+={m.TrophicLevel3Plus}",
             new Vector2(x, y), c);
         y += (int)lineH;
-        sb.DrawString(font, $"Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}",
+        sb.DrawString(font, $"{I18n.T("stats.starve")}:{m.StarvationDeaths} {I18n.T("stats.oldage")}:{m.OldAgeDeaths} {I18n.T("stats.pred")}:{m.PredationDeaths} {I18n.T("stats.comb")}:{m.CombatDeaths}",
             new Vector2(x, y), c);
         y += (int)lineH;
-        sb.DrawString(font, $"Species:{m.SpeciesCount} H:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2} Subsp:{m.TotalSubspecies}",
+        sb.DrawString(font, $"{I18n.T("stats.species")}:{m.SpeciesCount} {I18n.T("stats.het")}:{m.MeanHeterozygosity:F2} {I18n.T("stats.inb")}:{m.MeanInbreeding:F2} {I18n.T("stats.subsp")}:{m.TotalSubspecies}",
             new Vector2(x, y), c);
         if (m.LastDeathSpecies.Length > 0)
         {
             y += (int)lineH;
-            sb.DrawString(font, $"Last death: {m.LastDeathSpecies} ({m.LastDeathCause})",
+            sb.DrawString(font, $"{I18n.T("stats.lastdeath")}: {m.LastDeathSpecies} ({m.LastDeathCause})",
                 new Vector2(x, y), new Color(180, 120, 100));
         }
         if (_ecosystem.Disease.HasOutbreak)
         {
             y += (int)lineH;
-            sb.DrawString(font, $"Disease: {_ecosystem.Disease.ActiveDiseaseName}",
+            sb.DrawString(font, $"{I18n.T("stats.disease")}: {_ecosystem.Disease.ActiveDiseaseName}",
                 new Vector2(x, y), new Color(220, 60, 60));
         }
     }
