@@ -11,7 +11,7 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 32; // 1:1 pixel mapping, GPU handles it fine // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
+    private int _renderScale = 1; // 1 pixel per tile, GPU bilinear filtering // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
 
     // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
@@ -102,11 +102,17 @@ public sealed class PixelWorldRenderer : IDisposable
         }
 
         int pw = _world.PixelWidth, ph = _world.PixelHeight;
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
+            DepthStencilState.None, RasterizerState.CullCounterClockwise);
         for (int dy = -1; dy <= 1; dy++)
             for (int dx = -1; dx <= 1; dx++)
                 sb.Draw(_worldTexture,
                     new Rectangle(dx * pw, dy * ph, pw, ph),
                     Color.White);
+        sb.End();
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
+            DepthStencilState.None, RasterizerState.CullCounterClockwise);
     }
 
     private void RedrawWorldTexture(GraphicsDevice gd)
@@ -121,36 +127,7 @@ public sealed class PixelWorldRenderer : IDisposable
         {
             for (int x = 0; x < width; x++)
             {
-                float fx = x / (float)_renderScale;
-                float fy = y / (float)_renderScale;
-                int tileX = (int)fx;
-                int tileY = (int)fy;
-                float fracX = fx - tileX;
-                float fracY = fy - tileY;
-
-                Color baseColor = BiomeBaseColors[(int)_world.GetTile(tileX, tileY).Biome];
-
-                // Edge smoothing: blend with neighboring tile colors
-                if (fracX < 0.35f && tileX > 0)
-                {
-                    Color left = BiomeBaseColors[(int)_world.GetTile(tileX - 1, tileY).Biome];
-                    float t = (0.35f - fracX) / 0.35f;
-                    baseColor = Color.Lerp(baseColor, left, t * 0.5f);
-                }
-                if (fracY < 0.35f && tileY > 0)
-                {
-                    Color top = BiomeBaseColors[(int)_world.GetTile(tileX, tileY - 1).Biome];
-                    float t = (0.35f - fracY) / 0.35f;
-                    baseColor = Color.Lerp(baseColor, top, t * 0.5f);
-                }
-
-                data[y * width + x] = baseColor;
-                Color c = data[y * width + x];
-                int d = (x * 7 + y * 13) % 7 - 3;
-                data[y * width + x] = new Color(
-                    Math.Clamp(c.R + d, 0, 255),
-                    Math.Clamp(c.G + d, 0, 255),
-                    Math.Clamp(c.B + d, 0, 255));
+                data[y * width + x] = BiomeBaseColors[(int)_world.GetTile(x, y).Biome];
             }
         }
 
