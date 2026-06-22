@@ -11,7 +11,7 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 4; // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
+    private int _renderScale = 16; // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
 
     // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
@@ -101,15 +101,9 @@ public sealed class PixelWorldRenderer : IDisposable
             _needsRedraw = false;
         }
 
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
-            DepthStencilState.None, RasterizerState.CullCounterClockwise);
         sb.Draw(_worldTexture,
             new Rectangle(0, 0, _world.PixelWidth, _world.PixelHeight),
             Color.White);
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-            DepthStencilState.None, RasterizerState.CullCounterClockwise);
     }
 
     private void RedrawWorldTexture(GraphicsDevice gd)
@@ -147,8 +141,8 @@ public sealed class PixelWorldRenderer : IDisposable
                     baseColor = Color.Lerp(baseColor, top, t * 0.5f);
                 }
 
-                float noise = (_noise.GetNoise(x * 0.15f, y * 0.15f) + 1f) * 0.5f;
-                float brightness = 0.82f + noise * 0.36f;
+                float noise = (_noise.GetNoise(x, y) + 1f) * 0.5f;
+                float brightness = 0.88f + noise * 0.24f;
                 int r = (int)(baseColor.R * brightness);
                 int g = (int)(baseColor.G * brightness);
                 int b = (int)(baseColor.B * brightness);
