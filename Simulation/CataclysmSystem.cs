@@ -81,8 +81,9 @@ public sealed class CataclysmSystem
             _ => 0
         };
         if (radius <= 0) return;
-        int cx = ecosystem.Random.Next(radius, ecosystem.World.Width - radius);
-        int cy = ecosystem.Random.Next(radius, ecosystem.World.Height - radius);
+        int w = ecosystem.World.Width, h = ecosystem.World.Height;
+        int cx = ecosystem.Random.Next(Math.Min(radius, w - radius), Math.Max(radius + 1, w - radius));
+        int cy = ecosystem.Random.Next(Math.Min(radius, h - radius), Math.Max(radius + 1, h - radius));
         for (int dy = -radius; dy <= radius; dy++)
             for (int dx = -radius; dx <= radius; dx++)
             {

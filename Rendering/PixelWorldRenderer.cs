@@ -11,7 +11,7 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 4; // 4 sub-pixels per tile for texture detail // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
+    private int _renderScale = 16; // 256 sub-pixels per tile for realistic terrain // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
 
     // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
@@ -121,21 +121,38 @@ public sealed class PixelWorldRenderer : IDisposable
         {
             for (int x = 0; x < width; x++)
             {
-                float fx = x / (float)_renderScale;
-                float fy = y / (float)_renderScale;
-                int tileX = (int)fx;
-                int tileY = (int)fy;
-                float fracX = fx - tileX;
-                float fracY = fy - tileY;
+                float worldX = x * _world.TileSize / (float)_renderScale;
+                float worldY = y * _world.TileSize / (float)_renderScale;
+                int tileX = Math.Clamp((int)(worldX / _world.TileSize), 0, _world.Width - 1);
+                int tileY = Math.Clamp((int)(worldY / _world.TileSize), 0, _world.Height - 1);
+                int idx = tileY * _world.Width + tileX;
 
-                Color c00 = BiomeBaseColors[(int)_world.GetTile(tileX, tileY).Biome];
-                Color c10 = BiomeBaseColors[(int)_world.GetTile(Math.Min(tileX + 1, _world.Width - 1), tileY).Biome];
-                Color c01 = BiomeBaseColors[(int)_world.GetTile(tileX, Math.Min(tileY + 1, _world.Height - 1)).Biome];
-                Color c11 = BiomeBaseColors[(int)_world.GetTile(Math.Min(tileX + 1, _world.Width - 1), Math.Min(tileY + 1, _world.Height - 1)).Biome];
+                float elev = _world.ElevationField[idx];
+                float continent = _world.ContinentMask[idx];
 
-                Color top = Color.Lerp(c00, c10, fracX);
-                Color bottom = Color.Lerp(c01, c11, fracX);
-                data[y * width + x] = Color.Lerp(top, bottom, fracY);
+                Color pixelColor;
+                if (continent < 0.35f)
+                    pixelColor = Color.Lerp(BiomeBaseColors[0], BiomeBaseColors[1], continent * 3f); // ocean gradient
+                else if (elev < 0.15f)
+                    pixelColor = BiomeBaseColors[2]; // Beach
+                else if (elev < 0.3f)
+                    pixelColor = Color.Lerp(BiomeBaseColors[5], BiomeBaseColors[4], elev * 3f); // Grassland/Savanna
+                else if (elev < 0.5f)
+                    pixelColor = Color.Lerp(BiomeBaseColors[6], BiomeBaseColors[7], elev * 2f); // Forest
+                else if (elev < 0.7f)
+                    pixelColor = Color.Lerp(BiomeBaseColors[9], BiomeBaseColors[11], (elev - 0.5f) * 5f); // Tundra/Snow
+                else
+                    pixelColor = Color.Lerp(BiomeBaseColors[10], BiomeBaseColors[11], (elev - 0.7f) * 3f); // Mountain/Snow
+
+                if (_world.RiverMask[idx] && continent >= 0.35f)
+                    pixelColor = Color.Lerp(pixelColor, new Color(40, 100, 200), 0.3f);
+
+                // Add subtle noise
+                int d = (x * 7 + y * 13) % 5 - 2;
+                data[y * width + x] = new Color(
+                    Math.Clamp(pixelColor.R + d, 0, 255),
+                    Math.Clamp(pixelColor.G + d, 0, 255),
+                    Math.Clamp(pixelColor.B + d, 0, 255));
             }
         }
 

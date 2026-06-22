@@ -14,6 +14,8 @@ public sealed class ClimateSystem
     public float EnergyModifier { get; private set; } = 1f;
     public bool IsExtremeEvent { get; private set; }
     public string ExtremeEventName { get; private set; } = "";
+    public float WindSpeed { get; private set; } = 0.5f;
+    public float WindDirection { get; private set; }
 
     private float _extremeEventTimer;
     private float _extremeEventDuration;
@@ -45,6 +47,9 @@ public sealed class ClimateSystem
             Season.Winter => (-0.15f, 0.3f, 1.2f),
             _ => (0f, 1f, 1f)
         };
+
+        WindDirection = (WindDirection + (float)rng.NextDouble() * 0.1f) % (MathF.PI * 2);
+        WindSpeed = 0.3f + (float)rng.NextDouble() * 0.6f + Math.Abs(TemperatureModifier) * 2f;
 
         if (_extremeEventTimer > 0)
         {
