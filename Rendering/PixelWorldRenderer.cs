@@ -105,7 +105,7 @@ public sealed class PixelWorldRenderer : IDisposable
         for (int dy = -1; dy <= 1; dy++)
             for (int dx = -1; dx <= 1; dx++)
                 sb.Draw(_worldTexture,
-                    new Rectangle(dx * pw, dy * ph, pw, ph),
+                    new Rectangle(dx * pw, dy * ph, pw + 1, ph + 1),
                     Color.White);
     }
 
