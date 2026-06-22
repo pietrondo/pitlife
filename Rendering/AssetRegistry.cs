@@ -110,7 +110,7 @@ public static class AssetRegistry
         new("Morel", "Content/assets/creatures/plants/fungi/morel.png"),
         new("OysterMushroom", "Content/assets/creatures/plants/fungi/oyster_mushroom.png"),
         new("Mammoth", "Content/assets/creatures/mammals/herbivores/ungulates/moose.png"),
-        new("Sabertooth", "Content/assets/creatures/mammals/carnivores/felids/tiger.png"),
+        new("Sabertooth", "Content/assets/creatures/mammals/carnivores/felids/sabertooth.png"),
         new("Dodo", "Content/assets/creatures/birds/owls/owl.png"),
         new("Trilobite", "Content/assets/creatures/fish/tropical/fish.png"),
         new("Pufferfish", "Content/assets/creatures/fish/tropical/fish.png"),
