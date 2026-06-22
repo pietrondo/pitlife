@@ -550,7 +550,7 @@ public class Game1 : Game
         // Draw the map with Point Clamp (for crisp pixel art matching the minimap)
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
-        _ecosystem.Flow?.DrawOverlay(_spriteBatch, _ecosystem.World.TileSize);
+        //_ecosystem.Flow?.DrawOverlay(_spriteBatch, _ecosystem.World.TileSize);
         _spriteBatch.End();
 
         // Draw the creatures with Point Clamp (for crisp pixel art)

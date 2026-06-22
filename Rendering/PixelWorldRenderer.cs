@@ -11,7 +11,7 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 1; // 1 pixel per tile, GPU bilinear filtering // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
+    private int _renderScale = 4; // 4 sub-pixels per tile for texture detail // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
 
     // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
@@ -102,17 +102,11 @@ public sealed class PixelWorldRenderer : IDisposable
         }
 
         int pw = _world.PixelWidth, ph = _world.PixelHeight;
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp,
-            DepthStencilState.None, RasterizerState.CullCounterClockwise);
         for (int dy = -1; dy <= 1; dy++)
             for (int dx = -1; dx <= 1; dx++)
                 sb.Draw(_worldTexture,
                     new Rectangle(dx * pw, dy * ph, pw, ph),
                     Color.White);
-        sb.End();
-        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp,
-            DepthStencilState.None, RasterizerState.CullCounterClockwise);
     }
 
     private void RedrawWorldTexture(GraphicsDevice gd)
@@ -127,7 +121,21 @@ public sealed class PixelWorldRenderer : IDisposable
         {
             for (int x = 0; x < width; x++)
             {
-                data[y * width + x] = BiomeBaseColors[(int)_world.GetTile(x, y).Biome];
+                float fx = x / (float)_renderScale;
+                float fy = y / (float)_renderScale;
+                int tileX = (int)fx;
+                int tileY = (int)fy;
+                float fracX = fx - tileX;
+                float fracY = fy - tileY;
+
+                Color c00 = BiomeBaseColors[(int)_world.GetTile(tileX, tileY).Biome];
+                Color c10 = BiomeBaseColors[(int)_world.GetTile(Math.Min(tileX + 1, _world.Width - 1), tileY).Biome];
+                Color c01 = BiomeBaseColors[(int)_world.GetTile(tileX, Math.Min(tileY + 1, _world.Height - 1)).Biome];
+                Color c11 = BiomeBaseColors[(int)_world.GetTile(Math.Min(tileX + 1, _world.Width - 1), Math.Min(tileY + 1, _world.Height - 1)).Biome];
+
+                Color top = Color.Lerp(c00, c10, fracX);
+                Color bottom = Color.Lerp(c01, c11, fracX);
+                data[y * width + x] = Color.Lerp(top, bottom, fracY);
             }
         }
 
