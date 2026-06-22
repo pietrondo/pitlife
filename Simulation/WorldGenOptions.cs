@@ -55,13 +55,6 @@ public record WorldGenOptions
         int mapWidth,
         int mapHeight)
     {
-        if (continentCount < 1 || continentCount > 6)
-            throw new ArgumentOutOfRangeException(nameof(continentCount), continentCount, "Must be between 1 and 6");
-        if (seaLevel < 0f || seaLevel > 1f)
-            throw new ArgumentOutOfRangeException(nameof(seaLevel), seaLevel, "Must be between 0 and 1");
-        if (mapWidth < 16 || mapHeight < 16)
-            throw new ArgumentOutOfRangeException(nameof(mapWidth), "Map must be at least 16x16");
-
         Preset = preset;
         ContinentCount = continentCount;
         SeaLevel = seaLevel;
