@@ -63,36 +63,39 @@ public sealed class WorldGenerator
 
     private void BlendWorldEdges()
     {
-        int blend = 4;
+        int blend = 8;
         int w = _world.Width, h = _world.Height;
+        // Left-Right edges
         for (int y = 0; y < h; y++)
-        {
             for (int x = 0; x < blend; x++)
             {
-                float t = x / (float)blend;
                 if (_world.RiverMask[y * w + x] || _world.RiverMask[y * w + (w - 1 - x)]) continue;
-                var left = _world.Tiles[x, y];
-                var right = _world.Tiles[w - 1 - x, y];
-                if (left.Biome != right.Biome && _rng.NextDouble() < t)
-                    _world.Tiles[x, y] = new Tile(right.Biome);
-                if (right.Biome != left.Biome && _rng.NextDouble() < t)
-                    _world.Tiles[w - 1 - x, y] = new Tile(left.Biome);
+                var b = _world.Tiles[w - 1 - x, y].Biome;
+                _world.Tiles[x, y] = new Tile(b);
+                _world.Tiles[w - 1 - x, y] = new Tile(b);
             }
-        }
+        // Top-Bottom edges
         for (int x = 0; x < w; x++)
-        {
             for (int y = 0; y < blend; y++)
             {
                 if (_world.RiverMask[y * w + x] || _world.RiverMask[(h - 1 - y) * w + x]) continue;
-                float t = y / (float)blend;
-                var top = _world.Tiles[x, y];
-                var bottom = _world.Tiles[x, h - 1 - y];
-                if (top.Biome != bottom.Biome && _rng.NextDouble() < t)
-                    _world.Tiles[x, y] = new Tile(bottom.Biome);
-                if (bottom.Biome != top.Biome && _rng.NextDouble() < t)
-                    _world.Tiles[x, h - 1 - y] = new Tile(top.Biome);
+                var b = _world.Tiles[x, h - 1 - y].Biome;
+                _world.Tiles[x, y] = new Tile(b);
+                _world.Tiles[x, h - 1 - y] = new Tile(b);
             }
-        }
+        // Corners
+        for (int y = 0; y < blend; y++)
+            for (int x = 0; x < blend; x++)
+            {
+                int idxTL = y * w + x;
+                int idxBR = (h - 1 - y) * w + (w - 1 - x);
+                if (_world.RiverMask[idxTL] || _world.RiverMask[idxBR]) continue;
+                var b = _world.Tiles[w - 1, h - 1].Biome;
+                _world.Tiles[x, y] = new Tile(b);
+                _world.Tiles[w - 1, h - 1] = new Tile(b);
+                _world.Tiles[w - 1 - x, y] = new Tile(b);
+                _world.Tiles[x, h - 1 - y] = new Tile(b);
+            }
     }
 
     private void EnsureAllBiomesPresent()
