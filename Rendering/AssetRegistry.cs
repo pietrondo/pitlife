@@ -121,7 +121,7 @@ public static class AssetRegistry
         new("Ant", "Content/assets/creatures/invertebrates/insects/beetle.png"),
         new("Bee", "Content/assets/creatures/invertebrates/insects/butterfly.png"),
         new("Wasp", "Content/assets/creatures/invertebrates/insects/beetle.png"),
-        new("Mantis", "Content/assets/creatures/invertebrates/insects/beetle.png"),
+        new("Mantis", "Content/assets/creatures/invertebrates/insects/mantis.png"),
         new("Dragonfly", "Content/assets/creatures/invertebrates/insects/butterfly.png"),
         new("Crab", "Content/assets/creatures/fish/tropical/fish.png"),
         new("Lobster", "Content/assets/creatures/fish/shark.png"),
