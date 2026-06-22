@@ -11,7 +11,7 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 1; // 1:1 pixel-to-tile ratio for clean pixel art
+    private int _renderScale = 4; // 4x4 sub-pixels per tile for smoother look
 
     // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
