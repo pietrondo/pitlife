@@ -433,6 +433,16 @@ internal static class BuiltinSpecies
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.Beach], size: 0.8f);
         RegisterAnimal("Trilobite", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Swarm,
             biomes: Shallow, size: 0.3f);
+        RegisterAnimal("Pufferfish", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary,
+            biomes: ShallowOrDeep, size: 0.5f);
+        RegisterAnimal("PoisonFrog", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Swamp, BiomeType.Forest], size: 0.4f);
+        RegisterPlant("Belladonna", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            biomes: [BiomeType.Forest, BiomeType.Swamp]);
+        RegisterPlant("VenusFlyTrap", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            biomes: [BiomeType.Swamp]);
+        RegisterPlant("PitcherPlant", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            biomes: [BiomeType.Swamp, BiomeType.Forest]);
     }
 
     private static void RegisterPlant(

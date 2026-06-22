@@ -20,6 +20,9 @@ public abstract class Creature
     public float DiseaseTimer { get; set; }
     public string DiseaseName { get; set; } = "";
     public float Immunity { get; set; }
+    public bool IsPoisonous { get; set; }
+    public float Toxicity { get; set; }
+    public float NutritionalValue => Genome.Size * 5f * (1f - Toxicity * 0.7f);
     public float LastReproductionTime { get; set; } = -60f;
     public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
     public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;

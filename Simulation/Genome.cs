@@ -19,6 +19,7 @@ public struct Genome
     public float Aggression;
     public float Sociability;
     public float Intelligence;
+    public float PlantRecognition;
     public GeneticProfile Genetics;
 
     public float Heterozygosity => EnsureGeneticProfile().Heterozygosity;

@@ -113,6 +113,11 @@ public static class AssetRegistry
         new("Sabertooth", "Content/assets/creatures/mammals/carnivores/felids/tiger.png"),
         new("Dodo", "Content/assets/creatures/birds/owls/owl.png"),
         new("Trilobite", "Content/assets/creatures/fish/tropical/fish.png"),
+        new("Pufferfish", "Content/assets/creatures/fish/tropical/fish.png"),
+        new("PoisonFrog", "Content/assets/creatures/amphibians/anurans/frog.png"),
+        new("Belladonna", "Content/assets/creatures/plants/flowers/lavender.png"),
+        new("VenusFlyTrap", "Content/assets/creatures/plants/flowers/sunflower.png"),
+        new("PitcherPlant", "Content/assets/creatures/plants/flowers/flowers.png"),
     };
 
     public static IReadOnlyList<SpeciesAsset> SpeciesTextures

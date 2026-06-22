@@ -240,6 +240,7 @@ public class Ecosystem
                     var tile = World.GetTileAtPosition(c.Position.X, c.Position.Y);
                     if (tile.GrassAmount < tile.MaxGrass)
                         tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
+                    tile.SoilNutrients = Math.Min(2f, tile.SoilNutrients + 0.1f);
                     _spatialGrid.Remove(c);
                     Creatures.RemoveAt(i);
                 }

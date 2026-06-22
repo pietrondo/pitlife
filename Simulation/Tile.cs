@@ -20,6 +20,7 @@ public class Tile
     public float Vegetation { get; set; }
     public float MaxGrass { get; set; }
     public float GrassAmount { get; set; }
+    public float SoilNutrients { get; set; } = 1f;
     public bool IsPassable => Biome != BiomeType.DeepOcean
                             && Biome != BiomeType.ShallowWater
                             && Biome != BiomeType.Snow
@@ -45,7 +46,7 @@ public class Tile
 
     public void RegenerateGrass(float dt)
     {
-        float regenRate = 0.02f;
+        float regenRate = 0.02f * SoilNutrients;
         GrassAmount = Math.Min(MaxGrass, GrassAmount + regenRate * dt);
     }
 

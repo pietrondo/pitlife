@@ -46,6 +46,11 @@ public sealed class CreatureSpawner
         Creature c = (Creature)Activator.CreateInstance(def.CreatureType, position, genome, def.Species)!;
         if (c.CreatureType != CreatureType.Plant)
             c.Gender = _ecosystem.Random.Next(2) == 0 ? Gender.Male : Gender.Female;
+        if (c.Species is "Pufferfish" or "PoisonFrog" or "Belladonna" or "VenusFlyTrap" or "PitcherPlant")
+        {
+            c.Toxicity = 0.8f;
+            c.IsPoisonous = true;
+        }
         _ecosystem.AddCreature(c);
         return true;
     }

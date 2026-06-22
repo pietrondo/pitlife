@@ -107,9 +107,17 @@ public sealed class BaseBehavior : ICreatureBehavior
                 {
                     float eaten = Math.Min(food.Energy, 10f * dt);
                     food.Energy -= eaten;
-                    self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
-                    if (food.Energy <= 0) food.Die(DeathCause.Predation);
+                    if (food.IsPoisonous && self.Genome.PlantRecognition < 0.5f)
+                    {
+                        self.Energy -= eaten * 3f;
+                        self.RememberDanger(food.Position);
+                    }
+                    else
+                    {
+                        self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
+                    }
                     self.RememberFood(food.Position);
+                    if (food.Energy <= 0) food.Die(DeathCause.Predation);
                 }
                 else
                 {
@@ -131,7 +139,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     {
                         float damage = carn.AttackDamage * dt;
                         prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                        self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
+                        self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
                         if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     }
                     else
@@ -155,7 +163,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                     {
                         float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
                         prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                        self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
+                        self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
                         if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     }
                     else
@@ -212,7 +220,7 @@ public sealed class BaseBehavior : ICreatureBehavior
                 {
                     float damage = carn.AttackDamage * dt;
                     prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                    self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
+                    self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
                     if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                     return true;
                 }
@@ -226,7 +234,7 @@ public sealed class BaseBehavior : ICreatureBehavior
             {
                 float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
                 prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                self.Energy = Math.Min(self.Energy + damage * 1.5f, self.MaxEnergy);
+                self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
                 if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                 return true;
             }
