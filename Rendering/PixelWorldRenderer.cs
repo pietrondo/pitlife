@@ -30,6 +30,7 @@ public sealed class PixelWorldRenderer : IDisposable
         new(235, 240, 245),  // Snow
         new(0, 180, 160),     // CoralReef
         new(70, 60, 50),      // Cave
+        new(170, 50, 20),     // Volcano
     };
 
     // Slightly darker variation for subtle texture
@@ -49,6 +50,7 @@ public sealed class PixelWorldRenderer : IDisposable
         new(220, 225, 230),  // Snow dark
         new(0, 160, 140),     // CoralReef dark
         new(55, 45, 38),      // Cave dark
+        new(140, 40, 10),     // Volcano dark
     };
 
     // Slightly lighter variation for subtle highlights
@@ -68,6 +70,7 @@ public sealed class PixelWorldRenderer : IDisposable
         new(250, 255, 255),  // Snow light
         new(0, 210, 190),     // CoralReef light
         new(85, 72, 62),      // Cave light
+        new(200, 70, 35),     // Volcano light
     };
 
     public PixelWorldRenderer(World world, int seed)

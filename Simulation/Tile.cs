@@ -61,6 +61,7 @@ public class Tile
             BiomeType.Beach => 0.1f,
             BiomeType.CoralReef => 0.9f,
             BiomeType.Cave => 0f,
+            BiomeType.Volcano => 0.3f,
             _ => 0.0f
         };
 

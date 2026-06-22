@@ -53,6 +53,7 @@ public sealed class WorldGenerator
 
         PlaceCoralReefs();
         PlaceCaves();
+        PlaceVolcanoes();
         CarveRivers(_rng.Next());
         SmoothTerrain();
         EnsureAllBiomesPresent();
@@ -66,7 +67,7 @@ public sealed class WorldGenerator
             BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest,
             BiomeType.Desert, BiomeType.Savanna, BiomeType.Swamp,
             BiomeType.Mountain, BiomeType.Snow, BiomeType.Tundra,
-            BiomeType.CoralReef, BiomeType.Cave
+            BiomeType.CoralReef, BiomeType.Cave, BiomeType.Volcano
         };
 
         var present = new HashSet<BiomeType>();
@@ -120,6 +121,22 @@ public sealed class WorldGenerator
                             mountainNeighbors++;
                 if (mountainNeighbors >= 7 && _rng.NextDouble() < 0.15f)
                     _world.Tiles[x, y] = new Tile(BiomeType.Cave);
+            }
+        }
+    }
+
+    private void PlaceVolcanoes()
+    {
+        int placed = 0;
+        int maxVolcanoes = Math.Max(1, _world.Width * _world.Height / 3000);
+        for (int attempt = 0; attempt < 100 && placed < maxVolcanoes; attempt++)
+        {
+            int x = _rng.Next(1, _world.Width - 1);
+            int y = _rng.Next(1, _world.Height - 1);
+            if (_world.Tiles[x, y].Biome == BiomeType.Mountain && _rng.NextDouble() < 0.2f)
+            {
+                _world.Tiles[x, y] = new Tile(BiomeType.Volcano);
+                placed++;
             }
         }
     }

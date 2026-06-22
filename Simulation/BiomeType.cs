@@ -15,5 +15,6 @@ public enum BiomeType
     Mountain,
     Snow,
     CoralReef,
-    Cave
+    Cave,
+    Volcano
 }

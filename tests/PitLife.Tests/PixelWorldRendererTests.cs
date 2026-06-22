@@ -25,11 +25,11 @@ public class PixelWorldRendererTests
         var detailColors = PixelWorldRenderer.GetBiomeDetailColors();
         var highlightColors = PixelWorldRenderer.GetBiomeHighlightColors();
 
-        Assert.Equal(14, baseColors.Length);
-        Assert.Equal(14, detailColors.Length);
-        Assert.Equal(14, highlightColors.Length);
+        Assert.Equal(15, baseColors.Length);
+        Assert.Equal(15, detailColors.Length);
+        Assert.Equal(15, highlightColors.Length);
 
-        for (int i = 0; i < 14; i++)
+        for (int i = 0; i < 15; i++)
         {
             Assert.False(baseColors[i].R == 0 && baseColors[i].G == 0 && baseColors[i].B == 0,
                 $"Biome {i} has black base color");

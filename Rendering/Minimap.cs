@@ -134,6 +134,7 @@ public class Minimap
         BiomeType.Snow => new Color(235, 240, 245),
         BiomeType.CoralReef => new Color(0, 180, 160),
         BiomeType.Cave => new Color(60, 50, 45),
+        BiomeType.Volcano => new Color(170, 50, 20),
         _ => Color.Magenta
     };
 
@@ -154,6 +155,7 @@ public class Minimap
         new Color(235, 240, 245),  // Snow
         new Color(0, 180, 160),    // CoralReef
         new Color(70, 60, 50),     // Cave
+        new Color(170, 50, 20),    // Volcano
     ];
 
     private static Color GetCreatureColor(CreatureType type) => type switch
