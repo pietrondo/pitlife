@@ -30,8 +30,8 @@ public sealed class WorldGenerator
             for (int x = 0; x < w; x++)
             {
                 float theta = x / (float)w * MathF.PI * 2f;
-                float sx = MathF.Sin(theta) * 4f + phi * 2f;
-                float sy = MathF.Cos(theta) * 4f + phi * 2f;
+                float sx = MathF.Cos(theta) * 5f + y * 0.3f;
+                float sy = MathF.Sin(theta) * 5f + y * 0.3f;
 
                 float elev = (noise.GetNoise(sx, sy) + 1f) * 0.5f;
                 float cont = (noise.GetNoise(sx + 3f, sy + 3f) + 1f) * 0.5f;
