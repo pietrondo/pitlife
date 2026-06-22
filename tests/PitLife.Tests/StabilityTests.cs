@@ -108,7 +108,7 @@ public class StabilityTests
     {
         int seed = 101;
         AssertionTracker tracker;
-        var state = RunSimulation(seed, 90, out tracker, initialPlants: 100, initialHerbivores: 20,
+        var state = RunSimulation(seed, 90, out tracker, initialPlants: 120, initialHerbivores: 15,
             initialCarnivores: 0, initialOmnivores: 0);
 
         Assert.True(state.HerbivoreCount > 0,

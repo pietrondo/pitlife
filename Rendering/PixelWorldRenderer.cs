@@ -11,7 +11,7 @@ public sealed class PixelWorldRenderer : IDisposable
     private readonly FastNoiseLite _noise;
     private RenderTarget2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 8; // 8 sub-pixels per tile for smooth look
+    private int _renderScale = 12; // 8 sub-pixels per tile for smooth look
 
     // Biome colors matching the minimap (clean base colors)
     private static readonly Color[] BiomeBaseColors =
@@ -131,21 +131,20 @@ public sealed class PixelWorldRenderer : IDisposable
                 Color baseColor = BiomeBaseColors[(int)_world.GetTile(tileX, tileY).Biome];
 
                 // Edge smoothing: blend with neighboring tile colors
-                if (fracX < 0.2f && tileX > 0)
+                if (fracX < 0.3f && tileX > 0)
                 {
                     Color left = BiomeBaseColors[(int)_world.GetTile(tileX - 1, tileY).Biome];
-                    float t = (0.2f - fracX) / 0.2f;
-                    baseColor = Color.Lerp(baseColor, left, t * 0.8f);
+                    float t = (0.3f - fracX) / 0.3f;
+                    baseColor = Color.Lerp(baseColor, left, t * 0.6f);
                 }
-                if (fracY < 0.2f && tileY > 0)
+                if (fracY < 0.3f && tileY > 0)
                 {
                     Color top = BiomeBaseColors[(int)_world.GetTile(tileX, tileY - 1).Biome];
-                    float t = (0.2f - fracY) / 0.2f;
-                    baseColor = Color.Lerp(baseColor, top, t * 0.8f);
+                    float t = (0.3f - fracY) / 0.3f;
+                    baseColor = Color.Lerp(baseColor, top, t * 0.6f);
                 }
 
-                // Noise variation for texture
-                float noise = (_noise.GetNoise(x * 0.3f, y * 0.3f) + 1f) * 0.5f;
+                float noise = (_noise.GetNoise(x * 0.2f, y * 0.2f) + 1f) * 0.5f;
                 float brightness = 0.8f + noise * 0.4f;
                 int r = (int)(baseColor.R * brightness);
                 int g = (int)(baseColor.G * brightness);

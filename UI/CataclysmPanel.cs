@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PitLife.Core;
 
 namespace PitLife.UI;
 
@@ -58,6 +59,7 @@ public sealed class CataclysmPanel
                 if (b.Contains(mouse.Position))
                 {
                     SelectedType = (string)btn.Tag!;
+                    Logger.Debug($"CataclysmPanel: selected {SelectedType}");
                     return true;
                 }
                 y += 26;

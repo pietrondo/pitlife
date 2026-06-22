@@ -308,6 +308,7 @@ public abstract class Creature
         IsAlive = false;
         DeathCause = cause;
         Logger.Event("DEATH", $"{Species} died at age {Age:F1}s, energy {Energy:F1}, cause={cause}");
+        Logger.Debug($"DEATH_DETAIL: {Species} age={Age:F1} energy={Energy:F1} pos=({Position.X:F0},{Position.Y:F0}) cause={cause} thirst={Thirst:F0} infected={IsInfected}");
     }
 
     public void Wander(World world, float dt, Random random, float radius)
@@ -482,9 +483,10 @@ public abstract class Creature
 
     protected static Vector2 ClampToWorld(Vector2 pos, World? world = null)
     {
-        float maxX = world?.PixelWidth - 1 ?? float.MaxValue;
-        float maxY = world?.PixelHeight - 1 ?? float.MaxValue;
-        return new(Math.Clamp(pos.X, 1, maxX), Math.Clamp(pos.Y, 1, maxY));
+        if (world == null) return pos;
+        return new Vector2(
+            ((pos.X % world.PixelWidth) + world.PixelWidth) % world.PixelWidth,
+            ((pos.Y % world.PixelHeight) + world.PixelHeight) % world.PixelHeight);
     }
 
     protected abstract Creature CreateChild(Vector2 position, Genome genome, Random rng);
