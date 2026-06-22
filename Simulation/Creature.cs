@@ -70,6 +70,7 @@ public abstract class Creature
     public Vector2? Waypoint { get; set; }
     public ICreatureBehavior Behavior { get; set; } = new BaseBehavior();
     public Creature? Parent { get; set; }
+    public Vector2 HomePosition { get; set; }
     public float Thirst { get; set; }
     private const float MaxThirst = 100f;
     private const float WaypointReachedDistance = 14f;
@@ -77,6 +78,7 @@ public abstract class Creature
     protected Creature(Vector2 position, Genome genome, CreatureType type)
     {
         Position = ClampToWorld(position);
+        HomePosition = Position;
         Genome = genome;
         Energy = MaxEnergy * 0.5f;
         CreatureType = type;
@@ -256,7 +258,21 @@ public abstract class Creature
     public void Wander(World world, float dt, Random random, float radius)
     {
         if (Waypoint == null || Vector2.Distance(Position, Waypoint.Value) < WaypointReachedDistance)
-            Waypoint = PickWaypoint(world, random, radius);
+        {
+            float distFromHome = Vector2.Distance(Position, HomePosition);
+            if (distFromHome > radius * 3f)
+                Waypoint = HomePosition;
+            else
+                Waypoint = PickWaypoint(world, random, radius);
+        }
+
+        // Migrate if home area depleted
+        if (CreatureType != CreatureType.Plant)
+        {
+            var homeTile = world.GetTileAtPosition(HomePosition.X, HomePosition.Y);
+            if (homeTile.GrassAmount < 0.05f && random.NextDouble() < 0.0005f)
+                HomePosition = Position;
+        }
 
         if (Waypoint.HasValue)
             MoveToward(Waypoint.Value, dt, world);
