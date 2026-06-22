@@ -24,6 +24,8 @@ Rules:
 
 5. **I'm always open to ideas on better ways to do things.** Please don't hesitate to suggest a better way, or one that has long lasting impact over a tactical change.
 
+6. **Keep it scalable.** Prefer data-driven configuration (JSON, YAML) over hardcoded values in C#. Species, biomes, items, behaviors should be defined in external config files, not in source code. New content should not require recompilation.
+
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:full hash:f65d5d33 -->
 ## Issue Tracking with bd (beads)

@@ -443,6 +443,22 @@ internal static class BuiltinSpecies
             biomes: [BiomeType.Swamp]);
         RegisterPlant("PitcherPlant", PlantReproductionMode.Seeds, PollinationMode.Insects,
             biomes: [BiomeType.Swamp, BiomeType.Forest]);
+        RegisterAnimal("Ant", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm,
+            biomes: Land, size: 0.2f);
+        RegisterAnimal("Bee", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Swarm,
+            biomes: Land, size: 0.15f);
+        RegisterAnimal("Wasp", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm,
+            biomes: Land, size: 0.2f);
+        RegisterAnimal("Mantis", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Grassland, BiomeType.Forest], size: 0.3f);
+        RegisterAnimal("Dragonfly", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Swamp, BiomeType.ShallowWater], size: 0.25f);
+        RegisterAnimal("Crab", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.Beach, BiomeType.ShallowWater], size: 0.3f);
+        RegisterAnimal("Lobster", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary,
+            biomes: [BiomeType.DeepOcean, BiomeType.ShallowWater], size: 0.4f);
+        RegisterAnimal("Shrimp", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School,
+            biomes: ShallowOrDeep, size: 0.1f);
     }
 
     private static void RegisterPlant(

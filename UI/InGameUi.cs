@@ -119,8 +119,8 @@ public sealed class InGameUi
     {
         LayoutToolbar(viewportHeight);
         var toolbar = new Rectangle(8, viewportHeight - 60, 522, 52);
-        UiPrimitives.Fill(spriteBatch, pixel, toolbar, UiTheme.PanelBeige);
-        UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.ButtonShadow);
+        UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
+        UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
         _statisticsButton.Draw(spriteBatch, pixel, font, mouse, false);
         _creatureButton.Draw(spriteBatch, pixel, font, mouse, false);
         _arrangeButton.Draw(spriteBatch, pixel, font, mouse, false);

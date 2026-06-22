@@ -41,34 +41,39 @@ public sealed class UiWindow
 
     public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, bool isActive = true, Point mousePosition = default)
     {
-        // 3D shadow
-        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 4, Bounds.Y + 4, Bounds.Width, Bounds.Height), UiTheme.Shadow);
-        // Window body
-        UiPrimitives.Fill(spriteBatch, pixel, Bounds, UiTheme.PanelBeige);
-        // 3D border
-        UiPrimitives.Border(spriteBatch, pixel, Bounds, 2, UiTheme.ButtonHighlight);
-        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.Right, Bounds.Y, 2, Bounds.Height), UiTheme.ButtonShadow);
-        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X, Bounds.Bottom, Bounds.Width + 2, 2), UiTheme.ButtonShadow);
+        // Draw shadow
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 8, Bounds.Y + 8, Bounds.Width, Bounds.Height), UiTheme.Shadow);
+        // Draw window surface
+        UiPrimitives.Fill(spriteBatch, pixel, Bounds, UiTheme.ForestNight);
+        
+        // Draw border: active/focused windows get a bright Moss Signal border, inactive ones get a Bark Edge border
+        UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, isActive ? UiTheme.MossSignal : UiTheme.BarkEdge);
 
         Rectangle titleBar = TitleBarBounds;
-        UiPrimitives.Fill(spriteBatch, pixel, titleBar, isActive ? UiTheme.TitleBarBlue : UiTheme.DeepGrove);
-
+        UiPrimitives.Fill(spriteBatch, pixel, titleBar, UiTheme.DeepGrove);
+        
+        // Only draw the separator line between title and content if the window is NOT collapsed
         if (!IsCollapsed)
-            UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(titleBar.X, titleBar.Bottom - 2, titleBar.Width, 2), UiTheme.ButtonShadow);
+        {
+            UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(titleBar.X, titleBar.Bottom - 2, titleBar.Width, 2), UiTheme.BarkEdge);
+        }
 
-        Vector2 size = font.MeasureString(Title);
+        const float scale = 1.15f;
+        Vector2 size = font.MeasureString(Title) * scale;
         var position = new Vector2(titleBar.Center.X - size.X / 2f, titleBar.Center.Y - size.Y / 2f);
-        spriteBatch.DrawString(font, Title, position, UiTheme.TitleText, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+        spriteBatch.DrawString(font, Title, position, UiTheme.WarmParchment, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
 
         if (ShowCloseButton)
         {
             Rectangle close = CloseButtonBounds;
             bool isHovered = close.Contains(mousePosition);
-            Color closeColor = isHovered ? Color.Lerp(UiTheme.DangerClay, Color.White, 0.25f) : UiTheme.ButtonFace;
+            // Highlight close button when hovered
+            Color closeColor = isHovered ? Color.Lerp(UiTheme.DangerClay, Color.White, 0.25f) : UiTheme.DangerClay;
+
             UiPrimitives.Fill(spriteBatch, pixel, close, closeColor);
-            UiPrimitives.Border(spriteBatch, pixel, close, 1, UiTheme.ButtonShadow);
+            UiPrimitives.Border(spriteBatch, pixel, close, 2, UiTheme.WarmParchment);
             Vector2 closeSize = font.MeasureString("X");
-            spriteBatch.DrawString(font, "X", new Vector2(close.Center.X - closeSize.X / 2f, close.Center.Y - closeSize.Y / 2f), Color.Black);
+            spriteBatch.DrawString(font, "X", new Vector2(close.Center.X - closeSize.X / 2f, close.Center.Y - closeSize.Y / 2f), UiTheme.WarmParchment);
         }
     }
 }

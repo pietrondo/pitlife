@@ -69,6 +69,13 @@ public class Game1 : Game
     protected override void Initialize()
     {
         _speciesCatalogRuntime.CatalogChanged += OnSpeciesCatalogChanged;
+        string bundledCatalog = Path.Combine(Content.RootDirectory, "species.json");
+        if (File.Exists(bundledCatalog))
+        {
+            var bundledErrors = _speciesCatalogRuntime.LoadAndApply(bundledCatalog, Directory.GetCurrentDirectory());
+            if (bundledErrors.Count > 0)
+                Logger.Warn($"Bundled species catalog: {bundledErrors.Count} validation error(s)");
+        }
         IReadOnlyList<SpeciesCatalogValidationError> catalogErrors = _speciesCatalogRuntime.LoadAndApply(
             SpeciesCatalogRuntime.DefaultCatalogPath,
             Directory.GetCurrentDirectory());
