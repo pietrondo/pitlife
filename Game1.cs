@@ -355,6 +355,7 @@ public class Game1 : Game
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
             _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            _worldRenderer.Invalidate();
             Logger.Event("CATACLYSM", $"Player triggered {_inGameUi.SelectedCataclysm} at ({catPos.X:F0},{catPos.Y:F0})");
             _inGameUi.SelectedCataclysm = null;
         }

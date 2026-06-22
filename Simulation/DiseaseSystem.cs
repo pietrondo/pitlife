@@ -24,7 +24,7 @@ public sealed class DiseaseSystem
     ];
 
     private DiseaseDef _activeDisease;
-    private float _outbreakTimer;
+    private float _outbreakTimer = 60f;
     private bool _hasOutbreak;
 
     public bool HasOutbreak => _hasOutbreak;
