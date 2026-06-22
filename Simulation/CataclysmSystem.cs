@@ -94,6 +94,25 @@ public sealed class CataclysmSystem
         TriggerMassExtinction(ecosystem, rng);
     }
 
+    public void TriggerAt(Ecosystem ecosystem, Random rng, string type, Microsoft.Xna.Framework.Vector2 position)
+    {
+        ActiveEvent = type;
+        IsActive = true;
+        Timer = 40f;
+        GrassMultiplier = type switch { "Drought" => 0.1f, "Flood" => 2.5f, _ => 0.2f };
+        int tx = (int)(position.X / ecosystem.World.TileSize);
+        int ty = (int)(position.Y / ecosystem.World.TileSize);
+        int radius = type switch { "Asteroid" => 6, "Supervolcano" => 5, "Earthquake" => 8, _ => 3 };
+        for (int dy = -radius; dy <= radius; dy++)
+            for (int dx = -radius; dx <= radius; dx++)
+            {
+                var tile = ecosystem.World.GetTile(tx + dx, ty + dy);
+                if (tile.Biome != BiomeType.DeepOcean && tile.Biome != BiomeType.ShallowWater)
+                { tile.GrassAmount = type == "Flood" ? tile.MaxGrass : 0f; tile.SoilNutrients = type == "Flood" ? 2f : 0.1f; }
+            }
+        Logger.Event("CATACLYSM", $"Player {type} at ({tx},{ty}) r={radius}");
+    }
+
     public void UpdateVolcanoes(Ecosystem ecosystem, float dt, Random rng)
     {
         for (int y = 0; y < ecosystem.World.Height; y++)

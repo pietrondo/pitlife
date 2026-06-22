@@ -11,6 +11,8 @@ public sealed class InGameUi
     public const string StatisticsWindowId = "statistics";
     public const string CreatureWindowId = "creature";
     public const string TerrainWindowId = "terrain";
+    public const string CataclysmWindowId = "cataclysm";
+    public string? SelectedCataclysm { get; set; }
 
     private readonly UiWindowManager _windowManager = new();
     private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));
@@ -38,6 +40,11 @@ public sealed class InGameUi
         _windowManager.Add(new UiWindow(I18n.T("window.terrain"), TerrainWindowId)
         {
             Bounds = new Rectangle(32, 352, 320, 180),
+            ShowCloseButton = true
+        });
+        _windowManager.Add(new UiWindow(I18n.T("window.cataclysm"), CataclysmWindowId)
+        {
+            Bounds = new Rectangle(370, 88, 220, 200),
             ShowCloseButton = true
         });
     }
@@ -71,6 +78,8 @@ public sealed class InGameUi
             _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
         if (Pressed(keyboard, previousKeyboard, Keys.F5))
             _windowManager.TileWindows(viewportWidth, viewportHeight);
+        if (Pressed(keyboard, previousKeyboard, Keys.F8))
+            _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
 
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
@@ -152,6 +161,10 @@ public sealed class InGameUi
             else if (window.Id == TerrainWindowId)
             {
                 DrawTerrainWindow(spriteBatch, pixel, font, window.ContentBounds);
+            }
+            else if (window.Id == CataclysmWindowId)
+            {
+                DrawCataclysmWindow(spriteBatch, pixel, font, window.ContentBounds);
             }
         }
     }
@@ -342,5 +355,31 @@ public sealed class InGameUi
         DrawLine(spriteBatch, font, content.X, content.Y + 50, I18n.Format("terrain.elevation", elevation), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, content.X, content.Y + 72, I18n.Format("terrain.passable", passStr), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, content.X, content.Y + 94, I18n.Format("terrain.river", riverStr), UiTheme.WarmParchment);
+    }
+
+    private void DrawCataclysmWindow(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content)
+    {
+        int y = content.Y;
+        string[] cataclysms = ["Asteroid", "IceAge", "Supervolcano", "Earthquake", "Drought", "Flood"];
+        Color[] colors = [new(255,100,50), new(100,200,255), new(255,60,20), new(180,140,100), new(255,180,40), new(40,140,255)];
+        var mouse = Microsoft.Xna.Framework.Input.Mouse.GetState();
+
+        for (int i = 0; i < cataclysms.Length; i++)
+        {
+            var btn = new UiButton(cataclysms[i]) { Tag = cataclysms[i] };
+            btn.Bounds = new Rectangle(content.X, y, content.Width, 22);
+            bool sel = SelectedCataclysm == cataclysms[i];
+            btn.Draw(sb, pixel, font, mouse, sel);
+            if (sel)
+            {
+                var txtSize = font.MeasureString("Click map to place");
+                sb.DrawString(font, "Click map to place", new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
+            }
+            if (btn.WasClicked(mouse, new Microsoft.Xna.Framework.Input.MouseState()))
+            {
+                SelectedCataclysm = (string)btn.Tag!;
+            }
+            y += 26;
+        }
     }
 }

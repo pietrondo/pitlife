@@ -350,6 +350,15 @@ public class Game1 : Game
             }
         }
         else if (!pointerOverUi && !spawnPanelConsumed &&
+            _inGameUi.SelectedCataclysm != null &&
+            mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
+        {
+            var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
+            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            Logger.Event("CATACLYSM", $"Player triggered {_inGameUi.SelectedCataclysm} at ({catPos.X:F0},{catPos.Y:F0})");
+            _inGameUi.SelectedCataclysm = null;
+        }
+        else if (!pointerOverUi && !spawnPanelConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
