@@ -26,7 +26,7 @@ public sealed class InGameUi
     {
         _windowManager.Add(new UiWindow(I18n.T("window.statistics"), StatisticsWindowId)
         {
-            Bounds = new Rectangle(32, 88, 320, 248),
+            Bounds = new Rectangle(32, 88, 320, 288),
             IsOpen = true,
             ShowCloseButton = true
         });

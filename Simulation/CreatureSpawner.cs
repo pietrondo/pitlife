@@ -41,8 +41,7 @@ public sealed class CreatureSpawner
             return false;
 
         var genome = Genome.Random(_ecosystem.Random);
-        if (def.DefaultSize != 1.0f)
-            genome.Size = def.DefaultSize;
+        genome.Size = def.DefaultSize;
 
         Creature c = (Creature)Activator.CreateInstance(def.CreatureType, position, genome, def.Species)!;
         if (c.CreatureType != CreatureType.Plant)
