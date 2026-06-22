@@ -139,11 +139,11 @@ public sealed class InGameUi
 
             if (window.Id == StatisticsWindowId)
             {
-                int neededHeight = DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
+                int baseHeight = metrics != null ? 340 : 280;
+                if (window.Bounds.Height < baseHeight)
+                    window.Bounds = new Rectangle(window.Bounds.X, window.Bounds.Y, window.Bounds.Width, baseHeight);
+                DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
                     plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
-                int totalNeeded = neededHeight + 46;
-                if (totalNeeded > window.Bounds.Height)
-                    window.Bounds = new Rectangle(window.Bounds.X, window.Bounds.Y, window.Bounds.Width, totalNeeded);
             }
             else if (window.Id == CreatureWindowId)
             {
