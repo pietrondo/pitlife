@@ -26,21 +26,23 @@ public sealed class UiButton
     public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool isFocused)
     {
         bool hovered = IsHovered(mouse);
-        Color fill = hovered || isFocused ? UiTheme.ForestNight : UiTheme.DeepGrove;
-        Color border = IsDestructive ? UiTheme.DangerClay : UiTheme.BarkEdge;
+        Color fill = hovered ? UiTheme.ButtonFace : UiTheme.PanelBeige;
+        Color border = IsDestructive ? UiTheme.DangerClay : UiTheme.ButtonShadow;
 
-        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 4, Bounds.Y + 4, Bounds.Width, Bounds.Height), UiTheme.Shadow);
         UiPrimitives.Fill(spriteBatch, pixel, Bounds, fill);
-        UiPrimitives.Border(spriteBatch, pixel, Bounds, 2, border);
+        // 3D raised border
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, 2), UiTheme.ButtonHighlight);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X, Bounds.Y, 2, Bounds.Height), UiTheme.ButtonHighlight);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X, Bounds.Bottom - 2, Bounds.Width, 2), UiTheme.ButtonShadow);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.Right - 2, Bounds.Y, 2, Bounds.Height), UiTheme.ButtonShadow);
 
         if (isFocused)
             UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, UiTheme.MossSignal);
 
-        const float scale = 1.1f;
-        Vector2 size = font.MeasureString(Text) * scale;
+        Vector2 size = font.MeasureString(Text);
         Vector2 position = new(
             Bounds.Center.X - size.X / 2f,
             Bounds.Center.Y - size.Y / 2f);
-        spriteBatch.DrawString(font, Text, position, UiTheme.WarmParchment, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        spriteBatch.DrawString(font, Text, position, Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
     }
 }

@@ -175,8 +175,8 @@ public sealed class SpawnPanel
 
         if (!IsOpen) return;
 
-        UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(11, 23, 18, 235));
-        UiPrimitives.Border(sb, pixel, _panelBounds, 2, new Color(107, 81, 55));
+        UiPrimitives.Fill(sb, pixel, _panelBounds, UiTheme.PanelBeige);
+        UiPrimitives.Border(sb, pixel, _panelBounds, 2, UiTheme.ButtonShadow);
 
         sb.DrawString(font, I18n.T("spawn.title"),
             new Vector2(_panelBounds.X + 10, _panelBounds.Y + 6), UiTheme.MossSignal);
@@ -248,9 +248,9 @@ public sealed class SpawnPanel
     {
         bool isHover = _toggleBounds.Contains(mouse.Position);
         Color bg = IsOpen ? new Color(78, 156, 181, 230) :
-            (isHover ? new Color(11, 23, 18, 240) : new Color(11, 23, 18, 200));
+            (isHover ? UiTheme.ButtonFace : UiTheme.PanelBeige);
         UiPrimitives.Fill(sb, pixel, _toggleBounds, bg);
-        UiPrimitives.Border(sb, pixel, _toggleBounds, 2, IsOpen ? UiTheme.MossSignal : new Color(107, 81, 55));
+        UiPrimitives.Border(sb, pixel, _toggleBounds, 2, UiTheme.ButtonShadow);
 
         if (_iconTexture != null)
         {
