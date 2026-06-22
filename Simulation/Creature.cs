@@ -179,7 +179,8 @@ public abstract class Creature
         if (CreatureType == CreatureType.Plant) return;
         float seasonalFactor = ecosystem.Climate.EnergyModifier;
         float pressureFactor = ecosystem.PopulationPressure;
-        Energy -= EnergyConsumption * (seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f) * (1f / 60f);
+        float o2Factor = 2f - ecosystem.Atmosphere.OxygenModifier;
+        Energy -= EnergyConsumption * (seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f) * (1f / 60f);
     }
 
     private void UpdateEnvironmentalMultipliers(World world)

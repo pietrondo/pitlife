@@ -633,6 +633,10 @@ public class Game1 : Game
         y += (int)lineH;
         sb.DrawString(font, $"{I18n.T("stats.species")}:{m.SpeciesCount} {I18n.T("stats.het")}:{m.MeanHeterozygosity:F2} {I18n.T("stats.inb")}:{m.MeanInbreeding:F2} {I18n.T("stats.subsp")}:{m.TotalSubspecies}",
             new Vector2(x, y), c);
+        y += (int)lineH;
+        var atm = _ecosystem.Atmosphere;
+        sb.DrawString(font, $"O2:{atm.Oxygen:F0}% CO2:{atm.CO2:F0}%",
+            new Vector2(x, y), c);
         if (m.LastDeathSpecies.Length > 0)
         {
             y += (int)lineH;
