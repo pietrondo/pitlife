@@ -238,41 +238,6 @@ public class Ecosystem
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         UpdateStats();
-        SpawnWave(dt);
-    }
-
-    private float _spawnTimer;
-    private void SpawnWave(float dt)
-    {
-        _spawnTimer += dt;
-        if (_spawnTimer < 8f) return;
-        _spawnTimer = 0f;
-
-        // Only spawn if world is severely depopulated
-        int total = PlantCount + HerbivoreCount + CarnivoreCount + OmnivoreCount;
-        if (total > 150) return;
-
-        // Spawn plants if below 40% capacity
-        if (PlantCount < PlantCarryingCapacity * 0.4f)
-        {
-            int toSpawn = Math.Min(5, Math.Max(1, (PlantCarryingCapacity - PlantCount) / 5));
-            for (int i = 0; i < toSpawn; i++)
-                SpawnSpecies<Plant>(PlantSpecies, "Clover");
-        }
-
-        // Spawn herbivores if very low
-        if (HerbivoreCount < 10)
-            SpawnSubset<Herbivore>(HerbivoreSpecies, 2, "Gazelle");
-
-        // Spawn carnivores if very low
-        if (CarnivoreCount < 5)
-            SpawnSubset<Carnivore>(CarnivoreSpecies, 1, "Wolf");
-
-        // Spawn omnivores if very low
-        if (OmnivoreCount < 3)
-            SpawnSubset<Omnivore>(OmnivoreSpecies, 1, "Bear");
-
-        FlushPending();
     }
 
     private void ProcessDeaths(float dt)
