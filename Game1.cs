@@ -53,6 +53,7 @@ public class Game1 : Game
     private int _cataSelectedFrame;
     private string? _prevPanelCata;
     private string? _prevSpawnCata;
+    private string? _prevSpawnSpecies;
     private int _gameFrame;
 
     private enum GameScreen
@@ -326,25 +327,26 @@ public class Game1 : Game
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
 
         // ── Mutual exclusion: only one mode active ────────────
-        // Track changes and close other panel when selection changes
         bool spawnJustSelected = _spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata;
+        bool speciesJustSelected = _spawnPanel.SelectedSpeciesKey != null && _spawnPanel.SelectedSpeciesKey != _prevSpawnSpecies;
         bool panelJustSelected = _cataclysmPanel.SelectedType != null && _cataclysmPanel.SelectedType != _prevPanelCata;
 
-        if (spawnJustSelected || _spawnPanel.SelectedSpeciesKey != null)
+        if (spawnJustSelected || speciesJustSelected)
         {
             _prevSpawnCata = _spawnPanel.SelectedCataclysm;
+            _prevSpawnSpecies = _spawnPanel.SelectedSpeciesKey;
             if (spawnJustSelected) _cataSelectedFrame = _gameFrame;
             _cataclysmPanel.SelectedType = null;
             _prevPanelCata = null;
-            if (_cataclysmPanel.IsOpen) _cataclysmPanel.Toggle();
         }
         if (panelJustSelected)
         {
             _prevPanelCata = _cataclysmPanel.SelectedType;
             _cataSelectedFrame = _gameFrame;
             _spawnPanel.SelectedCataclysm = null;
+            _spawnPanel.DeselectSpecies();
             _prevSpawnCata = null;
-            if (_spawnPanel.IsOpen) _spawnPanel.Toggle();
+            _prevSpawnSpecies = null;
         }
         if (_cataclysmPanel.SelectedType == null && !_cataclysmPanel.IsOpen) _prevPanelCata = null;
         if (_spawnPanel.SelectedCataclysm == null) _prevSpawnCata = null;
@@ -363,6 +365,7 @@ public class Game1 : Game
                 _cataclysmPanel.SelectedType = null;
                 _prevPanelCata = null;
                 _prevSpawnCata = null;
+                _prevSpawnSpecies = null;
                 _cataSelectedFrame = 0;
             }
         }
@@ -428,6 +431,7 @@ public class Game1 : Game
             {
                 Logger.Event("SPAWN", $"Player spawned {spawned}x {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0})");
                 _spawnPanel.DeselectSpecies();
+                _prevSpawnSpecies = null;
             }
             else
             {
@@ -587,6 +591,7 @@ public class Game1 : Game
         _selectedCreature = null;
         _spawnPanel.Close();
         _inGameUi.ResetForWorld(_ecosystem.World);
+        _prevSpawnSpecies = null;
         _displayPlants = _ecosystem.PlantCount;
         _displayHerbivores = _ecosystem.HerbivoreCount;
         _displayCarnivores = _ecosystem.CarnivoreCount;
