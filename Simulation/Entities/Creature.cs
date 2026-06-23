@@ -22,6 +22,32 @@ public abstract class Creature
     public float Immunity { get; set; }
     public bool IsPoisonous { get; set; }
     public float Toxicity { get; set; }
+    public bool Hibernating { get; set; }
+
+    public void UpdateHibernation(Ecosystem ecosystem)
+    {
+        if (CreatureType == CreatureType.Plant) return;
+        var def = SpeciesRegistry.Get(Species);
+        if (def == null || !def.Hibernates) return;
+        var tile = ecosystem.World.GetTileAtPosition(Position.X, Position.Y);
+        float temp = ecosystem.Climate.GetTileTemperature(tile, Position.Y / ecosystem.World.TileSize, ecosystem.World.Height);
+        if (temp < 5f && !Hibernating)
+        {
+            Hibernating = true;
+            Logger.Event("HIBERNATE", $"{Species} entered hibernation at ({Position.X:F0},{Position.Y:F0}) T={temp:F0}°C");
+        }
+        else if (temp > 12f && Hibernating)
+        {
+            Hibernating = false;
+            Logger.Event("HIBERNATE", $"{Species} woke from hibernation at ({Position.X:F0},{Position.Y:F0}) T={temp:F0}°C");
+        }
+    }
+
+    private static readonly HashSet<string> HibernatingSpecies = new(StringComparer.Ordinal)
+    {
+        "Bear", "Raccoon", "Badger", "Snake", "Turtle", "PoisonFrog",
+        "Beetle", "Ant", "Lizard", "Crocodile"
+    };
     public float NutritionalValue => Genome.Size * 5f * (1f - Toxicity * 0.7f);
     public bool IsSleeping { get; private set; }
     public float LastReproductionTime { get; set; } = -60f;
@@ -135,11 +161,19 @@ public abstract class Creature
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
 
+        UpdateHibernation(ecosystem);
+
         UpdateEnvironmentalMultipliers(world, ecosystem);
         Position = ClampToWorld(Position, world);
 
         bool active = IsActive(ecosystem.CurrentDayPhase) || CreatureType == CreatureType.Plant;
         IsSleeping = !active && CreatureType != CreatureType.Plant;
+
+        if (Hibernating)
+        {
+            dt *= 0.05f;
+            active = false;
+        }
 
         if (active)
         {

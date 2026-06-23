@@ -47,6 +47,7 @@ public sealed class SpeciesDefinition
     public PollinationMode Pollination { get; }
     public float MinTemperature { get; }
     public float MaxTemperature { get; }
+    public bool Hibernates { get; }
 
     public SpeciesDefinition(
         string species,
@@ -60,7 +61,8 @@ public sealed class SpeciesDefinition
         PlantReproductionMode? plantReproduction = null,
         PollinationMode pollination = PollinationMode.None,
         float minTemperature = -50f,
-        float maxTemperature = 60f)
+        float maxTemperature = 60f,
+        bool hibernates = false)
     {
         if (kind == global::PitLife.Simulation.CreatureType.Plant && plantReproduction is null)
             throw new ArgumentException("Plant species require a reproduction mode.", nameof(plantReproduction));
@@ -82,6 +84,7 @@ public sealed class SpeciesDefinition
         Pollination = pollination;
         MinTemperature = minTemperature;
         MaxTemperature = maxTemperature;
+        Hibernates = hibernates;
     }
 
     public bool IsValidBiome(BiomeType biome) => ValidBiomes.Contains(biome);
