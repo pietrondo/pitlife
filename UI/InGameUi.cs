@@ -8,6 +8,12 @@ using PitLife.Simulation;
 
 namespace PitLife.UI;
 
+public struct PopSnapshot
+{
+    public int Plants, Herbivores, Carnivores, Omnivores;
+    public PopSnapshot(int p, int h, int c, int o) { Plants = p; Herbivores = h; Carnivores = c; Omnivores = o; }
+}
+
 public sealed class InGameUi
 {
     public const string StatisticsWindowId = "statistics";
@@ -37,6 +43,11 @@ public sealed class InGameUi
     public Point? SelectedTile { get; set; }
     public Point? HoverTile { get; set; }
     public event Action? ToolbarButtonClicked;
+
+    private readonly PopSnapshot[] _popHistory = new PopSnapshot[60];
+    private int _popHistoryCount;
+    private float _popRecordTimer;
+    private const float PopRecordInterval = 10f;
 
     public InGameUi()
     {
@@ -83,6 +94,22 @@ public sealed class InGameUi
 
     public bool CloseTopWindow() => _windowManager.CloseTopWindow();
     public void CloseAllWindows() => _windowManager.CloseAllWindows();
+
+    public void RecordPopSnapshot(int plants, int herbivores, int carnivores, int omnivores, float dt)
+    {
+        _popRecordTimer += dt;
+        if (_popRecordTimer < PopRecordInterval) return;
+        _popRecordTimer = 0;
+        if (_popHistoryCount < _popHistory.Length)
+        {
+            _popHistory[_popHistoryCount++] = new PopSnapshot(plants, herbivores, carnivores, omnivores);
+        }
+        else
+        {
+            Array.Copy(_popHistory, 1, _popHistory, 0, _popHistory.Length - 1);
+            _popHistory[_popHistory.Length - 1] = new PopSnapshot(plants, herbivores, carnivores, omnivores);
+        }
+    }
 
     public bool Update(
         MouseState mouse,
@@ -560,7 +587,7 @@ public sealed class InGameUi
 
         y += 6;
         DrawLine(sb, font, content.X, y, I18n.T("climate.populations"), UiTheme.MossSignal);
-        y += 22;
+        y += 20;
         int totalPop = plantCount + herbivoreCount + carnivoreCount + omnivoreCount;
         DrawInlineBar(sb, pixel, font, content.X, y, "P", plantCount, totalPop, UiTheme.MossSignal);
         y += 16;
@@ -570,6 +597,18 @@ public sealed class InGameUi
         y += 16;
         DrawInlineBar(sb, pixel, font, content.X, y, "O", omnivoreCount, totalPop, UiTheme.WarmParchment);
         y += 20;
+
+        if (_popHistoryCount >= 3)
+        {
+            DrawSparkline(sb, pixel, content.X, y, content.Width, _popHistory, _popHistoryCount, 0, UiTheme.MossSignal);
+            y += 14;
+            DrawSparkline(sb, pixel, content.X, y, content.Width, _popHistory, _popHistoryCount, 1, UiTheme.LakeBlue);
+            y += 14;
+            DrawSparkline(sb, pixel, content.X, y, content.Width, _popHistory, _popHistoryCount, 2, UiTheme.DangerClay);
+            y += 14;
+            DrawSparkline(sb, pixel, content.X, y, content.Width, _popHistory, _popHistoryCount, 3, UiTheme.WarmParchment);
+            y += 20;
+        }
 
         DrawLine(sb, font, content.X, y, I18n.T("climate.events"), UiTheme.MossSignal);
         y += 20;
@@ -581,6 +620,48 @@ public sealed class InGameUi
             if (ev.Length > 44) ev = ev.Substring(0, 44);
             DrawLine(sb, font, content.X, y, ev, new Color(180, 160, 140));
             y += 16;
+        }
+    }
+
+    private static void DrawSparkline(SpriteBatch sb, Texture2D pixel, int baseX, int baseY, int width,
+        PopSnapshot[] history, int count, int field, Color color)
+    {
+        int w = width - 8;
+        int h = 10;
+        float xStep = count > 1 ? (float)w / (count - 1) : 0;
+
+        int maxVal = 1;
+        for (int i = 0; i < count; i++)
+        {
+            int v = field switch { 0 => history[i].Plants, 1 => history[i].Herbivores, 2 => history[i].Carnivores, _ => history[i].Omnivores };
+            if (v > maxVal) maxVal = v;
+        }
+        if (maxVal < 1) maxVal = 1;
+
+        for (int i = 1; i < count; i++)
+        {
+            int v0 = field switch { 0 => history[i - 1].Plants, 1 => history[i - 1].Herbivores, 2 => history[i - 1].Carnivores, _ => history[i - 1].Omnivores };
+            int v1 = field switch { 0 => history[i].Plants, 1 => history[i].Herbivores, 2 => history[i].Carnivores, _ => history[i].Omnivores };
+            int x0 = baseX + (int)((i - 1) * xStep);
+            int y0 = baseY + h - (int)(v0 * h / (float)maxVal);
+            int x1 = baseX + (int)(i * xStep);
+            int y1 = baseY + h - (int)(v1 * h / (float)maxVal);
+            DrawLineSegment(sb, pixel, x0, y0, x1, y1, color);
+        }
+    }
+
+    private static void DrawLineSegment(SpriteBatch sb, Texture2D pixel, int x0, int y0, int x1, int y1, Color color)
+    {
+        int dx = Math.Abs(x1 - x0), dy = Math.Abs(y1 - y0);
+        int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+        int err = dx - dy;
+        while (true)
+        {
+            sb.Draw(pixel, new Rectangle(x0, y0, 1, 1), color);
+            if (x0 == x1 && y0 == y1) break;
+            int e2 = 2 * err;
+            if (e2 > -dy) { err -= dy; x0 += sx; }
+            if (e2 < dx) { err += dx; y0 += sy; }
         }
     }
 

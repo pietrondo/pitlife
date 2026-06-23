@@ -466,6 +466,9 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
+        _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
+            dt * _controller.CurrentSpeed);
+
         // Cataclysm placement when selected (require at least 1 frame delay after selection)
         bool cataReady = _cataSelectedFrame > 0 && (_gameFrame - _cataSelectedFrame) >= 1;
         if (_cataclysmPanel.SelectedType != null && cataReady &&
