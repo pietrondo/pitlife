@@ -393,6 +393,7 @@ public class Game1 : Game
             _prevSpawnSpecies = _spawnPanel.SelectedSpeciesKey;
             if (spawnJustSelected) _cataSelectedFrame = _gameFrame;
             _cataclysmPanel.SelectedType = null;
+            _inGameUi.SelectedCataclysm = null;
             _prevPanelCata = null;
         }
         if (panelJustSelected)
@@ -401,6 +402,7 @@ public class Game1 : Game
             _cataSelectedFrame = _gameFrame;
             _spawnPanel.SelectedCataclysm = null;
             _spawnPanel.DeselectSpecies();
+            _inGameUi.SelectedCataclysm = null;
             _prevSpawnCata = null;
             _prevSpawnSpecies = null;
         }
@@ -467,6 +469,16 @@ public class Game1 : Game
             _cataclysmPanel.SelectedType = null;
             _prevPanelCata = null;
             _cataSelectedFrame = 0;
+        }
+        // Cataclysm placement from InGameUi window
+        else if (_inGameUi.SelectedCataclysm != null &&
+            !pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
+            mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
+        {
+            var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
+            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            _worldRenderer.Invalidate();
+            _inGameUi.SelectedCataclysm = null;
         }
         // Spawn creature only when panel is open, species selected, click is NOT on any panel
         else if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
