@@ -346,6 +346,15 @@ public class Game1 : Game
             Math.Clamp(hx, 0, _ecosystem.World.Width - 1),
             Math.Clamp(hy, 0, _ecosystem.World.Height - 1));
 
+        if (mouse.LeftButton == ButtonState.Pressed &&
+            _minimap.HandleClick(mouse, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height))
+        {
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
         if (_inGameUi.WantsToGoToMainMenu)
         {
             _inGameUi.WantsToGoToMainMenu = false;

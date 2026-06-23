@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using PitLife.Simulation;
 
 namespace PitLife.Rendering;
@@ -58,6 +59,44 @@ public class Minimap
         DrawTerrain(sb, x, y);
         DrawCreatures(sb, x, y);
         DrawViewportRect(sb, x, y);
+    }
+
+    public Rectangle GetBounds(int viewportWidth, int viewportHeight)
+    {
+        int x = viewportWidth - Size - Margin;
+        int y = viewportHeight - Size - Margin - 52;
+        return new Rectangle(x, y, Size, Size);
+    }
+
+    public bool HandleClick(MouseState mouse, int viewportWidth, int viewportHeight)
+    {
+        var bounds = GetBounds(viewportWidth, viewportHeight);
+        if (!bounds.Contains(mouse.Position)) return false;
+        MoveCameraToMinimap(mouse.Position, bounds);
+        return true;
+    }
+
+    public bool HandleDrag(MouseState mouse, int viewportWidth, int viewportHeight)
+    {
+        var bounds = GetBounds(viewportWidth, viewportHeight);
+        if (!bounds.Contains(mouse.Position)) return false;
+        MoveCameraToMinimap(mouse.Position, bounds);
+        return true;
+    }
+
+    private void MoveCameraToMinimap(Point mousePos, Rectangle bounds)
+    {
+        float worldW = _ecosystem.World.PixelWidth;
+        float scaleX = Size / worldW;
+        float localX = mousePos.X - bounds.X;
+        float worldX = localX / scaleX;
+        _camera.Position = new Vector2(worldX, _camera.Position.Y);
+
+        float worldH = _ecosystem.World.PixelHeight;
+        float scaleY = Size / worldH;
+        float localY = mousePos.Y - bounds.Y;
+        float worldY = localY / scaleY;
+        _camera.Position = new Vector2(_camera.Position.X, worldY);
     }
 
     private void DrawTerrain(SpriteBatch sb, int x, int y)
