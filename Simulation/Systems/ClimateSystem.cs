@@ -11,7 +11,7 @@ public sealed class ClimateSystem : ISimulationSystem
     public const float PlanetRadiusKm = 6371f;
     public const float DefaultOrbitalAU = 1f;
     public const float DefaultEccentricity = 0.12f;
-    public const float OrbitalPeriod = 480f;
+    public const float OrbitalPeriod = 120f;
     public const float YearLength = OrbitalPeriod;
     public const float SeasonLength = OrbitalPeriod / 4f;
     public const float BaseSurfaceTempK = 288f;

@@ -429,6 +429,7 @@ public sealed class InGameUi
 
         Tile tile = World.Tiles[x, y];
         float elevation = World.ElevationField[y * World.Width + x];
+        float elevationM = (elevation - 0.15f) / 0.85f * 4000f;
         bool isRiver = World.RiverMask[y * World.Width + x];
 
         string passStr = I18n.T(tile.IsPassable ? "common.yes" : "common.no");
@@ -437,7 +438,7 @@ public sealed class InGameUi
 
         DrawLine(spriteBatch, font, content.X, content.Y, I18n.Format("terrain.heading", x, y), UiTheme.MossSignal);
         DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("terrain.biome", biomeName), UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 50, I18n.Format("terrain.elevation", elevation), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 50, I18n.Format("terrain.elevation", elevationM), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, content.X, content.Y + 72, I18n.Format("terrain.passable", passStr), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, content.X, content.Y + 94, I18n.Format("terrain.river", riverStr), UiTheme.WarmParchment);
     }
@@ -576,10 +577,21 @@ public sealed class InGameUi
         int maxShow = Math.Min(5, recent.Count);
         for (int i = recent.Count - maxShow; i < recent.Count; i++)
         {
-            string ev = recent[i];
-            if (ev.Length > 42) ev = ev.Substring(0, 42);
+            string ev = TranslateEvent(recent[i]);
+            if (ev.Length > 44) ev = ev.Substring(0, 44);
             DrawLine(sb, font, content.X, y, ev, new Color(180, 160, 140));
             y += 16;
         }
+    }
+
+    private static string TranslateEvent(string ev)
+    {
+        if (ev.StartsWith("[SEASON]")) return ev.Replace("[SEASON]", I18n.T("evt.season"));
+        if (ev.StartsWith("[CATACLYSM]")) return ev.Replace("[CATACLYSM]", I18n.T("evt.cataclysm"));
+        if (ev.StartsWith("[CLIMATE]")) return ev.Replace("[CLIMATE]", I18n.T("evt.climate"));
+        if (ev.StartsWith("[DEATH]")) return ev.Replace("[DEATH]", I18n.T("evt.death"));
+        if (ev.StartsWith("[SPAWN]")) return ev.Replace("[SPAWN]", I18n.T("evt.spawn"));
+        if (ev.StartsWith("[TERRAIN]")) return ev.Replace("[TERRAIN]", I18n.T("evt.terrain"));
+        return ev;
     }
 }
