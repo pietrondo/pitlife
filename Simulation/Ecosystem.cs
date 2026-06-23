@@ -56,6 +56,8 @@ public class Ecosystem
 
     public int Seed { get; }
 
+    private readonly List<ISimulationSystem> _systems = new();
+
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
         Seed = seed;
@@ -63,8 +65,9 @@ public class Ecosystem
         Random = new Random(seed);
         _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
-        Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
         Flow = new FlowSimulation(World);
+        InitSystems();
+        Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
     }
 
     public Ecosystem(WorldGenOptions options, int seed)
@@ -74,8 +77,24 @@ public class Ecosystem
         Random = new Random(seed);
         _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
-        Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
         Flow = new FlowSimulation(World);
+        InitSystems();
+        Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
+    }
+
+    private void InitSystems()
+    {
+        _systems.Add(Climate);
+        _systems.Add(Disease);
+        _systems.Add(Atmosphere);
+        _systems.Add(Cataclysms);
+        if (Flow != null) _systems.Add(Flow);
+        _systems.Add(Metrics);
+        var sorted = _systems.OrderBy(s => s.Phase).ToList();
+        _systems.Clear();
+        _systems.AddRange(sorted);
+        foreach (var sys in _systems)
+            sys.Initialize(World);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -229,12 +248,8 @@ public class Ecosystem
 
         FlushPending();
         ProcessDeaths(dt);
-        Climate.Update(TotalTime, Random);
-        Disease.Update(this, dt, Random);
-        Atmosphere.Update(PlantCount, HerbivoreCount + CarnivoreCount + OmnivoreCount, dt);
-        Cataclysms.Update(this, dt, Random);
-        Cataclysms.UpdateVolcanoes(this, dt, Random);
-        Flow?.Update(dt, Random);
+        foreach (var sys in _systems)
+            sys.Tick(this, gameTime);
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         UpdateStats();
@@ -403,6 +418,8 @@ public class Ecosystem
             OmnivoreCount = 0;
             _spatialGrid.Rebuild(Array.Empty<Creature>());
             _nextIndividualId = 1;
+            foreach (var sys in _systems)
+                sys.Reset();
         }
     }
 }

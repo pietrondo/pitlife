@@ -16,6 +16,8 @@ Rules:
 
 1. **Ask, don't assume.** If something is unclear, ask before writing a single line. Never make silent assumptions about intent, architecture, or requirements. When running unattended, pick the most reasonable interpretation, proceed, and record the assumption rather than blocking.
 
+1b. **Brainstorm before refactoring.** For any bd issue labeled `epic` or `refactor` that touches >=2 files, invoke the `brainstorming` skill *before* writing code. Produce a design artifact under `docs/decisions/` (e.g. `docs/decisions/<issue-id>-<slug>.md`) capturing: the problem, explored alternatives, chosen approach with rationale, and impacted files. This prevents silent assumptions (rule 1).
+
 2. **Implement the simplest solution for simple problems, better solutions for harder problems.** Do not over-engineer or add flexibility that isn't needed yet.
 
 3. **Don't touch unrelated code** but please do surface bad code or design smells you discover so they can be addressed as a separate issue.
@@ -25,6 +27,10 @@ Rules:
 5. **I'm always open to ideas on better ways to do things.** Please don't hesitate to suggest a better way, or one that has long lasting impact over a tactical change.
 
 6. **Keep it scalable.** Prefer data-driven configuration (JSON, YAML) over hardcoded values in C#. Species, biomes, items, behaviors should be defined in external config files, not in source code. New content should not require recompilation.
+
+## Code Review
+
+Before merging non-trivial changes, follow `docs/code-review-checklist.md` (derived from `requesting-code-review` skill). Covers: architecture fit, data-driven config compliance, test coverage, brainstorming artifacts, and production readiness. Use `bd ready` to find issues needing review.
 
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:full hash:f65d5d33 -->

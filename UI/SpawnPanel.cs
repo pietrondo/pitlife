@@ -11,15 +11,14 @@ namespace PitLife.UI;
 
 public sealed class SpawnPanel
 {
-    public bool IsOpen { get; private set; }
-    public string? SelectedSpeciesKey { get; private set; }
-    public string? SelectedCategory { get; private set; }
-    public string? SelectedCataclysm { get; set; }
-    public bool ShowCataclysms { get; set; }
+    public bool IsOpen => _state.IsOpen;
+    public string? SelectedSpeciesKey => _state.SelectedSpeciesKey;
+    public string? SelectedCategory => _state.SelectedCategory;
+    public string? SelectedCataclysm { get => _state.SelectedCataclysm; set => _state.SelectedCataclysm = value; }
+    public bool ShowCataclysms { get => _state.ShowCataclysms; set => _state.ShowCataclysms = value; }
 
-    private static readonly string[] CategoryOrder =
-        ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
-    private Dictionary<string, string[]> _speciesByCategory = BuildSpeciesByCategory();
+    private readonly SpawnPanelState _state = new();
+    private Dictionary<string, string[]> _speciesByCategory = SpeciesCatalogModel.Build();
 
     public const int PanelWidth = 200;
     public const int ToggleButtonSize = 44;
@@ -38,19 +37,19 @@ public sealed class SpawnPanel
     private Rectangle _speciesScrollArea;
     private int _viewportHeight;
     private Texture2D? _iconTexture;
-    private int _scrollOffset;
-    private int _maxScroll;
+    private int ScrollOffset { get => _state.ScrollOffset; set => _state.ScrollOffset = value; }
+    private int MaxScroll { get => _state.MaxScroll; set => _state.MaxScroll = value; }
     private readonly UiTextInput _searchInput = new() { Placeholder = "Filter...", MaxLength = 20 };
 
     public SpawnPanel() { RebuildCategoryButtons(); }
 
     internal static IReadOnlyList<string> SpeciesForCategory(string category) =>
-        BuildSpeciesByCategory().TryGetValue(category, out var species) ? species : Array.Empty<string>();
+        SpawnPanelState.SpeciesForCategory(category);
 
     public void RefreshSpeciesCatalog()
     {
-        _speciesByCategory = BuildSpeciesByCategory();
-        SelectedSpeciesKey = null;
+        _speciesByCategory = SpeciesCatalogModel.Build();
+        _state.DeselectSpecies();
         _searchInput.Clear();
         _lastSearchText = "";
         RebuildSpeciesButtons();
@@ -58,18 +57,15 @@ public sealed class SpawnPanel
 
     public void SetIconTexture(Texture2D? icon) => _iconTexture = icon;
 
-    public void Open() => IsOpen = true;
+    public void Open() => _state.Open();
     public void Close()
     {
-        IsOpen = false;
-        SelectedSpeciesKey = null;
-        SelectedCategory = null;
-        _scrollOffset = 0;
+        _state.Close();
         _searchInput.Clear();
         _lastSearchText = "";
     }
-    public void Toggle() => IsOpen = !IsOpen;
-    public void DeselectSpecies() => SelectedSpeciesKey = null;
+    public void Toggle() => _state.Toggle();
+    public void DeselectSpecies() => _state.DeselectSpecies();
 
     public void SetViewportHeight(int h) => _viewportHeight = h;
 
@@ -92,14 +88,9 @@ public sealed class SpawnPanel
             if (btn.Bounds.Contains(pos))
             {
                 var clickedKey = btn.Tag as string; // Internal English key
-                var newCategory = clickedKey == SelectedCategory ? null : clickedKey;
-                if (newCategory != SelectedCategory)
-                {
-                    Logger.Debug($"SpawnPanel: category changed from '{SelectedCategory}' to '{newCategory}'");
-                }
-                SelectedCategory = newCategory;
-                SelectedSpeciesKey = null;
-                _scrollOffset = 0;
+                var oldCategory = _state.SelectedCategory;
+                if (!_state.SelectCategory(clickedKey)) return false;
+                Logger.Debug($"SpawnPanel: category changed from '{oldCategory}' to '{_state.SelectedCategory}'");
                 _searchInput.Clear();
                 _lastSearchText = "";
                 RebuildSpeciesButtons();
@@ -110,8 +101,8 @@ public sealed class SpawnPanel
         {
             if (btn.Bounds.Contains(pos))
             {
-                SelectedSpeciesKey = btn.Tag as string; // Store the internal key, not localized name
-                Logger.Debug($"SpawnPanel: species selected '{SelectedSpeciesKey}'");
+                _state.SelectSpecies(btn.Tag as string);
+                Logger.Debug($"SpawnPanel: species selected '{_state.SelectedSpeciesKey}'");
                 return true;
             }
         }
@@ -141,8 +132,8 @@ public sealed class SpawnPanel
             return;
         int delta = mouse.ScrollWheelValue - previousMouse.ScrollWheelValue;
         if (delta == 0) return;
-        _scrollOffset = Math.Clamp(_scrollOffset - delta / 120 * (ButtonHeight + ButtonSpacing),
-            0, _maxScroll);
+        ScrollOffset = Math.Clamp(ScrollOffset - delta / 120 * (ButtonHeight + ButtonSpacing),
+            0, MaxScroll);
         LayoutSpeciesButtons();
     }
 
@@ -201,11 +192,11 @@ public sealed class SpawnPanel
 
         foreach (var btn in _categoryButtons)
         {
-            bool isSelected = btn.Tag as string == SelectedCategory;
+            bool isSelected = btn.Tag as string == _state.SelectedCategory;
             btn.Draw(sb, pixel, font, mouse, isSelected);
         }
 
-        if (SelectedCategory != null)
+        if (_state.SelectedCategory != null)
         {
             _searchInput.Draw(sb, pixel, font, mouse);
 
@@ -221,7 +212,7 @@ public sealed class SpawnPanel
             {
                 if (sBtn.Bounds.Bottom < _speciesScrollArea.Top || sBtn.Bounds.Top > _speciesScrollArea.Bottom)
                     continue;
-                bool isSel = sBtn.Tag as string == SelectedSpeciesKey;
+                bool isSel = sBtn.Tag as string == _state.SelectedSpeciesKey;
                 sBtn.Draw(sb, pixel, font, mouse, isSel);
             }
 
@@ -233,9 +224,9 @@ public sealed class SpawnPanel
             DrawScrollBar(sb, pixel);
         }
 
-        if (SelectedSpeciesKey != null)
+        if (_state.SelectedSpeciesKey != null)
         {
-            string selectedName = I18n.Species(SelectedSpeciesKey);
+            string selectedName = I18n.Species(_state.SelectedSpeciesKey!);
             string hint = I18n.T("spawn.selected") + ": " + selectedName;
             sb.DrawString(font, hint,
                 new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 36),
@@ -250,14 +241,14 @@ public sealed class SpawnPanel
 
     private void DrawScrollBar(SpriteBatch sb, Texture2D pixel)
     {
-        if (_maxScroll <= 0) return;
+        if (MaxScroll <= 0) return;
         int barX = _speciesScrollArea.Right - ScrollBarWidth;
         int barH = _speciesScrollArea.Height;
         UiPrimitives.Fill(sb, pixel, new Rectangle(barX, _speciesScrollArea.Y, ScrollBarWidth, barH),
             new Color(20, 20, 20, 180));
-        float thumbRatio = (float)barH / (barH + _maxScroll);
-        int thumbH = Math.Max(12, (int)(barH * thumbRatio));
-        int thumbY = _speciesScrollArea.Y + (int)((float)_scrollOffset / _maxScroll * (barH - thumbH));
+        float thumbRatio = (float)barH / (barH + MaxScroll);
+        int thumbH = Math.Max(16, (int)(barH * thumbRatio));
+        int thumbY = _speciesScrollArea.Y + (int)((float)ScrollOffset / MaxScroll * (barH - thumbH));
         UiPrimitives.Fill(sb, pixel, new Rectangle(barX, thumbY, ScrollBarWidth, thumbH),
             new Color(107, 81, 55, 200));
     }
@@ -328,7 +319,7 @@ public sealed class SpawnPanel
     {
         _categoryButtons.Clear();
         int y = 0 + HeaderHeight;
-        foreach (var category in CategoryOrder)
+        foreach (var category in SpawnPanelState.CategoryOrder)
         {
             _categoryButtons.Add(new UiButton(I18n.T($"spawn.{category.ToLowerInvariant()}"))
             {
@@ -352,8 +343,8 @@ public sealed class SpawnPanel
     private void RebuildSpeciesButtons()
     {
         _speciesButtons.Clear();
-        if (SelectedCategory == null) return;
-        if (!_speciesByCategory.TryGetValue(SelectedCategory, out var species)) return;
+        if (_state.SelectedCategory == null) return;
+        if (!_speciesByCategory.TryGetValue(_state.SelectedCategory, out var species)) return;
 
         string filter = _searchInput.Text.Trim();
         foreach (var s in species)
@@ -371,8 +362,8 @@ public sealed class SpawnPanel
                 Tag = s
             });
         }
-        _scrollOffset = 0;
-        _maxScroll = 0;
+        ScrollOffset = 0;
+        MaxScroll = 0;
         LayoutSpeciesButtons();
     }
 
@@ -382,15 +373,15 @@ public sealed class SpawnPanel
         int speciesStartY = _panelBounds.Y + HeaderHeight +
             _categoryButtons.Count * (ButtonHeight + ButtonSpacing + SectionSpacing);
         int speciesAreaHeight = _speciesScrollArea.Height;
-        int y = speciesStartY - _scrollOffset;
+        int y = speciesStartY - ScrollOffset;
         foreach (var button in _speciesButtons)
         {
             button.Bounds = new Rectangle(_panelBounds.X + 20, y, PanelWidth - 30 - ScrollBarWidth, ButtonHeight);
             y += ButtonHeight + ButtonSpacing;
         }
         int totalHeight = _speciesButtons.Count * (ButtonHeight + ButtonSpacing) - ButtonSpacing;
-        _maxScroll = Math.Max(0, totalHeight - speciesAreaHeight);
-        _scrollOffset = Math.Clamp(_scrollOffset, 0, _maxScroll);
+        MaxScroll = Math.Max(0, totalHeight - speciesAreaHeight);
+        ScrollOffset = Math.Clamp(ScrollOffset, 0, MaxScroll);
     }
 
     private int ComputePanelHeight()
@@ -416,32 +407,4 @@ public sealed class SpawnPanel
     {
         "Dolphin", "Whale", "Manatee", "Orca", "Seal", "SeaLion", "Otter", "Walrus"
     };
-
-    private static Dictionary<string, string[]> BuildSpeciesByCategory()
-    {
-        var categories = new Dictionary<string, List<string>>(StringComparer.Ordinal);
-        foreach (string category in CategoryOrder)
-            categories[category] = new List<string>();
-
-        foreach (string species in SpeciesRegistry.All)
-        {
-            SpeciesDefinition? definition = SpeciesRegistry.Get(species);
-            if (definition == null) continue;
-        string category = definition.Kind switch
-        {
-            CreatureType.Plant when definition.IsAquatic => "AquaticPlants",
-            CreatureType.Plant => "Plants",
-            CreatureType.Herbivore => "Herbivores",
-            CreatureType.Carnivore => "Carnivores",
-            CreatureType.Omnivore => "Omnivores",
-            _ => "Omnivores"
-        };
-            categories[category].Add(species);
-        }
-
-        var result = new Dictionary<string, string[]>(StringComparer.Ordinal);
-        foreach (string category in CategoryOrder)
-            result[category] = categories[category].ToArray();
-        return result;
-    }
 }

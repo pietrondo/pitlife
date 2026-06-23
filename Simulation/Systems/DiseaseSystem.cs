@@ -5,8 +5,9 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class DiseaseSystem
+public sealed class DiseaseSystem : ISimulationSystem
 {
+    public SimulationPhase Phase => SimulationPhase.Update;
     public readonly struct DiseaseDef
     {
         public string Name { get; init; }
@@ -29,6 +30,11 @@ public sealed class DiseaseSystem
 
     public bool HasOutbreak => _hasOutbreak;
     public string ActiveDiseaseName => _hasOutbreak ? _activeDisease.Name : "";
+
+    public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed, eco.Random);
+
+    public void Initialize(World world) { }
+    public void Reset() { _hasOutbreak = false; _outbreakTimer = 60f; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)
     {

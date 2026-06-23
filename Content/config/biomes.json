@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "biomes": {
+    "DeepOcean": { "vegetation": 0.0, "maxGrass": 0.0, "baseTemperature": 15.0 },
+    "ShallowWater": { "vegetation": 0.1, "maxGrass": 0.05, "baseTemperature": 18.0 },
+    "CoralReef": { "vegetation": 0.3, "maxGrass": 0.15, "baseTemperature": 22.0 },
+    "Beach": { "vegetation": 0.1, "maxGrass": 0.1, "baseTemperature": 22.0 },
+    "Grassland": { "vegetation": 0.6, "maxGrass": 1.0, "baseTemperature": 20.0 },
+    "Forest": { "vegetation": 0.8, "maxGrass": 0.5, "baseTemperature": 18.0 },
+    "DenseForest": { "vegetation": 1.0, "maxGrass": 0.3, "baseTemperature": 16.0 },
+    "Desert": { "vegetation": 0.05, "maxGrass": 0.01, "baseTemperature": 38.0 },
+    "Savanna": { "vegetation": 0.3, "maxGrass": 0.8, "baseTemperature": 28.0 },
+    "Swamp": { "vegetation": 0.7, "maxGrass": 0.6, "baseTemperature": 24.0 },
+    "Tundra": { "vegetation": 0.15, "maxGrass": 0.2, "baseTemperature": 5.0 },
+    "Mountain": { "vegetation": 0.1, "maxGrass": 0.15, "baseTemperature": 10.0 },
+    "Snow": { "vegetation": 0.0, "maxGrass": 0.0, "baseTemperature": -10.0 },
+    "Cave": { "vegetation": 0.0, "maxGrass": 0.0, "baseTemperature": 12.0 },
+    "Volcano": { "vegetation": 0.0, "maxGrass": 0.0, "baseTemperature": 45.0 }
+  }
+}

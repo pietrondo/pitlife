@@ -1,10 +1,12 @@
 using System;
+using Microsoft.Xna.Framework;
 using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class ClimateSystem
+public sealed class ClimateSystem : ISimulationSystem
 {
+    public SimulationPhase Phase => SimulationPhase.EarlyUpdate;
     public const float YearLength = 480f;
     public const float SeasonLength = YearLength / 4f;
     public Season CurrentSeason { get; private set; } = Season.Spring;
@@ -19,6 +21,11 @@ public sealed class ClimateSystem
 
     private float _extremeEventTimer;
     private float _extremeEventDuration;
+
+    public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco.TotalTime, eco.Random);
+
+    public void Initialize(World world) { }
+    public void Reset() { _extremeEventTimer = 0; IsExtremeEvent = false; ExtremeEventName = ""; }
 
     public void Update(float totalTime, Random rng)
     {

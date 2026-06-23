@@ -5,8 +5,9 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class CataclysmSystem
+public sealed class CataclysmSystem : ISimulationSystem
 {
+    public SimulationPhase Phase => SimulationPhase.Update;
     public bool IsActive { get; private set; }
     public string ActiveEvent { get; private set; } = "";
     public float Timer { get; private set; }
@@ -19,6 +20,16 @@ public sealed class CataclysmSystem
     public float AnimDuration { get; private set; } = 1.5f;
 
     private float _cooldownTimer;
+
+    public void Tick(Ecosystem eco, GameTime gameTime)
+    {
+        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed;
+        Update(eco, dt, eco.Random);
+        UpdateVolcanoes(eco, dt, eco.Random);
+    }
+
+    public void Initialize(World world) { }
+    public void Reset() { IsActive = false; ActiveEvent = ""; GrassMultiplier = 1f; _cooldownTimer = 0; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)
     {

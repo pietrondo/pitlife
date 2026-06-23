@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-public sealed class EcosystemMetrics
+public sealed class EcosystemMetrics : ISimulationSystem
 {
+    public SimulationPhase Phase => SimulationPhase.LateUpdate;
     public float TotalTime { get; private set; }
     public float FPS { get; set; }
     public int TotalCreatures { get; private set; }
@@ -61,6 +63,12 @@ public sealed class EcosystemMetrics
             case DeathCause.Combat: _combatDeaths++; CombatDeaths = _combatDeaths; break;
         }
     }
+
+    public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco);
+
+    public void Initialize(World world) { }
+
+    public void Reset() { ResetCounters(); SpeciesPopulations.Clear(); SubspeciesCounts.Clear(); SpeciesFirstAppearance.Clear(); SpeciesMaxPopulation.Clear(); }
 
     public void Update(Ecosystem ecosystem)
     {

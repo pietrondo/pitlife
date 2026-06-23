@@ -4,8 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PitLife.Simulation;
 
-public sealed class FlowSimulation : IDisposable
+public sealed class FlowSimulation : ISimulationSystem, IDisposable
 {
+    public SimulationPhase Phase => SimulationPhase.Update;
     private readonly World _world;
     private float[,] _water, _lava;
     private Vector2[,] _flowDir;
@@ -36,6 +37,11 @@ public sealed class FlowSimulation : IDisposable
     }
 
     public void Invalidate() => _dirty = true;
+
+    public void Tick(Ecosystem eco, GameTime gameTime) => Update((float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed, eco.Random);
+
+    public void Initialize(World world) { }
+    public void Reset() { Invalidate(); _timeAccum = 0; }
 
     public void Update(float dt, Random rng)
     {
