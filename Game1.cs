@@ -39,6 +39,7 @@ public class Game1 : Game
     private double _fpsTimer;
     private bool _showDebugOverlay;
     private bool _contentLoaded;
+    private float _showLoadingTimer = 1.5f;
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
 
@@ -152,6 +153,14 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        if (_showLoadingTimer > 0)
+        {
+            _showLoadingTimer -= dt;
+            _prevKbd = Keyboard.GetState();
+            _prevMouse = Mouse.GetState();
+            base.Update(gameTime);
+            return;
+        }
         UpdateFPS(gameTime);
         var kbd = Keyboard.GetState();
         var mouse = Mouse.GetState();
@@ -699,7 +708,7 @@ public class Game1 : Game
         _camera.Position = savedPos;
 
         _spriteBatch.Begin();
-        if (!_contentLoaded)
+        if (_showLoadingTimer > 0)
         {
             DrawLoadingScreen(_spriteBatch);
             _spriteBatch.End();
@@ -891,7 +900,7 @@ public class Game1 : Game
         int barX = (vw - barW) / 2;
         int barY = vh / 2;
         UiPrimitives.Fill(sb, _uiPixel, new Rectangle(barX, barY, barW, barH), new Color(20, 40, 30));
-        float progress = 0.5f + (float)Math.Sin(Environment.TickCount64 / 300.0) * 0.5f;
+        float progress = 1f - (_showLoadingTimer / 1.5f);
         int fillW = (int)(barW * progress);
         UiPrimitives.Fill(sb, _uiPixel, new Rectangle(barX + 2, barY + 2, fillW - 4, barH - 4), UiTheme.MossSignal);
         UiPrimitives.Border(sb, _uiPixel, new Rectangle(barX, barY, barW, barH), 2, UiTheme.BarkEdge);

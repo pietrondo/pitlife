@@ -237,7 +237,8 @@ public sealed class InGameUi
             }
             else if (window.Id == ClimateWindowId)
             {
-                DrawClimateDashboard(spriteBatch, pixel, font, window.ContentBounds, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed);
+                DrawClimateDashboard(spriteBatch, pixel, font, window.ContentBounds, mouse,
+                    plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime);
             }
         }
     }
@@ -481,11 +482,11 @@ public sealed class InGameUi
     }
 
     private void DrawClimateDashboard(SpriteBatch sb, Texture2D pixel, SpriteFont font,
-        Rectangle content, int plantCount, int herbivoreCount, int carnivoreCount,
-        int omnivoreCount, float totalTime, bool paused, float speed)
+        Rectangle content, MouseState mouse, int plantCount, int herbivoreCount,
+        int carnivoreCount, int omnivoreCount, float totalTime)
     {
         var climate = Climate;
-        if (climate == null)
+        if (climate == null || World == null)
         {
             DrawLine(sb, font, content.X, content.Y, "Climate data unavailable", UiTheme.MutedStone);
             return;
@@ -494,6 +495,7 @@ public sealed class InGameUi
         int y = content.Y;
         float pi = MathF.PI;
 
+        // Global data
         DrawLine(sb, font, content.X, y, I18n.Format("climate.season",
             I18n.T($"season.{climate.CurrentSeason.ToString().ToLowerInvariant()}")), UiTheme.MossSignal);
         y += 20;
@@ -502,11 +504,21 @@ public sealed class InGameUi
         DrawProgress(sb, pixel, new Rectangle(content.X, y, (int)progressW, 10), climate.SeasonProgress);
         y += 16;
 
-        string tempLabel = $"{climate.TemperatureModifier * 20f + 20f:0.#}°C";
+        string tempLabel = $"{(int)(20f + climate.TemperatureModifier * 20f)}°C";
         float tempNorm = Math.Clamp((climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
         DrawLine(sb, font, content.X, y, I18n.Format("climate.temperature", tempLabel),
             Color.Lerp(new Color(100, 150, 255), new Color(255, 120, 40), tempNorm));
         y += 18;
+
+        // Local tile data
+        int lx = Math.Clamp(mouse.X / World.TileSize, 0, World.Width - 1);
+        int ly = Math.Clamp(mouse.Y / World.TileSize, 0, World.Height - 1);
+        Tile localTile = World.GetTile(lx, ly);
+        float localTemp = climate.GetTileTemperature(localTile, ly, World.Height);
+        string biomeName = I18n.T($"biome.{localTile.Biome}");
+        DrawLine(sb, font, content.X, y,
+            I18n.Format("climate.local", lx, ly, biomeName, (int)localTemp), UiTheme.WarmParchment);
+        y += 20;
 
         DrawLine(sb, font, content.X, y,
             I18n.Format("climate.orbit", climate.SunDistanceAU, climate.OrbitalAngle * 180f / pi, climate.OrbitalSpeedKmS),
