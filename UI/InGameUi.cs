@@ -14,6 +14,8 @@ public sealed class InGameUi
     public const string CataclysmWindowId = "cataclysm";
     public string? SelectedCataclysm { get; set; }
 
+    private Rectangle _toolbarRect;
+
     private readonly UiWindowManager _windowManager = new();
     private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));
     private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
@@ -128,13 +130,7 @@ public sealed class InGameUi
 
         HandleCataclysmClick(mouse, previousMouse);
 
-        bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || 
-                           _creatureButton.Bounds.Contains(mouse.Position) ||
-                           _arrangeButton.Bounds.Contains(mouse.Position) ||
-                           _speedDownButton.Bounds.Contains(mouse.Position) ||
-                           _speedUpButton.Bounds.Contains(mouse.Position) ||
-                           _menuButton.Bounds.Contains(mouse.Position) ||
-                           _cataclysmButton.Bounds.Contains(mouse.Position);
+        bool overToolbar = _toolbarRect.Contains(mouse.Position);
         return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
     }
 
@@ -155,7 +151,7 @@ public sealed class InGameUi
         EcosystemMetrics? metrics = null)
     {
         LayoutToolbar(viewportHeight);
-        var toolbar = new Rectangle(8, viewportHeight - 60, 720, 52);
+        var toolbar = _toolbarRect;
         UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
         UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
         _statisticsButton.Draw(spriteBatch, pixel, font, mouse, false);
@@ -337,6 +333,7 @@ public sealed class InGameUi
     {
         int y = viewportHeight - 56;
         int bW = 110;
+        _toolbarRect = new Rectangle(8, viewportHeight - 60, 720, 52);
         _statisticsButton.Bounds = new Rectangle(12, y, bW, 44);
         _creatureButton.Bounds = new Rectangle(12 + bW + 6, y, bW, 44);
         _arrangeButton.Bounds = new Rectangle(12 + (bW + 6) * 2, y, bW, 44);
