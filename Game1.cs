@@ -97,7 +97,7 @@ public class Game1 : Game
             WorldHeight = _ecosystem.World.PixelHeight,
             Position = new Vector2(_ecosystem.World.PixelWidth / 2f, _ecosystem.World.PixelHeight / 2f)
         };
-        _worldRenderer = new PixelWorldRenderer(_ecosystem.World, 42);
+        _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
@@ -436,7 +436,7 @@ public class Game1 : Game
         var wgOpts = worldGenOptions ?? Simulation.WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
         _ecosystem = new Ecosystem(wgOpts, seed);
         _ecosystem.Initialize(60, 20, 15, 150);
-        _worldRenderer = new PixelWorldRenderer(_ecosystem.World, seed);
+        _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
@@ -499,7 +499,7 @@ public class Game1 : Game
         _ecosystem.FlushPending();
         _ecosystem.UpdateStats();
 
-        _worldRenderer = new PixelWorldRenderer(_ecosystem.World, data.Seed);
+        _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);

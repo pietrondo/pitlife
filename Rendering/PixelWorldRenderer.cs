@@ -8,77 +8,13 @@ namespace PitLife.Rendering;
 public sealed class PixelWorldRenderer : IDisposable
 {
     private readonly World _world;
-    private readonly FastNoiseLite _noise;
     private Texture2D? _worldTexture;
     private bool _needsRedraw = true;
-    private int _renderScale = 16; // 256 sub-pixels per tile for realistic terrain // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
+    private int _renderScale = 8;
 
-    // Biome colors matching the minimap (clean base colors)
-    private static readonly Color[] BiomeBaseColors =
-    {
-        new(28, 60, 110),    // DeepOcean
-        new(58, 118, 168),   // ShallowWater
-        new(220, 200, 140),  // Beach
-        new(220, 190, 110),  // Desert
-        new(200, 190, 110),  // Savanna
-        new(120, 180, 80),   // Grassland
-        new(60, 130, 60),    // Forest
-        new(35, 95, 45),     // DenseForest
-        new(80, 100, 70),    // Swamp
-        new(180, 185, 170),  // Tundra
-        new(120, 110, 100),  // Mountain
-        new(235, 240, 245),  // Snow
-        new(0, 180, 160),     // CoralReef
-        new(70, 60, 50),      // Cave
-        new(170, 50, 20),     // Volcano
-    };
-
-    // Slightly darker variation for subtle texture
-    private static readonly Color[] BiomeDetailColors =
-    {
-        new(20, 50, 90),     // DeepOcean dark
-        new(48, 100, 148),   // ShallowWater dark
-        new(200, 180, 120),  // Beach dark
-        new(200, 170, 90),   // Desert dark
-        new(180, 170, 90),   // Savanna dark
-        new(100, 160, 60),   // Grassland dark
-        new(45, 110, 45),    // Forest dark
-        new(25, 80, 30),     // DenseForest dark
-        new(65, 85, 55),     // Swamp dark
-        new(160, 165, 150),  // Tundra dark
-        new(105, 95, 85),    // Mountain dark
-        new(220, 225, 230),  // Snow dark
-        new(0, 160, 140),     // CoralReef dark
-        new(55, 45, 38),      // Cave dark
-        new(140, 40, 10),     // Volcano dark
-    };
-
-    // Slightly lighter variation for subtle highlights
-    private static readonly Color[] BiomeHighlightColors =
-    {
-        new(38, 75, 135),    // DeepOcean light
-        new(68, 135, 190),   // ShallowWater light
-        new(235, 215, 155),  // Beach light
-        new(235, 205, 125),  // Desert light
-        new(215, 205, 125),  // Savanna light
-        new(135, 200, 95),   // Grassland light
-        new(70, 150, 70),    // Forest light
-        new(45, 110, 60),    // DenseForest light
-        new(95, 115, 85),    // Swamp light
-        new(195, 200, 185),  // Tundra light
-        new(140, 125, 115),  // Mountain light
-        new(250, 255, 255),  // Snow light
-        new(0, 210, 190),     // CoralReef light
-        new(85, 72, 62),      // Cave light
-        new(200, 70, 35),     // Volcano light
-    };
-
-    public PixelWorldRenderer(World world, int seed)
+    public PixelWorldRenderer(World world)
     {
         _world = world;
-        _noise = new FastNoiseLite(seed);
-        _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        _noise.SetFrequency(0.05f);
     }
 
     public void LoadContent(GraphicsDevice gd)
@@ -126,19 +62,40 @@ public sealed class PixelWorldRenderer : IDisposable
                 float worldY = y * _world.TileSize / (float)_renderScale;
                 int tileX = Math.Clamp((int)(worldX / _world.TileSize), 0, _world.Width - 1);
                 int tileY = Math.Clamp((int)(worldY / _world.TileSize), 0, _world.Height - 1);
+
+                // Fractional position within tile (0..1)
+                float fx = (worldX / _world.TileSize) - tileX;
+                float fy = (worldY / _world.TileSize) - tileY;
+
+                // Smooth interpolation weights (hermite-like smoothstep)
+                float wx = fx * fx * (3f - 2f * fx);
+                float wy = fy * fy * (3f - 2f * fy);
+
+                // Get colors for 4 corners of the tile
+                int nx = Math.Min(tileX + 1, _world.Width - 1);
+                int ny = Math.Min(tileY + 1, _world.Height - 1);
+
+                Color c00 = GetBiomeRenderColor(_world.Tiles[tileX, tileY].Biome);
+                Color c10 = GetBiomeRenderColor(_world.Tiles[nx, tileY].Biome);
+                Color c01 = GetBiomeRenderColor(_world.Tiles[tileX, ny].Biome);
+                Color c11 = GetBiomeRenderColor(_world.Tiles[nx, ny].Biome);
+
+                // Bilinear interpolation
+                int r = (int)((1 - wx) * (1 - wy) * c00.R + wx * (1 - wy) * c10.R + (1 - wx) * wy * c01.R + wx * wy * c11.R);
+                int g = (int)((1 - wx) * (1 - wy) * c00.G + wx * (1 - wy) * c10.G + (1 - wx) * wy * c01.G + wx * wy * c11.G);
+                int b = (int)((1 - wx) * (1 - wy) * c00.B + wx * (1 - wy) * c10.B + (1 - wx) * wy * c01.B + wx * wy * c11.B);
+
+                // River override
                 int idx = tileY * _world.Width + tileX;
-
-                var biome = _world.Tiles[tileX, tileY].Biome;
-                Color pixelColor = GetBiomeRenderColor(biome);
-
                 if (_world.RiverMask[idx])
-                    pixelColor = Color.Lerp(pixelColor, new Color(40, 100, 200), 0.3f);
+                {
+                    var riverColor = new Color(40, 100, 200);
+                    r = (int)(r * 0.7f + riverColor.R * 0.3f);
+                    g = (int)(g * 0.7f + riverColor.G * 0.3f);
+                    b = (int)(b * 0.7f + riverColor.B * 0.3f);
+                }
 
-                int d = (x * 7 + y * 13) % 5 - 2;
-                data[y * width + x] = new Color(
-                    Math.Clamp(pixelColor.R + d, 0, 255),
-                    Math.Clamp(pixelColor.G + d, 0, 255),
-                    Math.Clamp(pixelColor.B + d, 0, 255));
+                data[y * width + x] = new Color(r, g, b);
             }
         }
 
@@ -172,10 +129,10 @@ public sealed class PixelWorldRenderer : IDisposable
     }
 
     // Static accessors for testing
-    public static Color[] GetBiomeBaseColors() => BiomeBaseColors;
-    public static Color[] GetBiomeDetailColors() => BiomeDetailColors;
-    public static Color[] GetBiomeHighlightColors() => BiomeHighlightColors;
-    public static int RenderScale => 1;
+    public static Color[] GetBiomeBaseColors() => new[] { GetBiomeRenderColor((BiomeType)0), GetBiomeRenderColor((BiomeType)1), GetBiomeRenderColor((BiomeType)2), GetBiomeRenderColor((BiomeType)3), GetBiomeRenderColor((BiomeType)4), GetBiomeRenderColor((BiomeType)5), GetBiomeRenderColor((BiomeType)6), GetBiomeRenderColor((BiomeType)7), GetBiomeRenderColor((BiomeType)8), GetBiomeRenderColor((BiomeType)9), GetBiomeRenderColor((BiomeType)10), GetBiomeRenderColor((BiomeType)11), GetBiomeRenderColor((BiomeType)12), GetBiomeRenderColor((BiomeType)13), GetBiomeRenderColor((BiomeType)14) };
+    public static Color[] GetBiomeDetailColors() => GetBiomeBaseColors();
+    public static Color[] GetBiomeHighlightColors() => GetBiomeBaseColors();
+    public static int RenderScale => 8;
 }
 
 // Simplex noise implementation (FastNoiseLite-style)
