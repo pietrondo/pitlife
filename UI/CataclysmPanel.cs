@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Core;
+using PitLife.Localization;
 
 namespace PitLife.UI;
 
@@ -25,12 +26,12 @@ public sealed class CataclysmPanel
 
     private readonly UiButton[] _buttons = new[]
     {
-        new UiButton("Asteroid") { Tag = "Asteroid" },
-        new UiButton("Ice Age") { Tag = "IceAge" },
-        new UiButton("Supervolcano") { Tag = "Supervolcano" },
-        new UiButton("Earthquake") { Tag = "Earthquake" },
-        new UiButton("Drought") { Tag = "Drought" },
-        new UiButton("Flood") { Tag = "Flood" }
+        new UiButton(I18n.T("cata.asteroid")) { Tag = "Asteroid" },
+        new UiButton(I18n.T("cata.iceage")) { Tag = "IceAge" },
+        new UiButton(I18n.T("cata.supervolcano")) { Tag = "Supervolcano" },
+        new UiButton(I18n.T("cata.earthquake")) { Tag = "Earthquake" },
+        new UiButton(I18n.T("cata.drought")) { Tag = "Drought" },
+        new UiButton(I18n.T("cata.flood")) { Tag = "Flood" }
     };
 
     public void Toggle() => IsOpen = !IsOpen;
@@ -86,7 +87,7 @@ public sealed class CataclysmPanel
         UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(30, 15, 10, 235));
         UiPrimitives.Border(sb, pixel, _panelBounds, 2, UiTheme.DangerClay);
 
-        sb.DrawString(font, "Cataclisma", new Vector2(_panelBounds.X + 8, _panelBounds.Y + 6), UiTheme.DangerClay);
+        sb.DrawString(font, I18n.T("toolbar.cataclysm"), new Vector2(_panelBounds.X + 8, _panelBounds.Y + 6), UiTheme.DangerClay);
 
         int y = _panelBounds.Y + 28;
         foreach (var btn in _buttons)
@@ -98,7 +99,7 @@ public sealed class CataclysmPanel
         }
 
         if (!string.IsNullOrEmpty(SelectedType))
-            sb.DrawString(font, "Clicca mappa", new Vector2(_panelBounds.X + 8, _panelBounds.Bottom - 20),
+            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(_panelBounds.X + 8, _panelBounds.Bottom - 20),
                 UiTheme.MossSignal);
     }
 

@@ -286,12 +286,12 @@ public sealed class SpawnPanel
 
     private readonly UiButton[] _cataButtons = new[]
     {
-        new UiButton("Asteroid") { Tag = "Asteroid" },
-        new UiButton("Ice Age") { Tag = "IceAge" },
-        new UiButton("Supervolcano") { Tag = "Supervolcano" },
-        new UiButton("Earthquake") { Tag = "Earthquake" },
-        new UiButton("Drought") { Tag = "Drought" },
-        new UiButton("Flood") { Tag = "Flood" }
+        new UiButton(I18n.T("cata.asteroid")) { Tag = "Asteroid" },
+        new UiButton(I18n.T("cata.iceage")) { Tag = "IceAge" },
+        new UiButton(I18n.T("cata.supervolcano")) { Tag = "Supervolcano" },
+        new UiButton(I18n.T("cata.earthquake")) { Tag = "Earthquake" },
+        new UiButton(I18n.T("cata.drought")) { Tag = "Drought" },
+        new UiButton(I18n.T("cata.flood")) { Tag = "Flood" }
     };
     private MouseState previousMouseState;
 
@@ -306,7 +306,7 @@ public sealed class SpawnPanel
             y += 26;
         }
         if (!string.IsNullOrEmpty(SelectedCataclysm))
-            sb.DrawString(font, "Click map", new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 30), UiTheme.MossSignal);
+            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 30), UiTheme.MossSignal);
     }
 
     public bool HandleCataclysmClick(MouseState mouse, MouseState prevMouse)

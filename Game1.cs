@@ -329,6 +329,16 @@ public class Game1 : Game
         if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) _controller.SetSpeed(2);
         if (kbd.IsKeyDown(Keys.D3) && !_prevKbd.IsKeyDown(Keys.D3)) _controller.SetSpeed(3);
         if (kbd.IsKeyDown(Keys.Space) && !_prevKbd.IsKeyDown(Keys.Space)) _controller.TogglePause();
+        if (_inGameUi.SpeedUpRequested)
+        {
+            _controller.SetSpeed(Math.Min(3, _controller.SpeedLevel + 1));
+            _inGameUi.SpeedUpRequested = false;
+        }
+        if (_inGameUi.SpeedDownRequested)
+        {
+            _controller.SetSpeed(Math.Max(0, _controller.SpeedLevel - 1));
+            _inGameUi.SpeedDownRequested = false;
+        }
         _prevKbd = kbd;
 
         _controller.Advance(dt);
@@ -339,8 +349,8 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
-        // Cataclysm placement when selected
-        if (_cataclysmPanel.SelectedType != null &&
+        // Cataclysm placement when selected (skip if UI consumed the click)
+        if (_cataclysmPanel.SelectedType != null && !cataConsumed &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
@@ -586,7 +596,22 @@ public class Game1 : Game
                 _font,
                 GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height);
-            _spriteBatch.End();
+        // Draw cataclysm impact animation
+        var cata = _ecosystem.Cataclysms;
+        if (cata.IsActive && cata.ImpactRadius > 0)
+        {
+            int r = (int)(cata.ImpactRadius * 0.5f);
+            var impRect = new Rectangle((int)cata.ImpactPosition.X - r, (int)cata.ImpactPosition.Y - r, r * 2, r * 2);
+            var alpha = (byte)(cata.Timer / 40f * 180);
+            var impColor = new Color(cata.ImpactColor.R, cata.ImpactColor.G, cata.ImpactColor.B, alpha);
+            for (int ring = 3; ring >= 0; ring--)
+            {
+                var ringColor = impColor * (1f - ring * 0.2f);
+                var ringRect = new Rectangle(impRect.X - ring * 8, impRect.Y - ring * 8, impRect.Width + ring * 16, impRect.Height + ring * 16);
+                UiPrimitives.Border(_spriteBatch, _uiPixel, ringRect, 2, ringColor);
+            }
+        }
+        _spriteBatch.End();
             base.Draw(gameTime);
             return;
         }

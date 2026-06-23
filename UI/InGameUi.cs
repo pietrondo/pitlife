@@ -19,9 +19,13 @@ public sealed class InGameUi
     private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
     private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange"));
     private readonly UiButton _menuButton = new(I18n.T("toolbar.menu"));
-    private readonly UiButton _cataclysmButton = new("CATACLYSM");
+    private readonly UiButton _cataclysmButton = new(I18n.T("toolbar.cataclysm"));
+    private readonly UiButton _speedDownButton = new("<");
+    private readonly UiButton _speedUpButton = new(">");
 
     public bool WantsToGoToMainMenu { get; set; } = false;
+    public bool SpeedUpRequested { get; set; }
+    public bool SpeedDownRequested { get; set; }
     public World? World { get; set; }
     public Point? SelectedTile { get; set; }
 
@@ -57,7 +61,10 @@ public sealed class InGameUi
     {
         World = world;
         SelectedTile = null;
+        SelectedCataclysm = null;
         WantsToGoToMainMenu = false;
+        SpeedUpRequested = false;
+        SpeedDownRequested = false;
     }
 
     public bool CloseTopWindow() => _windowManager.CloseTopWindow();
@@ -108,12 +115,24 @@ public sealed class InGameUi
             _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
         }
+        if (_speedDownButton.WasClicked(mouse, previousMouse))
+        {
+            SpeedDownRequested = true;
+            toolbarConsumed = true;
+        }
+        if (_speedUpButton.WasClicked(mouse, previousMouse))
+        {
+            SpeedUpRequested = true;
+            toolbarConsumed = true;
+        }
 
         HandleCataclysmClick(mouse, previousMouse);
 
         bool overToolbar = _statisticsButton.Bounds.Contains(mouse.Position) || 
                            _creatureButton.Bounds.Contains(mouse.Position) ||
                            _arrangeButton.Bounds.Contains(mouse.Position) ||
+                           _speedDownButton.Bounds.Contains(mouse.Position) ||
+                           _speedUpButton.Bounds.Contains(mouse.Position) ||
                            _menuButton.Bounds.Contains(mouse.Position) ||
                            _cataclysmButton.Bounds.Contains(mouse.Position);
         return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
@@ -136,12 +155,20 @@ public sealed class InGameUi
         EcosystemMetrics? metrics = null)
     {
         LayoutToolbar(viewportHeight);
-        var toolbar = new Rectangle(8, viewportHeight - 60, 522, 52);
+        var toolbar = new Rectangle(8, viewportHeight - 60, 720, 52);
         UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
         UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
         _statisticsButton.Draw(spriteBatch, pixel, font, mouse, false);
         _creatureButton.Draw(spriteBatch, pixel, font, mouse, false);
         _arrangeButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _speedDownButton.Draw(spriteBatch, pixel, font, mouse, false);
+        // Speed label between arrows
+        var speedLabel = paused ? I18n.T("hud.paused") : $"{speed:0.#}x";
+        var slSize = font.MeasureString(speedLabel);
+        var sx = _speedDownButton.Bounds.Right + 4;
+        var sy = _speedDownButton.Bounds.Center.Y - slSize.Y / 2;
+        spriteBatch.DrawString(font, speedLabel, new Vector2(sx, sy), UiTheme.WarmParchment);
+        _speedUpButton.Draw(spriteBatch, pixel, font, mouse, false);
         _cataclysmButton.Draw(spriteBatch, pixel, font, mouse, false);
         _menuButton.Draw(spriteBatch, pixel, font, mouse, false);
 
@@ -309,11 +336,14 @@ public sealed class InGameUi
     private void LayoutToolbar(int viewportHeight)
     {
         int y = viewportHeight - 56;
-        _statisticsButton.Bounds = new Rectangle(12, y, 100, 44);
-        _creatureButton.Bounds = new Rectangle(118, y, 100, 44);
-        _arrangeButton.Bounds = new Rectangle(224, y, 100, 44);
-        _cataclysmButton.Bounds = new Rectangle(330, y, 100, 44);
-        _menuButton.Bounds = new Rectangle(436, y, 100, 44);
+        int bW = 110;
+        _statisticsButton.Bounds = new Rectangle(12, y, bW, 44);
+        _creatureButton.Bounds = new Rectangle(12 + bW + 6, y, bW, 44);
+        _arrangeButton.Bounds = new Rectangle(12 + (bW + 6) * 2, y, bW, 44);
+        _speedDownButton.Bounds = new Rectangle(12 + (bW + 6) * 3, y, 36, 44);
+        _speedUpButton.Bounds = new Rectangle(12 + (bW + 6) * 3 + 40, y, 36, 44);
+        _cataclysmButton.Bounds = new Rectangle(12 + (bW + 6) * 4 + 6, y, bW, 44);
+        _menuButton.Bounds = new Rectangle(12 + (bW + 6) * 5 + 6, y, bW, 44);
     }
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
@@ -324,6 +354,7 @@ public sealed class InGameUi
         _statisticsButton.Text = I18n.T("toolbar.statistics");
         _creatureButton.Text = I18n.T("toolbar.creature");
         _arrangeButton.Text = I18n.T("toolbar.arrange");
+        _cataclysmButton.Text = I18n.T("toolbar.cataclysm");
         _menuButton.Text = I18n.T("toolbar.menu");
         foreach (UiWindow window in _windowManager.Windows)
         {
@@ -370,12 +401,12 @@ public sealed class InGameUi
 
     private readonly UiButton[] _cataclysmButtons = new[]
     {
-        new UiButton("Asteroid") { Tag = "Asteroid" },
-        new UiButton("Ice Age") { Tag = "IceAge" },
-        new UiButton("Supervolcano") { Tag = "Supervolcano" },
-        new UiButton("Earthquake") { Tag = "Earthquake" },
-        new UiButton("Drought") { Tag = "Drought" },
-        new UiButton("Flood") { Tag = "Flood" }
+        new UiButton(I18n.T("cata.asteroid")) { Tag = "Asteroid" },
+        new UiButton(I18n.T("cata.iceage")) { Tag = "IceAge" },
+        new UiButton(I18n.T("cata.supervolcano")) { Tag = "Supervolcano" },
+        new UiButton(I18n.T("cata.earthquake")) { Tag = "Earthquake" },
+        new UiButton(I18n.T("cata.drought")) { Tag = "Drought" },
+        new UiButton(I18n.T("cata.flood")) { Tag = "Flood" }
     };
 
     private void DrawCataclysmWindow(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content)
@@ -392,7 +423,7 @@ public sealed class InGameUi
             y += 26;
         }
         if (!string.IsNullOrEmpty(SelectedCataclysm))
-            sb.DrawString(font, "Click on map to place", new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
+            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
     }
 
     public bool HandleCataclysmClick(MouseState mouse, MouseState prevMouse)
