@@ -19,7 +19,7 @@ public sealed class CataclysmSystem : ISimulationSystem
     public float AnimTimer { get; private set; }
     public float AnimDuration { get; private set; } = 1.5f;
 
-    private float _cooldownTimer;
+    private float _cooldownTimer = 120f;
 
     public void Tick(Ecosystem eco, GameTime gameTime)
     {

@@ -118,7 +118,17 @@ public class Ecosystem
         {
             string name = selected[Random.Next(selected.Length)];
             var pos = RandomPassablePosition(name);
-            _spawner.SpawnByName(name, pos);
+            int nearby = 0;
+            foreach (var c in Creatures)
+                if (c.Species == name && Vector2.DistanceSquared(c.Position, pos) < 3600f)
+                    nearby++;
+            if (nearby >= 3)
+            {
+                Logger.Warn($"Spawn: skipping {name} at ({pos.X:F0},{pos.Y:F0}) - {nearby} nearby");
+                continue;
+            }
+            if (!_spawner.SpawnByName(name, pos))
+                Logger.Warn($"Spawn: {name} failed at ({pos.X:F0},{pos.Y:F0})");
         }
     }
 

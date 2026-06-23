@@ -1,6 +1,6 @@
 # PitLife
 
-Simulatore di ecosistema 2D data-driven con creature che vivono, si nutrono, si riproducono, evolvono e interagiscono in un mondo dinamico con 15 biomi, 86+ specie, stagioni, clima e cataclismi.
+Simulatore di ecosistema 2D data-driven con creature che vivono, si nutrono, si riproducono, evolvono e interagiscono in un mondo dinamico con 15 biomi, 86+ specie, stagioni orbitali, clima, cataclismi e recupero ambientale.
 
 ## Come Giocare
 
@@ -15,6 +15,7 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 | **Allinea** | Riordina finestre |
 | **< >** | Velocità simulazione (0/1x/2x/4x) |
 | **Cataclismi** | Pannello cataclismi |
+| **Clima** | Dashboard clima (stagione, orbita, temperatura locale, eventi) |
 | **Menu** | Torna al menu principale |
 
 ### Controlli
@@ -24,7 +25,7 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 | **WASD / Frecce** | Muovi camera |
 | **Rotella mouse** | Zoom |
 | **Click su creatura** | Seleziona e vedi dettagli |
-| **Click su terreno** | Vedi info bioma |
+| **Click su terreno** | Vedi info bioma ed elevazione (metri) |
 | **Spazio** | Pausa/Riprendi |
 | **↑ / ↓** | Aumenta/Riduci velocità |
 | **1 / 2 / 3** | Velocità 1x / 2x / 4x |
@@ -35,7 +36,20 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 | **F6** | Editor Specie |
 | **F7** | Cataclisma casuale globale |
 | **F8** | Pannello Cataclismi (sidebar) |
+| **F9** | Dashboard Clima |
 | **ESC** | Annulla selezione / Menu principale |
+
+### Dashboard Clima (F9)
+Mostra dati globali e locali in tempo reale:
+- **Stagione** globale con barra progresso (cambia ogni 30s)
+- **Temperatura** globale da orbita
+- **Temperatura locale** sotto il cursore: coordinate tile, bioma, °C
+- **Stagione locale** per emisfero (emisfero sud = opposta)
+- **Dati orbitali**: distanza sole (UA), angolo, velocità (km/s)
+- **Vento**: velocità e direzione
+- **Eventi estremi**: Heatwave, ColdSnap, Storm
+- **Popolazioni**: P/H/C/O con barre
+- **Eventi recenti**: ultimi 5 eventi di simulazione
 
 ### Spawn Creature
 1. Premi **F4** per aprire il pannello spawn
@@ -48,7 +62,7 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 1. Apri il pannello con **F8** (sidebar sinistra) o **Cataclismi** nella toolbar
 2. Seleziona il tipo: Asteroide, Era Glaciale, Supervulcano, Terremoto, Siccità, Inondazione
 3. Clicca sulla mappa per piazzarlo
-4. Il terreno cambia visibilmente (centro + anello)
+4. Il terreno cambia visibilmente (centro + anello) e recupera gradualmente
 5. **F7** per cataclisma casuale globale
 
 **Animazioni:**
@@ -58,8 +72,14 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 - **Terremoto**: scuotimento schermo, linee di crepa
 - **Siccità / Inondazione / Firestorm**: effetti visivi specifici
 
+**Recupero post-cataclisma:**
+- Bioma originale salvato e ripristinato gradualmente
+- Erba si espande da tile sane a tile danneggiate
+- Nutrienti del suolo recuperano via decomposizione
+
 ### World Generation (Menu principale)
 - **Preset**: Pangea, Continenti, Arcipelago, WetWorld, DryWorld
+- **Pianeta**: Earth-like (6371km, 1AU), Small Cold (4200km, 1.4AU), Large Hot (9800km, 0.72AU), Super-Earth (12000km, 0.9AU)
 - **Continenti**: 1-6 masse continentali distinte con centri reali
 - **Livello mare**: da 0 a 100, influenza rapporto terra/acqua
 - **Dimensione isole**: Piccole, Medie, Grandi
@@ -71,9 +91,11 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 - **15 biomi**: DeepOcean, ShallowWater, Beach, Desert, Savanna, Grassland, Forest, DenseForest, Swamp, Tundra, Mountain, Snow, CoralReef, Cave, Volcano
 - **86+ specie** tra piante, erbivori, carnivori, onnivori, insetti e preistorici
 - **Ciclo giorno/notte** con 4 fasi e overlay visivo
-- **4 stagioni** (480s = 1 anno) con effetti su crescita e metabolismo
-- **Clima**: temperatura per-tile, stress termico, eventi estremi
-- **Cataclismi**: modificano visibilmente il terreno (biomi, erba, nutrienti)
+- **Stagioni orbitali**: orbita ellittica (e=0.12), perielio/afelio, gradiente latitudinale (equatore caldo, poli freddi)
+- **Clima per-tile**: temperatura da orbita + latitudine + bioma, stress termico, eventi estremi
+- **Overlay stagionale**: tinta semi-trasparente sulla mappa per stagione
+- **Cataclismi**: modificano visibilmente il terreno con recupero graduale
+- **Elevazione in metri**: da -700m (oceano profondo) a 4000m (picco montuoso)
 
 ### Genetica ed Evoluzione
 - **Genoma diploide**: 11 loci con alleli, dominanza e ricombinazione
@@ -85,7 +107,7 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 
 ### Ecologia
 - **Rete trofica**: 5 livelli trofici, efficienza energetica 10%
-- **Grazing**: erba sui tile, rigenerazione stagionale
+- **Grazing**: erba sui tile, rigenerazione stagionale, espansione tra tile
 - **Nutrienti suolo**: ciclo NPK, decomposizione carogne fertilizza
 - **Atmosfera**: O₂/CO₂ globali, fotosintesi e respirazione
 - **Sete**: animali bevono da fiumi e oceani
@@ -93,6 +115,14 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 - **Malattie**: epidemie con trasmissione, immunità e recupero
 - **Simbiosi**: mutualismo implicito (api-fiori, pesci pulitori)
 - **Migrazioni**: home range, movimento stagionale
+
+### Flora e Fasce Climatiche
+- **24 specie vegetali** con range termico specifico
+- **Tropicali**: Cactus (15-55°C), Bamboo (5-48°C), Coral (18-40°C)
+- **Temperate**: Clover (-15-35°C), OakTree (-10-32°C), Fern (0-32°C)
+- **Boreali**: Moss (-30-25°C), Pine (-25-30°C), Juniper (-20-35°C)
+- **Acquatiche**: Seaweed (-5-35°C), Kelp (-2-28°C), WaterLily (10-40°C)
+- Spawning e riproduzione vincolati a bioma + temperatura
 
 ### Comportamento
 - **Ciclo attività**: animali diurni/notturni/crepuscolari
@@ -105,12 +135,16 @@ PitLife è una simulazione sandbox: osserva l'ecosistema evolvere, spawna creatu
 
 ### UI
 - **Tema foresta**: palette verde/marrone con finestre draggable
-- **Toolbar in basso**: statistiche, creature, velocità, cataclismi, menu
+- **Toolbar in basso**: statistiche, creature, velocità, cataclismi, clima, menu
+- **Loading screen**: barra di caricamento animata all'avvio e durante world gen
+- **Pannelli esclusivi**: aprire un pannello chiude automaticamente gli altri
+- **Dashboard clima**: dati orbitali, temperatura locale per-tile, emisferi
+- **Eventi tradotti**: messaggi in italiano con nomi specie localizzati
 - **Animazioni cataclismi**: meteora, magma, gelo, crepe, onde
 - **Minimap**: angolo in basso a destra con biomes e creature
 - **I18n**: Italiano/Inglese con toggle nel menu
 - **Persistenza**: salvataggio/caricamento mondo, preferenze lingua
-- **Log rotation**: max 5 file di log
+- **Log**: flush automatico su uscita, rotazione 5 file
 
 ## Requisiti
 
@@ -127,26 +161,25 @@ dotnet build
 dotnet run
 ```
 
-Oppure esegui `bin/Debug/net9.0/PitLife.exe` direttamente.
-
 ## Struttura
 
 | Directory | Contenuto |
 |-----------|-----------|
 | `Simulation/` | Ecosystem, Creature, Genome, Behaviors, Climate, Disease, Cataclysms, WorldGenerator |
 | `Rendering/` | PixelWorldRenderer, CreatureRenderer, Minimap, DayNightCycle, Camera |
-| `UI/` | MainMenu, SpawnPanel, InGameUi, CataclysmPanel, SpeciesEditor, UiWindow |
+| `UI/` | MainMenu, SpawnPanel, InGameUi, CataclysmPanel, SpeciesEditor, UiWindow, UiWindowManager |
 | `Core/` | Logger, AssetRegistry, SpeciesCatalog |
 | `Localization/` | I18n EN/IT |
-| `Content/` | Assets, sprites, font |
-| `tests/` | 245 test (stabilità, performance, property-based) |
+| `Content/` | Assets, sprites, font, species.json |
+| `tests/` | 255+ test (stabilità, performance, property-based) |
 
 ## Sviluppo
 
 PitLife usa C# con MonoGame. Per aggiungere specie o comportamenti:
-- **Specie**: modifica `Simulation/SpeciesRegistry.cs` o crea `Content/species.json`
+- **Specie**: modifica `Simulation/Entities/BuiltinSpecies.cs` o crea `Content/species.json`
 - **Comportamenti**: implementa `ICreatureBehavior` in `Simulation/Behaviors/`
 - **Biomi**: aggiungi a `BiomeType.cs`, `Tile.cs`, `WorldGenerator.cs`, renderer
+- **Piante**: imposta `MinTemperature`/`MaxTemperature` per fasce climatiche
 
 ## Licenza
 
