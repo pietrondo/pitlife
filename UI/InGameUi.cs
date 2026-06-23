@@ -163,7 +163,7 @@ public sealed class InGameUi
         var slSize = font.MeasureString(speedLabel);
         var sx = _speedDownButton.Bounds.Right + (_speedUpButton.Bounds.X - _speedDownButton.Bounds.Right) / 2f - slSize.X / 2f;
         var sy = _speedDownButton.Bounds.Center.Y - slSize.Y / 2;
-        spriteBatch.DrawString(font, speedLabel, new Vector2(sx, sy), UiTheme.WarmParchment);
+        spriteBatch.DrawString(font, speedLabel, new Vector2(sx, sy), Color.White);
         _speedUpButton.Draw(spriteBatch, pixel, font, mouse, false);
         _cataclysmButton.Draw(spriteBatch, pixel, font, mouse, false);
         _menuButton.Draw(spriteBatch, pixel, font, mouse, false);
@@ -339,7 +339,7 @@ public sealed class InGameUi
         _statisticsButton.Bounds = new Rectangle(x, y, 120, 44); x += 120 + gap;
         _creatureButton.Bounds = new Rectangle(x, y, 110, 44); x += 110 + gap;
         _arrangeButton.Bounds = new Rectangle(x, y, 90, 44); x += 90 + gap;
-        _speedDownButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + 2;
+        _speedDownButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + 20;
         _speedUpButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + gap;
         _cataclysmButton.Bounds = new Rectangle(x, y, 120, 44); x += 120 + gap;
         _menuButton.Bounds = new Rectangle(x, y, 80, 44);

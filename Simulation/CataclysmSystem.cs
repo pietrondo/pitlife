@@ -293,12 +293,28 @@ public sealed class CataclysmSystem
         }
         else if (ActiveEvent == "Supervolcano")
         {
-            // Eruption column
+            // Rising magma column from ground
             float intensity = Math.Min(1f, progress * 2f) * Math.Max(0f, 1f - progress * 1.5f);
-            DrawFireball(sb, pixel, pos - new Vector2(0, maxR * (1f - progress)), maxR * 0.4f * intensity, new Color(255, 80, 20), (byte)(intensity * 200));
-            // Lava spread
-            DrawRing(sb, pixel, pos, maxR * progress, new Color(255, 40, 10, (int)(intensity * 100)), 4);
-            DrawFireCluster(sb, pixel, pos, maxR * 0.5f * progress, progress, progress);
+            float colH = maxR * 2f * intensity;
+            // Magma column (vertical stream going up)
+            for (int stripe = 0; stripe < 3; stripe++)
+            {
+                float sx = pos.X + (stripe - 1) * maxR * 0.2f;
+                float sy = pos.Y - colH * (0.5f + stripe * 0.2f);
+                DrawFireball(sb, pixel, new Vector2(sx, sy), 3 + stripe * 2, new Color(255, 60, 10), (byte)(intensity * 180));
+            }
+            // Rising lava blobs
+            for (int i = 0; i < 6; i++)
+            {
+                float angle = (float)Math.Sin(progress * 5f + i * 1.2f) * 0.5f;
+                float rise = (progress + i * 0.1f) % 1f;
+                float bx = pos.X + angle * maxR * 0.4f;
+                float by = pos.Y - rise * colH;
+                DrawFireball(sb, pixel, new Vector2(bx, by), 2 + i % 3, new Color(255, 140, 20), (byte)(intensity * 200));
+            }
+            // Lava pool at base
+            DrawRing(sb, pixel, pos, maxR * progress * 0.7f, new Color(255, 40, 10, (int)(intensity * 150)), 5);
+            DrawFireCluster(sb, pixel, pos, maxR * 0.4f * progress, progress, progress);
         }
         else if (ActiveEvent == "Firestorm")
         {
