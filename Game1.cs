@@ -325,20 +325,38 @@ public class Game1 : Game
         bool cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
 
-        // Track when SelectedCataclysm was set (for SpawnPanel)
-        if (_spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata)
+        // ── Mutual exclusion: only one mode active ────────────
+        // Track changes and close other panel when selection changes
+        bool spawnJustSelected = _spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata;
+        bool panelJustSelected = _cataclysmPanel.SelectedType != null && _cataclysmPanel.SelectedType != _prevPanelCata;
+
+        if (spawnJustSelected || _spawnPanel.SelectedSpeciesKey != null)
         {
             _prevSpawnCata = _spawnPanel.SelectedCataclysm;
-            _cataSelectedFrame = _gameFrame;
+            if (spawnJustSelected) _cataSelectedFrame = _gameFrame;
+            _cataclysmPanel.SelectedType = null;
+            _prevPanelCata = null;
         }
-        // Track when SelectedType was set (for CataclysmPanel)
-        if (_cataclysmPanel.SelectedType != null && _cataclysmPanel.SelectedType != _prevPanelCata)
+        if (panelJustSelected)
         {
             _prevPanelCata = _cataclysmPanel.SelectedType;
             _cataSelectedFrame = _gameFrame;
+            _spawnPanel.SelectedCataclysm = null;
+            _prevSpawnCata = null;
         }
-        // Clear cata selection if panel closed
-        if (!_cataclysmPanel.IsOpen && _cataclysmPanel.SelectedType == null) _prevPanelCata = null;
+        if (_cataclysmPanel.SelectedType == null && !_cataclysmPanel.IsOpen) _prevPanelCata = null;
+        if (_spawnPanel.SelectedCataclysm == null) _prevSpawnCata = null;
+
+        // ESC cancels any active mode
+        if (kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape) && !_spawnPanel.IsOpen && !_cataclysmPanel.IsOpen)
+        {
+            _spawnPanel.SelectedCataclysm = null;
+            _spawnPanel.DeselectSpecies();
+            _cataclysmPanel.SelectedType = null;
+            _prevPanelCata = null;
+            _prevSpawnCata = null;
+            _cataSelectedFrame = 0;
+        }
 
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.Up) && _prevKbd.IsKeyUp(Keys.Up))
