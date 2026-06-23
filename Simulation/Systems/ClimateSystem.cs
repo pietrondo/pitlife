@@ -9,8 +9,8 @@ public sealed class ClimateSystem : ISimulationSystem
     public SimulationPhase Phase => SimulationPhase.EarlyUpdate;
 
     public const float PlanetRadiusKm = 6371f;
-    public const float OrbitalAU = 1f;
-    public const float Eccentricity = 0.12f;
+    public const float DefaultOrbitalAU = 1f;
+    public const float DefaultEccentricity = 0.12f;
     public const float OrbitalPeriod = 480f;
     public const float YearLength = OrbitalPeriod;
     public const float SeasonLength = OrbitalPeriod / 4f;
@@ -29,6 +29,8 @@ public sealed class ClimateSystem : ISimulationSystem
     public float OrbitalAngle { get; private set; }
     public float SunDistanceAU { get; private set; } = 1f;
     public float OrbitalSpeedKmS { get; private set; } = 29.8f;
+    public float OrbitalAU { get; private set; } = DefaultOrbitalAU;
+    public float Eccentricity { get; private set; } = DefaultEccentricity;
 
     private float _extremeEventTimer;
     private float _extremeEventDuration;
@@ -47,6 +49,14 @@ public sealed class ClimateSystem : ISimulationSystem
         TemperatureModifier = 0;
         GrassRegenModifier = 1f;
         EnergyModifier = 1f;
+    }
+
+    public void Configure(float planetRadiusKm, float orbitalAU, float eccentricity)
+    {
+        OrbitalAU = orbitalAU;
+        Eccentricity = eccentricity;
+        SunDistanceAU = orbitalAU;
+        OrbitalSpeedKmS = 29.8f * MathF.Sqrt(1f / orbitalAU);
     }
 
     public void Update(float totalTime, Random rng)
@@ -136,6 +146,21 @@ public sealed class ClimateSystem : ISimulationSystem
         float normalizedY = tileY / Math.Max(1, worldHeight - 1);
         float latitude = (normalizedY - 0.5f) * MathF.PI;
         return MathF.Cos(latitude);
+    }
+
+    public Season GetLocalSeason(float tileY, int worldHeight)
+    {
+        float normalizedY = tileY / Math.Max(1, worldHeight - 1);
+        bool isSouth = normalizedY > 0.5f;
+        if (!isSouth) return CurrentSeason;
+        return CurrentSeason switch
+        {
+            Season.Summer => Season.Winter,
+            Season.Winter => Season.Summer,
+            Season.Spring => Season.Autumn,
+            Season.Autumn => Season.Spring,
+            _ => CurrentSeason
+        };
     }
 
     public float GetTileTemperature(Tile tile, float tileY, int worldHeight)

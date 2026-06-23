@@ -497,8 +497,15 @@ public sealed class InGameUi
         float pi = MathF.PI;
 
         // Global data
-        DrawLine(sb, font, content.X, y, I18n.Format("climate.season",
-            I18n.T($"season.{climate.CurrentSeason.ToString().ToLowerInvariant()}")), UiTheme.MossSignal);
+        string seasonKey = climate.CurrentSeason switch
+        {
+            Season.Spring => "season.Spring",
+            Season.Summer => "season.Summer",
+            Season.Autumn => "season.Autumn",
+            Season.Winter => "season.Winter",
+            _ => "season.Spring"
+        };
+        DrawLine(sb, font, content.X, y, I18n.Format("climate.season", I18n.T(seasonKey)), UiTheme.MossSignal);
         y += 20;
 
         float progressW = content.Width - 8;
@@ -517,10 +524,20 @@ public sealed class InGameUi
         int ly = Math.Clamp(h.Y, 0, World.Height - 1);
         Tile localTile = World.GetTile(lx, ly);
         float localTemp = climate.GetTileTemperature(localTile, ly, World.Height);
+        Season localSeason = climate.GetLocalSeason(ly, World.Height);
+        string localSeasonKey = localSeason switch
+        {
+            Season.Spring => "season.Spring", Season.Summer => "season.Summer",
+            Season.Autumn => "season.Autumn", Season.Winter => "season.Winter", _ => "season.Spring"
+        };
+        string localSeasonName = I18n.T(localSeasonKey);
         string biomeName = I18n.T($"biome.{localTile.Biome}");
         DrawLine(sb, font, content.X, y,
             I18n.Format("climate.local", lx, ly, biomeName, (int)localTemp), UiTheme.WarmParchment);
-        y += 20;
+        y += 18;
+        DrawLine(sb, font, content.X, y,
+            I18n.Format("climate.localseason", localSeasonName), UiTheme.MossSignal);
+        y += 22;
 
         DrawLine(sb, font, content.X, y,
             I18n.Format("climate.orbit", climate.SunDistanceAU, climate.OrbitalAngle * 180f / pi, climate.OrbitalSpeedKmS),

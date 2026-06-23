@@ -50,12 +50,14 @@ public sealed class MainMenu
     private readonly UiButton _presetButton = new("");
     private readonly UiButton _islandSizeButton = new("");
     private readonly UiButton _mapSizeButton = new("");
+    private readonly UiButton _planetButton = new("");
 
     private bool _showOptions;
     private bool _showWorldGenPanel;
     private bool _inputReady;
     private int _focusedIndex;
     private int _presetIndex;
+    private int _planetIndex;
     private int _islandSizeIndex;
     private int _mapSizeIndex = 2;
 
@@ -76,7 +78,20 @@ public sealed class MainMenu
         ParseIntSafe(_seaLevelInput.Text, 40) / 100f,
         (IslandSize)_islandSizeIndex,
         MapSizes[_mapSizeIndex].Width,
-        MapSizes[_mapSizeIndex].Height);
+        MapSizes[_mapSizeIndex].Height)
+    {
+        PlanetRadiusKm = PlanetPresets[_planetIndex].RadiusKm,
+        OrbitalAU = PlanetPresets[_planetIndex].OrbitalAU,
+        Eccentricity = PlanetPresets[_planetIndex].Eccentricity
+    };
+
+    private static readonly (string Label, float RadiusKm, float OrbitalAU, float Eccentricity)[] PlanetPresets =
+    [
+        ("Earth-like", 6371f, 1.00f, 0.12f),
+        ("Small Cold", 4200f, 1.40f, 0.08f),
+        ("Large Hot", 9800f, 0.72f, 0.15f),
+        ("Super-Earth", 12000f, 0.90f, 0.10f)
+    ];
 
     private static int ParseIntSafe(string text, int fallback)
     {
@@ -193,6 +208,8 @@ public sealed class MainMenu
                 CycleIslandSize();
             if (_mapSizeButton.WasClicked(mouse, previousMouse))
                 CycleMapSize();
+            if (_planetButton.WasClicked(mouse, previousMouse))
+                CyclePlanet();
 
             if (_worldGenButtons[0].WasClicked(mouse, previousMouse))
             {
@@ -266,6 +283,7 @@ public sealed class MainMenu
 
             _presetButton.Draw(spriteBatch, pixel, font, mouse, false);
             _mapSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
+            _planetButton.Draw(spriteBatch, pixel, font, mouse, false);
 
             int labelX = _continentInput.Bounds.X - 8;
             string contLabel = I18n.T("menu.continents") + ":";
@@ -336,6 +354,7 @@ public sealed class MainMenu
         _presetButton.Text = I18n.T("menu.preset") + ": " + ((WorldGenPreset)_presetIndex);
         _islandSizeButton.Text = I18n.T("menu.islandSize") + ": " + ((IslandSize)_islandSizeIndex);
         _mapSizeButton.Text = I18n.T("menu.mapSize") + ": " + MapSizes[_mapSizeIndex].Label;
+        _planetButton.Text = I18n.T("menu.planet") + ": " + PlanetPresets[_planetIndex].Label;
         _showWorldGenPanel = true;
         return MenuAction.None;
     }
@@ -369,6 +388,12 @@ public sealed class MainMenu
         _mapSizeButton.Text = I18n.T("menu.mapSize") + ": " + MapSizes[_mapSizeIndex].Label;
     }
 
+    private void CyclePlanet()
+    {
+        _planetIndex = (_planetIndex + 1) % PlanetPresets.Length;
+        _planetButton.Text = I18n.T("menu.planet") + ": " + PlanetPresets[_planetIndex].Label;
+    }
+
     public void CloseWorldGenPanel()
     {
         _showWorldGenPanel = false;
@@ -377,7 +402,7 @@ public sealed class MainMenu
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showWorldGenPanel ? 500 : (_showOptions ? 260 : 436);
+        int panelHeight = _showWorldGenPanel ? 580 : (_showOptions ? 260 : 436);
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
@@ -397,14 +422,15 @@ public sealed class MainMenu
 
             _presetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY, wgButtonWidth, wgButtonHeight);
             _mapSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+            _planetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 2 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
 
             int labelWidth = (wgButtonWidth - wgInputWidth - 8) / 2 + wgInputWidth + 8;
-            _continentInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 2 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
-            _seaLevelInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 3 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
+            _continentInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 3 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
+            _seaLevelInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 4 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
 
-            _islandSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 4 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+            _islandSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 5 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
 
-            int genY = wgStartY + 5 * (wgButtonHeight + wgGap) + wgGap;
+            int genY = wgStartY + 6 * (wgButtonHeight + wgGap) + wgGap;
             _worldGenButtons[0].Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, genY, wgButtonWidth, wgButtonHeight);
             return;
         }

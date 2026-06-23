@@ -46,6 +46,9 @@ public record WorldGenOptions
             field = value;
         }
     }
+    public float PlanetRadiusKm { get; init; } = 6371f;
+    public float OrbitalAU { get; init; } = 1f;
+    public float Eccentricity { get; init; } = 0.12f;
 
     public WorldGenOptions(
         WorldGenPreset preset,

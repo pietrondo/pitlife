@@ -40,6 +40,9 @@ public class Game1 : Game
     private bool _showDebugOverlay;
     private bool _contentLoaded;
     private float _showLoadingTimer = 1.5f;
+    private bool _pendingWorldGen;
+    private int? _pendingSeed;
+    private WorldGenOptions? _pendingOptions;
     private GameScreen _screen = GameScreen.MainMenu;
     private float _menuInputCooldown = 0.75f;
 
@@ -156,6 +159,14 @@ public class Game1 : Game
         if (_showLoadingTimer > 0)
         {
             _showLoadingTimer -= dt;
+            if (_pendingWorldGen && _showLoadingTimer <= 0.8f)
+            {
+                GenerateNewWorld(_pendingSeed, _pendingOptions);
+                _pendingWorldGen = false;
+                _screen = GameScreen.Playing;
+                _paused = false;
+                _controller.SetPause(false);
+            }
             _prevKbd = Keyboard.GetState();
             _prevMouse = Mouse.GetState();
             base.Update(gameTime);
@@ -217,17 +228,17 @@ public class Game1 : Game
                     break;
                 case MenuAction.NewWorld:
                     _mainMenu.CloseWorldGenPanel();
-                    GenerateNewWorld(null, _mainMenu.CurrentOptions);
-                    _screen = GameScreen.Playing;
-                    _paused = false;
-                    _controller.SetPause(false);
+                    _pendingWorldGen = true;
+                    _pendingSeed = null;
+                    _pendingOptions = _mainMenu.CurrentOptions;
+                    _showLoadingTimer = 1.5f;
                     break;
                 case MenuAction.NewWorldWithSeed:
                     _mainMenu.CloseWorldGenPanel();
-                    GenerateNewWorld(_mainMenu.Seed, _mainMenu.CurrentOptions);
-                    _screen = GameScreen.Playing;
-                    _paused = false;
-                    _controller.SetPause(false);
+                    _pendingWorldGen = true;
+                    _pendingSeed = _mainMenu.Seed;
+                    _pendingOptions = _mainMenu.CurrentOptions;
+                    _showLoadingTimer = 1.5f;
                     break;
                 case MenuAction.SaveGame:
                     SaveSystem.Save("savegame.json", _ecosystem);
@@ -550,6 +561,7 @@ public class Game1 : Game
         int seed = seedOverride ?? new Random().Next();
         var wgOpts = worldGenOptions ?? Simulation.WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
         _ecosystem = new Ecosystem(wgOpts, seed);
+        _ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
         _ecosystem.Initialize(60, 20, 15, 150);
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
