@@ -120,6 +120,7 @@ public sealed class CataclysmSystem : ISimulationSystem
             AnimDuration = 2f;
         }
         Logger.Event("CATACLYSM", $"MASS EXTINCTION: {ActiveEvent} at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
+        TryChainReaction(ecosystem, rng, ActiveEvent, ImpactPosition);
     }
 
     private int ApplyTerrainChange(Ecosystem ecosystem)
@@ -149,6 +150,41 @@ public sealed class CataclysmSystem : ISimulationSystem
     public void TriggerManual(Ecosystem ecosystem, Random rng)
     {
         TriggerMassExtinction(ecosystem, rng);
+    }
+
+    private void TryChainReaction(Ecosystem ecosystem, Random rng, string type, Vector2 position)
+    {
+        // Earthquake on water → Tsunami
+        if (type == "Earthquake")
+        {
+            int tx = (int)(position.X / ecosystem.World.TileSize);
+            int ty = (int)(position.Y / ecosystem.World.TileSize);
+            bool nearWater = false;
+            for (int dy = -3; dy <= 3 && !nearWater; dy++)
+                for (int dx = -3; dx <= 3 && !nearWater; dx++)
+                {
+                    var t = ecosystem.World.GetTile(tx + dx, ty + dy);
+                    if (t.Biome == BiomeType.DeepOcean || t.Biome == BiomeType.ShallowWater)
+                        nearWater = true;
+                }
+            if (nearWater && rng.NextDouble() < 0.4f)
+            {
+                Logger.Event("CATACLYSM", $"Chain: Earthquake → Tsunami at ({tx},{ty})");
+                ImpactColor = new Color(30, 100, 200, 180);
+                ActiveEvent = "Tsunami";
+                GrassMultiplier = 2.5f;
+                IsActive = true;
+                Timer = 25f;
+            }
+        }
+
+        // Supervolcano → volcanic winter
+        if (type == "Supervolcano" && rng.NextDouble() < 0.5f)
+        {
+            Logger.Event("CATACLYSM", $"Chain: Supervolcano → Volcanic Winter");
+            GrassMultiplier *= 0.2f;
+            Timer = Math.Max(Timer, 60f);
+        }
     }
 
     public void TriggerAt(Ecosystem ecosystem, Random rng, string type, Microsoft.Xna.Framework.Vector2 position)
@@ -216,6 +252,7 @@ public sealed class CataclysmSystem : ISimulationSystem
                 tile.SoilNutrients = type == "Flood" ? 2f : 0.1f;
             }
         Logger.Event("CATACLYSM", $"Player {type} at ({tx},{ty}) r={radius}");
+        TryChainReaction(ecosystem, rng, type, position);
     }
 
     public void UpdateVolcanoes(Ecosystem ecosystem, float dt, Random rng)

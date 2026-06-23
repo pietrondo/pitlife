@@ -180,7 +180,7 @@ public class Ecosystem
                     if (Creatures.Count < MaxCreatures)
                     {
                         Creatures.Add(c);
-                        _spatialGrid.Update(c);
+                _spatialGrid.Update(c);
                     }
                 }
                 _pendingAdd.Clear();
@@ -255,6 +255,7 @@ public class Ecosystem
                     c.Die();
                 }
                 _spatialGrid.Update(c);
+                c.ApplyWindDrift(Climate.WindDirection, Climate.WindSpeed, dt, World);
             }
         }
 
@@ -374,6 +375,9 @@ public class Ecosystem
         if (plant.Energy < plant.ReproductionThreshold) return;
 
         float angle = (float)(Random.NextDouble() * Math.PI * 2);
+        float windBias = Climate.WindDirection;
+        if (plant.Genome.ForestAdaptation > 0.3f)
+            angle = (angle * 0.3f + windBias * 0.7f + (float)Math.PI * 0.5f) % ((float)Math.PI * 2);
         float dist = 30f + (float)Random.NextDouble() * 40f;
         Vector2 newPos = plant.Position + new Vector2((float)Math.Cos(angle) * dist, (float)Math.Sin(angle) * dist);
 

@@ -169,6 +169,17 @@ public abstract class Creature
         TryReproduce(ecosystem, dt);
     }
 
+    public void ApplyWindDrift(float windDir, float windSpeed, float dt, World world)
+    {
+        if (CreatureType == CreatureType.Plant) return;
+        float drift = windSpeed * 6f * dt;
+        if (IsAquatic) drift *= 0.3f;
+        Vector2 push = new Vector2(MathF.Cos(windDir) * drift, MathF.Sin(windDir) * drift);
+        Vector2 newPos = ClampToWorld(Position + push, world);
+        if (world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))
+            Position = newPos;
+    }
+
     private void TryReproduce(Ecosystem ecosystem, float dt)
     {
         if (!IsAdult) return;
