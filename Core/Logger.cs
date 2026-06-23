@@ -37,7 +37,7 @@ public static class Logger
             for (int i = 5; i < files.Length; i++)
                 File.Delete(files[i]);
         }
-        catch { /* ignore rotation errors */ }
+        catch (Exception ex) { Console.Error.WriteLine($"Log rotation failed: {ex.Message}"); }
     }
 
     public static void Info(string message) => Write("INFO", message);
