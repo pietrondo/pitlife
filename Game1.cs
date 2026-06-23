@@ -234,8 +234,8 @@ public class Game1 : Game
                             _screen = GameScreen.Playing;
                             _paused = false;
                             _controller.SetPause(false);
-                        }
-                    }
+    }
+}
                     catch (InvalidDataException ex)
                     {
                         Logger.Error($"Failed to load save: {ex.Message}");
@@ -699,6 +699,13 @@ public class Game1 : Game
         _camera.Position = savedPos;
 
         _spriteBatch.Begin();
+        if (!_contentLoaded)
+        {
+            DrawLoadingScreen(_spriteBatch);
+            _spriteBatch.End();
+            base.Draw(gameTime);
+            return;
+        }
         if (_screen == GameScreen.MainMenu)
         {
             _mainMenu.Draw(
@@ -869,7 +876,24 @@ public class Game1 : Game
         }
     }
 
-    
+    private void DrawLoadingScreen(SpriteBatch sb)
+    {
+        int vw = GraphicsDevice.Viewport.Width;
+        int vh = GraphicsDevice.Viewport.Height;
+        GraphicsDevice.Clear(new Color(11, 23, 18));
 
-    
+        string text = "LOADING...";
+        var size = _font.MeasureString(text);
+        sb.DrawString(_font, text, new Vector2((vw - size.X) / 2, vh / 2 - 40), UiTheme.MossSignal);
+
+        int barW = 300;
+        int barH = 16;
+        int barX = (vw - barW) / 2;
+        int barY = vh / 2;
+        UiPrimitives.Fill(sb, _uiPixel, new Rectangle(barX, barY, barW, barH), new Color(20, 40, 30));
+        float progress = 0.5f + (float)Math.Sin(Environment.TickCount64 / 300.0) * 0.5f;
+        int fillW = (int)(barW * progress);
+        UiPrimitives.Fill(sb, _uiPixel, new Rectangle(barX + 2, barY + 2, fillW - 4, barH - 4), UiTheme.MossSignal);
+        UiPrimitives.Border(sb, _uiPixel, new Rectangle(barX, barY, barW, barH), 2, UiTheme.BarkEdge);
+    }
 }

@@ -16,7 +16,7 @@ public sealed class ClimateSystem : ISimulationSystem
     public const float SeasonLength = OrbitalPeriod / 4f;
     public const float BaseSurfaceTempK = 288f;
 
-    public Season CurrentSeason { get; private set; } = Season.Spring;
+    public Season CurrentSeason { get; private set; } = Season.Summer;
     public float SeasonProgress { get; private set; }
     public float TemperatureModifier { get; private set; }
     public float GrassRegenModifier { get; private set; } = 1f;
@@ -27,8 +27,8 @@ public sealed class ClimateSystem : ISimulationSystem
     public float WindDirection { get; private set; }
 
     public float OrbitalAngle { get; private set; }
-    public float SunDistanceAU { get; private set; }
-    public float OrbitalSpeedKmS { get; private set; }
+    public float SunDistanceAU { get; private set; } = 1f;
+    public float OrbitalSpeedKmS { get; private set; } = 29.8f;
 
     private float _extremeEventTimer;
     private float _extremeEventDuration;
@@ -42,6 +42,11 @@ public sealed class ClimateSystem : ISimulationSystem
         IsExtremeEvent = false;
         ExtremeEventName = "";
         OrbitalAngle = 0;
+        SunDistanceAU = 1f;
+        OrbitalSpeedKmS = 29.8f;
+        TemperatureModifier = 0;
+        GrassRegenModifier = 1f;
+        EnergyModifier = 1f;
     }
 
     public void Update(float totalTime, Random rng)
@@ -66,6 +71,12 @@ public sealed class ClimateSystem : ISimulationSystem
             _ => Season.Spring
         };
 
+        if (newSeason != CurrentSeason)
+        {
+            CurrentSeason = newSeason;
+            Logger.Event("SEASON", $"Season changed to {CurrentSeason} at T={totalTime:F1}s (dist={SunDistanceAU:F3} AU)");
+        }
+
         (GrassRegenModifier, EnergyModifier) = CurrentSeason switch
         {
             Season.Spring => (1.3f, 1.0f),
@@ -78,12 +89,6 @@ public sealed class ClimateSystem : ISimulationSystem
         float orbitalBoost = TemperatureModifier * 0.3f;
         GrassRegenModifier += orbitalBoost;
         EnergyModifier -= orbitalBoost * 0.5f;
-
-        if (newSeason != CurrentSeason)
-        {
-            CurrentSeason = newSeason;
-            Logger.Event("SEASON", $"Season changed to {CurrentSeason} at T={totalTime:F1}s (dist={SunDistanceAU:F3} AU)");
-        }
 
         WindDirection = (WindDirection + (float)rng.NextDouble() * 0.1f) % (MathF.PI * 2);
         WindSpeed = 0.3f + (float)rng.NextDouble() * 0.6f + Math.Abs(TemperatureModifier) * 2f;
