@@ -593,7 +593,8 @@ public sealed class InGameUi
                .Replace("[SPAWN]", I18n.T("evt.spawn"))
                .Replace("[TERRAIN]", I18n.T("evt.terrain"));
         ev = ev.Replace("Season changed to ", I18n.T("evt.msg.season"))
-               .Replace(" at T=", " " + I18n.T("evt.msg.at") + " ")
+               .Replace(" at T=", " " + I18n.T("evt.msg.at") + "=")
+               .Replace(" at (", " " + I18n.T("evt.msg.at") + " (")
                .Replace("Player ", I18n.T("evt.msg.player") + " ")
                .Replace("MASS EXTINCTION: ", I18n.T("evt.msg.extinction") + " ")
                .Replace("Extreme event '", I18n.T("evt.msg.extreme") + " '")
@@ -605,8 +606,18 @@ public sealed class InGameUi
                .Replace("duration=", I18n.T("evt.msg.duration") + "=")
                .Replace("Cataclysm ended", I18n.T("evt.msg.cataend"))
                .Replace("died at age ", I18n.T("evt.msg.died"))
-               .Replace("x ", "x")
                .Replace("(dist=", "(" + I18n.T("evt.msg.dist") + "=");
+
+        foreach (string sp in Simulation.SpeciesRegistry.All)
+        {
+            string tr = Localization.I18n.Species(sp);
+            if (tr != sp && ev.Contains(sp))
+            {
+                int idx = ev.IndexOf(sp);
+                if (idx > 0 && !char.IsLetterOrDigit(ev[idx - 1]))
+                    ev = ev.Replace(sp, tr);
+            }
+        }
         return ev;
     }
 }
