@@ -328,6 +328,13 @@ public class Game1 : Game
             GraphicsDevice.Viewport.Width,
             GraphicsDevice.Viewport.Height);
 
+        var worldMouse = _camera.ScreenToWorld(mouse.X, mouse.Y);
+        int hx = (int)(worldMouse.X / _ecosystem.World.TileSize);
+        int hy = (int)(worldMouse.Y / _ecosystem.World.TileSize);
+        _inGameUi.HoverTile = new Point(
+            Math.Clamp(hx, 0, _ecosystem.World.Width - 1),
+            Math.Clamp(hy, 0, _ecosystem.World.Height - 1));
+
         if (_inGameUi.WantsToGoToMainMenu)
         {
             _inGameUi.WantsToGoToMainMenu = false;

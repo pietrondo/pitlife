@@ -35,6 +35,7 @@ public sealed class InGameUi
     public World? World { get; set; }
     public Simulation.ClimateSystem? Climate { get; set; }
     public Point? SelectedTile { get; set; }
+    public Point? HoverTile { get; set; }
     public event Action? ToolbarButtonClicked;
 
     public InGameUi()
@@ -511,8 +512,9 @@ public sealed class InGameUi
         y += 18;
 
         // Local tile data
-        int lx = Math.Clamp(mouse.X / World.TileSize, 0, World.Width - 1);
-        int ly = Math.Clamp(mouse.Y / World.TileSize, 0, World.Height - 1);
+        Point h = HoverTile ?? SelectedTile ?? new Point(World.Width / 2, World.Height / 2);
+        int lx = Math.Clamp(h.X, 0, World.Width - 1);
+        int ly = Math.Clamp(h.Y, 0, World.Height - 1);
         Tile localTile = World.GetTile(lx, ly);
         float localTemp = climate.GetTileTemperature(localTile, ly, World.Height);
         string biomeName = I18n.T($"biome.{localTile.Biome}");
