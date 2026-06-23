@@ -62,40 +62,35 @@ public sealed class PixelWorldRenderer : IDisposable
                 float worldY = y * _world.TileSize / (float)_renderScale;
                 int tileX = Math.Clamp((int)(worldX / _world.TileSize), 0, _world.Width - 1);
                 int tileY = Math.Clamp((int)(worldY / _world.TileSize), 0, _world.Height - 1);
-
-                // Fractional position within tile (0..1)
-                float fx = (worldX / _world.TileSize) - tileX;
-                float fy = (worldY / _world.TileSize) - tileY;
-
-                // Smooth interpolation weights (hermite-like smoothstep)
-                float wx = fx * fx * (3f - 2f * fx);
-                float wy = fy * fy * (3f - 2f * fy);
-
-                // Get colors for 4 corners of the tile
-                int nx = Math.Min(tileX + 1, _world.Width - 1);
-                int ny = Math.Min(tileY + 1, _world.Height - 1);
-
-                Color c00 = GetBiomeRenderColor(_world.Tiles[tileX, tileY].Biome);
-                Color c10 = GetBiomeRenderColor(_world.Tiles[nx, tileY].Biome);
-                Color c01 = GetBiomeRenderColor(_world.Tiles[tileX, ny].Biome);
-                Color c11 = GetBiomeRenderColor(_world.Tiles[nx, ny].Biome);
-
-                // Bilinear interpolation
-                int r = (int)((1 - wx) * (1 - wy) * c00.R + wx * (1 - wy) * c10.R + (1 - wx) * wy * c01.R + wx * wy * c11.R);
-                int g = (int)((1 - wx) * (1 - wy) * c00.G + wx * (1 - wy) * c10.G + (1 - wx) * wy * c01.G + wx * wy * c11.G);
-                int b = (int)((1 - wx) * (1 - wy) * c00.B + wx * (1 - wy) * c10.B + (1 - wx) * wy * c01.B + wx * wy * c11.B);
-
-                // River override
                 int idx = tileY * _world.Width + tileX;
-                if (_world.RiverMask[idx])
+
+                // Position within tile (0..1)
+                float lx = (worldX / _world.TileSize) - tileX;
+                float ly = (worldY / _world.TileSize) - tileY;
+
+                var biome = _world.Tiles[tileX, tileY].Biome;
+                Color pixelColor = GetBiomeRenderColor(biome);
+
+                // Ordered dither at biome boundaries for smooth transitions
+                // Check 4 neighbors; at boundaries blend using position-based threshold
+                Color BlendEdge(int nx, int ny, float proximity)
                 {
-                    var riverColor = new Color(40, 100, 200);
-                    r = (int)(r * 0.7f + riverColor.R * 0.3f);
-                    g = (int)(g * 0.7f + riverColor.G * 0.3f);
-                    b = (int)(b * 0.7f + riverColor.B * 0.3f);
+                    var nb = _world.Tiles[nx, ny].Biome;
+                    if (nb == biome) return pixelColor;
+                    float t = 1f - proximity; // 0 at boundary, 1 deep inside
+                    int hash = (x * 3 + y * 7) & 7; // 0..7
+                    return hash < t * 8f ? pixelColor : GetBiomeRenderColor(nb);
                 }
 
-                data[y * width + x] = new Color(r, g, b);
+                if (lx < 0.25f && tileX > 0)               pixelColor = BlendEdge(tileX - 1, tileY, lx / 0.25f);
+                else if (lx > 0.75f && tileX < _world.Width - 1) pixelColor = BlendEdge(tileX + 1, tileY, (1f - lx) / 0.25f);
+                if (ly < 0.25f && tileY > 0)               pixelColor = BlendEdge(tileX, tileY - 1, ly / 0.25f);
+                else if (ly > 0.75f && tileY < _world.Height - 1) pixelColor = BlendEdge(tileX, tileY + 1, (1f - ly) / 0.25f);
+
+                if (_world.RiverMask[idx])
+                    pixelColor = Color.Lerp(pixelColor, new Color(40, 100, 200), 0.3f);
+
+                data[y * width + x] = pixelColor;
             }
         }
 

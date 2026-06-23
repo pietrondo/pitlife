@@ -106,12 +106,11 @@ public sealed class WorldGenerator
                 BiomeType biome = elev switch
                 {
                     < 0.12f => isLand > 0f ? BiomeType.ShallowWater : BiomeType.DeepOcean,
-                    < 0.22f => BiomeType.Beach,
-                    < 0.35f => detail < 0.3f ? BiomeType.Desert : BiomeType.Grassland,
-                    < 0.50f => cst > 0.55f ? BiomeType.Swamp : BiomeType.Grassland,
-                    < 0.65f => detail < 0.35f ? BiomeType.Savanna : BiomeType.Forest,
-                    < 0.78f => BiomeType.DenseForest,
-                    < 0.90f => BiomeType.Mountain,
+                    < 0.20f => BiomeType.Beach,
+                    < 0.35f => BiomeType.Grassland,
+                    < 0.55f => BiomeType.Forest,
+                    < 0.72f => BiomeType.DenseForest,
+                    < 0.88f => BiomeType.Mountain,
                     _ => BiomeType.Snow
                 };
                 _world.Tiles[x, y] = new Tile(biome);
