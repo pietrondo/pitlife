@@ -48,6 +48,8 @@ public sealed class InGameUi
     private int _popHistoryCount;
     private float _popRecordTimer;
     private const float PopRecordInterval = 10f;
+    private readonly float[] _tempHistory = new float[60];
+    private int _tempHistoryCount;
 
     public InGameUi()
     {
@@ -108,6 +110,14 @@ public sealed class InGameUi
         {
             Array.Copy(_popHistory, 1, _popHistory, 0, _popHistory.Length - 1);
             _popHistory[_popHistory.Length - 1] = new PopSnapshot(plants, herbivores, carnivores, omnivores);
+        }
+        float temp = Climate?.TemperatureModifier * 20f + 20f ?? 20f;
+        if (_tempHistoryCount < _tempHistory.Length)
+            _tempHistory[_tempHistoryCount++] = temp;
+        else
+        {
+            Array.Copy(_tempHistory, 1, _tempHistory, 0, _tempHistory.Length - 1);
+            _tempHistory[_tempHistory.Length - 1] = temp;
         }
     }
 
@@ -546,6 +556,12 @@ public sealed class InGameUi
             Color.Lerp(new Color(100, 150, 255), new Color(255, 120, 40), tempNorm));
         y += 18;
 
+        if (_tempHistoryCount >= 3)
+        {
+            DrawTempSparkline(sb, pixel, content.X, y, content.Width, _tempHistory, _tempHistoryCount);
+            y += 12;
+        }
+
         // Local tile data
         Point h = HoverTile ?? SelectedTile ?? new Point(World.Width / 2, World.Height / 2);
         int lx = Math.Clamp(h.X, 0, World.Width - 1);
@@ -662,6 +678,25 @@ public sealed class InGameUi
             int e2 = 2 * err;
             if (e2 > -dy) { err -= dy; x0 += sx; }
             if (e2 < dx) { err += dx; y0 += sy; }
+        }
+    }
+
+    private static void DrawTempSparkline(SpriteBatch sb, Texture2D pixel, int baseX, int baseY, int width,
+        float[] history, int count)
+    {
+        int w = width - 8, h = 12;
+        float xStep = count > 1 ? (float)w / (count - 1) : 0;
+        float min = float.MaxValue, max = float.MinValue;
+        for (int i = 0; i < count; i++) { if (history[i] < min) min = history[i]; if (history[i] > max) max = history[i]; }
+        float range = max - min; if (range < 1f) range = 1f;
+        for (int i = 1; i < count; i++)
+        {
+            float v0 = (history[i - 1] - min) / range, v1 = (history[i] - min) / range;
+            Color c0 = Color.Lerp(new Color(80, 120, 220), new Color(230, 80, 40), v0);
+            Color c1 = Color.Lerp(new Color(80, 120, 220), new Color(230, 80, 40), v1);
+            int x0 = baseX + (int)((i - 1) * xStep), y0 = baseY + h - (int)(v0 * h);
+            int x1 = baseX + (int)(i * xStep), y1 = baseY + h - (int)(v1 * h);
+            DrawLineSegment(sb, pixel, x0, y0, x1, y1, c0);
         }
     }
 
