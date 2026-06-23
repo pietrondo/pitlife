@@ -161,7 +161,7 @@ public sealed class InGameUi
         // Speed label between arrows
         var speedLabel = paused ? I18n.T("hud.paused") : $"{speed:0.#}x";
         var slSize = font.MeasureString(speedLabel);
-        var sx = _speedDownButton.Bounds.Right + 4;
+        var sx = _speedDownButton.Bounds.Right + (_speedUpButton.Bounds.X - _speedDownButton.Bounds.Right) / 2f - slSize.X / 2f;
         var sy = _speedDownButton.Bounds.Center.Y - slSize.Y / 2;
         spriteBatch.DrawString(font, speedLabel, new Vector2(sx, sy), UiTheme.WarmParchment);
         _speedUpButton.Draw(spriteBatch, pixel, font, mouse, false);
@@ -332,15 +332,17 @@ public sealed class InGameUi
     private void LayoutToolbar(int viewportHeight)
     {
         int y = viewportHeight - 56;
-        int bW = 110;
         _toolbarRect = new Rectangle(8, viewportHeight - 60, 720, 52);
-        _statisticsButton.Bounds = new Rectangle(12, y, bW, 44);
-        _creatureButton.Bounds = new Rectangle(12 + bW + 6, y, bW, 44);
-        _arrangeButton.Bounds = new Rectangle(12 + (bW + 6) * 2, y, bW, 44);
-        _speedDownButton.Bounds = new Rectangle(12 + (bW + 6) * 3, y, 36, 44);
-        _speedUpButton.Bounds = new Rectangle(12 + (bW + 6) * 3 + 40, y, 36, 44);
-        _cataclysmButton.Bounds = new Rectangle(12 + (bW + 6) * 4 + 6, y, bW, 44);
-        _menuButton.Bounds = new Rectangle(12 + (bW + 6) * 5 + 6, y, bW, 44);
+
+        int x = 12;
+        int gap = 6;
+        _statisticsButton.Bounds = new Rectangle(x, y, 120, 44); x += 120 + gap;
+        _creatureButton.Bounds = new Rectangle(x, y, 110, 44); x += 110 + gap;
+        _arrangeButton.Bounds = new Rectangle(x, y, 90, 44); x += 90 + gap;
+        _speedDownButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + 2;
+        _speedUpButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + gap;
+        _cataclysmButton.Bounds = new Rectangle(x, y, 120, 44); x += 120 + gap;
+        _menuButton.Bounds = new Rectangle(x, y, 80, 44);
     }
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
