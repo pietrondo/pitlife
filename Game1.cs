@@ -411,9 +411,8 @@ public class Game1 : Game
             _prevPanelCata = null;
             _cataSelectedFrame = 0;
         }
-
         // Spawn creature only when panel is open, species selected, click is NOT on any panel
-        if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
+        else if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
             !spawnPanelConsumed && !cataConsumed && !pointerOverUi &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {

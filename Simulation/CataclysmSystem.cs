@@ -164,9 +164,36 @@ public sealed class CataclysmSystem
         for (int dy = -radius; dy <= radius; dy++)
             for (int dx = -radius; dx <= radius; dx++)
             {
-                var tile = ecosystem.World.GetTile(tx + dx, ty + dy);
-                if (tile.Biome != BiomeType.DeepOcean && tile.Biome != BiomeType.ShallowWater)
-                { tile.GrassAmount = type == "Flood" ? tile.MaxGrass : 0f; tile.SoilNutrients = type == "Flood" ? 2f : 0.1f; }
+                int wx = tx + dx, wy = ty + dy;
+                var tile = ecosystem.World.GetTile(wx, wy);
+                if (tile.Biome == BiomeType.DeepOcean || tile.Biome == BiomeType.ShallowWater) continue;
+
+                // Visible terrain changes (set Biome first - it resets grass)
+                float dist = MathF.Sqrt(dx * dx + dy * dy);
+                if (dist < radius * 0.4f)
+                {
+                    tile.Biome = type switch
+                    {
+                        "Asteroid" or "Supervolcano" => BiomeType.Volcano,
+                        "Earthquake" => BiomeType.Cave,
+                        "IceAge" => BiomeType.Snow,
+                        "Flood" => BiomeType.ShallowWater,
+                        _ => BiomeType.Desert
+                    };
+                }
+                else if (dist < radius * 0.8f)
+                {
+                    if (type is "Asteroid" or "Supervolcano" or "Drought")
+                        tile.Biome = BiomeType.Desert;
+                    else if (type == "Earthquake")
+                        tile.Biome = BiomeType.Mountain;
+                    else if (type == "IceAge")
+                        tile.Biome = BiomeType.Tundra;
+                }
+
+                // Then override grass/soil
+                tile.GrassAmount = type == "Flood" ? tile.MaxGrass : 0f;
+                tile.SoilNutrients = type == "Flood" ? 2f : 0.1f;
             }
         Logger.Event("CATACLYSM", $"Player {type} at ({tx},{ty}) r={radius}");
     }
