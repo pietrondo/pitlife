@@ -165,27 +165,31 @@ public class Ecosystem
     {
         lock (_lock)
         {
-            if (_pendingRemove.Count > 0)
-            {
-                var remove = new HashSet<Creature>(_pendingRemove);
-                foreach (var creature in remove)
-                    _spatialGrid.Remove(creature);
-                Creatures.RemoveAll(c => remove.Contains(c));
-                _pendingRemove.Clear();
-            }
-            if (_pendingAdd.Count > 0)
-            {
-                foreach (var c in _pendingAdd)
-                {
-                    if (Creatures.Count < MaxCreatures)
-                    {
-                        Creatures.Add(c);
-                _spatialGrid.Update(c);
-                    }
-                }
-                _pendingAdd.Clear();
-            }
+            FlushRemovals();
+            FlushAdditions();
         }
+    }
+
+    private void FlushRemovals()
+    {
+        if (_pendingRemove.Count == 0) return;
+        var remove = new HashSet<Creature>(_pendingRemove);
+        foreach (var creature in remove)
+            _spatialGrid.Remove(creature);
+        Creatures.RemoveAll(c => remove.Contains(c));
+        _pendingRemove.Clear();
+    }
+
+    private void FlushAdditions()
+    {
+        if (_pendingAdd.Count == 0) return;
+        foreach (var c in _pendingAdd)
+        {
+            if (Creatures.Count >= MaxCreatures) break;
+            Creatures.Add(c);
+            _spatialGrid.Update(c);
+        }
+        _pendingAdd.Clear();
     }
 
     private void SpawnSpecies<T>(string[] species, string defaultSpecies) where T : Creature
