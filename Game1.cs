@@ -31,6 +31,7 @@ public class Game1 : Game
     private readonly InGameUi _inGameUi = new();
     private readonly SpawnPanel _spawnPanel = new();
     private readonly CataclysmPanel _cataclysmPanel = new();
+    private readonly WeatherSystem _weather = new();
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
     private float _currentFPS;
@@ -466,6 +467,8 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
+        _weather.Update(_ecosystem.Climate, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
+
         _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
             dt * _controller.CurrentSpeed);
 
@@ -733,6 +736,11 @@ public class Game1 : Game
         Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
         _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), seasonTint);
         _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), tempBlend);
+        _spriteBatch.End();
+
+        bool isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
+        _weather.Draw(_spriteBatch, _uiPixel, isSnow);
         _spriteBatch.End();
 
         // Draw the creatures with Point Clamp (for crisp pixel art)
