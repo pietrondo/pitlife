@@ -662,12 +662,14 @@ public sealed class InGameUi
             int y0 = baseY + h - (int)(v0 * h / (float)maxVal);
             int x1 = baseX + (int)(i * xStep);
             int y1 = baseY + h - (int)(v1 * h / (float)maxVal);
-            DrawLineSegment(sb, pixel, x0, y0, x1, y1, color);
+            DrawLineSegment(sb, pixel, new Point(x0, y0), new Point(x1, y1), color);
         }
     }
 
-    private static void DrawLineSegment(SpriteBatch sb, Texture2D pixel, int x0, int y0, int x1, int y1, Color color)
+    private static void DrawLineSegment(SpriteBatch sb, Texture2D pixel, Point p0, Point p1, Color color)
     {
+        int x0 = p0.X, y0 = p0.Y;
+        int x1 = p1.X, y1 = p1.Y;
         int dx = Math.Abs(x1 - x0), dy = Math.Abs(y1 - y0);
         int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
         int err = dx - dy;
@@ -696,7 +698,7 @@ public sealed class InGameUi
             Color c1 = Color.Lerp(new Color(80, 120, 220), new Color(230, 80, 40), v1);
             int x0 = baseX + (int)((i - 1) * xStep), y0 = baseY + h - (int)(v0 * h);
             int x1 = baseX + (int)(i * xStep), y1 = baseY + h - (int)(v1 * h);
-            DrawLineSegment(sb, pixel, x0, y0, x1, y1, c0);
+            DrawLineSegment(sb, pixel, new Point(x0, y0), new Point(x1, y1), c0);
         }
     }
 
