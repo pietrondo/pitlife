@@ -413,9 +413,9 @@ public class Game1 : Game
             _cataSelectedFrame = 0;
         }
 
-        // Spawn creature only when panel is open, species selected, click is NOT on panel, and not consumed by UI
+        // Spawn creature only when panel is open, species selected, click is NOT on any panel
         if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
-            !spawnPanelConsumed && !pointerOverUi &&
+            !spawnPanelConsumed && !cataConsumed && !pointerOverUi &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var spawnPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
@@ -440,7 +440,7 @@ public class Game1 : Game
                 // Keep species selected so player can try another spot
             }
         }
-        else if (!pointerOverUi && !spawnPanelConsumed && cataReady &&
+        else if (!pointerOverUi && !spawnPanelConsumed && !cataConsumed && cataReady &&
             _spawnPanel.SelectedCataclysm != null &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
@@ -451,7 +451,7 @@ public class Game1 : Game
             _prevSpawnCata = null;
             _cataSelectedFrame = 0;
         }
-        else if (!pointerOverUi && !spawnPanelConsumed &&
+        else if (!pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
