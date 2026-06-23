@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Localization;
+using PitLife.Simulation;
 
 namespace PitLife.UI;
 
@@ -38,16 +39,49 @@ public sealed class MainMenu
         new("EN / IT"),
         new(I18n.T("common.back"))
     ];
+    private readonly UiButton[] _worldGenButtons =
+    [
+        new(I18n.T("menu.generate"))
+    ];
 
     private readonly UiTextInput _seedInput = new();
+    private readonly UiTextInput _continentInput = new();
+    private readonly UiTextInput _seaLevelInput = new();
+    private readonly UiButton _presetButton = new("");
+    private readonly UiButton _islandSizeButton = new("");
+    private readonly UiButton _mapSizeButton = new("");
 
     private bool _showOptions;
     private bool _showWorldGenPanel;
     private bool _inputReady;
     private int _focusedIndex;
+    private int _presetIndex;
+    private int _islandSizeIndex;
+    private int _mapSizeIndex = 2;
+
+    private static readonly (string Label, int Width, int Height)[] MapSizes =
+    [
+        ("96\u00d772", 96, 72),
+        ("200\u00d7150", 200, 150),
+        ("400\u00d7300", 400, 300),
+        ("800\u00d7600", 800, 600),
+    ];
 
     public int? Seed => _seedInput.Text.Length > 0 ? _seedInput.GetNumericValue() : null;
     public bool IsWorldGenPanelOpen => _showWorldGenPanel;
+
+    public WorldGenOptions CurrentOptions => new(
+        (WorldGenPreset)_presetIndex,
+        ParseIntSafe(_continentInput.Text, 1),
+        ParseIntSafe(_seaLevelInput.Text, 40) / 100f,
+        (IslandSize)_islandSizeIndex,
+        MapSizes[_mapSizeIndex].Width,
+        MapSizes[_mapSizeIndex].Height);
+
+    private static int ParseIntSafe(string text, int fallback)
+    {
+        return int.TryParse(text, out int val) ? val : fallback;
+    }
 
     public MenuAction Update(
         MouseState mouse,
@@ -66,6 +100,12 @@ public sealed class MainMenu
             _inputReady = keyboard.IsKeyUp(Keys.Enter) &&
                            keyboard.IsKeyUp(Keys.Space) &&
                            mouse.LeftButton == ButtonState.Released;
+            return MenuAction.None;
+        }
+
+        if (_showWorldGenPanel && Pressed(keyboard, previousKeyboard, Keys.Escape))
+        {
+            _showWorldGenPanel = false;
             return MenuAction.None;
         }
 
@@ -142,6 +182,25 @@ public sealed class MainMenu
             activatePressed = activatePressed || Pressed(keyboard, previousKeyboard, Keys.Space);
         }
 
+        if (_showWorldGenPanel)
+        {
+            _continentInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
+            _seaLevelInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
+
+            if (_presetButton.WasClicked(mouse, previousMouse))
+                CyclePreset();
+            if (_islandSizeButton.WasClicked(mouse, previousMouse))
+                CycleIslandSize();
+            if (_mapSizeButton.WasClicked(mouse, previousMouse))
+                CycleMapSize();
+
+            if (_worldGenButtons[0].WasClicked(mouse, previousMouse))
+            {
+                return Seed.HasValue ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld;
+            }
+            return MenuAction.None;
+        }
+
         if (activatePressed)
             activated = _focusedIndex;
 
@@ -199,8 +258,36 @@ public sealed class MainMenu
         }
 
         _window.Draw(spriteBatch, pixel, font, true, Mouse.GetState().Position);
-        UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         MouseState mouse = Mouse.GetState();
+
+        if (_showWorldGenPanel)
+        {
+            int wgCenterX = viewportWidth / 2;
+
+            _presetButton.Draw(spriteBatch, pixel, font, mouse, false);
+            _mapSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
+
+            int labelX = _continentInput.Bounds.X - 8;
+            string contLabel = I18n.T("menu.continents") + ":";
+            Vector2 contLabelSize = font.MeasureString(contLabel);
+            spriteBatch.DrawString(font, contLabel, new Vector2(labelX - contLabelSize.X, _continentInput.Bounds.Y + 8), Color.White);
+            _continentInput.Draw(spriteBatch, pixel, font, mouse);
+
+            string seaLabel = I18n.T("menu.seaLevel") + ":";
+            Vector2 seaLabelSize = font.MeasureString(seaLabel);
+            spriteBatch.DrawString(font, seaLabel, new Vector2(labelX - seaLabelSize.X, _seaLevelInput.Bounds.Y + 8), Color.White);
+            _seaLevelInput.Draw(spriteBatch, pixel, font, mouse);
+
+            _islandSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
+
+            _worldGenButtons[0].Draw(spriteBatch, pixel, font, mouse, true);
+            string wgHint = I18n.T("menu.worldGenHint");
+            Vector2 wgHintSize = font.MeasureString(wgHint);
+            spriteBatch.DrawString(font, wgHint, new Vector2(viewportWidth / 2f - wgHintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
+            return;
+        }
+
+        UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {
             bool isFocused = _showOptions 
@@ -227,22 +314,100 @@ public sealed class MainMenu
         return MenuAction.None;
     }
 
+    private bool _worldGenInitialized;
+
     private MenuAction OpenWorldGenPanel()
     {
+        if (!_worldGenInitialized)
+        {
+            var defaults = WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
+            _presetIndex = (int)defaults.Preset;
+            _continentInput.SetText(defaults.ContinentCount.ToString());
+            _continentInput.IsNumericOnly = true;
+            _continentInput.MaxLength = 1;
+            _seaLevelInput.SetText(((int)(defaults.SeaLevel * 100)).ToString());
+            _seaLevelInput.IsNumericOnly = true;
+            _seaLevelInput.MaxLength = 3;
+            _islandSizeIndex = (int)defaults.IslandSize;
+            _mapSizeIndex = Array.FindIndex(MapSizes, m => m.Width == defaults.MapWidth && m.Height == defaults.MapHeight);
+            if (_mapSizeIndex < 0) _mapSizeIndex = 2;
+            _worldGenInitialized = true;
+        }
+        _presetButton.Text = I18n.T("menu.preset") + ": " + ((WorldGenPreset)_presetIndex);
+        _islandSizeButton.Text = I18n.T("menu.islandSize") + ": " + ((IslandSize)_islandSizeIndex);
+        _mapSizeButton.Text = I18n.T("menu.mapSize") + ": " + MapSizes[_mapSizeIndex].Label;
         _showWorldGenPanel = true;
         return MenuAction.None;
+    }
+
+    private void ApplyPreset(WorldGenOptions preset)
+    {
+        _presetIndex = (int)preset.Preset;
+        _continentInput.SetText(preset.ContinentCount.ToString());
+        _seaLevelInput.SetText(((int)(preset.SeaLevel * 100)).ToString());
+        _islandSizeIndex = (int)preset.IslandSize;
+        _presetButton.Text = I18n.T("menu.preset") + ": " + preset.Preset;
+        _islandSizeButton.Text = I18n.T("menu.islandSize") + ": " + preset.IslandSize;
+    }
+
+    private void CyclePreset()
+    {
+        var presets = new[] { WorldGenOptions.Pangea(), WorldGenOptions.Continents(), WorldGenOptions.Archipelago(), WorldGenOptions.WetWorld(), WorldGenOptions.DryWorld() };
+        _presetIndex = (_presetIndex + 1) % presets.Length;
+        ApplyPreset(presets[_presetIndex]);
+    }
+
+    private void CycleIslandSize()
+    {
+        _islandSizeIndex = (_islandSizeIndex + 1) % 3;
+        _islandSizeButton.Text = I18n.T("menu.islandSize") + ": " + ((IslandSize)_islandSizeIndex);
+    }
+
+    private void CycleMapSize()
+    {
+        _mapSizeIndex = (_mapSizeIndex + 1) % MapSizes.Length;
+        _mapSizeButton.Text = I18n.T("menu.mapSize") + ": " + MapSizes[_mapSizeIndex].Label;
+    }
+
+    public void CloseWorldGenPanel()
+    {
+        _showWorldGenPanel = false;
     }
 
     private void Layout(int viewportWidth, int viewportHeight)
     {
         int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showOptions ? 260 : 436;
+        int panelHeight = _showWorldGenPanel ? 500 : (_showOptions ? 260 : 436);
         int logoSize = viewportHeight < 650 ? 96 : 144;
         int logoY = viewportHeight < 650 ? 16 : 28;
         int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
         panelY = Math.Min(panelY, viewportHeight - panelHeight - 48);
         _window.Bounds = new Rectangle(viewportWidth / 2 - panelWidth / 2, panelY, panelWidth, panelHeight);
-        _window.Title = I18n.T(_showOptions ? "menu.optionsTitle" : "menu.mainTitle");
+        _window.Title = I18n.T(_showWorldGenPanel ? "menu.worldGenTitle" : _showOptions ? "menu.optionsTitle" : "menu.mainTitle");
+
+        if (_showWorldGenPanel)
+        {
+            int wgButtonWidth = panelWidth - 48;
+            int wgButtonHeight = 46;
+            int wgInputWidth = 80;
+            int wgInputHeight = 40;
+            int wgGap = 8;
+            int wgStartY = _window.Bounds.Y + 56;
+            int wgCenterX = viewportWidth / 2;
+
+            _presetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY, wgButtonWidth, wgButtonHeight);
+            _mapSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+
+            int labelWidth = (wgButtonWidth - wgInputWidth - 8) / 2 + wgInputWidth + 8;
+            _continentInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 2 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
+            _seaLevelInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 3 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
+
+            _islandSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 4 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+
+            int genY = wgStartY + 5 * (wgButtonHeight + wgGap) + wgGap;
+            _worldGenButtons[0].Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, genY, wgButtonWidth, wgButtonHeight);
+            return;
+        }
 
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         int buttonWidth = panelWidth - 48;

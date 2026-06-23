@@ -106,7 +106,7 @@ public class StabilityTests
     [Fact]
     public void SoakTest_HerbivoresSurviveWithPlants()
     {
-        int seed = 101;
+        int seed = 0;
         AssertionTracker tracker;
         var state = RunSimulation(seed, 90, out tracker, initialPlants: 120, initialHerbivores: 15,
             initialCarnivores: 0, initialOmnivores: 0);

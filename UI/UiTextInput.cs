@@ -48,13 +48,19 @@ public sealed class UiTextInput
             {
                 Text += " ";
             }
-            else if (key >= Keys.D0 && key <= Keys.D9 && Text.Length < MaxLength)
+            else if (key >= Keys.D0 && key <= Keys.D9)
             {
-                Text += (key - Keys.D0).ToString();
+                if (Text.Length < MaxLength)
+                    Text += (key - Keys.D0).ToString();
+                else if (MaxLength == 1)
+                    Text = (key - Keys.D0).ToString();
             }
-            else if (key >= Keys.NumPad0 && key <= Keys.NumPad9 && Text.Length < MaxLength)
+            else if (key >= Keys.NumPad0 && key <= Keys.NumPad9)
             {
-                Text += (key - Keys.NumPad0).ToString();
+                if (Text.Length < MaxLength)
+                    Text += (key - Keys.NumPad0).ToString();
+                else if (MaxLength == 1)
+                    Text = (key - Keys.NumPad0).ToString();
             }
             else if (key >= Keys.A && key <= Keys.Z && !IsNumericOnly && Text.Length < MaxLength)
             {

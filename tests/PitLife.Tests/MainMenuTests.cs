@@ -149,6 +149,64 @@ public class MainMenuTests
     }
 
     [Fact]
+    public void WorldGenPanel_GenerateButton_ReturnsNewWorld_WhenSeedIsEmpty()
+    {
+        var menu = new MainMenu();
+        MouseState released = MouseAt(400, 340, ButtonState.Released);
+        menu.Update(released, released, new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        menu.Update(MouseAt(400, 340, ButtonState.Pressed), released,
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+        menu.Update(released, MouseAt(400, 340, ButtonState.Pressed),
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        menu.Update(MouseAt(400, 520, ButtonState.Pressed), released,
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+        MenuAction action = menu.Update(MouseAt(400, 520, ButtonState.Released), MouseAt(400, 520, ButtonState.Pressed),
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        Assert.Equal(MenuAction.NewWorld, action);
+    }
+
+    [Fact]
+    public void WorldGenPanel_GenerateButton_ReturnsNewWorldWithSeed_WhenSeedSet()
+    {
+        var menu = new MainMenu();
+        MouseState released = MouseAt(400, 390, ButtonState.Released);
+
+        menu.Update(released, released, new KeyboardState(), new KeyboardState(), 800, 720, false);
+        menu.Update(MouseAt(400, 390, ButtonState.Pressed), released,
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+        menu.Update(released, MouseAt(400, 390, ButtonState.Pressed),
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        menu.Update(released, released,
+            new KeyboardState(Keys.D4), new KeyboardState(), 800, 720, false);
+        menu.Update(released, released,
+            new KeyboardState(), new KeyboardState(Keys.D4), 800, 720, false);
+        menu.Update(released, released,
+            new KeyboardState(Keys.D2), new KeyboardState(), 800, 720, false);
+
+        menu.Update(released, released,
+            new KeyboardState(Keys.Up), new KeyboardState(), 800, 720, false);
+        menu.Update(released, released,
+            new KeyboardState(), new KeyboardState(Keys.Up), 800, 720, false);
+
+        menu.Update(released, released,
+            new KeyboardState(Keys.Enter), new KeyboardState(), 800, 720, false);
+        menu.Update(released, released,
+            new KeyboardState(), new KeyboardState(Keys.Enter), 800, 720, false);
+
+        menu.Update(MouseAt(400, 520, ButtonState.Pressed), released,
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+        MenuAction action = menu.Update(MouseAt(400, 520, ButtonState.Released), MouseAt(400, 520, ButtonState.Pressed),
+            new KeyboardState(), new KeyboardState(), 800, 720, false);
+
+        Assert.Equal(MenuAction.NewWorldWithSeed, action);
+        Assert.Equal(42, menu.Seed);
+    }
+
+    [Fact]
     public void HelpButton_RequestsHelpScreen()
     {
         var menu = new MainMenu();

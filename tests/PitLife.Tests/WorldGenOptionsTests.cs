@@ -1,3 +1,4 @@
+using System.Linq;
 using PitLife.Simulation;
 using Xunit;
 
@@ -34,7 +35,7 @@ public class WorldGenOptionsTests
         for (int i = 0; i < world.Width * world.Height; i++)
             if (world.ContinentMask[i] > 0.5f) landCells++;
         double landRatio = landCells / (double)(world.Width * world.Height);
-        Assert.InRange(landRatio, 0.45, 0.65);
+        Assert.InRange(landRatio, 0.15, 0.40);
     }
 
     [Fact]
@@ -84,5 +85,44 @@ public class WorldGenOptionsTests
         int CountContiguous(float[] mask, int w, int h) { return mask.Count(c => c > 0.5f); }
         Assert.NotEqual(CountContiguous(small.ContinentMask, small.Width, small.Height),
                         CountContiguous(large.ContinentMask, large.Width, large.Height));
+    }
+
+    [Fact]
+    public void MoreContinents_ProducesDifferentMap()
+    {
+        var one = new World(WorldGenOptions.Pangea() with { ContinentCount = 1, MapWidth = 96, MapHeight = 72 }, 42);
+        var four = new World(WorldGenOptions.Pangea() with { ContinentCount = 4, MapWidth = 96, MapHeight = 72 }, 42);
+        var six = new World(WorldGenOptions.Pangea() with { ContinentCount = 6, MapWidth = 96, MapHeight = 72 }, 42);
+
+        int[] Hash(float[] mask) => mask.Select(c => c > 0.5f ? 1 : 0).ToArray();
+        var h1 = Hash(one.ContinentMask);
+        var h4 = Hash(four.ContinentMask);
+        var h6 = Hash(six.ContinentMask);
+
+        Assert.False(h1.SequenceEqual(h4), "1 and 4 continents should produce different maps");
+        Assert.False(h1.SequenceEqual(h6), "1 and 6 continents should produce different maps");
+        Assert.False(h4.SequenceEqual(h6), "4 and 6 continents should produce different maps");
+    }
+
+    [Fact]
+    public void Ecosystem_Constructor_PassesOptionsToWorld()
+    {
+        var opts = WorldGenOptions.Pangea() with { MapWidth = 64, MapHeight = 48, ContinentCount = 3, SeaLevel = 0.5f };
+        var eco = new Ecosystem(opts, 42);
+        Assert.Equal(64, eco.World.Width);
+        Assert.Equal(48, eco.World.Height);
+        Assert.Equal(42, eco.Seed);
+    }
+
+    [Fact]
+    public void DifferentSeaLevels_ChangeLandRatio()
+    {
+        var shallow = new World(WorldGenOptions.Pangea() with { SeaLevel = 0.25f, MapWidth = 96, MapHeight = 72 }, 99);
+        var deep = new World(WorldGenOptions.Pangea() with { SeaLevel = 0.75f, MapWidth = 96, MapHeight = 72 }, 99);
+        int LandCells(float[] mask) => mask.Count(c => c > 0.5f);
+        int shallowLand = LandCells(shallow.ContinentMask);
+        int deepLand = LandCells(deep.ContinentMask);
+        Assert.True(shallowLand > deepLand,
+            $"Shallow sea (0.25) should have more land ({shallowLand}) than deep sea 0.75 ({deepLand})");
     }
 }

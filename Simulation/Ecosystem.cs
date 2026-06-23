@@ -67,6 +67,17 @@ public class Ecosystem
         Flow = new FlowSimulation(World);
     }
 
+    public Ecosystem(WorldGenOptions options, int seed)
+    {
+        Seed = seed;
+        World = new World(options, seed);
+        Random = new Random(seed);
+        _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        _spawner = new CreatureSpawner(this);
+        Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
+        Flow = new FlowSimulation(World);
+    }
+
     public void Initialize(int h, int c, int o, int p)
     {
         for (int i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");

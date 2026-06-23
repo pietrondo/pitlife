@@ -9,7 +9,7 @@ public sealed class PixelWorldRenderer : IDisposable
 {
     private readonly World _world;
     private readonly FastNoiseLite _noise;
-    private RenderTarget2D? _worldTexture;
+    private Texture2D? _worldTexture;
     private bool _needsRedraw = true;
     private int _renderScale = 16; // 256 sub-pixels per tile for realistic terrain // GPU-friendly: 16 pixels per tile // 8 sub-pixels per tile for smooth look
 
@@ -85,7 +85,8 @@ public sealed class PixelWorldRenderer : IDisposable
     {
         int texWidth = _world.Width * _renderScale;
         int texHeight = _world.Height * _renderScale;
-        _worldTexture = new RenderTarget2D(gd, texWidth, texHeight, false, SurfaceFormat.Color, DepthFormat.None);
+        _worldTexture?.Dispose();
+        _worldTexture = new Texture2D(gd, texWidth, texHeight);
         _needsRedraw = true;
     }
 
@@ -127,27 +128,12 @@ public sealed class PixelWorldRenderer : IDisposable
                 int tileY = Math.Clamp((int)(worldY / _world.TileSize), 0, _world.Height - 1);
                 int idx = tileY * _world.Width + tileX;
 
-                float elev = _world.ElevationField[idx];
-                float continent = _world.ContinentMask[idx];
+                var biome = _world.Tiles[tileX, tileY].Biome;
+                Color pixelColor = GetBiomeRenderColor(biome);
 
-                Color pixelColor;
-                if (continent < 0.35f)
-                    pixelColor = Color.Lerp(BiomeBaseColors[0], BiomeBaseColors[1], continent * 3f); // ocean gradient
-                else if (elev < 0.15f)
-                    pixelColor = BiomeBaseColors[2]; // Beach
-                else if (elev < 0.3f)
-                    pixelColor = Color.Lerp(BiomeBaseColors[5], BiomeBaseColors[4], elev * 3f); // Grassland/Savanna
-                else if (elev < 0.5f)
-                    pixelColor = Color.Lerp(BiomeBaseColors[6], BiomeBaseColors[7], elev * 2f); // Forest
-                else if (elev < 0.7f)
-                    pixelColor = Color.Lerp(BiomeBaseColors[9], BiomeBaseColors[11], (elev - 0.5f) * 5f); // Tundra/Snow
-                else
-                    pixelColor = Color.Lerp(BiomeBaseColors[10], BiomeBaseColors[11], (elev - 0.7f) * 3f); // Mountain/Snow
-
-                if (_world.RiverMask[idx] && continent >= 0.35f)
+                if (_world.RiverMask[idx])
                     pixelColor = Color.Lerp(pixelColor, new Color(40, 100, 200), 0.3f);
 
-                // Add subtle noise
                 int d = (x * 7 + y * 13) % 5 - 2;
                 data[y * width + x] = new Color(
                     Math.Clamp(pixelColor.R + d, 0, 255),
@@ -158,6 +144,26 @@ public sealed class PixelWorldRenderer : IDisposable
 
         _worldTexture.SetData(data);
     }
+
+    private static Color GetBiomeRenderColor(BiomeType biome) => biome switch
+    {
+        BiomeType.DeepOcean => new(28, 60, 110),
+        BiomeType.ShallowWater => new(58, 118, 168),
+        BiomeType.Beach => new(220, 200, 140),
+        BiomeType.Desert => new(220, 190, 110),
+        BiomeType.Savanna => new(200, 190, 110),
+        BiomeType.Grassland => new(120, 180, 80),
+        BiomeType.Forest => new(60, 130, 60),
+        BiomeType.DenseForest => new(35, 95, 45),
+        BiomeType.Swamp => new(80, 100, 70),
+        BiomeType.Tundra => new(180, 185, 170),
+        BiomeType.Mountain => new(120, 110, 100),
+        BiomeType.Snow => new(235, 240, 245),
+        BiomeType.CoralReef => new(0, 180, 160),
+        BiomeType.Cave => new(70, 60, 50),
+        BiomeType.Volcano => new(170, 50, 20),
+        _ => Color.Magenta
+    };
 
     public void Dispose()
     {

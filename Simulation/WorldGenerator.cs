@@ -30,41 +30,89 @@ public sealed class WorldGenerator
             _ => 0.15f
         };
         int continentCount = options.ContinentCount;
-
-        var noise = new FastNoiseLite(_rng.Next());
-        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-        noise.SetFrequency(0.8f);
-
         int w = _world.Width, h = _world.Height;
+
+        // ── 1. Place continent centers ──────────────────────────────
+        var centers = new (float X, float Y)[continentCount];
+        float maxDim = MathF.Max(w, h);
+        for (int c = 0; c < continentCount; c++)
+        {
+            float angle = (c + _rng.NextSingle() * 0.3f) * MathF.PI * 2f / continentCount;
+            float r = 0.25f + _rng.NextSingle() * 0.15f;
+            centers[c] = (
+                (0.5f + MathF.Cos(angle) * r) * w,
+                (0.5f + MathF.Sin(angle) * r) * h
+            );
+        }
+        float continentRadius = MathF.Min(w, h) * 0.45f / (continentCount * 0.35f + 0.3f);
+        // IslandSize.Large = bigger continents, Small = smaller
+        float sizeFactor = islandScale switch { 0.10f => 1.15f, 0.15f => 1.0f, 0.20f => 0.85f, _ => 1.0f };
+        continentRadius *= sizeFactor;
+
+        // ── 2. Multi-scale noise for natural coastlines ─────────────
+        var baseNoise = new FastNoiseLite(_rng.Next());
+        baseNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+        baseNoise.SetFrequency(0.03f / islandScale);
+
+        var coastNoise = new FastNoiseLite(_rng.Next());
+        coastNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+        coastNoise.SetFrequency(0.10f / islandScale);
+
+        var detailNoise = new FastNoiseLite(_rng.Next());
+        detailNoise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+        detailNoise.SetFrequency(0.30f / islandScale);
+
+        // ── 3. Generate terrain ─────────────────────────────────────
         for (int y = 0; y < h; y++)
         {
-            float phi = y / (float)h * MathF.PI;
             for (int x = 0; x < w; x++)
             {
-                float sx = x * islandScale;
-                float sy = y * islandScale;
+                // Distance to nearest continent center
+                float minDist = float.MaxValue;
+                for (int c = 0; c < continentCount; c++)
+                {
+                    float dx = x - centers[c].X;
+                    float dy = y - centers[c].Y;
+                    float d = MathF.Sqrt(dx * dx + dy * dy);
+                    if (d < minDist) minDist = d;
+                }
 
-                float elev = (noise.GetNoise(sx, sy) + 1f) * 0.5f;
-                float cont = (noise.GetNoise(sx + 3f, sy + 3f) + 1f) * 0.5f;
-                float moist = (noise.GetNoise(sx + 7f, sy + 7f) + 1f) * 0.5f;
+                // Continent mask: 1 = center, 0 = far away
+                float distNorm = minDist / continentRadius;
+                float mask = 1f - Math.Clamp(distNorm, 0f, 1f);
 
-                float lat = MathF.Abs(phi / MathF.PI - 0.5f) * 2f;
-                elev = elev * (1f - lat * 0.3f);
-                if (cont < seaLevel) elev = cont * 0.3f;
+                // Coastline noise warps the mask for natural shapes (only near edges)
+                float cst = (coastNoise.GetNoise(x, y) + 1f) * 0.5f;
+                float edgeDist = MathF.Abs(mask - seaLevel) / 0.15f;
+                if (edgeDist < 1f)
+                    mask += (cst - 0.5f) * 0.25f * (1f - edgeDist);
+                mask = Math.Clamp(mask, 0f, 1f);
+
+                // Smooth land/water transition
+                float landMask = mask > seaLevel ? 1f : mask / seaLevel;
+                float isLand = mask > seaLevel ? 1f : 0f;
+
+                // Base elevation from continent shape + noise
+                float baseElev = (baseNoise.GetNoise(x, y) + 1f) * 0.5f;
+                float detail = (detailNoise.GetNoise(x, y) + 1f) * 0.5f;
+                float elev = isLand * (baseElev * 0.6f + detail * 0.4f + mask * 0.3f);
+                elev += (1f - isLand) * mask * 0.12f;
+                elev = Math.Clamp(elev, 0f, 1f);
 
                 int idx = y * w + x;
                 _world.ElevationField[idx] = elev;
-                _world.ContinentMask[idx] = Math.Clamp(cont - seaLevel + 0.5f, 0f, 1f);
+                _world.ContinentMask[idx] = landMask;
 
                 BiomeType biome = elev switch
                 {
-                    < 0.15f => cont < seaLevel ? BiomeType.DeepOcean : BiomeType.ShallowWater,
+                    < 0.12f => isLand > 0f ? BiomeType.ShallowWater : BiomeType.DeepOcean,
                     < 0.22f => BiomeType.Beach,
-                    < 0.35f => moist < 0.3f ? BiomeType.Desert : BiomeType.Grassland,
-                    < 0.50f => moist < 0.35f ? BiomeType.Savanna : BiomeType.Forest,
-                    < 0.65f => BiomeType.DenseForest,
-                    < 0.78f => lat > 0.65f ? BiomeType.Tundra : BiomeType.Mountain,
-                    _ => lat > 0.75f ? BiomeType.Snow : BiomeType.Mountain
+                    < 0.35f => detail < 0.3f ? BiomeType.Desert : BiomeType.Grassland,
+                    < 0.50f => cst > 0.55f ? BiomeType.Swamp : BiomeType.Grassland,
+                    < 0.65f => detail < 0.35f ? BiomeType.Savanna : BiomeType.Forest,
+                    < 0.78f => BiomeType.DenseForest,
+                    < 0.90f => BiomeType.Mountain,
+                    _ => BiomeType.Snow
                 };
                 _world.Tiles[x, y] = new Tile(biome);
             }
@@ -76,8 +124,8 @@ public sealed class WorldGenerator
         PlaceVolcanoes();
         CarveRivers(_rng.Next());
         SmoothTerrain();
-        EnsureAllBiomesPresent();
         CopyEdgesForWrap();
+        EnsureAllBiomesPresent();
     }
 
     private void CopyEdgesForWrap()
@@ -156,6 +204,33 @@ public sealed class WorldGenerator
         for (int y = 0; y < _world.Height; y++)
             for (int x = 0; x < _world.Width; x++)
                 present.Add(_world.Tiles[x, y].Biome);
+
+        // Ensure Grassland exists first (it's used as replacement for other missing biomes)
+        if (!present.Contains(BiomeType.Grassland))
+        {
+            bool placed = false;
+            for (int y = 0; y < _world.Height && !placed; y++)
+                for (int x = 0; x < _world.Width && !placed; x++)
+                {
+                    int i = y * _world.Width + x;
+                    if (_world.RiverMask[i]) continue;
+                    var b = _world.Tiles[x, y].Biome;
+                    if (b == BiomeType.DeepOcean || b == BiomeType.ShallowWater) continue;
+                    _world.Tiles[x, y] = new Tile(BiomeType.Grassland);
+                    present.Add(BiomeType.Grassland);
+                    placed = true;
+                }
+            // Force-place if still missing
+            if (!placed)
+                for (int y = 0; y < _world.Height && !placed; y++)
+                    for (int x = 0; x < _world.Width && !placed; x++)
+                    {
+                        if (_world.RiverMask[y * _world.Width + x]) continue;
+                        _world.Tiles[x, y] = new Tile(BiomeType.Grassland);
+                        present.Add(BiomeType.Grassland);
+                        placed = true;
+                    }
+        }
 
         foreach (var biome in allTwelve)
         {

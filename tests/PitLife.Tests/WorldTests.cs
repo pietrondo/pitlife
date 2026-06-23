@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using PitLife.Simulation;
 
 namespace PitLife.Tests;
@@ -67,12 +68,9 @@ public class WorldTests
     {
         var w0 = new World(64, 48, 0);
         var w1 = new World(64, 48, 1);
-        var w2 = new World(64, 48, 2);
-        int c0 = CountContinents(w0.ContinentMask, 64, 48);
-        int c1 = CountContinents(w1.ContinentMask, 64, 48);
-        int c2 = CountContinents(w2.ContinentMask, 64, 48);
-        Assert.True(c0 != c1 || c1 != c2,
-            $"Expected different continent counts for different seeds, got c0={c0}, c1={c1}, c2={c2}");
+        // With deterministic continent algorithm, masks should differ (positions not count)
+        Assert.False(w0.ContinentMask.SequenceEqual(w1.ContinentMask),
+            "Different seeds should produce different continent masks");
     }
 
     [Fact]

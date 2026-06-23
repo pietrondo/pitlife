@@ -149,9 +149,12 @@ public class Game1 : Game
 
         if (_screen == GameScreen.MainMenu)
         {
-            _ecosystem.SimulationSpeed = 0.35f;
-            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
-            _dayNight.Update(_ecosystem.TotalTime);
+            if (!_mainMenu.IsWorldGenPanelOpen)
+            {
+                _ecosystem.SimulationSpeed = 0.35f;
+                _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
+                _dayNight.Update(_ecosystem.TotalTime);
+            }
 
             if (_helpScreen.IsActive)
             {
@@ -190,13 +193,15 @@ public class Game1 : Game
                     _controller.SetPause(false);
                     break;
                 case MenuAction.NewWorld:
-                    GenerateNewWorld(null);
+                    _mainMenu.CloseWorldGenPanel();
+                    GenerateNewWorld(null, _mainMenu.CurrentOptions);
                     _screen = GameScreen.Playing;
                     _paused = false;
                     _controller.SetPause(false);
                     break;
                 case MenuAction.NewWorldWithSeed:
-                    GenerateNewWorld(_mainMenu.Seed);
+                    _mainMenu.CloseWorldGenPanel();
+                    GenerateNewWorld(_mainMenu.Seed, _mainMenu.CurrentOptions);
                     _screen = GameScreen.Playing;
                     _paused = false;
                     _controller.SetPause(false);
@@ -275,6 +280,7 @@ public class Game1 : Game
 
         if (escapePressed || gamepadBack)
         {
+            _mainMenu.CloseWorldGenPanel();
             _screen = GameScreen.MainMenu;
             _paused = true;
             _prevKbd = kbd;
@@ -294,6 +300,7 @@ public class Game1 : Game
         if (_inGameUi.WantsToGoToMainMenu)
         {
             _inGameUi.WantsToGoToMainMenu = false;
+            _mainMenu.CloseWorldGenPanel();
             _screen = GameScreen.MainMenu;
             _paused = true;
             _prevKbd = kbd;
@@ -423,10 +430,11 @@ public class Game1 : Game
         return closest;
     }
 
-    private void GenerateNewWorld(int? seedOverride)
+    private void GenerateNewWorld(int? seedOverride, Simulation.WorldGenOptions? worldGenOptions = null)
     {
         int seed = seedOverride ?? new Random().Next();
-        _ecosystem = new Ecosystem(400, 300, seed);
+        var wgOpts = worldGenOptions ?? Simulation.WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
+        _ecosystem = new Ecosystem(wgOpts, seed);
         _ecosystem.Initialize(60, 20, 15, 150);
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World, seed);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
