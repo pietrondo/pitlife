@@ -586,12 +586,27 @@ public sealed class InGameUi
 
     private static string TranslateEvent(string ev)
     {
-        if (ev.StartsWith("[SEASON]")) return ev.Replace("[SEASON]", I18n.T("evt.season"));
-        if (ev.StartsWith("[CATACLYSM]")) return ev.Replace("[CATACLYSM]", I18n.T("evt.cataclysm"));
-        if (ev.StartsWith("[CLIMATE]")) return ev.Replace("[CLIMATE]", I18n.T("evt.climate"));
-        if (ev.StartsWith("[DEATH]")) return ev.Replace("[DEATH]", I18n.T("evt.death"));
-        if (ev.StartsWith("[SPAWN]")) return ev.Replace("[SPAWN]", I18n.T("evt.spawn"));
-        if (ev.StartsWith("[TERRAIN]")) return ev.Replace("[TERRAIN]", I18n.T("evt.terrain"));
+        ev = ev.Replace("[SEASON]", I18n.T("evt.season"))
+               .Replace("[CATACLYSM]", I18n.T("evt.cataclysm"))
+               .Replace("[CLIMATE]", I18n.T("evt.climate"))
+               .Replace("[DEATH]", I18n.T("evt.death"))
+               .Replace("[SPAWN]", I18n.T("evt.spawn"))
+               .Replace("[TERRAIN]", I18n.T("evt.terrain"));
+        ev = ev.Replace("Season changed to ", I18n.T("evt.msg.season"))
+               .Replace(" at T=", " " + I18n.T("evt.msg.at") + " ")
+               .Replace("Player ", I18n.T("evt.msg.player") + " ")
+               .Replace("MASS EXTINCTION: ", I18n.T("evt.msg.extinction") + " ")
+               .Replace("Extreme event '", I18n.T("evt.msg.extreme") + " '")
+               .Replace("' started", "' " + I18n.T("evt.msg.started"))
+               .Replace("' ended", "' " + I18n.T("evt.msg.ended"))
+               .Replace("Player spawned ", I18n.T("evt.msg.spawned") + " ")
+               .Replace("crater at ", I18n.T("evt.msg.crater") + " ")
+               .Replace("r=", I18n.T("evt.msg.radius") + "=")
+               .Replace("duration=", I18n.T("evt.msg.duration") + "=")
+               .Replace("Cataclysm ended", I18n.T("evt.msg.cataend"))
+               .Replace("died at age ", I18n.T("evt.msg.died"))
+               .Replace("x ", "x")
+               .Replace("(dist=", "(" + I18n.T("evt.msg.dist") + "=");
         return ev;
     }
 }
