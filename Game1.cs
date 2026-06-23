@@ -50,6 +50,10 @@ public class Game1 : Game
     private Creature? _selectedCreature;
     private MouseState _prevMouse;
     private KeyboardState _prevKbd;
+    private int _cataSelectedFrame;
+    private string? _prevPanelCata;
+    private string? _prevSpawnCata;
+    private int _gameFrame;
 
     private enum GameScreen
     {
@@ -168,7 +172,8 @@ public class Game1 : Game
                 if (gamepadBack)
                     _helpScreen.Hide();
                 _prevKbd = kbd;
-                _prevMouse = mouse;
+        _prevMouse = mouse;
+        _gameFrame++;
                 base.Update(gameTime);
                 return;
             }
@@ -320,6 +325,21 @@ public class Game1 : Game
         bool cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
 
+        // Track when SelectedCataclysm was set (for SpawnPanel)
+        if (_spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata)
+        {
+            _prevSpawnCata = _spawnPanel.SelectedCataclysm;
+            _cataSelectedFrame = _gameFrame;
+        }
+        // Track when SelectedType was set (for CataclysmPanel)
+        if (_cataclysmPanel.SelectedType != null && _cataclysmPanel.SelectedType != _prevPanelCata)
+        {
+            _prevPanelCata = _cataclysmPanel.SelectedType;
+            _cataSelectedFrame = _gameFrame;
+        }
+        // Clear cata selection if panel closed
+        if (!_cataclysmPanel.IsOpen && _cataclysmPanel.SelectedType == null) _prevPanelCata = null;
+
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.Up) && _prevKbd.IsKeyUp(Keys.Up))
             _controller.SetSpeed(Math.Min(3, _controller.SpeedLevel + 1));
@@ -349,14 +369,17 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
-        // Cataclysm placement when selected (skip if UI consumed the click)
-        if (_cataclysmPanel.SelectedType != null && !cataConsumed &&
+        // Cataclysm placement when selected (require at least 1 frame delay after selection)
+        bool cataReady = _cataSelectedFrame > 0 && (_gameFrame - _cataSelectedFrame) >= 1;
+        if (_cataclysmPanel.SelectedType != null && cataReady &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
             _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _cataclysmPanel.SelectedType!, catPos);
             _worldRenderer.Invalidate();
             _cataclysmPanel.SelectedType = null;
+            _prevPanelCata = null;
+            _cataSelectedFrame = 0;
         }
 
         // Spawn creature only when panel is open, species selected, click is NOT on panel, and not consumed by UI
@@ -385,7 +408,7 @@ public class Game1 : Game
                 // Keep species selected so player can try another spot
             }
         }
-        else if (!pointerOverUi && !spawnPanelConsumed &&
+        else if (!pointerOverUi && !spawnPanelConsumed && cataReady &&
             _spawnPanel.SelectedCataclysm != null &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
@@ -393,6 +416,8 @@ public class Game1 : Game
             _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _spawnPanel.SelectedCataclysm, catPos);
             _worldRenderer.Invalidate();
             _spawnPanel.SelectedCataclysm = null;
+            _prevSpawnCata = null;
+            _cataSelectedFrame = 0;
         }
         else if (!pointerOverUi && !spawnPanelConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
@@ -564,6 +589,12 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
+        // Apply screen shake from cataclysms
+        var shake = _ecosystem.Cataclysms.ScreenShake;
+        Vector2 savedPos = _camera.Position;
+        if (shake != Vector2.Zero)
+            _camera.Position = new Vector2(savedPos.X + shake.X, savedPos.Y + shake.Y);
+
         // Draw the map with Point Clamp (for crisp pixel art matching the minimap)
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
@@ -578,7 +609,12 @@ public class Game1 : Game
             var center = _selectedCreature.Position;
             _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
+        // Draw cataclysm animations (meteor, fire, frost, etc.)
+        _ecosystem.Cataclysms.Draw(_spriteBatch, _uiPixel);
         _spriteBatch.End();
+
+        // Restore camera position
+        _camera.Position = savedPos;
 
         _spriteBatch.Begin();
         if (_screen == GameScreen.MainMenu)
@@ -596,22 +632,7 @@ public class Game1 : Game
                 _font,
                 GraphicsDevice.Viewport.Width,
                 GraphicsDevice.Viewport.Height);
-        // Draw cataclysm impact animation
-        var cata = _ecosystem.Cataclysms;
-        if (cata.IsActive && cata.ImpactRadius > 0)
-        {
-            int r = (int)(cata.ImpactRadius * 0.5f);
-            var impRect = new Rectangle((int)cata.ImpactPosition.X - r, (int)cata.ImpactPosition.Y - r, r * 2, r * 2);
-            var alpha = (byte)(cata.Timer / 40f * 180);
-            var impColor = new Color(cata.ImpactColor.R, cata.ImpactColor.G, cata.ImpactColor.B, alpha);
-            for (int ring = 3; ring >= 0; ring--)
-            {
-                var ringColor = impColor * (1f - ring * 0.2f);
-                var ringRect = new Rectangle(impRect.X - ring * 8, impRect.Y - ring * 8, impRect.Width + ring * 16, impRect.Height + ring * 16);
-                UiPrimitives.Border(_spriteBatch, _uiPixel, ringRect, 2, ringColor);
-            }
-        }
-        _spriteBatch.End();
+            _spriteBatch.End();
             base.Draw(gameTime);
             return;
         }

@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using PitLife.Core;
 
 namespace PitLife.Simulation;
@@ -13,6 +14,9 @@ public sealed class CataclysmSystem
     public Vector2 ImpactPosition { get; private set; }
     public float ImpactRadius { get; private set; }
     public Color ImpactColor { get; private set; } = Color.Transparent;
+    public Vector2 ScreenShake { get; private set; }
+    public float AnimTimer { get; private set; }
+    public float AnimDuration { get; private set; } = 1.5f;
 
     private float _cooldownTimer;
 
@@ -21,11 +25,33 @@ public sealed class CataclysmSystem
         if (IsActive)
         {
             Timer -= dt;
+            AnimTimer += dt;
+            if (AnimTimer > AnimDuration) AnimTimer = AnimDuration;
+
+            // Screen shake for earthquakes
+            if (ActiveEvent == "Earthquake")
+            {
+                float intensity = Math.Clamp(Timer / 10f, 0f, 1f);
+                ScreenShake = new Vector2(
+                    (float)(rng.NextDouble() - 0.5) * 8f * intensity,
+                    (float)(rng.NextDouble() - 0.5) * 8f * intensity);
+            }
+            else
+            {
+                ScreenShake = Vector2.Zero;
+            }
+
             if (Timer <= 0)
             {
                 IsActive = false;
                 GrassMultiplier = 1f;
                 ActiveEvent = "";
+                ImpactPosition = Vector2.Zero;
+                ImpactRadius = 0;
+                ImpactColor = Color.Transparent;
+                ScreenShake = Vector2.Zero;
+                AnimTimer = 0;
+                AnimDuration = 1.5f;
                 Logger.Event("CATACLYSM", $"Cataclysm ended at T={ecosystem.TotalTime:F1}s");
             }
             return;
@@ -68,11 +94,24 @@ public sealed class CataclysmSystem
                 break;
         }
         IsActive = true;
-        ApplyTerrainChange(ecosystem);
+        int radius = ApplyTerrainChange(ecosystem);
+        if (radius > 0)
+        {
+            ImpactRadius = radius * ecosystem.World.TileSize;
+            ImpactColor = ActiveEvent switch
+            {
+                "Asteroid Impact" => new Color(255, 100, 30, (int)200),
+                "Supervolcano" => new Color(255, 50, 10, (int)200),
+                "Ice Age" => new Color(100, 200, 255, (int)150),
+                _ => Color.Transparent
+            };
+            AnimTimer = 0;
+            AnimDuration = 2f;
+        }
         Logger.Event("CATACLYSM", $"MASS EXTINCTION: {ActiveEvent} at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
     }
 
-    private void ApplyTerrainChange(Ecosystem ecosystem)
+    private int ApplyTerrainChange(Ecosystem ecosystem)
     {
         int radius = ActiveEvent switch
         {
@@ -80,10 +119,11 @@ public sealed class CataclysmSystem
             "Supervolcano" => 5,
             _ => 0
         };
-        if (radius <= 0) return;
+        if (radius <= 0) return 0;
         int w = ecosystem.World.Width, h = ecosystem.World.Height;
         int cx = ecosystem.Random.Next(Math.Min(radius, w - radius), Math.Max(radius + 1, w - radius));
         int cy = ecosystem.Random.Next(Math.Min(radius, h - radius), Math.Max(radius + 1, h - radius));
+        ImpactPosition = new Vector2(cx * ecosystem.World.TileSize, cy * ecosystem.World.TileSize);
         for (int dy = -radius; dy <= radius; dy++)
             for (int dx = -radius; dx <= radius; dx++)
             {
@@ -92,6 +132,7 @@ public sealed class CataclysmSystem
                 tile.SoilNutrients = 0.1f;
             }
         Logger.Event("TERRAIN", $"{ActiveEvent} crater at ({cx},{cy}) radius={radius}");
+        return radius;
     }
 
     public void TriggerManual(Ecosystem ecosystem, Random rng)
@@ -112,12 +153,12 @@ public sealed class CataclysmSystem
         ImpactRadius = radius * ecosystem.World.TileSize;
         ImpactColor = type switch
         {
-            "Asteroid" => new Color(255, 100, 30, 200),
-            "Supervolcano" => new Color(255, 50, 10, 200),
-            "Earthquake" => new Color(180, 140, 100, 150),
-            "IceAge" => new Color(100, 200, 255, 150),
-            "Drought" => new Color(255, 180, 40, 150),
-            "Flood" => new Color(40, 140, 255, 150),
+            "Asteroid" => new Color(255, 100, 30, (int)200),
+            "Supervolcano" => new Color(255, 50, 10, (int)200),
+            "Earthquake" => new Color(180, 140, 100, (int)150),
+            "IceAge" => new Color(100, 200, 255, (int)150),
+            "Drought" => new Color(255, 180, 40, (int)150),
+            "Flood" => new Color(40, 140, 255, (int)150),
             _ => Color.Transparent
         };
         for (int dy = -radius; dy <= radius; dy++)
@@ -178,5 +219,189 @@ public sealed class CataclysmSystem
         }
         IsActive = true;
         Logger.Event("CATACLYSM", $"{ActiveEvent} started at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
+    }
+
+    public void Draw(SpriteBatch sb, Texture2D pixel)
+    {
+        if (!IsActive || ImpactRadius <= 0) return;
+
+        float progress = AnimTimer / AnimDuration; // 0..1
+        Vector2 pos = ImpactPosition;
+        float maxR = ImpactRadius * 0.8f;
+
+        if (ActiveEvent is "Asteroid" or "Asteroid Impact")
+        {
+            // Falling meteor (first 0.3s)
+            if (progress < 0.3f)
+            {
+                float t = progress / 0.3f;
+                float meteorY = -100 + (pos.Y + 100) * (t * t); // accelerate down
+                var mColor = new Color(255, 200, 50);
+                DrawFireball(sb, pixel, new Vector2(pos.X, meteorY), 6 + (1-t)*12, mColor, 255);
+
+                // Smoke trail
+                for (int i = 1; i <= 4; i++)
+                {
+                    float trailY = meteorY + i * 20;
+                    byte alpha = (byte)((1f - i * 0.25f) * 180);
+                    var trailColor = new Color(100, 80, 40, (int)alpha);
+                    DrawFireball(sb, pixel, new Vector2(pos.X, trailY), 4 + i, trailColor, alpha);
+                }
+            }
+
+            // Explosion after impact
+            float explodeT = Math.Max(0, (progress - 0.3f) / 0.7f);
+            float ringR = maxR * explodeT;
+            var explodeColor = new Color(255, 150, 30);
+            // Expanding shock rings
+            for (int r = 0; r < 3; r++)
+            {
+                float rT = (explodeT + r * 0.3f) % 1.0f;
+                float rr = maxR * rT;
+                byte alpha = (byte)((1f - rT) * 128);
+                DrawRing(sb, pixel, pos, rr, new Color(255, 180, 40, (int)alpha), 3);
+            }
+            // Fire particles at impact
+            DrawFireCluster(sb, pixel, pos, maxR * 0.6f, explodeT, progress);
+        }
+        else if (ActiveEvent == "Supervolcano")
+        {
+            // Eruption column
+            float intensity = Math.Min(1f, progress * 2f) * Math.Max(0f, 1f - progress * 1.5f);
+            DrawFireball(sb, pixel, pos - new Vector2(0, maxR * (1f - progress)), maxR * 0.4f * intensity, new Color(255, 80, 20), (byte)(intensity * 200));
+            // Lava spread
+            DrawRing(sb, pixel, pos, maxR * progress, new Color(255, 40, 10, (int)(intensity * 100)), 4);
+            DrawFireCluster(sb, pixel, pos, maxR * 0.5f * progress, progress, progress);
+        }
+        else if (ActiveEvent == "Firestorm")
+        {
+            DrawFireCluster(sb, pixel, pos, maxR, progress, progress);
+            for (int i = 0; i < 5; i++)
+            {
+                float angle = i * 1.256f + progress * 3f;
+                float fx = pos.X + MathF.Cos(angle) * maxR * (0.5f + progress * 0.5f);
+                float fy = pos.Y + MathF.Sin(angle) * maxR * (0.5f + progress * 0.5f);
+                DrawFireball(sb, pixel, new Vector2(fx, fy), 3 + progress * 4, new Color(255, 160, 30), 180);
+            }
+        }
+        else if (ActiveEvent is "IceAge" or "Ice Age")
+        {
+            // Frost spread
+            float frostR = maxR * progress;
+            var frostColors = new[] { new Color(180, 220, 255, (int)60), new Color(150, 200, 240, (int)40), new Color(200, 230, 255, (int)30) };
+            for (int r = 0; r < 3; r++)
+            {
+                float cr = frostR * (1f - r * 0.3f);
+                DrawRing(sb, pixel, pos, cr, frostColors[r], (int)(2 + r * 2));
+            }
+            // Snowflakes
+            for (int i = 0; i < 8; i++)
+            {
+                float sx = pos.X + MathF.Cos(i * 0.8f + progress * 5f) * frostR * 0.8f;
+                float sy = pos.Y + MathF.Sin(i * 0.8f + progress * 2f) * frostR * 0.8f;
+                DrawFireball(sb, pixel, new Vector2(sx, sy), 2, new Color(255, 255, 255, (int)150), 150);
+            }
+        }
+        else if (ActiveEvent == "Earthquake")
+        {
+            // Crack lines radiating from center
+            float crackR = maxR * progress;
+            for (int i = 0; i < 6; i++)
+            {
+                float angle = i * 1.047f + progress * 0.5f;
+                float endX = pos.X + MathF.Cos(angle) * crackR;
+                float endY = pos.Y + MathF.Sin(angle) * crackR;
+                DrawLine(sb, pixel, pos, new Vector2(endX, endY), new Color(100, 80, 60, (int)120), 2);
+            }
+        }
+        else if (ActiveEvent == "Drought")
+        {
+            // Heat shimmer rings
+            for (int r = 0; r < 4; r++)
+            {
+                float rr = maxR * (1f - (progress + r * 0.2f) % 1f);
+                DrawRing(sb, pixel, pos, rr, new Color(255, 200, 80, (int)(progress * 80)), 2);
+            }
+        }
+        else if (ActiveEvent == "Flood")
+        {
+            // Water waves
+            for (int r = 0; r < 4; r++)
+            {
+                float rr = maxR * (progress + r * 0.25f) % maxR;
+                DrawRing(sb, pixel, pos, rr, new Color(60, 160, 240, (int)((1f - rr / maxR) * 120)), 3);
+            }
+        }
+        else if (ActiveEvent == "Bloom")
+        {
+            // Flower/grass particles
+            for (int i = 0; i < 10; i++)
+            {
+                float angle = i * 0.628f + progress * 2f;
+                float fx = pos.X + MathF.Cos(angle) * maxR * progress;
+                float fy = pos.Y + MathF.Sin(angle) * maxR * progress;
+                DrawFireball(sb, pixel, new Vector2(fx, fy), 3, new Color(100, 220, 80, (int)120), 120);
+            }
+        }
+
+        // Generic impact ring for all types
+        float genR = maxR * 0.5f * (1f + progress);
+        byte genA = (byte)((1f - progress) * 60);
+        if (genA > 0)
+            DrawRing(sb, pixel, pos, genR, new Color(ImpactColor.R, ImpactColor.G, ImpactColor.B, genA), 2);
+    }
+
+    private static void DrawFireball(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, byte alpha)
+    {
+        var color = new Color(c.R, c.G, c.B, alpha);
+        for (int dy = -(int)r; dy <= (int)r; dy++)
+            for (int dx = -(int)r; dx <= (int)r; dx++)
+            {
+                if (dx * dx + dy * dy <= r * r)
+                    sb.Draw(p, new Rectangle((int)pos.X + dx, (int)pos.Y + dy, 1, 1), color);
+            }
+    }
+
+    private static void DrawRing(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, int thickness)
+    {
+        for (int dy = -(int)r - thickness; dy <= (int)r + thickness; dy++)
+            for (int dx = -(int)r - thickness; dx <= (int)r + thickness; dx++)
+            {
+                float d = MathF.Sqrt(dx * dx + dy * dy);
+                if (d >= r - thickness && d <= r)
+                    sb.Draw(p, new Rectangle((int)pos.X + dx, (int)pos.Y + dy, 1, 1), c);
+            }
+    }
+
+    private void DrawFireCluster(SpriteBatch sb, Texture2D p, Vector2 pos, float radius, float t, float progress)
+    {
+        int seed = (int)(t * 100);
+        var rng = new Random(seed);
+        for (int i = 0; i < 20; i++)
+        {
+            float angle = (float)rng.NextDouble() * 6.28f;
+            float dist = (float)rng.NextDouble() * radius * (0.7f + 0.3f * MathF.Sin(progress * 3f + i));
+            float fx = pos.X + MathF.Cos(angle) * dist;
+            float fy = pos.Y + MathF.Sin(angle) * dist;
+            int size = 1 + rng.Next(3);
+            byte alpha = (byte)(160 + rng.Next(95));
+            var fc = new Color(255, 100 + rng.Next(155), 10 + rng.Next(30));
+            DrawFireball(sb, p, new Vector2(fx, fy), size, fc, alpha);
+        }
+    }
+
+    private static void DrawLine(SpriteBatch sb, Texture2D p, Vector2 from, Vector2 to, Color c, int thickness)
+    {
+        float dx = to.X - from.X;
+        float dy = to.Y - from.Y;
+        float len = MathF.Sqrt(dx * dx + dy * dy);
+        if (len < 1) return;
+        float nx = dx / len, ny = dy / len;
+        for (int i = 0; i < (int)len; i++)
+        {
+            int px = (int)(from.X + nx * i);
+            int py = (int)(from.Y + ny * i);
+            sb.Draw(p, new Rectangle(px, py, 1, thickness), c);
+        }
     }
 }
