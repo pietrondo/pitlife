@@ -174,7 +174,6 @@ public class Game1 : Game
                     _helpScreen.Hide();
                 _prevKbd = kbd;
         _prevMouse = mouse;
-        _gameFrame++;
                 base.Update(gameTime);
                 return;
             }
@@ -401,10 +400,6 @@ public class Game1 : Game
 
         // Cataclysm placement when selected (require at least 1 frame delay after selection)
         bool cataReady = _cataSelectedFrame > 0 && (_gameFrame - _cataSelectedFrame) >= 1;
-        if (mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
-        {
-            Logger.Debug($"[CLICK] frame={_gameFrame} cataSel={_cataclysmPanel.SelectedType} cataReady={cataReady} ptrUi={pointerOverUi} spawnCons={spawnPanelConsumed} cataCons={cataConsumed} spawnSel={_spawnPanel.SelectedCataclysm} species={_spawnPanel.SelectedSpeciesKey}");
-        }
         if (_cataclysmPanel.SelectedType != null && cataReady &&
             !pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
@@ -475,6 +470,7 @@ public class Game1 : Game
             }
         }
         _prevMouse = mouse;
+        _gameFrame++;
 
         base.Update(gameTime);
     }
