@@ -45,6 +45,8 @@ public sealed class SpeciesDefinition
     public float MaturityAge { get; }
     public PlantReproductionMode? PlantReproduction { get; }
     public PollinationMode Pollination { get; }
+    public float MinTemperature { get; }
+    public float MaxTemperature { get; }
 
     public SpeciesDefinition(
         string species,
@@ -56,7 +58,9 @@ public sealed class SpeciesDefinition
         float defaultSize = 1.0f,
         float maturityAge = 30f,
         PlantReproductionMode? plantReproduction = null,
-        PollinationMode pollination = PollinationMode.None)
+        PollinationMode pollination = PollinationMode.None,
+        float minTemperature = -50f,
+        float maxTemperature = 60f)
     {
         if (kind == global::PitLife.Simulation.CreatureType.Plant && plantReproduction is null)
             throw new ArgumentException("Plant species require a reproduction mode.", nameof(plantReproduction));
@@ -76,9 +80,13 @@ public sealed class SpeciesDefinition
         MaturityAge = maturityAge;
         PlantReproduction = plantReproduction;
         Pollination = pollination;
+        MinTemperature = minTemperature;
+        MaxTemperature = maxTemperature;
     }
 
     public bool IsValidBiome(BiomeType biome) => ValidBiomes.Contains(biome);
+    public bool IsValidTemperature(float temperature) => temperature >= MinTemperature && temperature <= MaxTemperature;
+    public bool IsValidClimate(BiomeType biome, float temperature) => IsValidBiome(biome) && IsValidTemperature(temperature);
 }
 
 public static class SpeciesRegistry

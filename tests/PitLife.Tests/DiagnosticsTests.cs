@@ -140,9 +140,9 @@ public class DiagnosticsTests
         var climate = new ClimateSystem();
         var rng = new Random(42);
         climate.Update(0, rng);
-        Assert.Equal(Season.Spring, climate.CurrentSeason);
+        Assert.Equal(Season.Summer, climate.CurrentSeason);
         climate.Update(ClimateSystem.YearLength + 10, rng);
-        Assert.Equal(Season.Spring, climate.CurrentSeason);
+        Assert.Equal(Season.Summer, climate.CurrentSeason);
     }
 
     [Fact]

@@ -72,6 +72,7 @@ public sealed class UiWindowManager
         }
         else
         {
+            CloseAllWindows();
             window.IsOpen = true;
             BringToFront(window);
             if (viewportWidth > 0 && viewportHeight > 0)
@@ -85,11 +86,18 @@ public sealed class UiWindowManager
         if (window == null)
             return;
 
+        CloseAllWindows();
         window.IsOpen = true;
         BringToFront(window);
 
         if (viewportWidth > 0 && viewportHeight > 0)
             TileWindows(viewportWidth, viewportHeight);
+    }
+
+    public void CloseAllWindows()
+    {
+        foreach (UiWindow w in _windows)
+            w.IsOpen = false;
     }
 
     public bool CloseTopWindow()

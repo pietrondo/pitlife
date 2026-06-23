@@ -61,6 +61,44 @@ public class World
                 Tiles[x, y].RegenerateGrass(dt);
     }
 
+    public void ProcessRecovery(float dt)
+    {
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
+            {
+                Tile tile = Tiles[x, y];
+                tile.RecoverFromCataclysm(dt);
+
+                if (tile.GrassAmount < tile.MaxGrass * 0.3f && tile.OriginalBiome == null)
+                    continue;
+
+                SpreadGrassToNeighbors(x, y, dt);
+            }
+    }
+
+    private void SpreadGrassToNeighbors(int x, int y, float dt)
+    {
+        Tile tile = Tiles[x, y];
+        if (tile.GrassAmount < tile.MaxGrass * 0.5f) return;
+
+        float spread = 0.003f * tile.SoilNutrients * dt;
+        TrySpread(tile, x - 1, y, spread);
+        TrySpread(tile, x + 1, y, spread);
+        TrySpread(tile, x, y - 1, spread);
+        TrySpread(tile, x, y + 1, spread);
+    }
+
+    private void TrySpread(Tile from, int nx, int ny, float amount)
+    {
+        if (nx < 0 || nx >= Width || ny < 0 || ny >= Height) return;
+        Tile neighbor = Tiles[nx, ny];
+        if (neighbor.Biome == BiomeType.DeepOcean || neighbor.Biome == BiomeType.ShallowWater) return;
+        if (neighbor.GrassAmount < neighbor.MaxGrass)
+        {
+            neighbor.GrassAmount = Math.Min(neighbor.MaxGrass, neighbor.GrassAmount + amount);
+        }
+    }
+
     public bool IsRiverAt(float worldX, float worldY)
     {
         int tx = (int)(worldX / TileSize);

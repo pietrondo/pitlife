@@ -13,6 +13,13 @@ public static class Logger
     private static readonly object Lock = new();
     private static readonly List<string> Buffer = [];
     private const int BufferSize = 50;
+    private static readonly List<string> _recentEvents = [];
+    private const int MaxRecentEvents = 20;
+
+    public static IReadOnlyList<string> RecentEvents
+    {
+        get { lock (Lock) return _recentEvents.ToArray(); }
+    }
 
     static Logger()
     {
@@ -37,7 +44,16 @@ public static class Logger
     public static void Debug(string message) => Write("DEBUG", message);
     public static void Warn(string message) => Write("WARN", message);
     public static void Error(string message) => Write("ERROR", message);
-    public static void Event(string category, string message) => Write($"EVT.{category}", message);
+    public static void Event(string category, string message)
+    {
+        Write($"EVT.{category}", message);
+        lock (Lock)
+        {
+            _recentEvents.Add($"[{category}] {message}");
+            if (_recentEvents.Count > MaxRecentEvents)
+                _recentEvents.RemoveAt(0);
+        }
+    }
 
     public static void Flush()
     {

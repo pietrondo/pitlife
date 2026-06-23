@@ -24,38 +24,62 @@ internal static class BuiltinSpecies
     public static void RegisterAll()
     {
         // Plants (Land)
-        RegisterPlant("Clover", PlantReproductionMode.Vegetative);
-        RegisterPlant("Poppy", PlantReproductionMode.Seeds, PollinationMode.Insects);
-        RegisterPlant("Mushroom", PlantReproductionMode.Spores);
-        RegisterPlant("GrassTuft", PlantReproductionMode.Seeds, PollinationMode.Wind);
-        RegisterPlant("Cactus", PlantReproductionMode.Seeds, PollinationMode.Insects);
-        RegisterPlant("Moss", PlantReproductionMode.Spores);
-        RegisterPlant("BerryBush", PlantReproductionMode.Seeds, PollinationMode.Insects);
-        RegisterPlant("Pine", PlantReproductionMode.Seeds, PollinationMode.Wind);
-        RegisterPlant("Toadstool", PlantReproductionMode.Spores);
-        RegisterPlant("OakTree", PlantReproductionMode.Seeds, PollinationMode.Wind);
-        RegisterPlant("PineTree", PlantReproductionMode.Seeds, PollinationMode.Wind);
-        RegisterPlant("Juniper", PlantReproductionMode.Seeds, PollinationMode.Insects);
-        RegisterPlant("Bamboo", PlantReproductionMode.Seeds, PollinationMode.Wind);
+        RegisterPlant("Clover", PlantReproductionMode.Vegetative,
+            minTemperature: -15f, maxTemperature: 35f);
+        RegisterPlant("Poppy", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: -5f, maxTemperature: 35f);
+        RegisterPlant("Mushroom", PlantReproductionMode.Spores,
+            minTemperature: -5f, maxTemperature: 28f);
+        RegisterPlant("GrassTuft", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -15f, maxTemperature: 45f);
+        RegisterPlant("Cactus", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: 15f, maxTemperature: 55f);
+        RegisterPlant("Moss", PlantReproductionMode.Spores,
+            minTemperature: -30f, maxTemperature: 25f);
+        RegisterPlant("BerryBush", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: -10f, maxTemperature: 35f);
+        RegisterPlant("Pine", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -25f, maxTemperature: 30f);
+        RegisterPlant("Toadstool", PlantReproductionMode.Spores,
+            minTemperature: -5f, maxTemperature: 30f);
+        RegisterPlant("OakTree", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -10f, maxTemperature: 32f);
+        RegisterPlant("PineTree", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -25f, maxTemperature: 25f);
+        RegisterPlant("Juniper", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: -20f, maxTemperature: 35f);
+        RegisterPlant("Bamboo", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: 5f, maxTemperature: 48f);
         RegisterPlant("Lavender", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            [BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland, BiomeType.Mountain]);
+            [BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland, BiomeType.Mountain],
+            minTemperature: 0f, maxTemperature: 45f);
         RegisterPlant("Fern", PlantReproductionMode.Spores, biomes:
-            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp]);
+            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp],
+            minTemperature: 0f, maxTemperature: 32f);
         RegisterPlant("Sunflower", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            [BiomeType.Savanna, BiomeType.Grassland]);
+            [BiomeType.Savanna, BiomeType.Grassland],
+            minTemperature: 10f, maxTemperature: 40f);
         RegisterPlant("Chanterelle", PlantReproductionMode.Spores, biomes:
-            [BiomeType.Forest, BiomeType.DenseForest]);
+            [BiomeType.Forest, BiomeType.DenseForest],
+            minTemperature: 0f, maxTemperature: 28f);
         RegisterPlant("Morel", PlantReproductionMode.Spores, biomes:
-            [BiomeType.Forest, BiomeType.Grassland]);
+            [BiomeType.Forest, BiomeType.Grassland],
+            minTemperature: 0f, maxTemperature: 32f);
         RegisterPlant("OysterMushroom", PlantReproductionMode.Spores, biomes:
-            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp]);
+            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp],
+            minTemperature: 0f, maxTemperature: 32f);
 
         // Aquatic Plants
-        RegisterAquaticPlant("Seaweed", PlantReproductionMode.Fragmentation);
-        RegisterAquaticPlant("Algae", PlantReproductionMode.Fragmentation);
-        RegisterAquaticPlant("Kelp", PlantReproductionMode.Spores);
-        RegisterAquaticPlant("WaterLily", PlantReproductionMode.Seeds, PollinationMode.Insects);
-        RegisterAquaticPlant("Coral", PlantReproductionMode.BroadcastSpawning);
+        RegisterAquaticPlant("Seaweed", PlantReproductionMode.Fragmentation,
+            minTemperature: -5f, maxTemperature: 35f);
+        RegisterAquaticPlant("Algae", PlantReproductionMode.Fragmentation,
+            minTemperature: -15f, maxTemperature: 45f);
+        RegisterAquaticPlant("Kelp", PlantReproductionMode.Spores,
+            minTemperature: -2f, maxTemperature: 28f);
+        RegisterAquaticPlant("WaterLily", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: 10f, maxTemperature: 40f);
+        RegisterAquaticPlant("Coral", PlantReproductionMode.BroadcastSpawning,
+            minTemperature: 18f, maxTemperature: 40f);
 
         // Herbivores
         RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 0.6f);
@@ -125,11 +149,14 @@ internal static class BuiltinSpecies
         RegisterAnimal("PoisonFrog", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Swamp, BiomeType.Forest], size: 0.4f);
         RegisterPlant("Belladonna", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            biomes: [BiomeType.Forest, BiomeType.Swamp]);
+            biomes: [BiomeType.Forest, BiomeType.Swamp],
+            minTemperature: 5f, maxTemperature: 32f);
         RegisterPlant("VenusFlyTrap", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            biomes: [BiomeType.Swamp]);
+            biomes: [BiomeType.Swamp],
+            minTemperature: 10f, maxTemperature: 36f);
         RegisterPlant("PitcherPlant", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            biomes: [BiomeType.Swamp, BiomeType.Forest]);
+            biomes: [BiomeType.Swamp, BiomeType.Forest],
+            minTemperature: 8f, maxTemperature: 35f);
         RegisterAnimal("Ant", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm,
             biomes: Land, size: 0.2f);
         RegisterAnimal("Bee", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Swarm,
@@ -152,7 +179,9 @@ internal static class BuiltinSpecies
         string name,
         PlantReproductionMode reproduction,
         PollinationMode pollination = PollinationMode.None,
-        BiomeType[]? biomes = null) =>
+        BiomeType[]? biomes = null,
+        float minTemperature = -30f,
+        float maxTemperature = 50f) =>
         SpeciesRegistry.Register(new SpeciesDefinition(
             species: name,
             creatureType: typeof(Plant),
@@ -161,12 +190,16 @@ internal static class BuiltinSpecies
             socialBehavior: SocialBehavior.None,
             validBiomes: biomes ?? Land,
             plantReproduction: reproduction,
-            pollination: pollination));
+            pollination: pollination,
+            minTemperature: minTemperature,
+            maxTemperature: maxTemperature));
 
     private static void RegisterAquaticPlant(
         string name,
         PlantReproductionMode reproduction,
-        PollinationMode pollination = PollinationMode.None) =>
+        PollinationMode pollination = PollinationMode.None,
+        float minTemperature = -5f,
+        float maxTemperature = 36f) =>
         SpeciesRegistry.Register(new SpeciesDefinition(
             species: name,
             creatureType: typeof(Plant),
@@ -175,7 +208,9 @@ internal static class BuiltinSpecies
             socialBehavior: SocialBehavior.None,
             validBiomes: ShallowOrDeep,
             plantReproduction: reproduction,
-            pollination: pollination));
+            pollination: pollination,
+            minTemperature: minTemperature,
+            maxTemperature: maxTemperature));
 
     private static void RegisterAnimal(string name, CreatureType kind, bool isAquatic,
         SocialBehavior social, BiomeType[] biomes, float size = 1.0f)

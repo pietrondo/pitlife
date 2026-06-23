@@ -23,6 +23,8 @@ public class Tile
     public float GrassAmount { get; set; }
     public float SoilNutrients { get; set; } = 1f;
     public float Temperature { get; set; } = 20f;
+    public BiomeType? OriginalBiome { get; set; }
+    public float CataclysmDamage { get; set; }
     public bool IsPassable => Biome != BiomeType.DeepOcean
                             && Biome != BiomeType.ShallowWater
                             && Biome != BiomeType.Snow
@@ -50,6 +52,23 @@ public class Tile
     {
         float regenRate = 0.02f * SoilNutrients;
         GrassAmount = Math.Min(MaxGrass, GrassAmount + regenRate * dt);
+    }
+
+    public void RecoverFromCataclysm(float dt)
+    {
+        if (CataclysmDamage <= 0 || OriginalBiome == null) return;
+        CataclysmDamage -= 0.008f * dt;
+        if (CataclysmDamage <= 0)
+        {
+            CataclysmDamage = 0;
+            if (Biome != OriginalBiome.Value)
+            {
+                Biome = OriginalBiome.Value;
+                GrassAmount = MaxGrass * 0.3f;
+                SoilNutrients = 0.5f;
+            }
+            OriginalBiome = null;
+        }
     }
 
     private static float VegetationFor(BiomeType biome) => biome switch

@@ -201,7 +201,8 @@ public class Ecosystem
             float x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
             float y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
             var tile = World.GetTileAtPosition(x, y);
-            if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidBiome(tile.Biome)))
+            if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidClimate(tile.Biome,
+                    Climate.GetTileTemperature(tile, y / World.TileSize, World.Height))))
                 return new Vector2(x, y);
         }
 
@@ -212,7 +213,8 @@ public class Ecosystem
             int tileX = index % World.Width;
             int tileY = index / World.Width;
             var tile = World.GetTile(tileX, tileY);
-            if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidBiome(tile.Biome)))
+            if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidClimate(tile.Biome,
+                    Climate.GetTileTemperature(tile, tileY, World.Height))))
                 return new Vector2((tileX + 0.5f) * World.TileSize, (tileY + 0.5f) * World.TileSize);
         }
 
@@ -252,6 +254,7 @@ public class Ecosystem
             sys.Tick(this, gameTime);
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
+        World.ProcessRecovery(dt);
         UpdateStats();
     }
 
@@ -369,6 +372,14 @@ public class Ecosystem
 
         var tile = World.GetTileAtPosition(newPos.X, newPos.Y);
         if (!tile.IsPassable) return;
+
+        var def = SpeciesRegistry.Get(plant.Species);
+        if (def != null)
+        {
+            int tileY = (int)(newPos.Y / World.TileSize);
+            if (!def.IsValidClimate(tile.Biome, Climate.GetTileTemperature(tile, tileY, World.Height)))
+                return;
+        }
 
         var sameSpeciesNearby = FindNeighbors(plant, 80f, c => c is Plant p && p.Species == plant.Species);
         if (sameSpeciesNearby.Count >= 4)

@@ -179,6 +179,8 @@ public sealed class CataclysmSystem : ISimulationSystem
                 var tile = ecosystem.World.GetTile(wx, wy);
                 if (tile.Biome == BiomeType.DeepOcean || tile.Biome == BiomeType.ShallowWater) continue;
 
+                BiomeType previousBiome = tile.Biome;
+
                 // Visible terrain changes (set Biome first - it resets grass)
                 float dist = MathF.Sqrt(dx * dx + dy * dy);
                 if (dist < radius * 0.4f)
@@ -200,6 +202,13 @@ public sealed class CataclysmSystem : ISimulationSystem
                         tile.Biome = BiomeType.Mountain;
                     else if (type == "IceAge")
                         tile.Biome = BiomeType.Tundra;
+                }
+
+                bool biomeChanged = tile.Biome != previousBiome;
+                if (biomeChanged)
+                {
+                    tile.OriginalBiome = previousBiome;
+                    tile.CataclysmDamage = 1f;
                 }
 
                 // Then override grass/soil

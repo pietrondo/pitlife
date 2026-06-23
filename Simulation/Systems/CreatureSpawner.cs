@@ -31,13 +31,19 @@ public sealed class CreatureSpawner
         var def = SpeciesRegistry.Get(species);
         if (def == null) return false;
         if (_ecosystem.IsFull) return false;
-        return def.IsValidBiome(_ecosystem.World.GetTileAtPosition(position.X, position.Y).Biome);
+        var tile = _ecosystem.World.GetTileAtPosition(position.X, position.Y);
+        int tileY = (int)(position.Y / _ecosystem.World.TileSize);
+        float effectiveTemp = _ecosystem.Climate.GetTileTemperature(tile, tileY, _ecosystem.World.Height);
+        return def.IsValidClimate(tile.Biome, effectiveTemp);
     }
 
     private bool SpawnInternal(SpeciesDefinition def, Vector2 position)
     {
         if (_ecosystem.IsFull) return false;
-        if (!def.IsValidBiome(_ecosystem.World.GetTileAtPosition(position.X, position.Y).Biome))
+        var tile = _ecosystem.World.GetTileAtPosition(position.X, position.Y);
+        int tileY = (int)(position.Y / _ecosystem.World.TileSize);
+        float effectiveTemp = _ecosystem.Climate.GetTileTemperature(tile, tileY, _ecosystem.World.Height);
+        if (!def.IsValidClimate(tile.Biome, effectiveTemp))
             return false;
 
         var genome = Genome.Random(_ecosystem.Random);

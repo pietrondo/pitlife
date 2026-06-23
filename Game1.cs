@@ -107,6 +107,15 @@ public class Game1 : Game
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
         _inGameUi.World = _ecosystem.World;
+        _inGameUi.Climate = _ecosystem.Climate;
+        _inGameUi.ToolbarButtonClicked += () =>
+        {
+            if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
+            if (_spawnPanel.IsOpen) _spawnPanel.Close();
+            if (_speciesEditor.IsOpen) _speciesEditor.Close();
+        };
+
+        Exiting += (_, _) => Logger.Flush();
 
         base.Initialize();
     }
@@ -259,7 +268,15 @@ public class Game1 : Game
         if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
             _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
+        {
             _speciesEditor.Toggle();
+            if (_speciesEditor.IsOpen)
+            {
+                _inGameUi.CloseAllWindows();
+                if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
+                if (_spawnPanel.IsOpen) _spawnPanel.Close();
+            }
+        }
 
         if (_speciesEditor.IsOpen)
         {
@@ -315,6 +332,8 @@ public class Game1 : Game
         }
 
         _spawnPanel.SetViewportHeight(GraphicsDevice.Viewport.Height);
+        bool cataWasOpen = _cataclysmPanel.IsOpen;
+        bool spawnWasOpen = _spawnPanel.IsOpen;
         if (kbd.IsKeyDown(Keys.F8) && !_prevKbd.IsKeyDown(Keys.F8))
             _cataclysmPanel.Toggle();
         if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
@@ -324,6 +343,17 @@ public class Game1 : Game
         bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
         bool cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
+
+        if ((_cataclysmPanel.IsOpen && !cataWasOpen) || (_spawnPanel.IsOpen && !spawnWasOpen))
+            _inGameUi.CloseAllWindows();
+
+        if (_cataclysmPanel.IsOpen && !cataWasOpen)
+            _spawnPanel.Close();
+        if (_spawnPanel.IsOpen && !spawnWasOpen)
+        {
+            _cataclysmPanel.Close();
+            _speciesEditor.Close();
+        }
 
         // ── Mutual exclusion: only one mode active ────────────
         bool spawnJustSelected = _spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata;
@@ -452,6 +482,9 @@ public class Game1 : Game
         else if (!pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
                  mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
+            if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
+            if (_spawnPanel.IsOpen) _spawnPanel.Close();
+            if (_speciesEditor.IsOpen) _speciesEditor.Close();
             var worldPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
             _selectedCreature = FindClosestCreature(_ecosystem.Creatures, worldPos);
             if (_selectedCreature != null)
@@ -631,6 +664,23 @@ public class Game1 : Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _worldRenderer.Draw(_spriteBatch, _camera);
         //_ecosystem.Flow?.DrawOverlay(_spriteBatch, _ecosystem.World.TileSize);
+        _spriteBatch.End();
+
+        // Seasonal overlay
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix,
+            blendState: BlendState.Additive);
+        Color seasonTint = _ecosystem.Climate.CurrentSeason switch
+        {
+            Season.Spring => new Color(40, 120, 40, 6),
+            Season.Summer => new Color(120, 100, 20, 8),
+            Season.Autumn => new Color(100, 70, 20, 8),
+            Season.Winter => new Color(60, 80, 160, 10),
+            _ => Color.Transparent
+        };
+        float tempAlpha = Math.Clamp((_ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
+        Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
+        _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), seasonTint);
+        _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), tempBlend);
         _spriteBatch.End();
 
         // Draw the creatures with Point Clamp (for crisp pixel art)

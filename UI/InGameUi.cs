@@ -1,6 +1,8 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PitLife.Core;
 using PitLife.Localization;
 using PitLife.Simulation;
 
@@ -12,6 +14,7 @@ public sealed class InGameUi
     public const string CreatureWindowId = "creature";
     public const string TerrainWindowId = "terrain";
     public const string CataclysmWindowId = "cataclysm";
+    public const string ClimateWindowId = "climate";
     public string? SelectedCataclysm { get; set; }
 
     private Rectangle _toolbarRect;
@@ -22,6 +25,7 @@ public sealed class InGameUi
     private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange"));
     private readonly UiButton _menuButton = new(I18n.T("toolbar.menu"));
     private readonly UiButton _cataclysmButton = new(I18n.T("toolbar.cataclysm"));
+    private readonly UiButton _climateButton = new(I18n.T("toolbar.climate"));
     private readonly UiButton _speedDownButton = new("<");
     private readonly UiButton _speedUpButton = new(">");
 
@@ -29,7 +33,9 @@ public sealed class InGameUi
     public bool SpeedUpRequested { get; set; }
     public bool SpeedDownRequested { get; set; }
     public World? World { get; set; }
+    public Simulation.ClimateSystem? Climate { get; set; }
     public Point? SelectedTile { get; set; }
+    public event Action? ToolbarButtonClicked;
 
     public InGameUi()
     {
@@ -54,6 +60,11 @@ public sealed class InGameUi
             Bounds = new Rectangle(370, 88, 220, 200),
             ShowCloseButton = true
         });
+        _windowManager.Add(new UiWindow(I18n.T("window.climate"), ClimateWindowId)
+        {
+            Bounds = new Rectangle(348, 96, 300, 420),
+            ShowCloseButton = true
+        });
     }
 
     public void OpenCreatureWindow(int vpw, int vph) => _windowManager.Open(CreatureWindowId, vpw, vph);
@@ -70,6 +81,7 @@ public sealed class InGameUi
     }
 
     public bool CloseTopWindow() => _windowManager.CloseTopWindow();
+    public void CloseAllWindows() => _windowManager.CloseAllWindows();
 
     public bool Update(
         MouseState mouse,
@@ -83,24 +95,40 @@ public sealed class InGameUi
         LayoutToolbar(viewportHeight);
 
         if (Pressed(keyboard, previousKeyboard, Keys.F2))
+        {
             _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
         if (Pressed(keyboard, previousKeyboard, Keys.F3))
+        {
             _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
         if (Pressed(keyboard, previousKeyboard, Keys.F5))
             _windowManager.TileWindows(viewportWidth, viewportHeight);
         if (Pressed(keyboard, previousKeyboard, Keys.F8))
+        {
             _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F9))
+        {
+            _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
 
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
         {
             _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
+            ToolbarButtonClicked?.Invoke();
         }
         if (_creatureButton.WasClicked(mouse, previousMouse))
         {
             _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
+            ToolbarButtonClicked?.Invoke();
         }
         if (_arrangeButton.WasClicked(mouse, previousMouse))
         {
@@ -116,6 +144,13 @@ public sealed class InGameUi
         {
             _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
             toolbarConsumed = true;
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (_climateButton.WasClicked(mouse, previousMouse))
+        {
+            _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
+            toolbarConsumed = true;
+            ToolbarButtonClicked?.Invoke();
         }
         if (_speedDownButton.WasClicked(mouse, previousMouse))
         {
@@ -166,6 +201,7 @@ public sealed class InGameUi
         spriteBatch.DrawString(font, speedLabel, new Vector2(sx, sy), Color.White);
         _speedUpButton.Draw(spriteBatch, pixel, font, mouse, false);
         _cataclysmButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _climateButton.Draw(spriteBatch, pixel, font, mouse, false);
         _menuButton.Draw(spriteBatch, pixel, font, mouse, false);
 
         foreach (UiWindow window in _windowManager.Windows)
@@ -198,6 +234,10 @@ public sealed class InGameUi
             else if (window.Id == CataclysmWindowId)
             {
                 DrawCataclysmWindow(spriteBatch, pixel, font, window.ContentBounds);
+            }
+            else if (window.Id == ClimateWindowId)
+            {
+                DrawClimateDashboard(spriteBatch, pixel, font, window.ContentBounds, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed);
             }
         }
     }
@@ -342,6 +382,7 @@ public sealed class InGameUi
         _speedDownButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + 20;
         _speedUpButton.Bounds = new Rectangle(x, y, 36, 44); x += 36 + gap;
         _cataclysmButton.Bounds = new Rectangle(x, y, 120, 44); x += 120 + gap;
+        _climateButton.Bounds = new Rectangle(x, y, 80, 44); x += 80 + gap;
         _menuButton.Bounds = new Rectangle(x, y, 80, 44);
     }
 
@@ -354,6 +395,7 @@ public sealed class InGameUi
         _creatureButton.Text = I18n.T("toolbar.creature");
         _arrangeButton.Text = I18n.T("toolbar.arrange");
         _cataclysmButton.Text = I18n.T("toolbar.cataclysm");
+        _climateButton.Text = I18n.T("toolbar.climate");
         _menuButton.Text = I18n.T("toolbar.menu");
         foreach (UiWindow window in _windowManager.Windows)
         {
@@ -436,5 +478,77 @@ public sealed class InGameUi
             }
         }
         return false;
+    }
+
+    private void DrawClimateDashboard(SpriteBatch sb, Texture2D pixel, SpriteFont font,
+        Rectangle content, int plantCount, int herbivoreCount, int carnivoreCount,
+        int omnivoreCount, float totalTime, bool paused, float speed)
+    {
+        var climate = Climate;
+        if (climate == null)
+        {
+            DrawLine(sb, font, content.X, content.Y, "Climate data unavailable", UiTheme.MutedStone);
+            return;
+        }
+
+        int y = content.Y;
+        float pi = MathF.PI;
+
+        DrawLine(sb, font, content.X, y, I18n.Format("climate.season",
+            I18n.T($"season.{climate.CurrentSeason.ToString().ToLowerInvariant()}")), UiTheme.MossSignal);
+        y += 20;
+
+        float progressW = content.Width - 8;
+        DrawProgress(sb, pixel, new Rectangle(content.X, y, (int)progressW, 10), climate.SeasonProgress);
+        y += 16;
+
+        string tempLabel = $"{climate.TemperatureModifier * 20f + 20f:0.#}°C";
+        float tempNorm = Math.Clamp((climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
+        DrawLine(sb, font, content.X, y, I18n.Format("climate.temperature", tempLabel),
+            Color.Lerp(new Color(100, 150, 255), new Color(255, 120, 40), tempNorm));
+        y += 18;
+
+        DrawLine(sb, font, content.X, y,
+            I18n.Format("climate.orbit", climate.SunDistanceAU, climate.OrbitalAngle * 180f / pi, climate.OrbitalSpeedKmS),
+            UiTheme.WarmParchment);
+        y += 18;
+
+        DrawLine(sb, font, content.X, y,
+            I18n.Format("climate.wind", climate.WindSpeed, climate.WindDirection * 180f / pi),
+            UiTheme.WarmParchment);
+        y += 18;
+
+        if (climate.IsExtremeEvent)
+        {
+            DrawLine(sb, font, content.X, y,
+                I18n.Format("climate.extreme", climate.ExtremeEventName),
+                climate.ExtremeEventName == "Heatwave" ? new Color(255, 140, 40) : new Color(120, 180, 255));
+            y += 18;
+        }
+
+        y += 6;
+        DrawLine(sb, font, content.X, y, I18n.T("climate.populations"), UiTheme.MossSignal);
+        y += 22;
+        int totalPop = plantCount + herbivoreCount + carnivoreCount + omnivoreCount;
+        DrawInlineBar(sb, pixel, font, content.X, y, "P", plantCount, totalPop, UiTheme.MossSignal);
+        y += 16;
+        DrawInlineBar(sb, pixel, font, content.X, y, "H", herbivoreCount, totalPop, UiTheme.LakeBlue);
+        y += 16;
+        DrawInlineBar(sb, pixel, font, content.X, y, "C", carnivoreCount, totalPop, UiTheme.DangerClay);
+        y += 16;
+        DrawInlineBar(sb, pixel, font, content.X, y, "O", omnivoreCount, totalPop, UiTheme.WarmParchment);
+        y += 20;
+
+        DrawLine(sb, font, content.X, y, I18n.T("climate.events"), UiTheme.MossSignal);
+        y += 20;
+        var recent = Core.Logger.RecentEvents;
+        int maxShow = Math.Min(5, recent.Count);
+        for (int i = recent.Count - maxShow; i < recent.Count; i++)
+        {
+            string ev = recent[i];
+            if (ev.Length > 42) ev = ev.Substring(0, 42);
+            DrawLine(sb, font, content.X, y, ev, new Color(180, 160, 140));
+            y += 16;
+        }
     }
 }

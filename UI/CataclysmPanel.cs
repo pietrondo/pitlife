@@ -40,6 +40,12 @@ public sealed class CataclysmPanel
         if (!IsOpen) SelectedType = null;
     }
 
+    public void Close()
+    {
+        IsOpen = false;
+        SelectedType = null;
+    }
+
     public bool Update(MouseState mouse, MouseState prevMouse)
     {
         // Toggle button click - use direct press detection

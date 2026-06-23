@@ -12,19 +12,19 @@ public class ClimateSystemTests
         var rng = new System.Random(42);
 
         climate.Update(0, rng);
-        Assert.Equal(Season.Spring, climate.CurrentSeason);
-
-        climate.Update(ClimateSystem.SeasonLength - 1, rng);
-        Assert.Equal(Season.Spring, climate.CurrentSeason);
-
-        climate.Update(ClimateSystem.SeasonLength + 1, rng);
         Assert.Equal(Season.Summer, climate.CurrentSeason);
 
-        climate.Update(ClimateSystem.SeasonLength * 2 + 1, rng);
+        climate.Update(ClimateSystem.SeasonLength - 1, rng);
+        Assert.Equal(Season.Summer, climate.CurrentSeason);
+
+        climate.Update(ClimateSystem.SeasonLength + 5, rng);
         Assert.Equal(Season.Autumn, climate.CurrentSeason);
 
-        climate.Update(ClimateSystem.SeasonLength * 3 + 1, rng);
+        climate.Update(ClimateSystem.SeasonLength * 2 + 5, rng);
         Assert.Equal(Season.Winter, climate.CurrentSeason);
+
+        climate.Update(ClimateSystem.SeasonLength * 3 + 5, rng);
+        Assert.Equal(Season.Spring, climate.CurrentSeason);
     }
 
     [Fact]
@@ -34,10 +34,10 @@ public class ClimateSystemTests
         var rng = new System.Random(42);
 
         climate.Update(ClimateSystem.YearLength + 10, rng);
-        Assert.Equal(Season.Spring, climate.CurrentSeason);
+        Assert.Equal(Season.Summer, climate.CurrentSeason);
 
         climate.Update(ClimateSystem.YearLength * 2 + ClimateSystem.SeasonLength + 5, rng);
-        Assert.Equal(Season.Summer, climate.CurrentSeason);
+        Assert.Equal(Season.Autumn, climate.CurrentSeason);
     }
 
     [Fact]
@@ -46,10 +46,10 @@ public class ClimateSystemTests
         var climate = new ClimateSystem();
         var rng = new System.Random(42);
 
-        climate.Update(ClimateSystem.SeasonLength * 0.5f, rng);
+        climate.Update(ClimateSystem.SeasonLength * 3.5f, rng);
         float springRegen = climate.GrassRegenModifier;
 
-        climate.Update(ClimateSystem.SeasonLength * 3.5f, rng);
+        climate.Update(ClimateSystem.SeasonLength * 2.5f, rng);
         float winterRegen = climate.GrassRegenModifier;
 
         Assert.True(springRegen > winterRegen,
@@ -63,13 +63,13 @@ public class ClimateSystemTests
         var rng = new System.Random(42);
 
         climate.Update(ClimateSystem.SeasonLength * 0.5f, rng);
-        float springEnergy = climate.EnergyModifier;
+        float summerEnergy = climate.EnergyModifier;
 
-        climate.Update(ClimateSystem.SeasonLength * 3.5f, rng);
+        climate.Update(ClimateSystem.SeasonLength * 2.5f, rng);
         float winterEnergy = climate.EnergyModifier;
 
-        Assert.True(winterEnergy > springEnergy,
-            $"Winter energy {winterEnergy} should exceed spring {springEnergy}");
+        Assert.True(winterEnergy > summerEnergy,
+            $"Winter energy {winterEnergy} should exceed summer {summerEnergy}");
     }
 
     [Fact]

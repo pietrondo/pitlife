@@ -7,8 +7,15 @@ namespace PitLife.Simulation;
 public sealed class ClimateSystem : ISimulationSystem
 {
     public SimulationPhase Phase => SimulationPhase.EarlyUpdate;
-    public const float YearLength = 480f;
-    public const float SeasonLength = YearLength / 4f;
+
+    public const float PlanetRadiusKm = 6371f;
+    public const float OrbitalAU = 1f;
+    public const float Eccentricity = 0.12f;
+    public const float OrbitalPeriod = 480f;
+    public const float YearLength = OrbitalPeriod;
+    public const float SeasonLength = OrbitalPeriod / 4f;
+    public const float BaseSurfaceTempK = 288f;
+
     public Season CurrentSeason { get; private set; } = Season.Spring;
     public float SeasonProgress { get; private set; }
     public float TemperatureModifier { get; private set; }
@@ -19,41 +26,64 @@ public sealed class ClimateSystem : ISimulationSystem
     public float WindSpeed { get; private set; } = 0.5f;
     public float WindDirection { get; private set; }
 
+    public float OrbitalAngle { get; private set; }
+    public float SunDistanceAU { get; private set; }
+    public float OrbitalSpeedKmS { get; private set; }
+
     private float _extremeEventTimer;
     private float _extremeEventDuration;
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco.TotalTime, eco.Random);
 
     public void Initialize(World world) { }
-    public void Reset() { _extremeEventTimer = 0; IsExtremeEvent = false; ExtremeEventName = ""; }
+    public void Reset()
+    {
+        _extremeEventTimer = 0;
+        IsExtremeEvent = false;
+        ExtremeEventName = "";
+        OrbitalAngle = 0;
+    }
 
     public void Update(float totalTime, Random rng)
     {
-        float yearTime = totalTime % YearLength;
-        SeasonProgress = (yearTime % SeasonLength) / SeasonLength;
+        OrbitalAngle = totalTime / OrbitalPeriod * MathF.PI * 2 % (MathF.PI * 2);
+        float cosTheta = MathF.Cos(OrbitalAngle);
+        float semiLatus = OrbitalAU * (1f - Eccentricity * Eccentricity);
+        SunDistanceAU = semiLatus / (1f + Eccentricity * cosTheta);
 
-        Season newSeason = yearTime switch
+        float orbitalCircumference = 2f * MathF.PI * OrbitalAU * 149.6e6f;
+        OrbitalSpeedKmS = orbitalCircumference / (OrbitalPeriod * 149.6e6f) * OrbitalAU;
+
+        TemperatureModifier = cosTheta * 0.15f;
+
+        SeasonProgress = (OrbitalAngle % (MathF.PI / 2f)) / (MathF.PI / 2f);
+
+        Season newSeason = OrbitalAngle switch
         {
-            < SeasonLength => Season.Spring,
-            < SeasonLength * 2 => Season.Summer,
-            < SeasonLength * 3 => Season.Autumn,
-            _ => Season.Winter
+            < MathF.PI / 2f => Season.Summer,
+            < MathF.PI => Season.Autumn,
+            < MathF.PI * 3f / 2f => Season.Winter,
+            _ => Season.Spring
         };
+
+        (GrassRegenModifier, EnergyModifier) = CurrentSeason switch
+        {
+            Season.Spring => (1.3f, 1.0f),
+            Season.Summer => (0.9f, 1.0f),
+            Season.Autumn => (0.7f, 1.0f),
+            Season.Winter => (0.3f, 1.2f),
+            _ => (1f, 1f)
+        };
+
+        float orbitalBoost = TemperatureModifier * 0.3f;
+        GrassRegenModifier += orbitalBoost;
+        EnergyModifier -= orbitalBoost * 0.5f;
 
         if (newSeason != CurrentSeason)
         {
             CurrentSeason = newSeason;
-            Logger.Event("SEASON", $"Season changed to {CurrentSeason} at T={totalTime:F1}s");
+            Logger.Event("SEASON", $"Season changed to {CurrentSeason} at T={totalTime:F1}s (dist={SunDistanceAU:F3} AU)");
         }
-
-        (TemperatureModifier, GrassRegenModifier, EnergyModifier) = CurrentSeason switch
-        {
-            Season.Spring => (0.0f, 1.3f, 1.0f),
-            Season.Summer => (0.15f, 0.9f, 1.0f),
-            Season.Autumn => (0.0f, 0.7f, 1.0f),
-            Season.Winter => (-0.15f, 0.3f, 1.2f),
-            _ => (0f, 1f, 1f)
-        };
 
         WindDirection = (WindDirection + (float)rng.NextDouble() * 0.1f) % (MathF.PI * 2);
         WindSpeed = 0.3f + (float)rng.NextDouble() * 0.6f + Math.Abs(TemperatureModifier) * 2f;
@@ -94,6 +124,21 @@ public sealed class ClimateSystem : ISimulationSystem
 
             Logger.Event("CLIMATE", $"Extreme event '{ExtremeEventName}' started at T={totalTime:F1}s, duration={_extremeEventDuration:F1}s");
         }
+    }
+
+    public float GetLatitudeModifier(float tileY, int worldHeight)
+    {
+        float normalizedY = tileY / Math.Max(1, worldHeight - 1);
+        float latitude = (normalizedY - 0.5f) * MathF.PI;
+        return MathF.Cos(latitude);
+    }
+
+    public float GetTileTemperature(Tile tile, float tileY, int worldHeight)
+    {
+        float latMod = GetLatitudeModifier(tileY, worldHeight);
+        float orbitalEffect = TemperatureModifier * 20f;
+        float latEffect = (latMod - 0.6f) * 25f;
+        return tile.Temperature + orbitalEffect + latEffect;
     }
 }
 

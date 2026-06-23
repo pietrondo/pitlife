@@ -297,7 +297,8 @@ public abstract class Creature
                 break;
         }
 
-        float tileTemp = tile.Temperature + ecosystem.Climate.TemperatureModifier * 20f;
+        int tileY = (int)(Position.Y / ecosystem.World.TileSize);
+        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
         float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
         if (tempDiff > 15f && CreatureType != CreatureType.Plant)
             CurrentEnergyMultiplier += tempDiff * 0.02f;
