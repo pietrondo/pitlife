@@ -336,6 +336,7 @@ public class Game1 : Game
             if (spawnJustSelected) _cataSelectedFrame = _gameFrame;
             _cataclysmPanel.SelectedType = null;
             _prevPanelCata = null;
+            if (_cataclysmPanel.IsOpen) _cataclysmPanel.Toggle();
         }
         if (panelJustSelected)
         {
@@ -343,19 +344,27 @@ public class Game1 : Game
             _cataSelectedFrame = _gameFrame;
             _spawnPanel.SelectedCataclysm = null;
             _prevSpawnCata = null;
+            if (_spawnPanel.IsOpen) _spawnPanel.Toggle();
         }
         if (_cataclysmPanel.SelectedType == null && !_cataclysmPanel.IsOpen) _prevPanelCata = null;
         if (_spawnPanel.SelectedCataclysm == null) _prevSpawnCata = null;
 
-        // ESC cancels any active mode
-        if (kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape) && !_spawnPanel.IsOpen && !_cataclysmPanel.IsOpen)
+        // ESC: close panel if open, otherwise cancel active mode
+        if (kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape))
         {
-            _spawnPanel.SelectedCataclysm = null;
-            _spawnPanel.DeselectSpecies();
-            _cataclysmPanel.SelectedType = null;
-            _prevPanelCata = null;
-            _prevSpawnCata = null;
-            _cataSelectedFrame = 0;
+            if (_cataclysmPanel.IsOpen)
+                _cataclysmPanel.Toggle();
+            else if (_spawnPanel.IsOpen)
+                _spawnPanel.Toggle();
+            if (_cataclysmPanel.SelectedType != null || _spawnPanel.SelectedCataclysm != null || _spawnPanel.SelectedSpeciesKey != null)
+            {
+                _spawnPanel.SelectedCataclysm = null;
+                _spawnPanel.DeselectSpecies();
+                _cataclysmPanel.SelectedType = null;
+                _prevPanelCata = null;
+                _prevSpawnCata = null;
+                _cataSelectedFrame = 0;
+            }
         }
 
         _camera.HandleInput(dt);
@@ -390,6 +399,7 @@ public class Game1 : Game
         // Cataclysm placement when selected (require at least 1 frame delay after selection)
         bool cataReady = _cataSelectedFrame > 0 && (_gameFrame - _cataSelectedFrame) >= 1;
         if (_cataclysmPanel.SelectedType != null && cataReady &&
+            !pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);

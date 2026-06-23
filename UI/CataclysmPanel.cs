@@ -34,7 +34,11 @@ public sealed class CataclysmPanel
         new UiButton(I18n.T("cata.flood")) { Tag = "Flood" }
     };
 
-    public void Toggle() => IsOpen = !IsOpen;
+    public void Toggle()
+    {
+        IsOpen = !IsOpen;
+        if (!IsOpen) SelectedType = null;
+    }
 
     public bool Update(MouseState mouse, MouseState prevMouse)
     {
