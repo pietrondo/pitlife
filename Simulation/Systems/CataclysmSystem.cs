@@ -318,29 +318,29 @@ public sealed class CataclysmSystem : ISimulationSystem
         {
             case "Asteroid":
             case "Asteroid Impact":
-                DrawAsteroid(sb, pixel, pos, maxR, progress);
+                DrawAsteroidEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "Supervolcano":
-                DrawSupervolcano(sb, pixel, pos, maxR, progress);
+                DrawSupervolcanoEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "Firestorm":
-                DrawFirestorm(sb, pixel, pos, maxR, progress);
+                DrawFirestormEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "IceAge":
             case "Ice Age":
-                DrawIceAge(sb, pixel, pos, maxR, progress);
+                DrawIceAgeEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "Earthquake":
-                DrawEarthquake(sb, pixel, pos, maxR, progress);
+                DrawEarthquakeEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "Drought":
-                DrawDrought(sb, pixel, pos, maxR, progress);
+                DrawDroughtEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "Flood":
-                DrawFlood(sb, pixel, pos, maxR, progress);
+                DrawFloodEvent(sb, pixel, pos, maxR, progress);
                 break;
             case "Bloom":
-                DrawBloom(sb, pixel, pos, maxR, progress);
+                DrawBloomEvent(sb, pixel, pos, maxR, progress);
                 break;
         }
 
@@ -351,7 +351,7 @@ public sealed class CataclysmSystem : ISimulationSystem
             DrawRing(sb, pixel, pos, genR, new Color(ImpactColor.R, ImpactColor.G, ImpactColor.B, genA), 2);
     }
 
-    private void DrawAsteroid(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawAsteroidEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Falling meteor (first 0.3s)
         if (progress < 0.3f)
@@ -387,7 +387,7 @@ public sealed class CataclysmSystem : ISimulationSystem
         DrawFireCluster(sb, pixel, pos, maxR * 0.6f, explodeT, progress);
     }
 
-    private void DrawSupervolcano(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawSupervolcanoEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Rising magma column from ground
         float intensity = Math.Min(1f, progress * 2f) * Math.Max(0f, 1f - progress * 1.5f);
@@ -413,7 +413,7 @@ public sealed class CataclysmSystem : ISimulationSystem
         DrawFireCluster(sb, pixel, pos, maxR * 0.4f * progress, progress, progress);
     }
 
-    private void DrawFirestorm(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawFirestormEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         DrawFireCluster(sb, pixel, pos, maxR, progress, progress);
         for (int i = 0; i < 5; i++)
@@ -425,7 +425,7 @@ public sealed class CataclysmSystem : ISimulationSystem
         }
     }
 
-    private void DrawIceAge(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawIceAgeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Frost spread
         float frostR = maxR * progress;
@@ -444,7 +444,7 @@ public sealed class CataclysmSystem : ISimulationSystem
         }
     }
 
-    private void DrawEarthquake(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawEarthquakeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Crack lines radiating from center
         float crackR = maxR * progress;
@@ -454,23 +454,10 @@ public sealed class CataclysmSystem : ISimulationSystem
             float endX = pos.X + MathF.Cos(angle) * crackR;
             float endY = pos.Y + MathF.Sin(angle) * crackR;
             DrawLine(sb, pixel, pos, new Vector2(endX, endY), new Color(100, 80, 60, (int)120), 2);
-
-            // Draw 2 smaller branching lines at the midpoint
-            float midX = (pos.X + endX) / 2f;
-            float midY = (pos.Y + endY) / 2f;
-            float perpAngle1 = angle + 1.57f;
-            float perpAngle2 = angle - 1.57f;
-            float branchLen = crackR * 0.3f;
-            float branch1X = midX + MathF.Cos(perpAngle1) * branchLen;
-            float branch1Y = midY + MathF.Sin(perpAngle1) * branchLen;
-            float branch2X = midX + MathF.Cos(perpAngle2) * branchLen;
-            float branch2Y = midY + MathF.Sin(perpAngle2) * branchLen;
-            DrawLine(sb, pixel, new Vector2(midX, midY), new Vector2(branch1X, branch1Y), new Color(100, 80, 60, (int)120), 1);
-            DrawLine(sb, pixel, new Vector2(midX, midY), new Vector2(branch2X, branch2Y), new Color(100, 80, 60, (int)120), 1);
         }
     }
 
-    private void DrawDrought(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawDroughtEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Heat shimmer rings
         for (int r = 0; r < 4; r++)
@@ -480,18 +467,17 @@ public sealed class CataclysmSystem : ISimulationSystem
         }
     }
 
-    private void DrawFlood(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawFloodEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Water waves
         for (int r = 0; r < 4; r++)
         {
             float rr = maxR * (progress + r * 0.25f) % maxR;
-            rr += MathF.Sin(progress * 10f + r) * (maxR * 0.05f); // create rippling waves
             DrawRing(sb, pixel, pos, rr, new Color(60, 160, 240, (int)((1f - rr / maxR) * 120)), 3);
         }
     }
 
-    private void DrawBloom(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawBloomEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
     {
         // Flower/grass particles
         for (int i = 0; i < 10; i++)
