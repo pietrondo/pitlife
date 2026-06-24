@@ -235,9 +235,22 @@ public static class SpeciesCatalogStore
             ?? throw new InvalidDataException("Species catalog is empty.");
     }
 
-    public static void Save(string path, SpeciesCatalogDocument document)
+    public static void Save(string path, SpeciesCatalogDocument document, string baseDirectory)
     {
-        string? directory = Path.GetDirectoryName(Path.GetFullPath(path));
+        string fullPath = Path.GetFullPath(path);
+        string fullBase = Path.GetFullPath(baseDirectory);
+
+        if (!fullBase.EndsWith(Path.DirectorySeparatorChar.ToString()) && !fullBase.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
+        {
+            fullBase += Path.DirectorySeparatorChar;
+        }
+
+        if (!fullPath.StartsWith(fullBase, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new UnauthorizedAccessException("Resolved path is outside the allowed base directory.");
+        }
+
+        string? directory = Path.GetDirectoryName(fullPath);
         if (directory is not null)
             Directory.CreateDirectory(directory);
 
