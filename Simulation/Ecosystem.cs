@@ -31,6 +31,7 @@ public class Ecosystem
     public CataclysmSystem Cataclysms { get; } = new();
     public TrophicDynamics Trophic { get; } = new();
     public FruitSystem Fruits { get; } = new();
+    public CreaturePool Pool { get; } = new();
     public FlowSimulation? Flow { get; private set; }
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
@@ -294,6 +295,7 @@ public class Ecosystem
                         tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
                     tile.SoilNutrients = Math.Min(2f, tile.SoilNutrients + 0.1f);
                     _spatialGrid.Remove(c);
+                    Pool.Return(c);
                     Creatures.RemoveAt(i);
                 }
             }

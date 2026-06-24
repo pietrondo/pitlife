@@ -49,7 +49,8 @@ public sealed class CreatureSpawner
         var genome = Genome.Random(_ecosystem.Random);
         genome.Size = def.DefaultSize;
 
-        Creature c = (Creature)Activator.CreateInstance(def.CreatureType, position, genome, def.Species)!;
+        Creature? c = _ecosystem.Pool.Rent(def.Species, position, genome);
+        if (c == null) return false;
         if (c.CreatureType != CreatureType.Plant)
             c.Gender = _ecosystem.Random.Next(2) == 0 ? Gender.Male : Gender.Female;
         if (c.Species is "Pufferfish" or "PoisonFrog" or "Belladonna" or "VenusFlyTrap" or "PitcherPlant")

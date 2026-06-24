@@ -154,6 +154,32 @@ public abstract class Creature
         };
     }
 
+    internal void ResetForReuse(Vector2 position, Genome genome)
+    {
+        Position = ClampToWorld(position);
+        HomePosition = Position;
+        Genome = genome;
+        Energy = MaxEnergy * BalanceConfig.Data.Creature.InitialEnergyRatio;
+        Age = 0;
+        IsAlive = true;
+        DeathCause = DeathCause.Unknown;
+        IsInfected = false;
+        DiseaseTimer = 0;
+        DiseaseName = "";
+        IsPoisonous = false;
+        Toxicity = 0;
+        Hibernating = false;
+        IsSleeping = false;
+        Thirst = 0;
+        LastReproductionTime = -60f;
+        RememberedFood.Clear();
+        RememberedDanger.Clear();
+        Waypoint = null;
+        Facing = new Vector2(0, 1);
+        CurrentSpeedMultiplier = 1f;
+        CurrentEnergyMultiplier = 1f;
+    }
+
     public virtual void Update(World world, Ecosystem ecosystem, GameTime gameTime)
     {
         if (!IsAlive) return;

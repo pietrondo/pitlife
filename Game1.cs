@@ -32,6 +32,7 @@ public class Game1 : Game
     private readonly SpawnPanel _spawnPanel = new();
     private readonly CataclysmPanel _cataclysmPanel = new();
     private readonly WeatherSystem _weather = new();
+    private WaterEffect _waterEffect = null!;
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
     private float _currentFPS;
@@ -111,6 +112,7 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
+        _waterEffect = new WaterEffect();
         _inGameUi.World = _ecosystem.World;
         _inGameUi.Climate = _ecosystem.Climate;
         _inGameUi.ToolbarButtonClicked += () =>
@@ -468,6 +470,7 @@ public class Game1 : Game
         _displayTime = _controller.TotalTime;
 
         _weather.Update(_ecosystem.Climate, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
+        _waterEffect.Update(dt);
 
         _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
             dt * _controller.CurrentSpeed);
@@ -594,6 +597,7 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
+        _waterEffect = new WaterEffect();
         ResetWorldSessionState();
         
         _worldRenderer.LoadContent(GraphicsDevice);
@@ -657,6 +661,7 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
+        _waterEffect = new WaterEffect();
         ResetWorldSessionState();
 
         _worldRenderer.LoadContent(GraphicsDevice);
@@ -818,6 +823,7 @@ public class Game1 : Game
         bool isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _weather.Draw(_spriteBatch, _uiPixel, isSnow);
+        _waterEffect.Draw(_spriteBatch, _uiPixel, _ecosystem.World, _camera);
         _spriteBatch.End();
 
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
