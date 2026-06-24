@@ -70,3 +70,4 @@ bun.lock
 
 # Game Logs
 logs/
+savegame.json
