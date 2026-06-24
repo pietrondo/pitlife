@@ -24,8 +24,19 @@ internal static class BuiltinSpecies
 
     public static void RegisterAll()
     {
+        RegisterPlants();
+        RegisterAnimals();
+    }
+
+    private static void RegisterPlants()
+    {
         RegisterLandPlants();
         RegisterAquaticPlants();
+        RegisterCarnivorousPlants();
+    }
+
+    private static void RegisterAnimals()
+    {
         RegisterHerbivores();
         RegisterCarnivores();
         RegisterOmnivores();
@@ -34,7 +45,6 @@ internal static class BuiltinSpecies
         RegisterInsects();
         RegisterCrustaceans();
         RegisterAmphibians();
-        RegisterCarnivorousPlants();
     }
 
     private static void RegisterLandPlants()
