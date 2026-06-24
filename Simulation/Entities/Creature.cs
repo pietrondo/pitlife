@@ -229,6 +229,16 @@ public abstract class Creature
         if (totalAnimals > 10 && sameSpeciesCount > totalAnimals / 3 && ecosystem.Random.NextDouble() > 0.3f)
             return;
 
+        // Lotka-Volterra: adjust reproduction probability based on trophic balance
+        float trophicBirthBonus = CreatureType switch
+        {
+            CreatureType.Herbivore => ecosystem.Trophic.HerbivoreBirthBonus,
+            CreatureType.Carnivore => ecosystem.Trophic.CarnivoreBirthBonus,
+            _ => 1f
+        };
+        if (trophicBirthBonus < 1f && ecosystem.Random.NextDouble() > trophicBirthBonus)
+            return;
+
         var mate = ecosystem.FindNearestMate(this);
         if (mate != null && DistanceTo(mate) < VisionPixels * 0.5f)
         {
@@ -277,7 +287,17 @@ public abstract class Creature
         float o2Factor = 2f - ecosystem.Atmosphere.OxygenModifier;
         float altitude = ecosystem.World.GetElevation(Position.X, Position.Y);
         float altitudeFactor = altitude > 0.6f ? (altitude - 0.6f) * 3f : 0f;
-        Energy -= EnergyConsumption * (seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f + altitudeFactor) * (1f / 60f);
+
+        // Lotka-Volterra trophic dynamics: adjust death rate based on predator-prey balance
+        float trophicDeathMultiplier = CreatureType switch
+        {
+            CreatureType.Herbivore => ecosystem.Trophic.HerbivoreDeathPenalty,
+            CreatureType.Carnivore => ecosystem.Trophic.CarnivoreDeathPenalty,
+            _ => 1f
+        };
+
+        float combinedFactor = seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f + altitudeFactor;
+        Energy -= EnergyConsumption * combinedFactor * trophicDeathMultiplier * (1f / 60f);
     }
 
     private void UpdateEnvironmentalMultipliers(World world, Ecosystem ecosystem)

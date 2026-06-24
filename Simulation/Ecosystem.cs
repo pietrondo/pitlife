@@ -29,6 +29,8 @@ public class Ecosystem
     public PhylogeneticGraph Phylogeny { get; } = new();
     public AtmosphereSystem Atmosphere { get; } = new();
     public CataclysmSystem Cataclysms { get; } = new();
+    public TrophicDynamics Trophic { get; } = new();
+    public FruitSystem Fruits { get; } = new();
     public FlowSimulation? Flow { get; private set; }
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
@@ -88,6 +90,8 @@ public class Ecosystem
         _systems.Add(Disease);
         _systems.Add(Atmosphere);
         _systems.Add(Cataclysms);
+        _systems.Add(Trophic);
+        _systems.Add(Fruits);
         if (Flow != null) _systems.Add(Flow);
         _systems.Add(Metrics);
         var sorted = _systems.OrderBy(s => s.Phase).ToList();

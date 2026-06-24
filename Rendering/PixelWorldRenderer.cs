@@ -94,7 +94,73 @@ public sealed class PixelWorldRenderer : IDisposable
             }
         }
 
+        // Draw per-tile decorations (trees, rocks, flowers)
+        DrawDecorations(data, width, height);
+
         _worldTexture.SetData(data);
+    }
+
+    private void DrawDecorations(Color[] data, int texWidth, int texHeight)
+    {
+        for (int ty = 0; ty < _world.Height; ty++)
+        {
+            for (int tx = 0; tx < _world.Width; tx++)
+            {
+                float vegetation = _world.Tiles[tx, ty].Vegetation;
+                int seed = _world.Width * 7919 + _world.Height;
+                var deco = TileDecorations.GetDecoration(_world.Tiles[tx, ty].Biome, tx, ty, seed, vegetation);
+                if (deco == TileDecorations.DecorationType.None) continue;
+
+                var color = TileDecorations.GetColor(deco, tx, ty, seed);
+
+                // Draw at center of tile in world texture space
+                int cx = tx * _renderScale + _renderScale / 2;
+                int cy = ty * _renderScale + _renderScale / 2;
+
+                switch (deco)
+                {
+                    case TileDecorations.DecorationType.Tree:
+                        // 2x3 tree trunk + 3x2 canopy
+                        DrawPixel(data, texWidth, texHeight, cx, cy, color);
+                        DrawPixel(data, texWidth, texHeight, cx, cy - 1, color);
+                        DrawPixel(data, texWidth, texHeight, cx - 1, cy - 2, color);
+                        DrawPixel(data, texWidth, texHeight, cx, cy - 2, color);
+                        DrawPixel(data, texWidth, texHeight, cx + 1, cy - 2, color);
+                        break;
+                    case TileDecorations.DecorationType.Rock:
+                        DrawPixel(data, texWidth, texHeight, cx, cy, color);
+                        DrawPixel(data, texWidth, texHeight, cx + 1, cy, color);
+                        break;
+                    case TileDecorations.DecorationType.Flower:
+                        DrawPixel(data, texWidth, texHeight, cx, cy, color);
+                        break;
+                    case TileDecorations.DecorationType.Bush:
+                        DrawPixel(data, texWidth, texHeight, cx, cy, color);
+                        DrawPixel(data, texWidth, texHeight, cx + 1, cy, color);
+                        DrawPixel(data, texWidth, texHeight, cx, cy + 1, color);
+                        break;
+                    case TileDecorations.DecorationType.Mushroom:
+                        DrawPixel(data, texWidth, texHeight, cx, cy - 1, color);
+                        DrawPixel(data, texWidth, texHeight, cx, cy, new Color(245, 222, 179));
+                        break;
+                    case TileDecorations.DecorationType.Cactus:
+                        DrawPixel(data, texWidth, texHeight, cx, cy, color);
+                        DrawPixel(data, texWidth, texHeight, cx, cy - 1, color);
+                        DrawPixel(data, texWidth, texHeight, cx, cy - 2, color);
+                        break;
+                    case TileDecorations.DecorationType.Coral:
+                        DrawPixel(data, texWidth, texHeight, cx, cy, color);
+                        DrawPixel(data, texWidth, texHeight, cx + 1, cy - 1, color);
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void DrawPixel(Color[] data, int texWidth, int texHeight, int px, int py, Color color)
+    {
+        if (px >= 0 && px < texWidth && py >= 0 && py < texHeight)
+            data[py * texWidth + px] = color;
     }
 
     private static Color GetBiomeRenderColor(BiomeType biome) => biome switch

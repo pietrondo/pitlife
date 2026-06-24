@@ -40,6 +40,23 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static bool TryFeedHerbivore(Creature self, Ecosystem ecosystem, float dt, World world)
     {
+        // Try eating a nearby fruit first
+        var fruit = ecosystem.Fruits.TryEatFruit(self.Position, 12f);
+        if (fruit.HasValue)
+        {
+            if (fruit.Value.Poisonous && self.Genome.PlantRecognition < 0.5f)
+            {
+                self.Energy -= fruit.Value.EnergyValue * 2f;
+                self.RememberDanger(fruit.Value.Position);
+            }
+            else
+            {
+                self.Energy = Math.Min(self.Energy + fruit.Value.EnergyValue, self.MaxEnergy);
+                self.RememberFood(fruit.Value.Position);
+            }
+            return true;
+        }
+
         Plant? food = self is Herbivore h
             ? ecosystem.FindNearestPlant(h)
             : ecosystem.FindNearestPlantFor(self);
