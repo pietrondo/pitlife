@@ -39,5 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="PitLife.Tests" />
+    <InternalsVisibleTo Include="PitLife.Benchmarks" />
   </ItemGroup>
 </Project>
