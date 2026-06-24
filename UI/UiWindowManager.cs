@@ -133,21 +133,21 @@ public sealed class UiWindowManager
         if (_draggedWindow == null)
             return false;
 
-        if (mouse.LeftButton == ButtonState.Pressed)
+        if (mouse.LeftButton != ButtonState.Pressed)
         {
-            _draggedWindow.Bounds = Clamp(
-                new Rectangle(
-                    mouse.X - _dragOffset.X,
-                    mouse.Y - _dragOffset.Y,
-                    _draggedWindow.Bounds.Width,
-                    _draggedWindow.Bounds.Height),
-                viewportWidth,
-                viewportHeight);
-            return true;
+            _draggedWindow = null;
+            return false;
         }
 
-        _draggedWindow = null;
-        return false;
+        _draggedWindow.Bounds = Clamp(
+            new Rectangle(
+                mouse.X - _dragOffset.X,
+                mouse.Y - _dragOffset.Y,
+                _draggedWindow.Bounds.Width,
+                _draggedWindow.Bounds.Height),
+            viewportWidth,
+            viewportHeight);
+        return true;
     }
 
     private bool HandleWindowPress(MouseState mouse)
@@ -155,41 +155,47 @@ public sealed class UiWindowManager
         for (int i = _windows.Count - 1; i >= 0; i--)
         {
             UiWindow window = _windows[i];
-            if (!window.IsOpen || !window.Bounds.Contains(mouse.Position))
-                continue;
-
-            BringToFront(window);
-
-            // Double click detection on title bar to collapse/expand
-            var now = System.DateTime.UtcNow;
-            var elapsed = now - _lastClickTime;
-            bool isDoubleClick = _lastClickedWindowId == window.Id && elapsed.TotalMilliseconds < 350;
-            _lastClickTime = now;
-            _lastClickedWindowId = window.Id;
-
-            if (window.ShowCloseButton && window.CloseButtonBounds.Contains(mouse.Position))
-            {
-                window.IsOpen = false;
+            if (TryHandleWindowPress(window, mouse))
                 return true;
-            }
-
-            if (window.IsDraggable && window.TitleBarBounds.Contains(mouse.Position))
-            {
-                if (isDoubleClick)
-                {
-                    window.ToggleCollapse();
-                    _draggedWindow = null;
-                    return true;
-                }
-
-                _draggedWindow = window;
-                _dragOffset = new Point(mouse.X - window.Bounds.X, mouse.Y - window.Bounds.Y);
-            }
-
-            return true;
         }
 
         return false;
+    }
+
+    private bool TryHandleWindowPress(UiWindow window, MouseState mouse)
+    {
+        if (!window.IsOpen || !window.Bounds.Contains(mouse.Position))
+            return false;
+
+        BringToFront(window);
+
+        // Double click detection on title bar to collapse/expand
+        var now = System.DateTime.UtcNow;
+        var elapsed = now - _lastClickTime;
+        bool isDoubleClick = _lastClickedWindowId == window.Id && elapsed.TotalMilliseconds < 350;
+        _lastClickTime = now;
+        _lastClickedWindowId = window.Id;
+
+        if (window.ShowCloseButton && window.CloseButtonBounds.Contains(mouse.Position))
+        {
+            window.IsOpen = false;
+            return true;
+        }
+
+        if (window.IsDraggable && window.TitleBarBounds.Contains(mouse.Position))
+        {
+            if (isDoubleClick)
+            {
+                window.ToggleCollapse();
+                _draggedWindow = null;
+                return true;
+            }
+
+            _draggedWindow = window;
+            _dragOffset = new Point(mouse.X - window.Bounds.X, mouse.Y - window.Bounds.Y);
+        }
+
+        return true;
     }
 
     public bool IsPointerOverWindow(Point point)
