@@ -13,7 +13,7 @@ public class SaveSystemTests
     public void SaveAndLoad_RestoresEcosystemCorrectly()
     {
         string filePath = "test_savegame.json";
-        
+
         var original = new Ecosystem(32, 24, 42);
         original.Initialize(2, 1, 1, 3);
         original.TotalTime = 123.45f;
@@ -343,8 +343,10 @@ public class SaveSystemTests
                 Assert.NotNull(def);
                 var genome = new Genome
                 {
-                    Speed = cData.Genome.Speed, Size = cData.Genome.Size,
-                    Metabolism = cData.Genome.Metabolism, VisionRange = cData.Genome.VisionRange,
+                    Speed = cData.Genome.Speed,
+                    Size = cData.Genome.Size,
+                    Metabolism = cData.Genome.Metabolism,
+                    VisionRange = cData.Genome.VisionRange,
                     Color = new Color(cData.Genome.ColorR, cData.Genome.ColorG, cData.Genome.ColorB),
                     MutationRate = cData.Genome.MutationRate,
                     DesertAdaptation = cData.Genome.DesertAdaptation,

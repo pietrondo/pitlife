@@ -32,10 +32,8 @@ public class Game1 : Game
     private readonly SpawnPanel _spawnPanel = new();
     private readonly CataclysmPanel _cataclysmPanel = new();
     private readonly WeatherSystem _weather = new();
-    private WaterEffect _waterEffect = null!;
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
-    private readonly SpeciesCyclopedia _cyclopedia = new();
     private float _currentFPS;
     private float _frametimeMS;
     private int _frameCount;
@@ -101,8 +99,8 @@ public class Game1 : Game
         _graphics.PreferredBackBufferHeight = 800;
         _graphics.ApplyChanges();
 
-        _ecosystem = new Ecosystem(200, 150, 42);
-        _ecosystem.Initialize(30, 8, 5, 100);
+        _ecosystem = new Ecosystem(400, 300, 42);
+        _ecosystem.Initialize(50, 15, 10, 200);
         _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
         {
             WorldWidth = _ecosystem.World.PixelWidth,
@@ -113,7 +111,6 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
-        _waterEffect = new WaterEffect();
         _inGameUi.World = _ecosystem.World;
         _inGameUi.Climate = _ecosystem.Climate;
         _inGameUi.ToolbarButtonClicked += () =>
@@ -206,7 +203,7 @@ public class Game1 : Game
                 if (gamepadBack)
                     _helpScreen.Hide();
                 _prevKbd = kbd;
-        _prevMouse = mouse;
+                _prevMouse = mouse;
                 base.Update(gameTime);
                 return;
             }
@@ -232,7 +229,6 @@ public class Game1 : Game
                     break;
                 case MenuAction.NewWorld:
                     _mainMenu.CloseWorldGenPanel();
-                    _mainMenu.GameInProgress = false;
                     _pendingWorldGen = true;
                     _pendingSeed = null;
                     _pendingOptions = _mainMenu.CurrentOptions;
@@ -240,7 +236,6 @@ public class Game1 : Game
                     break;
                 case MenuAction.NewWorldWithSeed:
                     _mainMenu.CloseWorldGenPanel();
-                    _mainMenu.GameInProgress = false;
                     _pendingWorldGen = true;
                     _pendingSeed = _mainMenu.Seed;
                     _pendingOptions = _mainMenu.CurrentOptions;
@@ -260,8 +255,8 @@ public class Game1 : Game
                             _screen = GameScreen.Playing;
                             _paused = false;
                             _controller.SetPause(false);
-    }
-}
+                        }
+                    }
                     catch (InvalidDataException ex)
                     {
                         Logger.Error($"Failed to load save: {ex.Message}");
@@ -291,28 +286,12 @@ public class Game1 : Game
 
         if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
             _showDebugOverlay = !_showDebugOverlay;
-        if (kbd.IsKeyDown(Keys.F5) && _prevKbd.IsKeyUp(Keys.F5))
-            _cyclopedia.Toggle(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
             _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
         {
             _speciesEditor.Toggle();
-        if (_cyclopedia.IsOpen)
-        {
-            if (escapePressed)
-                _cyclopedia.Close();
-            else
-                _cyclopedia.Update(mouse, _prevMouse, kbd, _prevKbd,
-                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-
-            _prevKbd = kbd;
-            _prevMouse = mouse;
-            base.Update(gameTime);
-            return;
-        }
-
-        if (_speciesEditor.IsOpen)
+            if (_speciesEditor.IsOpen)
             {
                 _inGameUi.CloseAllWindows();
                 if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
@@ -345,7 +324,6 @@ public class Game1 : Game
         if (escapePressed || gamepadBack)
         {
             _mainMenu.CloseWorldGenPanel();
-            _mainMenu.GameInProgress = true;
             _screen = GameScreen.MainMenu;
             _paused = true;
             _prevKbd = kbd;
@@ -382,7 +360,6 @@ public class Game1 : Game
         {
             _inGameUi.WantsToGoToMainMenu = false;
             _mainMenu.CloseWorldGenPanel();
-            _mainMenu.GameInProgress = true;
             _screen = GameScreen.MainMenu;
             _paused = true;
             _prevKbd = kbd;
@@ -491,7 +468,6 @@ public class Game1 : Game
         _displayTime = _controller.TotalTime;
 
         _weather.Update(_ecosystem.Climate, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
-        _waterEffect.Update(dt);
 
         _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
             dt * _controller.CurrentSpeed);
@@ -618,9 +594,8 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
-        _waterEffect = new WaterEffect();
         ResetWorldSessionState();
-        
+
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
         _minimap.LoadContent(GraphicsDevice);
@@ -682,7 +657,6 @@ public class Game1 : Game
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
-        _waterEffect = new WaterEffect();
         ResetWorldSessionState();
 
         _worldRenderer.LoadContent(GraphicsDevice);
@@ -737,10 +711,54 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
-        if (_screen == GameScreen.Playing)
+        // Apply screen shake from cataclysms
+        var shake = _ecosystem.Cataclysms.ScreenShake;
+        Vector2 savedPos = _camera.Position;
+        if (shake != Vector2.Zero)
+            _camera.Position = new Vector2(savedPos.X + shake.X, savedPos.Y + shake.Y);
+
+        // Draw the map with Point Clamp (for crisp pixel art matching the minimap)
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
+        _worldRenderer.Draw(_spriteBatch, _camera);
+        //_ecosystem.Flow?.DrawOverlay(_spriteBatch, _ecosystem.World.TileSize);
+        _spriteBatch.End();
+
+        // Seasonal overlay
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix,
+            blendState: BlendState.Additive);
+        Color seasonTint = _ecosystem.Climate.CurrentSeason switch
         {
-            DrawWorld(gameTime);
+            Season.Spring => new Color(40, 120, 40, 6),
+            Season.Summer => new Color(120, 100, 20, 8),
+            Season.Autumn => new Color(100, 70, 20, 8),
+            Season.Winter => new Color(60, 80, 160, 10),
+            _ => Color.Transparent
+        };
+        float tempAlpha = Math.Clamp((_ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
+        Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
+        _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), seasonTint);
+        _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), tempBlend);
+        _spriteBatch.End();
+
+        bool isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
+        _weather.Draw(_spriteBatch, _uiPixel, isSnow);
+        _spriteBatch.End();
+
+        // Draw the creatures with Point Clamp (for crisp pixel art)
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
+        _creatureRenderer.Draw(_spriteBatch, _camera, _dayNight.GetOverlayColor(), _font);
+        if (_screen == GameScreen.Playing && _selectedCreature != null && _selectedCreature.IsAlive)
+        {
+            var center = _selectedCreature.Position;
+            _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
+        // Draw cataclysm animations (meteor, fire, frost, etc.)
+        _ecosystem.Cataclysms.Draw(_spriteBatch, _uiPixel);
+        _spriteBatch.End();
+
+        // Restore camera position
+        _camera.Position = savedPos;
 
         _spriteBatch.Begin();
         if (_showLoadingTimer > 0)
@@ -770,7 +788,19 @@ public class Game1 : Game
             return;
         }
 
-        DrawHUD(_spriteBatch, _font);
+        string speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
+        float years = _displayTime / 480f + 1;
+        string hud = $"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | {speed}";
+        _spriteBatch.DrawString(_font, hud, new Vector2(10, 10), Color.White);
+        _spriteBatch.DrawString(_font, I18n.T("hud.controls"),
+            new Vector2(10, 32), new Color(160, 160, 160));
+        string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
+        _spriteBatch.DrawString(_font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
+        string seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
+        _spriteBatch.DrawString(_font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
+        string seedLabel = $"Seed: {_ecosystem.Seed}";
+        _spriteBatch.DrawString(_font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
+
         DrawDebugOverlay(_spriteBatch, _font);
 
         if (_logo != null)
@@ -809,83 +839,9 @@ public class Game1 : Game
             Mouse.GetState(),
             GraphicsDevice.Viewport.Width,
             GraphicsDevice.Viewport.Height);
-        _cyclopedia.Draw(_spriteBatch, _uiPixel, _font);
         _spriteBatch.End();
 
         base.Draw(gameTime);
-    }
-
-    private void DrawWorld(GameTime gameTime)
-    {
-        var shake = _ecosystem.Cataclysms.ScreenShake;
-        Vector2 savedPos = _camera.Position;
-        if (shake != Vector2.Zero)
-            _camera.Position = new Vector2(savedPos.X + shake.X, savedPos.Y + shake.Y);
-
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
-        _worldRenderer.Draw(_spriteBatch, _camera);
-        _spriteBatch.End();
-
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix,
-            blendState: BlendState.Additive);
-        Color seasonTint = _ecosystem.Climate.CurrentSeason switch
-        {
-            Season.Spring => new Color(40, 120, 40, 6),
-            Season.Summer => new Color(120, 100, 20, 8),
-            Season.Autumn => new Color(100, 70, 20, 8),
-            Season.Winter => new Color(60, 80, 160, 10),
-            _ => Color.Transparent
-        };
-        float tempAlpha = Math.Clamp((_ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
-        Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
-        _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), seasonTint);
-        _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), tempBlend);
-        _spriteBatch.End();
-
-        bool isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
-        _weather.Draw(_spriteBatch, _uiPixel, isSnow);
-        _waterEffect.Draw(_spriteBatch, _uiPixel, _ecosystem.World, _camera);
-        _spriteBatch.End();
-
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
-        _creatureRenderer.Draw(_spriteBatch, _camera, _dayNight.GetOverlayColor(), _font);
-        if (_selectedCreature != null && _selectedCreature.IsAlive)
-        {
-            var center = _selectedCreature.Position;
-            _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
-        }
-        _ecosystem.Cataclysms.Draw(_spriteBatch, _uiPixel);
-        DrawFruits(_spriteBatch);
-        _spriteBatch.End();
-
-        _camera.Position = savedPos;
-    }
-
-    private void DrawFruits(SpriteBatch sb)
-    {
-        foreach (var fruit in _ecosystem.Fruits.Fruits)
-        {
-            if (!fruit.IsAlive) continue;
-            var color = fruit.GetColor();
-            sb.Draw(_uiPixel, new Rectangle((int)fruit.Position.X - 1, (int)fruit.Position.Y - 1, 2, 2), color);
-        }
-    }
-
-    private void DrawHUD(SpriteBatch sb, SpriteFont font)
-    {
-        string speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
-        float years = _displayTime / 480f + 1;
-        string hud = $"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | {speed}";
-        sb.DrawString(font, hud, new Vector2(10, 10), Color.White);
-        sb.DrawString(font, I18n.T("hud.controls"),
-            new Vector2(10, 32), new Color(160, 160, 160));
-        string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
-        sb.DrawString(font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
-        string seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
-        sb.DrawString(font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
-        string seedLabel = $"Seed: {_ecosystem.Seed}";
-        sb.DrawString(font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
     }
 
     private void LoadSettings()

@@ -45,13 +45,13 @@ public sealed class UiWindow
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 8, Bounds.Y + 8, Bounds.Width, Bounds.Height), UiTheme.Shadow);
         // Draw window surface
         UiPrimitives.Fill(spriteBatch, pixel, Bounds, UiTheme.ForestNight);
-        
+
         // Draw border: active/focused windows get a bright Moss Signal border, inactive ones get a Bark Edge border
         UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, isActive ? UiTheme.MossSignal : UiTheme.BarkEdge);
 
         Rectangle titleBar = TitleBarBounds;
         UiPrimitives.Fill(spriteBatch, pixel, titleBar, UiTheme.DeepGrove);
-        
+
         // Only draw the separator line between title and content if the window is NOT collapsed
         if (!IsCollapsed)
         {

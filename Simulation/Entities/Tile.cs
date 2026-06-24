@@ -72,20 +72,20 @@ public class Tile
     }
 
     private static float VegetationFor(BiomeType biome) => biome switch
-        {
-            BiomeType.DenseForest => 1.0f,
-            BiomeType.Forest => 0.9f,
-            BiomeType.Swamp => 0.8f,
-            BiomeType.Grassland => 0.7f,
-            BiomeType.Savanna => 0.4f,
-            BiomeType.Tundra => 0.2f,
-            BiomeType.Desert => 0.1f,
-            BiomeType.Beach => 0.1f,
-            BiomeType.CoralReef => 0.9f,
-            BiomeType.Cave => 0f,
-            BiomeType.Volcano => 0.3f,
-            _ => 0.0f
-        };
+    {
+        BiomeType.DenseForest => 1.0f,
+        BiomeType.Forest => 0.9f,
+        BiomeType.Swamp => 0.8f,
+        BiomeType.Grassland => 0.7f,
+        BiomeType.Savanna => 0.4f,
+        BiomeType.Tundra => 0.2f,
+        BiomeType.Desert => 0.1f,
+        BiomeType.Beach => 0.1f,
+        BiomeType.CoralReef => 0.9f,
+        BiomeType.Cave => 0f,
+        BiomeType.Volcano => 0.3f,
+        _ => 0.0f
+    };
 
     private static float GrassFor(BiomeType biome) => biome switch
     {

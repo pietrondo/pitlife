@@ -113,12 +113,12 @@ public class LifecycleBalanceTests
     private static Vector2 FindLandPosition(World world)
     {
         for (int y = 1; y < world.Height - 1; y++)
-        for (int x = 1; x < world.Width - 1; x++)
-        {
-            Tile tile = world.GetTile(x, y);
-            if (tile.IsPassable && tile.Biome is not (BiomeType.DeepOcean or BiomeType.ShallowWater))
-                return new Vector2((x + 0.5f) * world.TileSize, (y + 0.5f) * world.TileSize);
-        }
+            for (int x = 1; x < world.Width - 1; x++)
+            {
+                Tile tile = world.GetTile(x, y);
+                if (tile.IsPassable && tile.Biome is not (BiomeType.DeepOcean or BiomeType.ShallowWater))
+                    return new Vector2((x + 0.5f) * world.TileSize, (y + 0.5f) * world.TileSize);
+            }
         throw new InvalidOperationException("No land tile found for balance test");
     }
 

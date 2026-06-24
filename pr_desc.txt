@@ -1,4 +1,7 @@
-🎯 **What:** The code health issue addressed was a long, complex Layout method in UI/MainMenu.cs. We extracted layout configurations for different panels into LayoutWorldGenPanel, LayoutOptionsPanel, and LayoutMainPanel helper functions.
-💡 **Why:** This improves maintainability and readability by keeping smaller, more focused helper functions instead of one big monolithic function.
-✅ **Verification:** We confirmed structural integrity using git diff and ran DOTNET_ROLL_FORWARD=Major dotnet test tests/PitLife.Tests verifying that tests pass successfully. No new functionality or tests were needed.
-✨ **Result:** The Layout function logic in UI/MainMenu.cs is cleaner, maintainable, and readable.
+🎯 **What:** Extracted the monolithic `DrawClimateDashboard` method in `UI/InGameUi.cs` into four smaller helper methods (`DrawClimateGlobalData`, `DrawClimateLocalData`, `DrawClimatePopulationData`, and `DrawClimateEventsData`).
+💡 **Why:** The original method was overly long and violated the single responsibility principle. This refactor dramatically improves readability and maintainability by isolating global metrics, local tile metrics, population statistics, and event logging into focused blocks.
+✅ **Verification:**
+- Verified source code changes using `git diff` to ensure no functional behavior was lost.
+- Verified compilation and test suite passing (`DOTNET_ROLL_FORWARD=Major dotnet test tests/PitLife.Tests`).
+- Brainstorming artifact recorded in `docs/decisions/`.
+✨ **Result:** The `InGameUi.cs` codebase is significantly easier to understand and maintain without changing UI functionality.

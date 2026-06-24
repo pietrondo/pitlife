@@ -84,7 +84,7 @@ public class WorldTests
             if (world.ContinentMask[i] <= 0.3f)
             {
                 hasOcean = true;
-                Assert.True(world.ElevationField[i] >= 0f && world.ElevationField[i] < 0.5f, 
+                Assert.True(world.ElevationField[i] >= 0f && world.ElevationField[i] < 0.5f,
                     $"Cella oceanica {i} ha elev={world.ElevationField[i]}, atteso in [0, 0.5)");
             }
             else
@@ -144,9 +144,9 @@ public class WorldTests
                 int i = y * W + x;
                 if (!world.RiverMask[i]) continue;
                 bool hasOceanNeighbor = false;
-                if (x > 0     && world.ContinentMask[i - 1] <= 0.5f) hasOceanNeighbor = true;
+                if (x > 0 && world.ContinentMask[i - 1] <= 0.5f) hasOceanNeighbor = true;
                 if (x < W - 1 && world.ContinentMask[i + 1] <= 0.5f) hasOceanNeighbor = true;
-                if (y > 0     && world.ContinentMask[i - W] <= 0.5f) hasOceanNeighbor = true;
+                if (y > 0 && world.ContinentMask[i - W] <= 0.5f) hasOceanNeighbor = true;
                 if (y < H - 1 && world.ContinentMask[i + W] <= 0.5f) hasOceanNeighbor = true;
                 if (hasOceanNeighbor)
                 {
@@ -160,10 +160,10 @@ public class WorldTests
         {
             int c = queue.Dequeue();
             int cx = c % W, cy = c / W;
-            if (cx > 0)         { int n = c - 1; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
-            if (cx < W - 1)     { int n = c + 1; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
-            if (cy > 0)         { int n = c - W; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
-            if (cy < H - 1)     { int n = c + W; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cx > 0) { int n = c - 1; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cx < W - 1) { int n = c + 1; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cy > 0) { int n = c - W; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
+            if (cy < H - 1) { int n = c + W; if (!visited[n] && (world.RiverMask[n] || world.ElevationField[n] <= 0.5f)) { visited[n] = true; queue.Enqueue(n); } }
         }
 
         var disconnected = new List<int>();
@@ -237,10 +237,10 @@ public class WorldTests
                     int c = queue.Dequeue();
                     int cx = c % width;
                     int cy = c / width;
-                    if (cx > 0)            { int n = c - 1;     if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
-                    if (cx < width - 1)    { int n = c + 1;     if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
-                    if (cy > 0)            { int n = c - width; if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
-                    if (cy < height - 1)   { int n = c + width; if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
+                    if (cx > 0) { int n = c - 1; if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
+                    if (cx < width - 1) { int n = c + 1; if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
+                    if (cy > 0) { int n = c - width; if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
+                    if (cy < height - 1) { int n = c + width; if (!visited[n] && mask[n] > 0.5f) { visited[n] = true; queue.Enqueue(n); } }
                 }
             }
         }

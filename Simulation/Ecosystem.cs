@@ -29,9 +29,6 @@ public class Ecosystem
     public PhylogeneticGraph Phylogeny { get; } = new();
     public AtmosphereSystem Atmosphere { get; } = new();
     public CataclysmSystem Cataclysms { get; } = new();
-    public TrophicDynamics Trophic { get; } = new();
-    public FruitSystem Fruits { get; } = new();
-    public CreaturePool Pool { get; } = new();
     public FlowSimulation? Flow { get; private set; }
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
@@ -91,8 +88,6 @@ public class Ecosystem
         _systems.Add(Disease);
         _systems.Add(Atmosphere);
         _systems.Add(Cataclysms);
-        _systems.Add(Trophic);
-        _systems.Add(Fruits);
         if (Flow != null) _systems.Add(Flow);
         _systems.Add(Metrics);
         var sorted = _systems.OrderBy(s => s.Phase).ToList();
@@ -295,7 +290,6 @@ public class Ecosystem
                         tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
                     tile.SoilNutrients = Math.Min(2f, tile.SoilNutrients + 0.1f);
                     _spatialGrid.Remove(c);
-                    Pool.Return(c);
                     Creatures.RemoveAt(i);
                 }
             }
@@ -304,7 +298,7 @@ public class Ecosystem
     }
 
     private int _logCounter = 0;
-    
+
     public void UpdateStats()
     {
         int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
@@ -341,7 +335,7 @@ public class Ecosystem
         PopulationPressure = aliveCount > softCap
             ? 1f + (aliveCount - softCap) / (MaxCreatures * 0.3f) * 1.5f
             : 1f;
-        
+
         _logCounter++;
         if (_logCounter % 60 == 0) // Log every ~1 second at 60 FPS
         {

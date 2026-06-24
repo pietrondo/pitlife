@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace PitLife.Simulation;
@@ -102,21 +101,6 @@ public static class SpeciesRegistry
     static SpeciesRegistry()
     {
         BuiltinSpecies.RegisterAll();
-        TryLoadJsonOverrides();
-    }
-
-    private static void TryLoadJsonOverrides()
-    {
-        try
-        {
-            string path = Path.Combine("Content", "config", "species.json");
-            if (!File.Exists(path)) return;
-            SpeciesJsonLoader.Load(path);
-        }
-        catch
-        {
-            // JSON failure is non-fatal: keep built-in species
-        }
     }
 
     public static void Register(SpeciesDefinition def)

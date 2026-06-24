@@ -40,27 +40,9 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static bool TryFeedHerbivore(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        // Try eating a nearby fruit first
-        var fruit = ecosystem.Fruits.TryEatFruit(self.Position, 12f);
-        if (fruit.HasValue)
-        {
-            if (fruit.Value.Poisonous && self.Genome.PlantRecognition < 0.5f)
-            {
-                self.Energy -= fruit.Value.EnergyValue * 2f;
-                self.RememberDanger(fruit.Value.Position);
-            }
-            else
-            {
-                self.Energy = Math.Min(self.Energy + fruit.Value.EnergyValue, self.MaxEnergy);
-                self.RememberFood(fruit.Value.Position);
-            }
-            return true;
-        }
-
         Plant? food = self is Herbivore h
             ? ecosystem.FindNearestPlant(h)
             : ecosystem.FindNearestPlantFor(self);
-
         if (food != null)
         {
             if (self.DistanceTo(food) < 12f)
@@ -86,7 +68,6 @@ internal sealed class FeedingModule : IBehaviorModule
             }
             return true;
         }
-
         return TryEatCarcass(self, ecosystem, dt);
     }
 
@@ -110,7 +91,7 @@ internal sealed class FeedingModule : IBehaviorModule
                 }
                 return true;
             }
-            if (TryEatCarcass(self, ecosystem, dt)) return true;
+            return TryEatCarcass(self, ecosystem, dt);
         }
         return false;
     }
@@ -162,8 +143,8 @@ internal sealed class FeedingModule : IBehaviorModule
         return self.CreatureType switch
         {
             CreatureType.Herbivore => TryFeedNearbyHerbivore(self, ecosystem, dt, world),
-            CreatureType.Carnivore => TryFeedNearbyCarnivore(self, ecosystem, dt, world),
-            CreatureType.Omnivore => TryFeedNearbyOmnivore(self, ecosystem, dt, world),
+            CreatureType.Carnivore => TryFeedNearbyCarnivore(self, ecosystem, dt),
+            CreatureType.Omnivore => TryFeedNearbyOmnivore(self, ecosystem, dt),
             _ => false
         };
     }
@@ -184,7 +165,7 @@ internal sealed class FeedingModule : IBehaviorModule
         return TryGraze(self, world, dt);
     }
 
-    private static bool TryFeedNearbyCarnivore(Creature self, Ecosystem ecosystem, float dt, World world)
+    private static bool TryFeedNearbyCarnivore(Creature self, Ecosystem ecosystem, float dt)
     {
         if (self is Carnivore carn)
         {
@@ -201,7 +182,7 @@ internal sealed class FeedingModule : IBehaviorModule
         return TryEatCarcass(self, ecosystem, dt);
     }
 
-    private static bool TryFeedNearbyOmnivore(Creature self, Ecosystem ecosystem, float dt, World world)
+    private static bool TryFeedNearbyOmnivore(Creature self, Ecosystem ecosystem, float dt)
     {
         Creature? prey = ecosystem.FindNearestPrey(self);
         if (prey != null && self.DistanceTo(prey) < 10f)

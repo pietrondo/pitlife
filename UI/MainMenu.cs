@@ -60,7 +60,6 @@ public sealed class MainMenu
     private int _planetIndex;
     private int _islandSizeIndex;
     private int _mapSizeIndex = 2;
-    public bool GameInProgress { get; set; }
 
     private static readonly (string Label, int Width, int Height)[] MapSizes =
     [
@@ -358,8 +357,8 @@ public sealed class MainMenu
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {
-            bool isFocused = _showOptions 
-                ? (i == _focusedIndex) 
+            bool isFocused = _showOptions
+                ? (i == _focusedIndex)
                 : (i < 2 ? i == _focusedIndex : i + 1 == _focusedIndex);
             buttons[i].Draw(spriteBatch, pixel, font, mouse, isFocused);
         }
@@ -587,7 +586,7 @@ public sealed class MainMenu
 
     private void RefreshText(bool isFullscreen)
     {
-        _mainButtons[0].Text = GameInProgress ? I18n.T("menu.continue") : I18n.T("menu.start");
+        _mainButtons[0].Text = I18n.T("menu.start");
         _mainButtons[1].Text = I18n.T("menu.newWorld");
         _mainButtons[2].Text = I18n.T("menu.saveGame");
         _mainButtons[3].Text = I18n.T("menu.loadGame");

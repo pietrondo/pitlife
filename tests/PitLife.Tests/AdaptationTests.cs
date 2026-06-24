@@ -18,7 +18,7 @@ public class AdaptationTests
         {
             return new TestCreature(position, genome);
         }
-        
+
         // Expose ConsumeEnergy for testing
         public void TestConsumeEnergy(float dt) => ConsumeEnergy(dt);
     }
@@ -66,7 +66,7 @@ public class AdaptationTests
 
         // Assert adapted has lower energy multiplier (less drain) than unadapted
         Assert.True(adaptedCreature.CurrentEnergyMultiplier < unadaptedCreature.CurrentEnergyMultiplier);
-        
+
         // Exact expected values:
         // Unadapted energy multiplier: 1.0 + (1.0 - 0.0) * 1.0 = 2.0
         // Adapted energy multiplier: 1.0 + (1.0 - 1.0) * 1.0 = 1.0
@@ -103,15 +103,29 @@ public class AdaptationTests
     {
         var first = new Genome
         {
-            Speed = 0.51f, Size = 0.61f, Metabolism = 0.71f, VisionRange = 1.1f,
-            MutationRate = 0f, DesertAdaptation = 0.11f, ColdAdaptation = 0.21f,
-            ForestAdaptation = 0.31f, WaterAdaptation = 0.41f, Color = Color.Red
+            Speed = 0.51f,
+            Size = 0.61f,
+            Metabolism = 0.71f,
+            VisionRange = 1.1f,
+            MutationRate = 0f,
+            DesertAdaptation = 0.11f,
+            ColdAdaptation = 0.21f,
+            ForestAdaptation = 0.31f,
+            WaterAdaptation = 0.41f,
+            Color = Color.Red
         };
         var second = new Genome
         {
-            Speed = 1.51f, Size = 1.61f, Metabolism = 1.71f, VisionRange = 9.1f,
-            MutationRate = 0f, DesertAdaptation = 0.91f, ColdAdaptation = 0.81f,
-            ForestAdaptation = 0.72f, WaterAdaptation = 0.62f, Color = Color.Blue
+            Speed = 1.51f,
+            Size = 1.61f,
+            Metabolism = 1.71f,
+            VisionRange = 9.1f,
+            MutationRate = 0f,
+            DesertAdaptation = 0.91f,
+            ColdAdaptation = 0.81f,
+            ForestAdaptation = 0.72f,
+            WaterAdaptation = 0.62f,
+            Color = Color.Blue
         };
 
         Genome child = Genome.Reproduce(first, second, new Random(7));
