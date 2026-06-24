@@ -314,37 +314,34 @@ public sealed class CataclysmSystem : ISimulationSystem
         Vector2 pos = ImpactPosition;
         float maxR = ImpactRadius * 0.8f;
 
-        if (ActiveEvent is "Asteroid" or "Asteroid Impact")
+        switch (ActiveEvent)
         {
-            DrawAsteroid(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent == "Supervolcano")
-        {
-            DrawSupervolcano(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent == "Firestorm")
-        {
-            DrawFirestorm(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent is "IceAge" or "Ice Age")
-        {
-            DrawIceAge(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent == "Earthquake")
-        {
-            DrawEarthquake(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent == "Drought")
-        {
-            DrawDrought(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent == "Flood")
-        {
-            DrawFlood(sb, pixel, pos, maxR, progress);
-        }
-        else if (ActiveEvent == "Bloom")
-        {
-            DrawBloom(sb, pixel, pos, maxR, progress);
+            case "Asteroid":
+            case "Asteroid Impact":
+                DrawAsteroid(sb, pixel, pos, maxR, progress);
+                break;
+            case "Supervolcano":
+                DrawSupervolcano(sb, pixel, pos, maxR, progress);
+                break;
+            case "Firestorm":
+                DrawFirestorm(sb, pixel, pos, maxR, progress);
+                break;
+            case "IceAge":
+            case "Ice Age":
+                DrawIceAge(sb, pixel, pos, maxR, progress);
+                break;
+            case "Earthquake":
+                DrawEarthquake(sb, pixel, pos, maxR, progress);
+                break;
+            case "Drought":
+                DrawDrought(sb, pixel, pos, maxR, progress);
+                break;
+            case "Flood":
+                DrawFlood(sb, pixel, pos, maxR, progress);
+                break;
+            case "Bloom":
+                DrawBloom(sb, pixel, pos, maxR, progress);
+                break;
         }
 
         // Generic impact ring for all types
@@ -505,6 +502,7 @@ public sealed class CataclysmSystem : ISimulationSystem
             DrawFireball(sb, pixel, new Vector2(fx, fy), 3, new Color(100, 220, 80, (int)120), 120);
         }
     }
+
     private static void DrawFireball(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, byte alpha)
     {
         var color = new Color(c.R, c.G, c.B, alpha);
