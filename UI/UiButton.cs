@@ -31,10 +31,15 @@ public sealed class UiButton
 
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 4, Bounds.Y + 4, Bounds.Width, Bounds.Height), UiTheme.Shadow);
         UiPrimitives.Fill(spriteBatch, pixel, Bounds, fill);
-        UiPrimitives.Border(spriteBatch, pixel, Bounds, 2, border);
 
-        if (isFocused)
+        if (isFocused && !hovered)
             UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, UiTheme.MossSignal);
+        else if (hovered && !isFocused)
+            UiPrimitives.Border(spriteBatch, pixel, Bounds, 2, Color.Lerp(border, Color.White, 0.2f));
+        else if (isFocused && hovered)
+            UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, Color.Lerp(UiTheme.MossSignal, Color.White, 0.2f));
+        else
+            UiPrimitives.Border(spriteBatch, pixel, Bounds, 2, border);
 
         const float scale = 1.1f;
         Vector2 size = font.MeasureString(Text) * scale;
