@@ -461,108 +461,124 @@ public sealed class MainMenu
 
         if (_showWorldGenPanel)
         {
-            int wgButtonWidth = panelWidth - 48;
-            int wgButtonHeight = 46;
-            int wgInputWidth = 80;
-            int wgInputHeight = 40;
-            int wgGap = 8;
-            int wgStartY = _window.Bounds.Y + 56;
-            int wgCenterX = viewportWidth / 2;
-
-            _presetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY, wgButtonWidth, wgButtonHeight);
-            _mapSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
-            _planetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 2 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
-
-            int labelWidth = (wgButtonWidth - wgInputWidth - 8) / 2 + wgInputWidth + 8;
-            _continentInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 3 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
-            _seaLevelInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 4 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
-
-            _islandSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 5 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
-
-            int genY = wgStartY + 6 * (wgButtonHeight + wgGap) + wgGap;
-            _worldGenButtons[0].Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, genY, wgButtonWidth, wgButtonHeight);
+            LayoutWorldGenPanel(viewportWidth, panelWidth);
             return;
         }
 
-        UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
-        int buttonWidth = panelWidth - 48;
         int buttonHeight = 52;
         int gap = 12;
         int startY = _window.Bounds.Y + 60;
 
         if (_showOptions)
         {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].Bounds = new Rectangle(
-                    viewportWidth / 2 - buttonWidth / 2,
-                    startY + i * (buttonHeight + gap),
-                    buttonWidth,
-                    buttonHeight);
-            }
+            LayoutOptionsPanel(viewportWidth, panelWidth, startY, buttonHeight, gap);
         }
         else
         {
-            // Start Game button (index 0)
-            buttons[0].Bounds = new Rectangle(
+            LayoutMainPanel(viewportWidth, panelWidth, startY, buttonHeight, gap);
+        }
+    }
+
+    private void LayoutWorldGenPanel(int viewportWidth, int panelWidth)
+    {
+        int wgButtonWidth = panelWidth - 48;
+        int wgButtonHeight = 46;
+        int wgInputWidth = 80;
+        int wgInputHeight = 40;
+        int wgGap = 8;
+        int wgStartY = _window.Bounds.Y + 56;
+        int wgCenterX = viewportWidth / 2;
+
+        _presetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY, wgButtonWidth, wgButtonHeight);
+        _mapSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+        _planetButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 2 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+
+        int labelWidth = (wgButtonWidth - wgInputWidth - 8) / 2 + wgInputWidth + 8;
+        _continentInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 3 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
+        _seaLevelInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 4 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
+
+        _islandSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 5 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
+
+        int genY = wgStartY + 6 * (wgButtonHeight + wgGap) + wgGap;
+        _worldGenButtons[0].Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, genY, wgButtonWidth, wgButtonHeight);
+    }
+
+    private void LayoutOptionsPanel(int viewportWidth, int panelWidth, int startY, int buttonHeight, int gap)
+    {
+        int buttonWidth = panelWidth - 48;
+        for (int i = 0; i < _optionButtons.Length; i++)
+        {
+            _optionButtons[i].Bounds = new Rectangle(
                 viewportWidth / 2 - buttonWidth / 2,
-                startY,
-                buttonWidth,
-                buttonHeight);
-
-            // New World button (index 1)
-            buttons[1].Bounds = new Rectangle(
-                viewportWidth / 2 - buttonWidth / 2,
-                startY + (buttonHeight + gap),
-                buttonWidth,
-                buttonHeight);
-
-            // Seed input
-            int inputY = startY + 2 * (buttonHeight + gap);
-            _seedInput.Placeholder = I18n.T("menu.seedPlaceholder");
-            _seedInput.IsNumericOnly = true;
-            _seedInput.MaxLength = 10;
-            _seedInput.Bounds = new Rectangle(
-                viewportWidth / 2 - buttonWidth / 2,
-                inputY,
-                buttonWidth,
-                40);
-
-            // Side-by-side Save & Load (indices 2 & 3 in _mainButtons)
-            int halfWidth = (buttonWidth - gap) / 2;
-            int saveLoadY = inputY + 40 + gap;
-            buttons[2].Bounds = new Rectangle(
-                _window.Bounds.X + 24,
-                saveLoadY,
-                halfWidth,
-                buttonHeight);
-            buttons[3].Bounds = new Rectangle(
-                _window.Bounds.X + 24 + halfWidth + gap,
-                saveLoadY,
-                halfWidth,
-                buttonHeight);
-
-            // Side-by-side Options & Help (indices 4 & 5 in _mainButtons)
-            int optionsHelpY = saveLoadY + buttonHeight + gap;
-            buttons[4].Bounds = new Rectangle(
-                _window.Bounds.X + 24,
-                optionsHelpY,
-                halfWidth,
-                buttonHeight);
-            buttons[5].Bounds = new Rectangle(
-                _window.Bounds.X + 24 + halfWidth + gap,
-                optionsHelpY,
-                halfWidth,
-                buttonHeight);
-
-            // Exit button (index 6 in _mainButtons)
-            int exitY = optionsHelpY + buttonHeight + gap;
-            buttons[6].Bounds = new Rectangle(
-                viewportWidth / 2 - buttonWidth / 2,
-                exitY,
+                startY + i * (buttonHeight + gap),
                 buttonWidth,
                 buttonHeight);
         }
+    }
+
+    private void LayoutMainPanel(int viewportWidth, int panelWidth, int startY, int buttonHeight, int gap)
+    {
+        int buttonWidth = panelWidth - 48;
+
+        // Start Game button (index 0)
+        _mainButtons[0].Bounds = new Rectangle(
+            viewportWidth / 2 - buttonWidth / 2,
+            startY,
+            buttonWidth,
+            buttonHeight);
+
+        // New World button (index 1)
+        _mainButtons[1].Bounds = new Rectangle(
+            viewportWidth / 2 - buttonWidth / 2,
+            startY + (buttonHeight + gap),
+            buttonWidth,
+            buttonHeight);
+
+        // Seed input
+        int inputY = startY + 2 * (buttonHeight + gap);
+        _seedInput.Placeholder = I18n.T("menu.seedPlaceholder");
+        _seedInput.IsNumericOnly = true;
+        _seedInput.MaxLength = 10;
+        _seedInput.Bounds = new Rectangle(
+            viewportWidth / 2 - buttonWidth / 2,
+            inputY,
+            buttonWidth,
+            40);
+
+        // Side-by-side Save & Load (indices 2 & 3 in _mainButtons)
+        int halfWidth = (buttonWidth - gap) / 2;
+        int saveLoadY = inputY + 40 + gap;
+        _mainButtons[2].Bounds = new Rectangle(
+            _window.Bounds.X + 24,
+            saveLoadY,
+            halfWidth,
+            buttonHeight);
+        _mainButtons[3].Bounds = new Rectangle(
+            _window.Bounds.X + 24 + halfWidth + gap,
+            saveLoadY,
+            halfWidth,
+            buttonHeight);
+
+        // Side-by-side Options & Help (indices 4 & 5 in _mainButtons)
+        int optionsHelpY = saveLoadY + buttonHeight + gap;
+        _mainButtons[4].Bounds = new Rectangle(
+            _window.Bounds.X + 24,
+            optionsHelpY,
+            halfWidth,
+            buttonHeight);
+        _mainButtons[5].Bounds = new Rectangle(
+            _window.Bounds.X + 24 + halfWidth + gap,
+            optionsHelpY,
+            halfWidth,
+            buttonHeight);
+
+        // Exit button (index 6 in _mainButtons)
+        int exitY = optionsHelpY + buttonHeight + gap;
+        _mainButtons[6].Bounds = new Rectangle(
+            viewportWidth / 2 - buttonWidth / 2,
+            exitY,
+            buttonWidth,
+            buttonHeight);
     }
 
     private static bool Pressed(KeyboardState current, KeyboardState previous, Keys key) =>
