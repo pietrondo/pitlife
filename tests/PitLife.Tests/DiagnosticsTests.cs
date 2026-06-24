@@ -126,10 +126,17 @@ public class DiagnosticsTests
     {
         var eco = new Ecosystem(48, 36, 42);
         int spawned = 0;
-        foreach (var sp in SpeciesRegistry.All.Take(20))
+        foreach (var sp in SpeciesRegistry.All)
         {
-            var pos = new Vector2(eco.Random.Next(100, 500), eco.Random.Next(100, 500));
-            if (eco.SpawnByName(sp, pos)) spawned++;
+            for (int i = 0; i < 50; i++)
+            {
+                var pos = new Microsoft.Xna.Framework.Vector2(eco.Random.Next(100, 500), eco.Random.Next(100, 500));
+                if (eco.SpawnByName(sp, pos))
+                {
+                    spawned++;
+                    break;
+                }
+            }
         }
         Assert.True(spawned > 0, $"Spawned {spawned} species");
     }
