@@ -313,135 +313,34 @@ public sealed class CataclysmSystem : ISimulationSystem
         Vector2 pos = ImpactPosition;
         float maxR = ImpactRadius * 0.8f;
 
-        if (ActiveEvent is "Asteroid" or "Asteroid Impact")
+        switch (ActiveEvent)
         {
-            // Falling meteor (first 0.3s)
-            if (progress < 0.3f)
-            {
-                float t = progress / 0.3f;
-                float meteorY = -100 + (pos.Y + 100) * (t * t); // accelerate down
-                var mColor = new Color(255, 200, 50);
-                DrawFireball(sb, pixel, new Vector2(pos.X, meteorY), 6 + (1-t)*12, mColor, 255);
-
-                // Smoke trail
-                for (int i = 1; i <= 4; i++)
-                {
-                    float trailY = meteorY + i * 20;
-                    byte alpha = (byte)((1f - i * 0.25f) * 180);
-                    var trailColor = new Color(100, 80, 40, (int)alpha);
-                    DrawFireball(sb, pixel, new Vector2(pos.X, trailY), 4 + i, trailColor, alpha);
-                }
-            }
-
-            // Explosion after impact
-            float explodeT = Math.Max(0, (progress - 0.3f) / 0.7f);
-            float ringR = maxR * explodeT;
-            var explodeColor = new Color(255, 150, 30);
-            // Expanding shock rings
-            for (int r = 0; r < 3; r++)
-            {
-                float rT = (explodeT + r * 0.3f) % 1.0f;
-                float rr = maxR * rT;
-                byte alpha = (byte)((1f - rT) * 128);
-                DrawRing(sb, pixel, pos, rr, new Color(255, 180, 40, (int)alpha), 3);
-            }
-            // Fire particles at impact
-            DrawFireCluster(sb, pixel, pos, maxR * 0.6f, explodeT, progress);
-        }
-        else if (ActiveEvent == "Supervolcano")
-        {
-            // Rising magma column from ground
-            float intensity = Math.Min(1f, progress * 2f) * Math.Max(0f, 1f - progress * 1.5f);
-            float colH = maxR * 2f * intensity;
-            // Magma column (vertical stream going up)
-            for (int stripe = 0; stripe < 3; stripe++)
-            {
-                float sx = pos.X + (stripe - 1) * maxR * 0.2f;
-                float sy = pos.Y - colH * (0.5f + stripe * 0.2f);
-                DrawFireball(sb, pixel, new Vector2(sx, sy), 3 + stripe * 2, new Color(255, 60, 10), (byte)(intensity * 180));
-            }
-            // Rising lava blobs
-            for (int i = 0; i < 6; i++)
-            {
-                float angle = (float)Math.Sin(progress * 5f + i * 1.2f) * 0.5f;
-                float rise = (progress + i * 0.1f) % 1f;
-                float bx = pos.X + angle * maxR * 0.4f;
-                float by = pos.Y - rise * colH;
-                DrawFireball(sb, pixel, new Vector2(bx, by), 2 + i % 3, new Color(255, 140, 20), (byte)(intensity * 200));
-            }
-            // Lava pool at base
-            DrawRing(sb, pixel, pos, maxR * progress * 0.7f, new Color(255, 40, 10, (int)(intensity * 150)), 5);
-            DrawFireCluster(sb, pixel, pos, maxR * 0.4f * progress, progress, progress);
-        }
-        else if (ActiveEvent == "Firestorm")
-        {
-            DrawFireCluster(sb, pixel, pos, maxR, progress, progress);
-            for (int i = 0; i < 5; i++)
-            {
-                float angle = i * 1.256f + progress * 3f;
-                float fx = pos.X + MathF.Cos(angle) * maxR * (0.5f + progress * 0.5f);
-                float fy = pos.Y + MathF.Sin(angle) * maxR * (0.5f + progress * 0.5f);
-                DrawFireball(sb, pixel, new Vector2(fx, fy), 3 + progress * 4, new Color(255, 160, 30), 180);
-            }
-        }
-        else if (ActiveEvent is "IceAge" or "Ice Age")
-        {
-            // Frost spread
-            float frostR = maxR * progress;
-            var frostColors = new[] { new Color(180, 220, 255, (int)60), new Color(150, 200, 240, (int)40), new Color(200, 230, 255, (int)30) };
-            for (int r = 0; r < 3; r++)
-            {
-                float cr = frostR * (1f - r * 0.3f);
-                DrawRing(sb, pixel, pos, cr, frostColors[r], (int)(2 + r * 2));
-            }
-            // Snowflakes
-            for (int i = 0; i < 8; i++)
-            {
-                float sx = pos.X + MathF.Cos(i * 0.8f + progress * 5f) * frostR * 0.8f;
-                float sy = pos.Y + MathF.Sin(i * 0.8f + progress * 2f) * frostR * 0.8f;
-                DrawFireball(sb, pixel, new Vector2(sx, sy), 2, new Color(255, 255, 255, (int)150), 150);
-            }
-        }
-        else if (ActiveEvent == "Earthquake")
-        {
-            // Crack lines radiating from center
-            float crackR = maxR * progress;
-            for (int i = 0; i < 6; i++)
-            {
-                float angle = i * 1.047f + progress * 0.5f;
-                float endX = pos.X + MathF.Cos(angle) * crackR;
-                float endY = pos.Y + MathF.Sin(angle) * crackR;
-                DrawLine(sb, pixel, pos, new Vector2(endX, endY), new Color(100, 80, 60, (int)120), 2);
-            }
-        }
-        else if (ActiveEvent == "Drought")
-        {
-            // Heat shimmer rings
-            for (int r = 0; r < 4; r++)
-            {
-                float rr = maxR * (1f - (progress + r * 0.2f) % 1f);
-                DrawRing(sb, pixel, pos, rr, new Color(255, 200, 80, (int)(progress * 80)), 2);
-            }
-        }
-        else if (ActiveEvent == "Flood")
-        {
-            // Water waves
-            for (int r = 0; r < 4; r++)
-            {
-                float rr = maxR * (progress + r * 0.25f) % maxR;
-                DrawRing(sb, pixel, pos, rr, new Color(60, 160, 240, (int)((1f - rr / maxR) * 120)), 3);
-            }
-        }
-        else if (ActiveEvent == "Bloom")
-        {
-            // Flower/grass particles
-            for (int i = 0; i < 10; i++)
-            {
-                float angle = i * 0.628f + progress * 2f;
-                float fx = pos.X + MathF.Cos(angle) * maxR * progress;
-                float fy = pos.Y + MathF.Sin(angle) * maxR * progress;
-                DrawFireball(sb, pixel, new Vector2(fx, fy), 3, new Color(100, 220, 80, (int)120), 120);
-            }
+            case "Asteroid":
+            case "Asteroid Impact":
+                DrawAsteroidEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "Supervolcano":
+                DrawSupervolcanoEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "Firestorm":
+                DrawFirestormEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "IceAge":
+            case "Ice Age":
+                DrawIceAgeEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "Earthquake":
+                DrawEarthquakeEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "Drought":
+                DrawDroughtEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "Flood":
+                DrawFloodEvent(sb, pixel, pos, maxR, progress);
+                break;
+            case "Bloom":
+                DrawBloomEvent(sb, pixel, pos, maxR, progress);
+                break;
         }
 
         // Generic impact ring for all types
@@ -449,6 +348,144 @@ public sealed class CataclysmSystem : ISimulationSystem
         byte genA = (byte)((1f - progress) * 60);
         if (genA > 0)
             DrawRing(sb, pixel, pos, genR, new Color(ImpactColor.R, ImpactColor.G, ImpactColor.B, genA), 2);
+    }
+
+    private void DrawAsteroidEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Falling meteor (first 0.3s)
+        if (progress < 0.3f)
+        {
+            float t = progress / 0.3f;
+            float meteorY = -100 + (pos.Y + 100) * (t * t); // accelerate down
+            var mColor = new Color(255, 200, 50);
+            DrawFireball(sb, pixel, new Vector2(pos.X, meteorY), 6 + (1 - t) * 12, mColor, 255);
+
+            // Smoke trail
+            for (int i = 1; i <= 4; i++)
+            {
+                float trailY = meteorY + i * 20;
+                byte alpha = (byte)((1f - i * 0.25f) * 180);
+                var trailColor = new Color(100, 80, 40, (int)alpha);
+                DrawFireball(sb, pixel, new Vector2(pos.X, trailY), 4 + i, trailColor, alpha);
+            }
+        }
+
+        // Explosion after impact
+        float explodeT = Math.Max(0, (progress - 0.3f) / 0.7f);
+        float ringR = maxR * explodeT;
+        var explodeColor = new Color(255, 150, 30);
+        // Expanding shock rings
+        for (int r = 0; r < 3; r++)
+        {
+            float rT = (explodeT + r * 0.3f) % 1.0f;
+            float rr = maxR * rT;
+            byte alpha = (byte)((1f - rT) * 128);
+            DrawRing(sb, pixel, pos, rr, new Color(255, 180, 40, (int)alpha), 3);
+        }
+        // Fire particles at impact
+        DrawFireCluster(sb, pixel, pos, maxR * 0.6f, explodeT, progress);
+    }
+
+    private void DrawSupervolcanoEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Rising magma column from ground
+        float intensity = Math.Min(1f, progress * 2f) * Math.Max(0f, 1f - progress * 1.5f);
+        float colH = maxR * 2f * intensity;
+        // Magma column (vertical stream going up)
+        for (int stripe = 0; stripe < 3; stripe++)
+        {
+            float sx = pos.X + (stripe - 1) * maxR * 0.2f;
+            float sy = pos.Y - colH * (0.5f + stripe * 0.2f);
+            DrawFireball(sb, pixel, new Vector2(sx, sy), 3 + stripe * 2, new Color(255, 60, 10), (byte)(intensity * 180));
+        }
+        // Rising lava blobs
+        for (int i = 0; i < 6; i++)
+        {
+            float angle = (float)Math.Sin(progress * 5f + i * 1.2f) * 0.5f;
+            float rise = (progress + i * 0.1f) % 1f;
+            float bx = pos.X + angle * maxR * 0.4f;
+            float by = pos.Y - rise * colH;
+            DrawFireball(sb, pixel, new Vector2(bx, by), 2 + i % 3, new Color(255, 140, 20), (byte)(intensity * 200));
+        }
+        // Lava pool at base
+        DrawRing(sb, pixel, pos, maxR * progress * 0.7f, new Color(255, 40, 10, (int)(intensity * 150)), 5);
+        DrawFireCluster(sb, pixel, pos, maxR * 0.4f * progress, progress, progress);
+    }
+
+    private void DrawFirestormEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        DrawFireCluster(sb, pixel, pos, maxR, progress, progress);
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = i * 1.256f + progress * 3f;
+            float fx = pos.X + MathF.Cos(angle) * maxR * (0.5f + progress * 0.5f);
+            float fy = pos.Y + MathF.Sin(angle) * maxR * (0.5f + progress * 0.5f);
+            DrawFireball(sb, pixel, new Vector2(fx, fy), 3 + progress * 4, new Color(255, 160, 30), 180);
+        }
+    }
+
+    private void DrawIceAgeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Frost spread
+        float frostR = maxR * progress;
+        var frostColors = new[] { new Color(180, 220, 255, (int)60), new Color(150, 200, 240, (int)40), new Color(200, 230, 255, (int)30) };
+        for (int r = 0; r < 3; r++)
+        {
+            float cr = frostR * (1f - r * 0.3f);
+            DrawRing(sb, pixel, pos, cr, frostColors[r], (int)(2 + r * 2));
+        }
+        // Snowflakes
+        for (int i = 0; i < 8; i++)
+        {
+            float sx = pos.X + MathF.Cos(i * 0.8f + progress * 5f) * frostR * 0.8f;
+            float sy = pos.Y + MathF.Sin(i * 0.8f + progress * 2f) * frostR * 0.8f;
+            DrawFireball(sb, pixel, new Vector2(sx, sy), 2, new Color(255, 255, 255, (int)150), 150);
+        }
+    }
+
+    private void DrawEarthquakeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Crack lines radiating from center
+        float crackR = maxR * progress;
+        for (int i = 0; i < 6; i++)
+        {
+            float angle = i * 1.047f + progress * 0.5f;
+            float endX = pos.X + MathF.Cos(angle) * crackR;
+            float endY = pos.Y + MathF.Sin(angle) * crackR;
+            DrawLine(sb, pixel, pos, new Vector2(endX, endY), new Color(100, 80, 60, (int)120), 2);
+        }
+    }
+
+    private void DrawDroughtEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Heat shimmer rings
+        for (int r = 0; r < 4; r++)
+        {
+            float rr = maxR * (1f - (progress + r * 0.2f) % 1f);
+            DrawRing(sb, pixel, pos, rr, new Color(255, 200, 80, (int)(progress * 80)), 2);
+        }
+    }
+
+    private void DrawFloodEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Water waves
+        for (int r = 0; r < 4; r++)
+        {
+            float rr = maxR * (progress + r * 0.25f) % maxR;
+            DrawRing(sb, pixel, pos, rr, new Color(60, 160, 240, (int)((1f - rr / maxR) * 120)), 3);
+        }
+    }
+
+    private void DrawBloomEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    {
+        // Flower/grass particles
+        for (int i = 0; i < 10; i++)
+        {
+            float angle = i * 0.628f + progress * 2f;
+            float fx = pos.X + MathF.Cos(angle) * maxR * progress;
+            float fy = pos.Y + MathF.Sin(angle) * maxR * progress;
+            DrawFireball(sb, pixel, new Vector2(fx, fy), 3, new Color(100, 220, 80, (int)120), 120);
+        }
     }
 
     private static void DrawFireball(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, byte alpha)
