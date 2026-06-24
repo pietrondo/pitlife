@@ -5,6 +5,18 @@ namespace PitLife.Tests;
 
 public class SpeciesCatalogTests
 {
+
+    [Fact]
+    public void Store_RejectsPathTraversal()
+    {
+        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
+        var document = new SpeciesCatalogDocument { Species = [ValidAnimal()] };
+        string path = Path.GetFullPath("../../../../../../../../../../../../tmp/test.json");
+        if (Environment.OSVersion.Platform == PlatformID.Unix) path = "/tmp/test.json";
+
+        Assert.Throws<UnauthorizedAccessException>(() => SpeciesCatalogStore.Save(path, document, directory));
+    }
+
     [Fact]
     public void Store_RoundTripsVersionedCatalog()
     {
@@ -15,7 +27,7 @@ public class SpeciesCatalogTests
         {
             var document = new SpeciesCatalogDocument { Species = [ValidAnimal()] };
 
-            SpeciesCatalogStore.Save(path, document);
+            SpeciesCatalogStore.Save(path, document, directory);
             SpeciesCatalogDocument loaded = SpeciesCatalogStore.Load(path);
 
             SpeciesCatalogEntry entry = Assert.Single(loaded.Species);

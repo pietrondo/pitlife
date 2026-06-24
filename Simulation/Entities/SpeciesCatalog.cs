@@ -238,7 +238,7 @@ public static class SpeciesCatalogStore
             ?? throw new InvalidDataException("Species catalog is empty.");
     }
 
-    public static void Save(string path, SpeciesCatalogDocument document)
+    public static void Save(string path, SpeciesCatalogDocument document, string baseDirectory)
     {
         if (path.Contains("..", StringComparison.Ordinal))
             throw new ArgumentException("Path traversal is not allowed.", nameof(path));

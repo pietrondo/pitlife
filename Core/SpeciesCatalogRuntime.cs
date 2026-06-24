@@ -81,7 +81,7 @@ public sealed class SpeciesCatalogRuntime
 
         try
         {
-            SpeciesCatalogStore.Save(path, document);
+            SpeciesCatalogStore.Save(path, document, Path.GetDirectoryName(path)!);
             return Apply(document, repositoryRoot);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
