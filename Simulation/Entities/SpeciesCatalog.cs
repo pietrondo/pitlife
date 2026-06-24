@@ -243,15 +243,23 @@ public static class SpeciesCatalogStore
         if (path.Contains("..", StringComparison.Ordinal))
             throw new ArgumentException("Path traversal is not allowed.", nameof(path));
 
-        string? directory = Path.GetDirectoryName(Path.GetFullPath(path));
+        string fullBaseDir = Path.GetFullPath(baseDirectory);
+        if (!fullBaseDir.EndsWith(Path.DirectorySeparatorChar))
+            fullBaseDir += Path.DirectorySeparatorChar;
+
+        string fullPath = Path.GetFullPath(Path.Combine(baseDirectory, path));
+        if (!fullPath.StartsWith(fullBaseDir, StringComparison.OrdinalIgnoreCase))
+            throw new UnauthorizedAccessException("Path traversal is not allowed.");
+
+        string? directory = Path.GetDirectoryName(fullPath);
         if (directory is not null)
             Directory.CreateDirectory(directory);
 
-        string temporaryPath = path + ".tmp";
+        string temporaryPath = fullPath + ".tmp";
         try
         {
             File.WriteAllText(temporaryPath, JsonSerializer.Serialize(document, Options));
-            File.Move(temporaryPath, path, overwrite: true);
+            File.Move(temporaryPath, fullPath, overwrite: true);
         }
         finally
         {
