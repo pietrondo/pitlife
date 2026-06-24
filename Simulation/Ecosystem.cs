@@ -298,7 +298,7 @@ public class Ecosystem
     }
 
     private int _logCounter = 0;
-    
+
     public void UpdateStats()
     {
         int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
@@ -335,7 +335,7 @@ public class Ecosystem
         PopulationPressure = aliveCount > softCap
             ? 1f + (aliveCount - softCap) / (MaxCreatures * 0.3f) * 1.5f
             : 1f;
-        
+
         _logCounter++;
         if (_logCounter % 60 == 0) // Log every ~1 second at 60 FPS
         {

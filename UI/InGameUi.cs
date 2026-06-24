@@ -335,7 +335,7 @@ public sealed class InGameUi
         return y - content.Y + 8;
     }
 
-    
+
 
     private static void DrawInlineBar(SpriteBatch sb, Texture2D pixel, SpriteFont font,
         int x, int y, string label, int value, int total, Color color)
@@ -504,7 +504,7 @@ public sealed class InGameUi
             y += 26;
         }
         if (!string.IsNullOrEmpty(SelectedCataclysm))
-            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
+            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(content.X, content.Bottom - 20), new Color(255, 200, 100));
     }
 
     public bool HandleCataclysmClick(MouseState mouse, MouseState prevMouse)
@@ -571,8 +571,11 @@ public sealed class InGameUi
         Season localSeason = climate.GetLocalSeason(ly, World.Height);
         string localSeasonKey = localSeason switch
         {
-            Season.Spring => "season.Spring", Season.Summer => "season.Summer",
-            Season.Autumn => "season.Autumn", Season.Winter => "season.Winter", _ => "season.Spring"
+            Season.Spring => "season.Spring",
+            Season.Summer => "season.Summer",
+            Season.Autumn => "season.Autumn",
+            Season.Winter => "season.Winter",
+            _ => "season.Spring"
         };
         string localSeasonName = I18n.T(localSeasonKey);
         string biomeName = I18n.T($"biome.{localTile.Biome}");

@@ -308,8 +308,8 @@ public sealed class MainMenu
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {
-            bool isFocused = _showOptions 
-                ? (i == _focusedIndex) 
+            bool isFocused = _showOptions
+                ? (i == _focusedIndex)
                 : (i < 2 ? i == _focusedIndex : i + 1 == _focusedIndex);
             buttons[i].Draw(spriteBatch, pixel, font, mouse, isFocused);
         }

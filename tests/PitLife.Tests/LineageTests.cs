@@ -73,7 +73,8 @@ public class LineageTests
     {
         var ancestors = new System.Collections.Generic.Dictionary<ulong, byte>
         {
-            [10] = 1, [20] = 2
+            [10] = 1,
+            [20] = 2
         };
         var restored = LineageRecord.Restore(1, 10, 20, ancestors);
         Assert.Equal(1ul, restored.IndividualId);

@@ -29,161 +29,181 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static bool TryFeed(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        if (self.CreatureType == CreatureType.Herbivore)
+        return self.CreatureType switch
         {
-            Plant? food = self is Herbivore h
-                ? ecosystem.FindNearestPlant(h)
-                : ecosystem.FindNearestPlantFor(self);
-            if (food != null)
-            {
-                if (self.DistanceTo(food) < 12f)
-                {
-                    float eaten = Math.Min(food.Energy, 10f * dt);
-                    food.Energy -= eaten;
-                    if (food.IsPoisonous && self.Genome.PlantRecognition < 0.5f)
-                    {
-                        self.Energy -= eaten * 3f;
-                        self.RememberDanger(food.Position);
-                    }
-                    else
-                    {
-                        self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
-                    }
-                    self.RememberFood(food.Position);
-                    if (food.Energy <= 0) food.Die(DeathCause.Predation);
-                }
-                else
-                {
-                    self.MoveToward(food.Position, dt, world);
-                    TryGraze(self, world, dt);
-                }
-                return true;
-            }
-            if (TryEatCarcass(self, ecosystem, dt)) return true;
-        }
-        else if (self.CreatureType == CreatureType.Carnivore)
-        {
-            if (self is Carnivore carn)
-            {
-                Creature? prey = ecosystem.FindNearestPrey(self);
-                if (prey != null && self.DistanceTo(prey) < self.VisionPixels)
-                {
-                    if (self.DistanceTo(prey) < 10f)
-                    {
-                        float damage = carn.AttackDamage * dt;
-                        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                        self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
-                        if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
-                    }
-                    else
-                    {
-                        self.MoveToward(prey.Position, dt, world);
-                    }
-                    return true;
-                }
-                if (TryEatCarcass(self, ecosystem, dt)) return true;
-            }
-        }
-        else if (self.CreatureType == CreatureType.Omnivore)
-        {
-            bool seekPrey = self.Energy < self.MaxEnergy * 0.4f && ecosystem.Random.NextDouble() < 0.4;
-            if (seekPrey)
-            {
-                Creature? prey = ecosystem.FindNearestPrey(self);
-                if (prey != null && self.DistanceTo(prey) < self.VisionPixels)
-                {
-                    if (self.DistanceTo(prey) < 10f)
-                    {
-                        float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
-                        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                        self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
-                        if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
-                    }
-                    else
-                    {
-                        self.MoveToward(prey.Position, dt, world);
-                    }
-                    return true;
-                }
-            }
+            CreatureType.Herbivore => TryFeedHerbivore(self, ecosystem, dt, world),
+            CreatureType.Carnivore => TryFeedCarnivore(self, ecosystem, dt, world),
+            CreatureType.Omnivore => TryFeedOmnivore(self, ecosystem, dt, world),
+            _ => false
+        };
+    }
 
-            Plant? food = ecosystem.FindNearestPlantFor(self);
-            if (food != null)
+    private static bool TryFeedHerbivore(Creature self, Ecosystem ecosystem, float dt, World world)
+    {
+        Plant? food = self is Herbivore h
+            ? ecosystem.FindNearestPlant(h)
+            : ecosystem.FindNearestPlantFor(self);
+        if (food != null)
+        {
+            if (self.DistanceTo(food) < 12f)
             {
-                if (self.DistanceTo(food) < 12f)
+                float eaten = Math.Min(food.Energy, 10f * dt);
+                food.Energy -= eaten;
+                if (food.IsPoisonous && self.Genome.PlantRecognition < 0.5f)
                 {
-                    float eaten = Math.Min(food.Energy, 8f * dt);
-                    food.Energy -= eaten;
-                    self.Energy = Math.Min(self.Energy + eaten * 1.5f, self.MaxEnergy);
-                    if (food.Energy <= 0) food.Die(DeathCause.Predation);
+                    self.Energy -= eaten * 3f;
+                    self.RememberDanger(food.Position);
                 }
                 else
                 {
-                    self.MoveToward(food.Position, dt, world);
+                    self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
+                }
+                self.RememberFood(food.Position);
+                if (food.Energy <= 0) food.Die(DeathCause.Predation);
+            }
+            else
+            {
+                self.MoveToward(food.Position, dt, world);
+                TryGraze(self, world, dt);
+            }
+            return true;
+        }
+        return TryEatCarcass(self, ecosystem, dt);
+    }
+
+    private static bool TryFeedCarnivore(Creature self, Ecosystem ecosystem, float dt, World world)
+    {
+        if (self is Carnivore carn)
+        {
+            Creature? prey = ecosystem.FindNearestPrey(self);
+            if (prey != null && self.DistanceTo(prey) < self.VisionPixels)
+            {
+                if (self.DistanceTo(prey) < 10f)
+                {
+                    float damage = carn.AttackDamage * dt;
+                    prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
+                    self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
+                    if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
+                }
+                else
+                {
+                    self.MoveToward(prey.Position, dt, world);
                 }
                 return true;
             }
+            return TryEatCarcass(self, ecosystem, dt);
+        }
+        return false;
+    }
+
+    private static bool TryFeedOmnivore(Creature self, Ecosystem ecosystem, float dt, World world)
+    {
+        bool seekPrey = self.Energy < self.MaxEnergy * 0.4f && ecosystem.Random.NextDouble() < 0.4;
+        if (seekPrey)
+        {
+            Creature? prey = ecosystem.FindNearestPrey(self);
+            if (prey != null && self.DistanceTo(prey) < self.VisionPixels)
+            {
+                if (self.DistanceTo(prey) < 10f)
+                {
+                    float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
+                    prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
+                    self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
+                    if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
+                }
+                else
+                {
+                    self.MoveToward(prey.Position, dt, world);
+                }
+                return true;
+            }
+        }
+
+        Plant? food = ecosystem.FindNearestPlantFor(self);
+        if (food != null)
+        {
+            if (self.DistanceTo(food) < 12f)
+            {
+                float eaten = Math.Min(food.Energy, 8f * dt);
+                food.Energy -= eaten;
+                self.Energy = Math.Min(self.Energy + eaten * 1.5f, self.MaxEnergy);
+                if (food.Energy <= 0) food.Die(DeathCause.Predation);
+            }
+            else
+            {
+                self.MoveToward(food.Position, dt, world);
+            }
+            return true;
         }
         return false;
     }
 
     private static bool TryFeedNearby(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        if (self.CreatureType == CreatureType.Herbivore)
+        return self.CreatureType switch
         {
-            Plant? food = self is Herbivore h
-                ? ecosystem.FindNearestPlant(h)
-                : ecosystem.FindNearestPlantFor(self);
-            if (food != null && self.DistanceTo(food) < 12f)
-            {
-                float eaten = Math.Min(food.Energy, 10f * dt);
-                food.Energy -= eaten;
-                self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
-                if (food.Energy <= 0) food.Die(DeathCause.Predation);
-                return true;
-            }
-            return TryGraze(self, world, dt);
-        }
-        else if (self.CreatureType == CreatureType.Carnivore)
+            CreatureType.Herbivore => TryFeedNearbyHerbivore(self, ecosystem, dt, world),
+            CreatureType.Carnivore => TryFeedNearbyCarnivore(self, ecosystem, dt),
+            CreatureType.Omnivore => TryFeedNearbyOmnivore(self, ecosystem, dt),
+            _ => false
+        };
+    }
+
+    private static bool TryFeedNearbyHerbivore(Creature self, Ecosystem ecosystem, float dt, World world)
+    {
+        Plant? food = self is Herbivore h
+            ? ecosystem.FindNearestPlant(h)
+            : ecosystem.FindNearestPlantFor(self);
+        if (food != null && self.DistanceTo(food) < 12f)
         {
-            if (self is Carnivore carn)
-            {
-                Creature? prey = ecosystem.FindNearestPrey(self);
-                if (prey != null && self.DistanceTo(prey) < 10f)
-                {
-                    float damage = carn.AttackDamage * dt;
-                    prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
-                    self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
-                    if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
-                    return true;
-                }
-            }
-            return TryEatCarcass(self, ecosystem, dt);
+            float eaten = Math.Min(food.Energy, 10f * dt);
+            food.Energy -= eaten;
+            self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
+            if (food.Energy <= 0) food.Die(DeathCause.Predation);
+            return true;
         }
-        else if (self.CreatureType == CreatureType.Omnivore)
+        return TryGraze(self, world, dt);
+    }
+
+    private static bool TryFeedNearbyCarnivore(Creature self, Ecosystem ecosystem, float dt)
+    {
+        if (self is Carnivore carn)
         {
             Creature? prey = ecosystem.FindNearestPrey(self);
             if (prey != null && self.DistanceTo(prey) < 10f)
             {
-                float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
+                float damage = carn.AttackDamage * dt;
                 prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
                 self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
                 if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
                 return true;
             }
-
-            Plant? food = ecosystem.FindNearestPlantFor(self);
-            if (food != null && self.DistanceTo(food) < 12f)
-            {
-                float eaten = Math.Min(food.Energy, 8f * dt);
-                food.Energy -= eaten;
-                self.Energy = Math.Min(self.Energy + eaten * 1.5f, self.MaxEnergy);
-                if (food.Energy <= 0) food.Die(DeathCause.Predation);
-                return true;
-            }
-            return TryEatCarcass(self, ecosystem, dt);
         }
-        return false;
+        return TryEatCarcass(self, ecosystem, dt);
+    }
+
+    private static bool TryFeedNearbyOmnivore(Creature self, Ecosystem ecosystem, float dt)
+    {
+        Creature? prey = ecosystem.FindNearestPrey(self);
+        if (prey != null && self.DistanceTo(prey) < 10f)
+        {
+            float damage = (self is Omnivore om ? om.AttackDamage : 12f) * dt;
+            prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / 25f);
+            self.Energy = Math.Min(self.Energy + damage * 1.5f * (1f - prey.Toxicity * 0.5f), self.MaxEnergy);
+            if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
+            return true;
+        }
+
+        Plant? food = ecosystem.FindNearestPlantFor(self);
+        if (food != null && self.DistanceTo(food) < 12f)
+        {
+            float eaten = Math.Min(food.Energy, 8f * dt);
+            food.Energy -= eaten;
+            self.Energy = Math.Min(self.Energy + eaten * 1.5f, self.MaxEnergy);
+            if (food.Energy <= 0) food.Die(DeathCause.Predation);
+            return true;
+        }
+        return TryEatCarcass(self, ecosystem, dt);
     }
 
     internal static bool TryGraze(Creature self, World world, float dt)

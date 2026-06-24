@@ -203,7 +203,7 @@ public class Game1 : Game
                 if (gamepadBack)
                     _helpScreen.Hide();
                 _prevKbd = kbd;
-        _prevMouse = mouse;
+                _prevMouse = mouse;
                 base.Update(gameTime);
                 return;
             }
@@ -255,8 +255,8 @@ public class Game1 : Game
                             _screen = GameScreen.Playing;
                             _paused = false;
                             _controller.SetPause(false);
-    }
-}
+                        }
+                    }
                     catch (InvalidDataException ex)
                     {
                         Logger.Error($"Failed to load save: {ex.Message}");
@@ -595,7 +595,7 @@ public class Game1 : Game
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
         ResetWorldSessionState();
-        
+
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
         _minimap.LoadContent(GraphicsDevice);

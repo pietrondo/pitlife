@@ -82,9 +82,9 @@ public sealed class PixelWorldRenderer : IDisposable
                     return hash < t * 8f ? pixelColor : GetBiomeRenderColor(nb);
                 }
 
-                if (lx < 0.25f && tileX > 0)               pixelColor = BlendEdge(tileX - 1, tileY, lx / 0.25f);
+                if (lx < 0.25f && tileX > 0) pixelColor = BlendEdge(tileX - 1, tileY, lx / 0.25f);
                 else if (lx > 0.75f && tileX < _world.Width - 1) pixelColor = BlendEdge(tileX + 1, tileY, (1f - lx) / 0.25f);
-                if (ly < 0.25f && tileY > 0)               pixelColor = BlendEdge(tileX, tileY - 1, ly / 0.25f);
+                if (ly < 0.25f && tileY > 0) pixelColor = BlendEdge(tileX, tileY - 1, ly / 0.25f);
                 else if (ly > 0.75f && tileY < _world.Height - 1) pixelColor = BlendEdge(tileX, tileY + 1, (1f - ly) / 0.25f);
 
                 if (_world.RiverMask[idx])
