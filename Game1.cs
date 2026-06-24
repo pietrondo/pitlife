@@ -856,7 +856,7 @@ public class Game1 : Game
                     I18n.SetLanguage(lang.GetString() ?? "it");
             }
         }
-        catch { }
+        catch (Exception ex) { Logger.Error($"Failed to load settings: {ex.Message}"); }
     }
 
     private void SaveSettings()
@@ -866,13 +866,13 @@ public class Game1 : Game
             var settings = new { language = I18n.CurrentLanguage, fullscreen = _graphics.IsFullScreen };
             File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(settings));
         }
-        catch { }
+        catch (Exception ex) { Logger.Error($"Failed to save settings: {ex.Message}"); }
     }
 
     internal static void SaveLanguagePref()
     {
         try { File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(new { language = I18n.CurrentLanguage })); }
-        catch { }
+        catch (Exception ex) { Logger.Error($"Failed to save settings: {ex.Message}"); }
     }
 
     private void OnSpeciesCatalogChanged()
