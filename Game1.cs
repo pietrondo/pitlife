@@ -232,6 +232,7 @@ public class Game1 : Game
                     break;
                 case MenuAction.NewWorld:
                     _mainMenu.CloseWorldGenPanel();
+                    _mainMenu.GameInProgress = false;
                     _pendingWorldGen = true;
                     _pendingSeed = null;
                     _pendingOptions = _mainMenu.CurrentOptions;
@@ -239,6 +240,7 @@ public class Game1 : Game
                     break;
                 case MenuAction.NewWorldWithSeed:
                     _mainMenu.CloseWorldGenPanel();
+                    _mainMenu.GameInProgress = false;
                     _pendingWorldGen = true;
                     _pendingSeed = _mainMenu.Seed;
                     _pendingOptions = _mainMenu.CurrentOptions;
@@ -343,6 +345,7 @@ public class Game1 : Game
         if (escapePressed || gamepadBack)
         {
             _mainMenu.CloseWorldGenPanel();
+            _mainMenu.GameInProgress = true;
             _screen = GameScreen.MainMenu;
             _paused = true;
             _prevKbd = kbd;
@@ -379,6 +382,7 @@ public class Game1 : Game
         {
             _inGameUi.WantsToGoToMainMenu = false;
             _mainMenu.CloseWorldGenPanel();
+            _mainMenu.GameInProgress = true;
             _screen = GameScreen.MainMenu;
             _paused = true;
             _prevKbd = kbd;
