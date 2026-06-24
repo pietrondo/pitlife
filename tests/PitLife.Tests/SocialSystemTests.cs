@@ -226,5 +226,30 @@ public class SocialSystemTests
         Assert.True(t1.Energy < 49f);
         Assert.True(t2.Energy < 49f);
     }
+
+    [Fact]
+    public void ApplySolitaryBehavior_WeakAnimalsFlee()
+    {
+        var eco = new Ecosystem(200, 200, 42);
+
+        var g = new Genome { Size = 1.0f, Speed = 10.0f, VisionRange = 3.0f };
+        var t1 = new Carnivore(new Vector2(100, 100), g) { Species = "Tiger", Energy = 5f };
+        var t2 = new Carnivore(new Vector2(105, 100), g) { Species = "Tiger", Energy = 5f };
+
+        // Grow to adult because babies might not execute solitary combat logic.
+        t1.GrowFor(50f);
+        t2.GrowFor(50f);
+
+        eco.AddCreature(t1);
+        eco.AddCreature(t2);
+        eco.FlushPending();
+
+        eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
+
+        // If they fought, energy drops by >1f. So < 4f.
+        // If they flee, energy drops by ~0.3f. So energy > 4f.
+        Assert.True(t1.Energy > 4f, $"t1 Energy: {t1.Energy}");
+        Assert.True(t2.Energy > 4f, $"t2 Energy: {t2.Energy}");
+    }
 }
 

@@ -14,6 +14,7 @@ internal sealed class RiverSystem
 
     public void CarveRivers(int seed)
     {
+        Core.Logger.Debug($"Carving rivers with seed {seed}");
         var rng = new Random(seed);
         int riverThreshold = 3 + (int)(rng.NextDouble() * 8f);
         int W = _world.Width, H = _world.Height;
@@ -29,6 +30,8 @@ internal sealed class RiverSystem
                 float e = _world.ElevationField[idx];
                 int bestDir = -1;
                 float bestDrop = 0f;
+                int secondBestDir = -1;
+                float secondBestDrop = 0f;
                 for (int d = 0; d < 8; d++)
                 {
                     int nx = x + dx[d];
@@ -36,8 +39,23 @@ internal sealed class RiverSystem
                     if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
                     float ne = _world.ElevationField[ny * W + nx];
                     float drop = (e - ne) / dd[d];
-                    if (drop > bestDrop) { bestDrop = drop; bestDir = d; }
+                    if (drop > bestDrop)
+                    {
+                        secondBestDrop = bestDrop;
+                        secondBestDir = bestDir;
+                        bestDrop = drop;
+                        bestDir = d;
+                    }
+                    else if (drop > secondBestDrop)
+                    {
+                        secondBestDrop = drop;
+                        secondBestDir = d;
+                    }
                 }
+
+                if (rng.NextDouble() < 0.15f && secondBestDir != -1 && secondBestDrop > 0f)
+                    bestDir = secondBestDir;
+
                 flowDir[idx] = bestDir;
             }
 

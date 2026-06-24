@@ -34,6 +34,7 @@ public sealed class WeatherSystem
 
         float windDir = climate.WindDirection;
         float windSpeed = climate.WindSpeed;
+        windSpeed += MathF.Sin(climate.SeasonProgress * MathF.PI * 2f) * 0.5f;
 
         for (int i = _count - 1; i >= 0; i--)
         {

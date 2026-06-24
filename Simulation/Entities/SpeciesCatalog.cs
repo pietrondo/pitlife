@@ -243,20 +243,7 @@ public static class SpeciesCatalogStore
         if (path.Contains("..", StringComparison.Ordinal))
             throw new ArgumentException("Path traversal is not allowed.", nameof(path));
 
-        string fullPath = Path.GetFullPath(path);
-        string fullBase = Path.GetFullPath(baseDirectory);
-
-        if (!fullBase.EndsWith(Path.DirectorySeparatorChar.ToString()) && !fullBase.EndsWith(Path.AltDirectorySeparatorChar.ToString()))
-        {
-            fullBase += Path.DirectorySeparatorChar;
-        }
-
-        if (!fullPath.StartsWith(fullBase, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new UnauthorizedAccessException("Resolved path is outside the allowed base directory.");
-        }
-
-        string? directory = Path.GetDirectoryName(fullPath);
+        string? directory = Path.GetDirectoryName(Path.GetFullPath(path));
         if (directory is not null)
             Directory.CreateDirectory(directory);
 

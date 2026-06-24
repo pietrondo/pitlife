@@ -176,6 +176,14 @@ internal sealed class SocialModule : IBehaviorModule
             self.MoveAwayFrom(neighbor.Position, dt, world);
             self.Energy -= 3f * dt;
 
+            if (self.Energy < self.MaxEnergy * 0.3f)
+            {
+                self.MoveAwayFrom(neighbor.Position, dt * 2.0f, world);
+                if (ecosystem.Random.NextDouble() < 0.1 * dt)
+                    Core.Logger.Event("FLEE", $"{self.Species} fled from rival at ({self.Position.X:F0},{self.Position.Y:F0})");
+                return true;
+            }
+
             if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
             {
                 self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f) * (0.5f + self.Genome.Aggression);

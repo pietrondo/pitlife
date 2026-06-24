@@ -91,8 +91,9 @@ Mostra dati globali e locali in tempo reale:
 - **15 biomi**: DeepOcean, ShallowWater, Beach, Desert, Savanna, Grassland, Forest, DenseForest, Swamp, Tundra, Mountain, Snow, CoralReef, Cave, Volcano
 - **86+ specie** tra piante, erbivori, carnivori, onnivori, insetti e preistorici
 - **Ciclo giorno/notte** con 4 fasi e overlay visivo
-- **Stagioni orbitali**: orbita ellittica (e=0.12), perielio/afelio, gradiente latitudinale (equatore caldo, poli freddi)
+- **Stagioni orbitali**: orbita ellittica (e=0.12), perielio/afelio, gradiente latitudinale (equatore caldo, poli freddi, modello climatico sferoide oblato)
 - **Clima per-tile**: temperatura da orbita + latitudine + bioma, stress termico, eventi estremi
+- **Fiumi meandriformi**: generazione procedurale di fiumi con percorsi realistici e non lineari
 - **Overlay stagionale**: tinta semi-trasparente sulla mappa per stagione
 - **Cataclismi**: modificano visibilmente il terreno con recupero graduale
 - **Elevazione in metri**: da -700m (oceano profondo) a 4000m (picco montuoso)
@@ -132,6 +133,7 @@ Mostra dati globali e locali in tempo reale:
 - **Territorialità**: difesa del branco, home range
 - **Socialità**: branchi, stormi, banchi con flocking
 - **Difese**: statistiche di attacco/difesa basate sul genoma
+- **Fuga per bassa energia**: istinto di sopravvivenza dinamico per evitare combattimenti quando deboli
 
 ### UI
 - **Tema foresta**: palette verde/marrone con finestre draggable
