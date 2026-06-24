@@ -110,22 +110,65 @@ public sealed class MainMenu
         Layout(viewportWidth, viewportHeight);
         RefreshText(isFullscreen);
 
+        if (!IsInputReady(mouse, keyboard)) return MenuAction.None;
+        if (HandleEscapeKey(keyboard, previousKeyboard)) return MenuAction.None;
+
+        int prevFocused = _focusedIndex;
+        HandleKeyboardNavigation(keyboard, previousKeyboard);
+        HandleSeedInput(keyboard, previousKeyboard, mouse, previousMouse, prevFocused);
+        UpdateHoverStates(mouse);
+
+        if (_showOptions && Pressed(keyboard, previousKeyboard, Keys.Escape))
+        {
+            _showOptions = false;
+            _focusedIndex = 4; // Focus Options button in main menu
+            return MenuAction.None;
+        }
+
+        int activated = GetClickedButton(mouse, previousMouse);
+        if (IsActivatePressed(keyboard, previousKeyboard))
+            activated = _focusedIndex;
+
+        if (_showWorldGenPanel)
+        {
+            return UpdateWorldGenPanel(mouse, previousMouse, keyboard, previousKeyboard);
+        }
+
+        if (activated < 0)
+            return MenuAction.None;
+
+        if (_showOptions)
+        {
+            return HandleOptionsActivation(activated, isFullscreen);
+        }
+
+        return HandleMainMenuActivation(activated);
+    }
+
+    private bool IsInputReady(MouseState mouse, KeyboardState keyboard)
+    {
         if (!_inputReady)
         {
             _inputReady = keyboard.IsKeyUp(Keys.Enter) &&
                            keyboard.IsKeyUp(Keys.Space) &&
                            mouse.LeftButton == ButtonState.Released;
-            return MenuAction.None;
         }
+        return _inputReady;
+    }
 
+    private bool HandleEscapeKey(KeyboardState keyboard, KeyboardState previousKeyboard)
+    {
         if (_showWorldGenPanel && Pressed(keyboard, previousKeyboard, Keys.Escape))
         {
             _showWorldGenPanel = false;
-            return MenuAction.None;
+            return true;
         }
+        return false;
+    }
 
+    private void HandleKeyboardNavigation(KeyboardState keyboard, KeyboardState previousKeyboard)
+    {
         int totalElements = _showOptions ? 3 : 8;
-        int prevFocused = _focusedIndex;
 
         // Keyboard navigation
         if (Pressed(keyboard, previousKeyboard, Keys.Up))
@@ -147,7 +190,10 @@ public sealed class MainMenu
                 else if (_focusedIndex == 6) _focusedIndex = 5; // Help -> Options
             }
         }
+    }
 
+    private void HandleSeedInput(KeyboardState keyboard, KeyboardState previousKeyboard, MouseState mouse, MouseState previousMouse, int prevFocused)
+    {
         // Sync keyboard navigation to seed input focus
         if (!_showOptions && _focusedIndex != prevFocused)
         {
@@ -165,7 +211,10 @@ public sealed class MainMenu
         {
             _focusedIndex = 2;
         }
+    }
 
+    private void UpdateHoverStates(MouseState mouse)
+    {
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {
@@ -174,15 +223,12 @@ public sealed class MainMenu
                 _focusedIndex = _showOptions ? i : (i < 2 ? i : i + 1);
             }
         }
+    }
 
-        if (_showOptions && Pressed(keyboard, previousKeyboard, Keys.Escape))
-        {
-            _showOptions = false;
-            _focusedIndex = 4; // Focus Options button in main menu
-            return MenuAction.None;
-        }
-
+    private int GetClickedButton(MouseState mouse, MouseState previousMouse)
+    {
         int activated = -1;
+        UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {
             if (buttons[i].WasClicked(mouse, previousMouse))
@@ -190,57 +236,59 @@ public sealed class MainMenu
                 activated = _showOptions ? i : (i < 2 ? i : i + 1);
             }
         }
+        return activated;
+    }
 
+    private bool IsActivatePressed(KeyboardState keyboard, KeyboardState previousKeyboard)
+    {
         bool activatePressed = Pressed(keyboard, previousKeyboard, Keys.Enter);
         if (!(_seedInput.IsFocused && !_showOptions))
         {
             activatePressed = activatePressed || Pressed(keyboard, previousKeyboard, Keys.Space);
         }
+        return activatePressed;
+    }
 
-        if (_showWorldGenPanel)
+    private MenuAction UpdateWorldGenPanel(MouseState mouse, MouseState previousMouse, KeyboardState keyboard, KeyboardState previousKeyboard)
+    {
+        _continentInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
+        _seaLevelInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
+
+        if (_presetButton.WasClicked(mouse, previousMouse))
+            CyclePreset();
+        if (_islandSizeButton.WasClicked(mouse, previousMouse))
+            CycleIslandSize();
+        if (_mapSizeButton.WasClicked(mouse, previousMouse))
+            CycleMapSize();
+        if (_planetButton.WasClicked(mouse, previousMouse))
+            CyclePlanet();
+
+        if (_worldGenButtons[0].WasClicked(mouse, previousMouse))
         {
-            _continentInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
-            _seaLevelInput.Update(keyboard, previousKeyboard, mouse, previousMouse);
+            return Seed.HasValue ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld;
+        }
+        return MenuAction.None;
+    }
 
-            if (_presetButton.WasClicked(mouse, previousMouse))
-                CyclePreset();
-            if (_islandSizeButton.WasClicked(mouse, previousMouse))
-                CycleIslandSize();
-            if (_mapSizeButton.WasClicked(mouse, previousMouse))
-                CycleMapSize();
-            if (_planetButton.WasClicked(mouse, previousMouse))
-                CyclePlanet();
-
-            if (_worldGenButtons[0].WasClicked(mouse, previousMouse))
-            {
-                return Seed.HasValue ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld;
-            }
+    private MenuAction HandleOptionsActivation(int activated, bool isFullscreen)
+    {
+        if (activated == 0)
+            return MenuAction.ToggleFullscreen;
+        if (activated == 1)
+        {
+            I18n.SetLanguage(I18n.CurrentLanguage == "it" ? "en" : "it");
+            Game1.SaveLanguagePref();
+            RefreshText(isFullscreen);
             return MenuAction.None;
         }
 
-        if (activatePressed)
-            activated = _focusedIndex;
+        _showOptions = false;
+        _focusedIndex = 4;
+        return MenuAction.None;
+    }
 
-        if (activated < 0)
-            return MenuAction.None;
-
-        if (_showOptions)
-        {
-            if (activated == 0)
-                return MenuAction.ToggleFullscreen;
-            if (activated == 1)
-            {
-                I18n.SetLanguage(I18n.CurrentLanguage == "it" ? "en" : "it");
-                Game1.SaveLanguagePref();
-                RefreshText(isFullscreen);
-                return MenuAction.None;
-            }
-
-            _showOptions = false;
-            _focusedIndex = 4;
-            return MenuAction.None;
-        }
-
+    private MenuAction HandleMainMenuActivation(int activated)
+    {
         return activated switch
         {
             0 => MenuAction.StartGame,
@@ -254,6 +302,7 @@ public sealed class MainMenu
             _ => MenuAction.None
         };
     }
+
 
     public void Draw(
         SpriteBatch spriteBatch,
@@ -415,6 +464,7 @@ public sealed class MainMenu
             LayoutWorldGenPanel(viewportWidth, panelWidth);
             return;
         }
+
 
         int startY = _window.Bounds.Y + 60;
 

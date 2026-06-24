@@ -89,39 +89,44 @@ public sealed class DiseaseSystem : ISimulationSystem
 
         foreach (var carrier in infected)
         {
-            carrier.DiseaseTimer -= dt;
-            carrier.Energy -= _activeDisease.EnergyDrain * dt;
+            ProcessCarrier(ecosystem, carrier, dt, rng);
+        }
+    }
 
-            if (carrier.Energy <= 0)
-            {
-                carrier.Die(DeathCause.Starvation);
-                continue;
-            }
+    private void ProcessCarrier(Ecosystem ecosystem, Creature carrier, float dt, Random rng)
+    {
+        carrier.DiseaseTimer -= dt;
+        carrier.Energy -= _activeDisease.EnergyDrain * dt;
 
-            if (carrier.DiseaseTimer <= 0)
-            {
-                carrier.IsInfected = false;
-                carrier.DiseaseName = "";
-                carrier.Immunity = Math.Min(1f, carrier.Immunity + 0.3f);
-                Logger.Event("DISEASE", $"{carrier.Species} recovered from {_activeDisease.Name} at T={ecosystem.TotalTime:F1}s");
-                continue;
-            }
+        if (carrier.Energy <= 0)
+        {
+            carrier.Die(DeathCause.Starvation);
+            return;
+        }
 
-            float transmissionChance = _activeDisease.TransmissionRate * dt;
-            if (rng.NextDouble() < transmissionChance)
+        if (carrier.DiseaseTimer <= 0)
+        {
+            carrier.IsInfected = false;
+            carrier.DiseaseName = "";
+            carrier.Immunity = Math.Min(1f, carrier.Immunity + 0.3f);
+            Logger.Event("DISEASE", $"{carrier.Species} recovered from {_activeDisease.Name} at T={ecosystem.TotalTime:F1}s");
+            return;
+        }
+
+        float transmissionChance = _activeDisease.TransmissionRate * dt;
+        if (rng.NextDouble() >= transmissionChance) return;
+
+        var neighbors = ecosystem.FindNeighbors(carrier, 30f,
+            n => n.IsAlive && !n.IsInfected && n.CreatureType != CreatureType.Plant
+                 && n.Species == carrier.Species);
+
+        foreach (var n in neighbors)
+        {
+            if (rng.NextDouble() < (1f - n.Immunity))
             {
-                var neighbors = ecosystem.FindNeighbors(carrier, 30f,
-                    n => n.IsAlive && !n.IsInfected && n.CreatureType != CreatureType.Plant
-                         && n.Species == carrier.Species);
-                foreach (var n in neighbors)
-                {
-                    if (rng.NextDouble() < (1f - n.Immunity))
-                    {
-                        n.IsInfected = true;
-                        n.DiseaseTimer = _activeDisease.RecoveryTime;
-                        n.DiseaseName = _activeDisease.Name;
-                    }
-                }
+                n.IsInfected = true;
+                n.DiseaseTimer = _activeDisease.RecoveryTime;
+                n.DiseaseName = _activeDisease.Name;
             }
         }
     }

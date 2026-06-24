@@ -78,17 +78,17 @@ internal sealed class SpatialGrid
         {
             for (int x = minCellX; x <= maxCellX; x++)
             {
-                if (_buckets.TryGetValue((x, y), out var bucket))
-                {
-                    foreach (var candidate in bucket)
-                    {
-                        if (candidate == seeker || !candidate.IsAlive || !predicate(candidate))
-                            continue;
+                if (!_buckets.TryGetValue((x, y), out var bucket))
+                    continue;
 
-                        if (Vector2.DistanceSquared(position, candidate.Position) <= radiusSquared)
-                        {
-                            results.Add(candidate);
-                        }
+                foreach (var candidate in bucket)
+                {
+                    if (candidate == seeker || !candidate.IsAlive || !predicate(candidate))
+                        continue;
+
+                    if (Vector2.DistanceSquared(position, candidate.Position) <= radiusSquared)
+                    {
+                        results.Add(candidate);
                     }
                 }
             }
