@@ -35,6 +35,7 @@ public class Game1 : Game
     private WaterEffect _waterEffect = null!;
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
+    private readonly SpeciesCyclopedia _cyclopedia = new();
     private float _currentFPS;
     private float _frametimeMS;
     private int _frameCount;
@@ -288,12 +289,28 @@ public class Game1 : Game
 
         if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
             _showDebugOverlay = !_showDebugOverlay;
+        if (kbd.IsKeyDown(Keys.F5) && _prevKbd.IsKeyUp(Keys.F5))
+            _cyclopedia.Toggle(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
             _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
         {
             _speciesEditor.Toggle();
-            if (_speciesEditor.IsOpen)
+        if (_cyclopedia.IsOpen)
+        {
+            if (escapePressed)
+                _cyclopedia.Close();
+            else
+                _cyclopedia.Update(mouse, _prevMouse, kbd, _prevKbd,
+                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return;
+        }
+
+        if (_speciesEditor.IsOpen)
             {
                 _inGameUi.CloseAllWindows();
                 if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
@@ -788,6 +805,7 @@ public class Game1 : Game
             Mouse.GetState(),
             GraphicsDevice.Viewport.Width,
             GraphicsDevice.Viewport.Height);
+        _cyclopedia.Draw(_spriteBatch, _uiPixel, _font);
         _spriteBatch.End();
 
         base.Draw(gameTime);
