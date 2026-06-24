@@ -25,6 +25,16 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+
+      - name: Install Fonts (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip" -OutFile "dejavu.zip"
+          Expand-Archive "dejavu.zip" -DestinationPath "dejavu"
+          $fonts = (New-Object -ComObject Shell.Application).Namespace(0x14)
+          Get-ChildItem -Path "dejavu\\dejavu-fonts-ttf-2.37\\ttf" -Filter "*.ttf" | ForEach-Object { $fonts.CopyHere($_.FullName, 0x10) }
+        shell: powershell
+
       - name: Restore dependencies
         run: dotnet restore
 
