@@ -696,14 +696,16 @@ public class Game1 : Game
         _ => Color.White
     };
 
-    private static Color GetSeasonColor(Season season) => season switch
+    private static readonly Dictionary<Season, Color> _seasonColors = new()
     {
-        Season.Spring => new Color(140, 220, 100),
-        Season.Summer => new Color(255, 200, 60),
-        Season.Autumn => new Color(220, 140, 40),
-        Season.Winter => new Color(160, 200, 240),
-        _ => Color.White
+        { Season.Spring, new Color(140, 220, 100) },
+        { Season.Summer, new Color(255, 200, 60) },
+        { Season.Autumn, new Color(220, 140, 40) },
+        { Season.Winter, new Color(160, 200, 240) }
     };
+
+    private static Color GetSeasonColor(Season season) =>
+        _seasonColors.TryGetValue(season, out var color) ? color : Color.White;
 
     protected override void Draw(GameTime gameTime)
     {
@@ -854,7 +856,7 @@ public class Game1 : Game
                     I18n.SetLanguage(lang.GetString() ?? "it");
             }
         }
-        catch { }
+        catch (Exception ex) { Logger.Error($"Failed to load settings: {ex.Message}"); }
     }
 
     private void SaveSettings()
@@ -864,13 +866,13 @@ public class Game1 : Game
             var settings = new { language = I18n.CurrentLanguage, fullscreen = _graphics.IsFullScreen };
             File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(settings));
         }
-        catch { }
+        catch (Exception ex) { Logger.Error($"Failed to save settings: {ex.Message}"); }
     }
 
     internal static void SaveLanguagePref()
     {
         try { File.WriteAllText("settings.json", System.Text.Json.JsonSerializer.Serialize(new { language = I18n.CurrentLanguage })); }
-        catch { }
+        catch (Exception ex) { Logger.Error($"Failed to save settings: {ex.Message}"); }
     }
 
     private void OnSpeciesCatalogChanged()

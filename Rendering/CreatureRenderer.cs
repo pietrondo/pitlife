@@ -86,16 +86,6 @@ public class CreatureRenderer
         Rectangle visible = camera.VisibleArea;
         var creatures = _ecosystem.Creatures;
 
-        Color ApplyOverlay(Color original)
-        {
-            if (dayNightOverlay.HasValue && dayNightOverlay.Value.A > 0)
-            {
-                float alpha = dayNightOverlay.Value.A / 255f;
-                return Color.Lerp(original, new Color(dayNightOverlay.Value.R, dayNightOverlay.Value.G, dayNightOverlay.Value.B, (byte)255), alpha);
-            }
-            return original;
-        }
-
         for (int i = 0; i < creatures.Count; i++)
         {
             Creature? c = null;
@@ -113,74 +103,113 @@ public class CreatureRenderer
                     py < visible.Y - 64 || py > visible.Y + visible.Height + 64)
                     continue;
 
-                float size = c.CreatureType == CreatureType.Plant
-                    ? 18f * c.Genome.Size
-                    : 28f * c.Genome.Size;
-                if (c.IsBaby) size *= 0.6f;
+                float size = CalculateSize(c);
                 int s = Math.Max(6, (int)size);
                 Rectangle dest = new((int)(px - s / 2), (int)(py - s / 2), s, s);
 
-                Texture2D? tex;
-                if (_genderedSpeciesTextures.TryGetValue(c.Species, out var gendered))
-                    tex = c.Gender == Gender.Male ? gendered.Male : gendered.Female;
-                else if (_speciesTextures.TryGetValue(c.Species, out var st))
-                    tex = st;
-                else
-                    tex = c.CreatureType switch
-                    {
-                        CreatureType.Plant => _plantTexture,
-                        CreatureType.Herbivore => _herbivoreTexture,
-                        CreatureType.Carnivore => _carnivoreTexture,
-                        CreatureType.Omnivore => _omnivoreTexture,
-                        _ => null
-                    };
+                Texture2D? tex = GetCreatureTexture(c);
 
                 if (tex != null)
                 {
-                    Color tint = c.CreatureType == CreatureType.Plant
-                        ? new Color(c.Genome.Color.R, (byte)Math.Min(255, c.Genome.Color.G * 1.3f), c.Genome.Color.B)
-                        : c.Genome.Color;
-                    tint = ApplyOverlay(tint);
-                    sb.Draw(tex, dest, null, tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
-                    if (font != null && c.IsSleeping)
-                        sb.DrawString(font, "z", new Vector2(dest.Right - 4, dest.Top - 8), Color.LightBlue);
+                    DrawCreatureWithTexture(sb, c, dest, tex, dayNightOverlay, font);
                 }
                 else
                 {
-                    Color bodyColor = ApplyOverlay(c.Genome.Color);
-                    sb.Draw(_pixelTexture, dest, bodyColor * 0.9f);
-
-                    Vector2 dir = c.Facing;
-                    if (dir.LengthSquared() > 0.01f)
-                    {
-                        dir.Normalize();
-                        float eyeOffset = size * 0.3f;
-                        int eyeSize = Math.Max(2, s / 4);
-                        sb.Draw(_pixelTexture, new Rectangle(
-                            (int)(px + dir.X * eyeOffset - dir.Y * eyeOffset / 2 - eyeSize / 2),
-                            (int)(py + dir.Y * eyeOffset + dir.X * eyeOffset / 2 - eyeSize / 2),
-                            eyeSize, eyeSize), Color.White);
-                        sb.Draw(_pixelTexture, new Rectangle(
-                            (int)(px + dir.X * eyeOffset + dir.Y * eyeOffset / 2 - eyeSize / 2),
-                            (int)(py + dir.Y * eyeOffset - dir.X * eyeOffset / 2 - eyeSize / 2),
-                            eyeSize, eyeSize), Color.White);
-                    }
+                    DrawCreatureFallback(sb, c, px, py, size, s, dest, dayNightOverlay);
                 }
 
-                // Gender icon
-                if (c.Gender != Gender.None && _pixelTexture != null)
-                {
-                    Color genderColor = GetGenderIndicatorColor(c.Gender)!.Value;
-                    genderColor = ApplyOverlay(genderColor);
-                    int dot = Math.Max(2, s / 6);
-                    int yOff = s / 2 + 2;
-                    sb.Draw(_pixelTexture, new Rectangle((int)px - dot / 2, (int)py + yOff, dot, dot), genderColor);
-                }
+                DrawGenderIcon(sb, c, px, py, s, dayNightOverlay);
             }
             catch (Exception ex)
             {
                 if (c != null && _reportedRenderFailures.Add(c))
                     Console.Error.WriteLine($"Creature render failed for {c.Species}: {ex.Message}");
+            }
+        }
+    }
+
+    private Color ApplyOverlay(Color original, Color? dayNightOverlay)
+    {
+        if (dayNightOverlay.HasValue && dayNightOverlay.Value.A > 0)
+        {
+            float alpha = dayNightOverlay.Value.A / 255f;
+            return Color.Lerp(original, new Color(dayNightOverlay.Value.R, dayNightOverlay.Value.G, dayNightOverlay.Value.B, (byte)255), alpha);
+        }
+        return original;
+    }
+
+    private float CalculateSize(Creature c)
+    {
+        float size = c.CreatureType == CreatureType.Plant
+            ? 18f * c.Genome.Size
+            : 28f * c.Genome.Size;
+        if (c.IsBaby) size *= 0.6f;
+        return size;
+    }
+
+    private Texture2D? GetCreatureTexture(Creature c)
+    {
+        if (_genderedSpeciesTextures.TryGetValue(c.Species, out var gendered))
+            return c.Gender == Gender.Male ? gendered.Male : gendered.Female;
+        else if (_speciesTextures.TryGetValue(c.Species, out var st))
+            return st;
+        else
+            return c.CreatureType switch
+            {
+                CreatureType.Plant => _plantTexture,
+                CreatureType.Herbivore => _herbivoreTexture,
+                CreatureType.Carnivore => _carnivoreTexture,
+                CreatureType.Omnivore => _omnivoreTexture,
+                _ => null
+            };
+    }
+
+    private void DrawCreatureWithTexture(SpriteBatch sb, Creature c, Rectangle dest, Texture2D tex, Color? dayNightOverlay, SpriteFont? font)
+    {
+        Color tint = c.CreatureType == CreatureType.Plant
+            ? new Color(c.Genome.Color.R, (byte)Math.Min(255, c.Genome.Color.G * 1.3f), c.Genome.Color.B)
+            : c.Genome.Color;
+        tint = ApplyOverlay(tint, dayNightOverlay);
+        sb.Draw(tex, dest, null, tint, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+        if (font != null && c.IsSleeping)
+            sb.DrawString(font, "z", new Vector2(dest.Right - 4, dest.Top - 8), Color.LightBlue);
+    }
+
+    private void DrawCreatureFallback(SpriteBatch sb, Creature c, float px, float py, float size, int s, Rectangle dest, Color? dayNightOverlay)
+    {
+        if (_pixelTexture == null) return;
+
+        Color bodyColor = ApplyOverlay(c.Genome.Color, dayNightOverlay);
+        sb.Draw(_pixelTexture, dest, bodyColor * 0.9f);
+
+        Vector2 dir = c.Facing;
+        if (dir.LengthSquared() > 0.01f)
+        {
+            dir.Normalize();
+            float eyeOffset = size * 0.3f;
+            int eyeSize = Math.Max(2, s / 4);
+            sb.Draw(_pixelTexture, new Rectangle(
+                (int)(px + dir.X * eyeOffset - dir.Y * eyeOffset / 2 - eyeSize / 2),
+                (int)(py + dir.Y * eyeOffset + dir.X * eyeOffset / 2 - eyeSize / 2),
+                eyeSize, eyeSize), Color.White);
+            sb.Draw(_pixelTexture, new Rectangle(
+                (int)(px + dir.X * eyeOffset + dir.Y * eyeOffset / 2 - eyeSize / 2),
+                (int)(py + dir.Y * eyeOffset - dir.X * eyeOffset / 2 - eyeSize / 2),
+                eyeSize, eyeSize), Color.White);
+        }
+    }
+
+    private void DrawGenderIcon(SpriteBatch sb, Creature c, float px, float py, int s, Color? dayNightOverlay)
+    {
+        if (c.Gender != Gender.None && _pixelTexture != null)
+        {
+            Color? maybeGenderColor = GetGenderIndicatorColor(c.Gender);
+            if (maybeGenderColor.HasValue)
+            {
+                Color genderColor = ApplyOverlay(maybeGenderColor.Value, dayNightOverlay);
+                int dot = Math.Max(2, s / 6);
+                int yOff = s / 2 + 2;
+                sb.Draw(_pixelTexture, new Rectangle((int)px - dot / 2, (int)py + yOff, dot, dot), genderColor);
             }
         }
     }
