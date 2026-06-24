@@ -41,6 +41,10 @@ public sealed class UiButton
         Vector2 position = new(
             Bounds.Center.X - size.X / 2f,
             Bounds.Center.Y - size.Y / 2f);
+
+        if (hovered && mouse.LeftButton == ButtonState.Pressed)
+            position.Y += 2f;
+
         spriteBatch.DrawString(font, Text, position, UiTheme.WarmParchment, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
     }
 }

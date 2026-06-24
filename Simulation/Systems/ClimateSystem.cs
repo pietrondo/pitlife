@@ -137,6 +137,8 @@ public sealed class ClimateSystem : ISimulationSystem
                 GrassRegenModifier *= 0.5f;
             }
 
+            Core.Logger.Debug($"Triggered extreme event {ExtremeEventName}");
+
             Logger.Event("CLIMATE", $"Extreme event '{ExtremeEventName}' started at T={totalTime:F1}s, duration={_extremeEventDuration:F1}s");
         }
     }
@@ -145,7 +147,9 @@ public sealed class ClimateSystem : ISimulationSystem
     {
         float normalizedY = tileY / Math.Max(1, worldHeight - 1);
         float latitude = (normalizedY - 0.5f) * MathF.PI;
-        return MathF.Cos(latitude);
+        float flattening = 1.0f / 298.257f;
+        float eccentricLat = MathF.Atan((1.0f - flattening) * MathF.Tan(latitude));
+        return MathF.Cos(eccentricLat);
     }
 
     public Season GetLocalSeason(float tileY, int worldHeight)

@@ -305,6 +305,7 @@ public sealed class CataclysmSystem : ISimulationSystem
         Logger.Event("CATACLYSM", $"{ActiveEvent} started at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
     }
 
+
     public void Draw(SpriteBatch sb, Texture2D pixel)
     {
         if (!IsActive || ImpactRadius <= 0) return;

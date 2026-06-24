@@ -101,4 +101,18 @@ public class ClimateSystemTests
             Assert.InRange(climate.SeasonProgress, 0f, 1f);
         }
     }
+
+    [Fact]
+    public void TestOblateSpheroidLatitude()
+    {
+        var climate = new ClimateSystem();
+        // Compare latitude modifier to a standard spherical approach to ensure it applies flattening
+        float sphericalLatitude = (100f / 199f - 0.5f) * System.MathF.PI;
+        float sphericalCos = System.MathF.Cos(sphericalLatitude);
+
+        float modifier = climate.GetLatitudeModifier(100f, 200);
+        // Because of the oblate flattening, the eccentric latitude is slightly different from the pure spherical one
+        // meaning the cosine should not be perfectly equal to the unflattened cosine (except at poles/equator).
+        Assert.NotEqual(sphericalCos, modifier, 7);
+    }
 }
