@@ -31,12 +31,12 @@ public abstract class Creature
         if (def == null || !def.Hibernates) return;
         var tile = ecosystem.World.GetTileAtPosition(Position.X, Position.Y);
         float temp = ecosystem.Climate.GetTileTemperature(tile, Position.Y / ecosystem.World.TileSize, ecosystem.World.Height);
-        if (temp < 5f && !Hibernating)
+        if (temp < BalanceConfig.Data.Hibernation.EnterTemperature && !Hibernating)
         {
             Hibernating = true;
             Logger.Event("HIBERNATE", $"{Species} entered hibernation at ({Position.X:F0},{Position.Y:F0}) T={temp:F0}°C");
         }
-        else if (temp > 12f && Hibernating)
+        else if (temp > BalanceConfig.Data.Hibernation.WakeTemperature && Hibernating)
         {
             Hibernating = false;
             Logger.Event("HIBERNATE", $"{Species} woke from hibernation at ({Position.X:F0},{Position.Y:F0}) T={temp:F0}°C");
@@ -48,20 +48,20 @@ public abstract class Creature
         "Bear", "Raccoon", "Badger", "Snake", "Turtle", "PoisonFrog",
         "Beetle", "Ant", "Lizard", "Crocodile"
     };
-    public float NutritionalValue => Genome.Size * 5f * (1f - Toxicity * 0.7f);
+    public float NutritionalValue => Genome.Size * BalanceConfig.Data.Creature.NutritionalValueSizeMultiplier * (1f - Toxicity * BalanceConfig.Data.Creature.NutritionalValueToxicityRatio);
     public bool IsSleeping { get; private set; }
     public float LastReproductionTime { get; set; } = -60f;
-    public int LitterSize => Math.Max(1, (int)(Genome.Size * 1.5f));
-    public float ReproductionCooldown => 30f + (1f - Genome.Metabolism) * 30f;
-    public float Defense => Genome.Size * 5f + Genome.Metabolism * 3f;
-    public float AttackPower => Genome.Speed * 4f + Genome.Size * 2f;
+    public int LitterSize => Math.Max(1, (int)(Genome.Size * BalanceConfig.Data.Creature.LitterSizeMultiplier));
+    public float ReproductionCooldown => BalanceConfig.Data.Creature.ReproductionCooldownBase + (1f - Genome.Metabolism) * BalanceConfig.Data.Creature.ReproductionCooldownMetabolismFactor;
+    public float Defense => Genome.Size * BalanceConfig.Data.Creature.DefenseSizeMultiplier + Genome.Metabolism * BalanceConfig.Data.Creature.DefenseMetabolismMultiplier;
+    public float AttackPower => Genome.Speed * BalanceConfig.Data.Creature.AttackSpeedMultiplier + Genome.Size * BalanceConfig.Data.Creature.AttackSizeMultiplier;
     public string Subspecies { get; set; } = "";
 
     // Memory
     public List<Vector2> RememberedFood { get; } = new();
     public List<Vector2> RememberedDanger { get; } = new();
-    private const int MaxMemories = 5;
-    private const float MemoryDecayChance = 0.001f;
+    private static int MaxMemories => BalanceConfig.Data.Creature.MaxMemories;
+    private static float MemoryDecayChance => BalanceConfig.Data.Creature.MemoryDecayChance;
 
     public void RememberFood(Vector2 pos)
     {
@@ -77,7 +77,7 @@ public abstract class Creature
 
     public void DecayMemories(Random rng)
     {
-        float decayRate = 0.002f * (1f - Genome.MemorySpan * 0.8f);
+        float decayRate = BalanceConfig.Data.Creature.MemoryDecayRateBase * (1f - Genome.MemorySpan * BalanceConfig.Data.Creature.MemoryDecayMemorySpanFactor);
         if (rng.NextDouble() < decayRate && RememberedFood.Count > 0)
             RememberedFood.RemoveAt(rng.Next(RememberedFood.Count));
         if (rng.NextDouble() < decayRate && RememberedDanger.Count > 0)
@@ -114,18 +114,18 @@ public abstract class Creature
     public Gender Gender { get; set; } = Gender.None;
     public LineageRecord Lineage { get; private set; } = LineageRecord.Founder();
     public float InbreedingCoefficient { get; private set; }
-    public float GeneticFitness => MathHelper.Clamp(1f - InbreedingCoefficient * 0.5f, 0.5f, 1f);
+    public float GeneticFitness => MathHelper.Clamp(1f - InbreedingCoefficient * BalanceConfig.Data.Inbreeding.CoefficientImpact, BalanceConfig.Data.Inbreeding.MinFitness, 1f);
     public float MaturityAge => SpeciesRegistry.Get(Species)?.MaturityAge ?? 30f;
     public LifeStage LifeStage => Age >= MaturityAge ? LifeStage.Adult : LifeStage.Infant;
     public bool IsAdult => LifeStage == LifeStage.Adult;
     public bool IsBaby => LifeStage == LifeStage.Infant;
-    public float MaxEnergy => 50f * Genome.Size * GeneticFitness;
-    public float EnergyConsumption => Genome.Metabolism * 0.5f * Genome.Size;
+    public float MaxEnergy => BalanceConfig.Data.Creature.MaxEnergyBaseMultiplier * Genome.Size * GeneticFitness;
+    public float EnergyConsumption => Genome.Metabolism * BalanceConfig.Data.Creature.EnergyConsumptionBaseMultiplier * Genome.Size;
     public float CurrentSpeedMultiplier { get; protected set; } = 1f;
     public float CurrentEnergyMultiplier { get; protected set; } = 1f;
-    public float Speed => Genome.Speed * 30f * CurrentSpeedMultiplier * GeneticFitness * (IsBaby ? 0.5f : 1f);
-    public float VisionPixels => Genome.VisionRange * 32f * (IsBaby ? 0.5f : 1f);
-    public float ReproductionThreshold => MaxEnergy * 0.7f;
+    public float Speed => Genome.Speed * BalanceConfig.Data.Creature.SpeedBase * CurrentSpeedMultiplier * GeneticFitness * (IsBaby ? BalanceConfig.Data.Movement.InfantSpeedMultiplier : 1f);
+    public float VisionPixels => Genome.VisionRange * BalanceConfig.Data.Creature.VisionRangeBase * (IsBaby ? BalanceConfig.Data.Movement.InfantSpeedMultiplier : 1f);
+    public float ReproductionThreshold => MaxEnergy * BalanceConfig.Data.Creature.ReproductionThresholdRatio;
     public virtual bool IsAquatic => false;
 
     public Vector2 Facing { get; set; } = new(0, 1);
@@ -134,15 +134,15 @@ public abstract class Creature
     public Creature? Parent { get; set; }
     public Vector2 HomePosition { get; set; }
     public float Thirst { get; set; }
-    private const float MaxThirst = 100f;
-    private const float WaypointReachedDistance = 14f;
+    private static float MaxThirst => BalanceConfig.Data.Thirst.MaxThirst;
+    private static float WaypointReachedDistance => BalanceConfig.Data.Movement.WaypointReachedDistance;
 
     protected Creature(Vector2 position, Genome genome, CreatureType type)
     {
         Position = ClampToWorld(position);
         HomePosition = Position;
         Genome = genome;
-        Energy = MaxEnergy * 0.5f;
+        Energy = MaxEnergy * BalanceConfig.Data.Creature.InitialEnergyRatio;
         CreatureType = type;
         Diet = type switch
         {
@@ -171,7 +171,7 @@ public abstract class Creature
 
         if (Hibernating)
         {
-            dt *= 0.05f;
+            dt *= BalanceConfig.Data.Hibernation.TimeMultiplier;
             active = false;
         }
 
@@ -182,19 +182,19 @@ public abstract class Creature
         }
         else
         {
-            dt *= 0.3f;
+            dt *= BalanceConfig.Data.Sleep.TimeMultiplier;
         }
 
         ApplyClimateAndPopulationPressure(ecosystem);
         ConsumeEnergy(dt);
 
-        float thirstRate = 2f + CurrentEnergyMultiplier * 4f;
+        float thirstRate = BalanceConfig.Data.Thirst.BaseRate + CurrentEnergyMultiplier * BalanceConfig.Data.Thirst.EnergyMultiplierRate;
         if (CreatureType == CreatureType.Plant) thirstRate = 0f;
         Thirst = Math.Min(MaxThirst, Thirst + thirstRate * dt);
-        if (Thirst >= MaxThirst * 0.9f)
-            Energy -= EnergyConsumption * 3f * dt;
+        if (Thirst >= MaxThirst * BalanceConfig.Data.Thirst.PenaltyThresholdRatio)
+            Energy -= EnergyConsumption * BalanceConfig.Data.Thirst.EnergyDrainMultiplier * dt;
 
-        if (Energy <= 0 || Age > 300f)
+        if (Energy <= 0 || Age > BalanceConfig.Data.Creature.MaxAge)
         {
             Die(Energy <= 0 ? DeathCause.Starvation : DeathCause.OldAge);
             return;
@@ -206,8 +206,8 @@ public abstract class Creature
     public void ApplyWindDrift(float windDir, float windSpeed, float dt, World world)
     {
         if (CreatureType == CreatureType.Plant) return;
-        float drift = windSpeed * 6f * dt;
-        if (IsAquatic) drift *= 0.3f;
+        float drift = windSpeed * BalanceConfig.Data.Wind.DriftSpeedLand * dt;
+        if (IsAquatic) drift *= BalanceConfig.Data.Wind.DriftSpeedAquaticMultiplier;
         Vector2 push = new Vector2(MathF.Cos(windDir) * drift, MathF.Sin(windDir) * drift);
         Vector2 newPos = ClampToWorld(Position + push, world);
         if (world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))

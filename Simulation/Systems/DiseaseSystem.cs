@@ -17,15 +17,29 @@ public sealed class DiseaseSystem : ISimulationSystem
         public float EnergyDrain { get; init; }
     }
 
-    public static readonly DiseaseDef[] Presets =
-    [
-        new() { Name = "Fever", TransmissionRate = 0.15f, Lethality = 0.1f, RecoveryTime = 30f, EnergyDrain = 2f },
-        new() { Name = "Plague", TransmissionRate = 0.3f, Lethality = 0.3f, RecoveryTime = 45f, EnergyDrain = 4f },
-        new() { Name = "Parasite", TransmissionRate = 0.1f, Lethality = 0.05f, RecoveryTime = 60f, EnergyDrain = 1f }
-    ];
+    public static readonly DiseaseDef[] Presets = LoadPresets();
+
+    private static DiseaseDef[] LoadPresets()
+    {
+        var entries = DiseaseConfig.Diseases;
+        var result = new DiseaseDef[entries.Count];
+        for (int i = 0; i < entries.Count; i++)
+        {
+            var e = entries[i];
+            result[i] = new DiseaseDef
+            {
+                Name = e.Name,
+                TransmissionRate = e.TransmissionRate,
+                Lethality = e.Lethality,
+                RecoveryTime = e.RecoveryTime,
+                EnergyDrain = e.EnergyDrain
+            };
+        }
+        return result;
+    }
 
     private DiseaseDef _activeDisease;
-    private float _outbreakTimer = 60f;
+    private float _outbreakTimer = DiseaseConfig.Outbreak.InitialTimerSeconds;
     private bool _hasOutbreak;
 
     public bool HasOutbreak => _hasOutbreak;
@@ -34,7 +48,7 @@ public sealed class DiseaseSystem : ISimulationSystem
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed, eco.Random);
 
     public void Initialize(World world) { }
-    public void Reset() { _hasOutbreak = false; _outbreakTimer = 60f; }
+    public void Reset() { _hasOutbreak = false; _outbreakTimer = DiseaseConfig.Outbreak.InitialTimerSeconds; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)
     {
@@ -45,7 +59,7 @@ public sealed class DiseaseSystem : ISimulationSystem
         }
 
         _outbreakTimer -= dt;
-        if (_outbreakTimer <= 0 && ecosystem.Creatures.Count > 10)
+        if (_outbreakTimer <= 0 && ecosystem.Creatures.Count > DiseaseConfig.Outbreak.MinCreatures)
         {
             _activeDisease = Presets[rng.Next(Presets.Length)];
             var candidates = new List<Creature>();

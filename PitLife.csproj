@@ -32,6 +32,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\config\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Content\config\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="PitLife.Tests" />
   </ItemGroup>
 </Project>

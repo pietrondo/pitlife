@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "creature": {
+    "maxAge": 300,
+    "initialEnergyRatio": 0.5,
+    "maxEnergyBaseMultiplier": 50,
+    "energyConsumptionBaseMultiplier": 0.5,
+    "speedBase": 30,
+    "visionRangeBase": 32,
+    "reproductionThresholdRatio": 0.7,
+    "litterSizeMultiplier": 1.5,
+    "reproductionCooldownBase": 30,
+    "reproductionCooldownMetabolismFactor": 30,
+    "defenseSizeMultiplier": 5,
+    "defenseMetabolismMultiplier": 3,
+    "attackSpeedMultiplier": 4,
+    "attackSizeMultiplier": 2,
+    "nutritionalValueSizeMultiplier": 5,
+    "nutritionalValueToxicityRatio": 0.7,
+    "maxMemories": 5,
+    "memoryDecayChance": 0.001,
+    "memoryDecayRateBase": 0.002,
+    "memoryDecayMemorySpanFactor": 0.8
+  },
+  "thirst": {
+    "maxThirst": 100,
+    "baseRate": 2,
+    "energyMultiplierRate": 4,
+    "penaltyThresholdRatio": 0.9,
+    "energyDrainMultiplier": 3
+  },
+  "hibernation": {
+    "enterTemperature": 5,
+    "wakeTemperature": 12,
+    "timeMultiplier": 0.05
+  },
+  "sleep": {
+    "timeMultiplier": 0.3
+  },
+  "wind": {
+    "driftSpeedLand": 6,
+    "driftSpeedAquaticMultiplier": 0.3
+  },
+  "movement": {
+    "waypointReachedDistance": 14,
+    "infantSpeedMultiplier": 0.5
+  },
+  "inbreeding": {
+    "coefficientImpact": 0.5,
+    "minFitness": 0.5
+  }
+}

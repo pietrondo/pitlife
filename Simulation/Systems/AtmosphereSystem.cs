@@ -1,35 +1,30 @@
 using System;
 using Microsoft.Xna.Framework;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
 public sealed class AtmosphereSystem : ISimulationSystem
 {
     public SimulationPhase Phase => SimulationPhase.Update;
-    public float Oxygen { get; private set; } = 50f;
-    public float CO2 { get; private set; } = 30f;
-    public float OxygenModifier => MathHelper.Clamp(Oxygen / 50f, 0.3f, 2f);
-    public float CO2Modifier => MathHelper.Clamp(CO2 / 30f, 0.5f, 2f);
-
-    private const float MaxLevel = 100f;
-    private const float O2PerPlant = 0.003f;
-    private const float O2PerAnimal = 0.002f;
-    private const float CO2PerAnimal = 0.001f;
-    private const float CO2DecayRate = 0.01f;
+    public float Oxygen { get; private set; } = AtmosphereConfig.Data.InitialOxygen;
+    public float CO2 { get; private set; } = AtmosphereConfig.Data.InitialCO2;
+    public float OxygenModifier => MathHelper.Clamp(Oxygen / AtmosphereConfig.Data.OxygenModifierBase, AtmosphereConfig.Data.OxygenModifierMin, AtmosphereConfig.Data.OxygenModifierMax);
+    public float CO2Modifier => MathHelper.Clamp(CO2 / AtmosphereConfig.Data.Co2ModifierBase, AtmosphereConfig.Data.Co2ModifierMin, AtmosphereConfig.Data.Co2ModifierMax);
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco.PlantCount, eco.HerbivoreCount + eco.CarnivoreCount + eco.OmnivoreCount, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed);
 
     public void Initialize(World world) { }
-    public void Reset() { Oxygen = 50f; CO2 = 30f; }
+    public void Reset() { Oxygen = AtmosphereConfig.Data.InitialOxygen; CO2 = AtmosphereConfig.Data.InitialCO2; }
 
     public void Update(int plantCount, int animalCount, float dt)
     {
-        Oxygen += plantCount * O2PerPlant * dt;
-        Oxygen -= animalCount * O2PerAnimal * dt;
-        Oxygen = MathHelper.Clamp(Oxygen, 0f, MaxLevel);
+        Oxygen += plantCount * AtmosphereConfig.Data.O2PerPlant * dt;
+        Oxygen -= animalCount * AtmosphereConfig.Data.O2PerAnimal * dt;
+        Oxygen = MathHelper.Clamp(Oxygen, 0f, AtmosphereConfig.Data.MaxLevel);
 
-        CO2 += animalCount * CO2PerAnimal * dt;
-        CO2 -= CO2DecayRate * dt;
-        CO2 = MathHelper.Clamp(CO2, 0f, MaxLevel);
+        CO2 += animalCount * AtmosphereConfig.Data.Co2PerAnimal * dt;
+        CO2 -= AtmosphereConfig.Data.Co2DecayRate * dt;
+        CO2 = MathHelper.Clamp(CO2, 0f, AtmosphereConfig.Data.MaxLevel);
     }
 }

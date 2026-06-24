@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "initialOxygen": 50,
+  "initialCO2": 30,
+  "maxLevel": 100,
+  "o2PerPlant": 0.003,
+  "o2PerAnimal": 0.002,
+  "co2PerAnimal": 0.001,
+  "co2DecayRate": 0.01,
+  "oxygenModifierBase": 50,
+  "co2ModifierBase": 30,
+  "oxygenModifierMin": 0.3,
+  "oxygenModifierMax": 2.0,
+  "co2ModifierMin": 0.5,
+  "co2ModifierMax": 2.0
+}
