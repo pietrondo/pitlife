@@ -16,6 +16,6 @@ public class SpeciesCatalogTraversalTests
     [Fact]
     public void Save_ThrowsOnPathTraversal()
     {
-        Assert.Throws<ArgumentException>(() => SpeciesCatalogStore.Save("../secret.json", new SpeciesCatalogDocument()));
+        Assert.Throws<ArgumentException>(() => SpeciesCatalogStore.Save("../secret.json", new SpeciesCatalogDocument(), "some_directory"));
     }
 }
