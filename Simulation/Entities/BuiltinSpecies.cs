@@ -21,7 +21,20 @@ internal static class BuiltinSpecies
         BiomeType.Mountain, BiomeType.Snow, BiomeType.ShallowWater
     ];
 
+
     public static void RegisterAll()
+    {
+        RegisterLandPlants();
+        RegisterAquaticPlants();
+        RegisterHerbivores();
+        RegisterCarnivores();
+        RegisterOmnivores();
+        RegisterMisc();
+        RegisterMarineMammalsAndSemiAquatic();
+        RegisterMiscRemaining();
+    }
+
+    private static void RegisterLandPlants()
     {
         // Plants (Land)
         RegisterPlant("Clover", PlantReproductionMode.Vegetative,
@@ -68,7 +81,10 @@ internal static class BuiltinSpecies
         RegisterPlant("OysterMushroom", PlantReproductionMode.Spores, biomes:
             [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp],
             minTemperature: 0f, maxTemperature: 32f);
+    }
 
+    private static void RegisterAquaticPlants()
+    {
         // Aquatic Plants
         RegisterAquaticPlant("Seaweed", PlantReproductionMode.Fragmentation,
             minTemperature: -5f, maxTemperature: 35f);
@@ -80,7 +96,10 @@ internal static class BuiltinSpecies
             minTemperature: 10f, maxTemperature: 40f);
         RegisterAquaticPlant("Coral", PlantReproductionMode.BroadcastSpawning,
             minTemperature: 18f, maxTemperature: 40f);
+    }
 
+    private static void RegisterHerbivores()
+    {
         // Herbivores
         RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 0.6f);
         RegisterAnimal("Deer", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
@@ -94,7 +113,10 @@ internal static class BuiltinSpecies
         RegisterAnimal("Moose", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp,
                 BiomeType.Tundra, BiomeType.Mountain, BiomeType.Snow], size: 1.4f);
+    }
 
+    private static void RegisterCarnivores()
+    {
         // Carnivores
         RegisterAnimal("Fox", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Lynx", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
@@ -109,7 +131,10 @@ internal static class BuiltinSpecies
         RegisterAnimal("Piranha", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow, size: 0.7f);
         RegisterAnimal("Owl", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp], size: 0.7f);
+    }
 
+    private static void RegisterOmnivores()
+    {
         // Omnivores
         RegisterAnimal("Boar", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Raccoon", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.6f, hibernates: true);
@@ -119,12 +144,18 @@ internal static class BuiltinSpecies
         RegisterAnimal("Jellyfish", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Swarm, biomes: ShallowOrDeep, size: 0.6f);
         RegisterAnimal("Badger", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest], size: 0.8f, hibernates: true);
+    }
 
+    private static void RegisterMisc()
+    {
         // Misc
         RegisterAnimal("Gazelle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
         RegisterAnimal("Kangaroo", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 1.1f);
         RegisterAnimal("Cheetah", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.9f);
+    }
 
+    private static void RegisterMarineMammalsAndSemiAquatic()
+    {
         // New Marine Mammals and Semi-Aquatic Creatures
         RegisterAnimal("Dolphin", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Pack, biomes: ShallowOrDeep, size: 1.0f);
         RegisterAnimal("Whale", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Herd, biomes: Deep, size: 2.0f);
@@ -135,7 +166,10 @@ internal static class BuiltinSpecies
         RegisterAnimal("Otter", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Pair, biomes: Shallow, size: 0.8f);
         RegisterAnimal("Walrus", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.5f);
         RegisterAnimal("Hippopotamus", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Herd, biomes: LandAndShallow, size: 1.6f);
+    }
 
+    private static void RegisterMiscRemaining()
+    {
         RegisterAnimal("Mammoth", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd,
             biomes: [BiomeType.Tundra, BiomeType.Snow, BiomeType.Mountain], size: 2.5f);
         RegisterAnimal("Sabertooth", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pair,
