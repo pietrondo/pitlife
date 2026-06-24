@@ -520,6 +520,7 @@ public sealed class InGameUi
         return false;
     }
 
+
     private void DrawClimateDashboard(SpriteBatch sb, Texture2D pixel, SpriteFont font,
         Rectangle content, MouseState mouse, int plantCount, int herbivoreCount,
         int carnivoreCount, int omnivoreCount, float totalTime)
@@ -532,15 +533,22 @@ public sealed class InGameUi
         }
 
         int y = content.Y;
-        float pi = MathF.PI;
 
+        DrawClimateGlobalData(sb, pixel, font, content, climate, ref y);
+        DrawClimateLocalData(sb, font, content, climate, ref y);
+        DrawClimatePopulationData(sb, pixel, font, content, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, ref y);
+        DrawClimateEventsData(sb, font, content, ref y);
+    }
+
+    private void DrawClimateGlobalData(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
+    {
         // Global data
         string seasonKey = climate.CurrentSeason switch
         {
-            Season.Spring => "season.Spring",
-            Season.Summer => "season.Summer",
-            Season.Autumn => "season.Autumn",
-            Season.Winter => "season.Winter",
+            Simulation.Season.Spring => "season.Spring",
+            Simulation.Season.Summer => "season.Summer",
+            Simulation.Season.Autumn => "season.Autumn",
+            Simulation.Season.Winter => "season.Winter",
             _ => "season.Spring"
         };
         DrawLine(sb, font, content.X, y, I18n.Format("climate.season", I18n.T(seasonKey)), UiTheme.MossSignal);
@@ -561,18 +569,23 @@ public sealed class InGameUi
             DrawTempSparkline(sb, pixel, content.X, y, content.Width, _tempHistory, _tempHistoryCount);
             y += 12;
         }
+    }
+
+    private void DrawClimateLocalData(SpriteBatch sb, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
+    {
+        float pi = MathF.PI;
 
         // Local tile data
-        Point h = HoverTile ?? SelectedTile ?? new Point(World.Width / 2, World.Height / 2);
-        int lx = Math.Clamp(h.X, 0, World.Width - 1);
-        int ly = Math.Clamp(h.Y, 0, World.Height - 1);
-        Tile localTile = World.GetTile(lx, ly);
-        float localTemp = climate.GetTileTemperature(localTile, ly, World.Height);
-        Season localSeason = climate.GetLocalSeason(ly, World.Height);
+        Point h = HoverTile ?? SelectedTile ?? new Point(World!.Width / 2, World!.Height / 2);
+        int lx = Math.Clamp(h.X, 0, World!.Width - 1);
+        int ly = Math.Clamp(h.Y, 0, World!.Height - 1);
+        Simulation.Tile localTile = World!.GetTile(lx, ly);
+        float localTemp = climate.GetTileTemperature(localTile, ly, World!.Height);
+        Simulation.Season localSeason = climate.GetLocalSeason(ly, World!.Height);
         string localSeasonKey = localSeason switch
         {
-            Season.Spring => "season.Spring", Season.Summer => "season.Summer",
-            Season.Autumn => "season.Autumn", Season.Winter => "season.Winter", _ => "season.Spring"
+            Simulation.Season.Spring => "season.Spring", Simulation.Season.Summer => "season.Summer",
+            Simulation.Season.Autumn => "season.Autumn", Simulation.Season.Winter => "season.Winter", _ => "season.Spring"
         };
         string localSeasonName = I18n.T(localSeasonKey);
         string biomeName = I18n.T($"biome.{localTile.Biome}");
@@ -600,7 +613,10 @@ public sealed class InGameUi
                 climate.ExtremeEventName == "Heatwave" ? new Color(255, 140, 40) : new Color(120, 180, 255));
             y += 18;
         }
+    }
 
+    private void DrawClimatePopulationData(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content, int plantCount, int herbivoreCount, int carnivoreCount, int omnivoreCount, ref int y)
+    {
         y += 6;
         DrawLine(sb, font, content.X, y, I18n.T("climate.populations"), UiTheme.MossSignal);
         y += 20;
@@ -625,7 +641,10 @@ public sealed class InGameUi
             DrawSparkline(sb, pixel, content.X, y, content.Width, _popHistory, _popHistoryCount, 3, UiTheme.WarmParchment);
             y += 20;
         }
+    }
 
+    private void DrawClimateEventsData(SpriteBatch sb, SpriteFont font, Rectangle content, ref int y)
+    {
         DrawLine(sb, font, content.X, y, I18n.T("climate.events"), UiTheme.MossSignal);
         y += 20;
         var recent = Core.Logger.RecentEvents;
