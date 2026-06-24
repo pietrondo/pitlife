@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PitLife.Simulation;
+using PitLife.Core;
 
 namespace PitLife.Rendering;
 
@@ -74,7 +75,7 @@ public class CreatureRenderer
         try { if (File.Exists(path)) return Texture2D.FromFile(gd, path); }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unable to load texture '{path}': {ex.Message}");
+            Logger.Error($"Unable to load texture '{path}': {ex.Message}");
         }
         return null;
     }
@@ -92,40 +93,45 @@ public class CreatureRenderer
             try
             {
                 c = creatures[i];
-                if (c == null || !c.IsAlive) continue;
-
-                float px = c.Position.X;
-                float py = c.Position.Y;
-
-                if (float.IsNaN(px) || float.IsNaN(py)) continue;
-
-                if (px < visible.X - 64 || px > visible.X + visible.Width + 64 ||
-                    py < visible.Y - 64 || py > visible.Y + visible.Height + 64)
-                    continue;
-
-                float size = CalculateSize(c);
-                int s = Math.Max(6, (int)size);
-                Rectangle dest = new((int)(px - s / 2), (int)(py - s / 2), s, s);
-
-                Texture2D? tex = GetCreatureTexture(c);
-
-                if (tex != null)
-                {
-                    DrawCreatureWithTexture(sb, c, dest, tex, dayNightOverlay, font);
-                }
-                else
-                {
-                    DrawCreatureFallback(sb, c, px, py, size, s, dest, dayNightOverlay);
-                }
-
-                DrawGenderIcon(sb, c, px, py, s, dayNightOverlay);
+                DrawCreature(sb, dayNightOverlay, font, visible, c);
             }
             catch (Exception ex)
             {
                 if (c != null && _reportedRenderFailures.Add(c))
-                    Console.Error.WriteLine($"Creature render failed for {c.Species}: {ex.Message}");
+                    Logger.Error($"Creature render failed for {c.Species}: {ex.Message}");
             }
         }
+    }
+
+    private void DrawCreature(SpriteBatch sb, Color? dayNightOverlay, SpriteFont? font, Rectangle visible, Creature? c)
+    {
+        if (c == null || !c.IsAlive) return;
+
+        float px = c.Position.X;
+        float py = c.Position.Y;
+
+        if (float.IsNaN(px) || float.IsNaN(py)) return;
+
+        if (px < visible.X - 64 || px > visible.X + visible.Width + 64 ||
+            py < visible.Y - 64 || py > visible.Y + visible.Height + 64)
+            return;
+
+        float size = CalculateSize(c);
+        int s = Math.Max(6, (int)size);
+        Rectangle dest = new((int)(px - s / 2), (int)(py - s / 2), s, s);
+
+        Texture2D? tex = GetCreatureTexture(c);
+
+        if (tex != null)
+        {
+            DrawCreatureWithTexture(sb, c, dest, tex, dayNightOverlay, font);
+        }
+        else
+        {
+            DrawCreatureFallback(sb, c, px, py, size, s, dest, dayNightOverlay);
+        }
+
+        DrawGenderIcon(sb, c, px, py, s, dayNightOverlay);
     }
 
     private Color ApplyOverlay(Color original, Color? dayNightOverlay)
