@@ -392,6 +392,20 @@ public sealed class InGameUi
 
         DrawLine(spriteBatch, font, content.X, content.Y + 312, I18n.Format("creature.genome",
             creature.Genome.Color.R, creature.Genome.Color.G, creature.Genome.Color.B), UiTheme.MutedStone);
+
+        // Lineage tree
+        DrawLine(spriteBatch, font, content.X, content.Y + 340, "Lineage", UiTheme.MossSignal);
+        var lineage = creature.Lineage;
+        int genDepth = 0;
+        foreach (var kv in lineage.AncestorDepths)
+            genDepth = Math.Max(genDepth, kv.Value);
+        string lineageText = lineage.ParentAId > 0
+            ? $"Parents: [{lineage.ParentAId}, {lineage.ParentBId}]  |  ID: {lineage.IndividualId}"
+            : $"ID: {lineage.IndividualId}  |  Founder";
+        DrawLine(spriteBatch, font, content.X, content.Y + 362, lineageText, UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, content.Y + 382,
+            $"Ancestors: {lineage.AncestorDepths.Count}  |  MaxGen: {genDepth}  |  Inbreeding: {creature.InbreedingCoefficient:F3}  |  Fitness: {creature.GeneticFitness:F2}",
+            new Color(200, 180, 140));
     }
 
     private static void DrawProgress(SpriteBatch spriteBatch, Texture2D pixel, Rectangle bounds, float value)

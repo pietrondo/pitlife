@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PitLife.Simulation;
 
@@ -15,12 +16,17 @@ internal sealed class TerrainRefiner
     public void SmoothTerrain()
     {
         var tmp = new BiomeType[_world.Width, _world.Height];
-        for (int y = 0; y < _world.Height; y++)
-            for (int x = 0; x < _world.Width; x++)
-                tmp[x, y] = _world.Tiles[x, y].Biome;
+        int w = _world.Width, h = _world.Height;
 
-        for (int y = 1; y < _world.Height - 1; y++)
-            for (int x = 1; x < _world.Width - 1; x++)
+        Parallel.For(0, h, y =>
+        {
+            for (int x = 0; x < w; x++)
+                tmp[x, y] = _world.Tiles[x, y].Biome;
+        });
+
+        Parallel.For(1, h - 1, y =>
+        {
+            for (int x = 1; x < w - 1; x++)
             {
                 var b = _world.Tiles[x, y].Biome;
                 if (b == BiomeType.DeepOcean || b == BiomeType.ShallowWater) continue;
@@ -31,10 +37,13 @@ internal sealed class TerrainRefiner
                 if (_world.Tiles[x, y + 1].Biome == b) matches++;
                 tmp[x, y] = matches >= 2 ? b : MostCommonNeighbor(x, y);
             }
+        });
 
-        for (int y = 1; y < _world.Height - 1; y++)
-            for (int x = 1; x < _world.Width - 1; x++)
+        Parallel.For(1, h - 1, y =>
+        {
+            for (int x = 1; x < w - 1; x++)
                 _world.Tiles[x, y].Biome = tmp[x, y];
+        });
     }
 
     private BiomeType MostCommonNeighbor(int x, int y)
@@ -55,7 +64,7 @@ internal sealed class TerrainRefiner
     public void CopyEdgesForWrap()
     {
         int w = _world.Width, h = _world.Height;
-        for (int y = 0; y < h; y++)
+        Parallel.For(0, h, y =>
         {
             int iLeft = y * w + 0;
             int iRight = y * w + (w - 1);
@@ -63,8 +72,8 @@ internal sealed class TerrainRefiner
             _world.ElevationField[iRight] = _world.ElevationField[iLeft];
             _world.ContinentMask[iRight] = _world.ContinentMask[iLeft];
             _world.RiverMask[iRight] = _world.RiverMask[iLeft];
-        }
-        for (int x = 0; x < w; x++)
+        });
+        Parallel.For(0, w, x =>
         {
             int iTop = 0 * w + x;
             int iBot = (h - 1) * w + x;
@@ -72,7 +81,7 @@ internal sealed class TerrainRefiner
             _world.ElevationField[iBot] = _world.ElevationField[iTop];
             _world.ContinentMask[iBot] = _world.ContinentMask[iTop];
             _world.RiverMask[iBot] = _world.RiverMask[iTop];
-        }
+        });
     }
 
     public void EnsureAllBiomesPresent()
