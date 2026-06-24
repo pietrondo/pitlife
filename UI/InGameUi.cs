@@ -275,8 +275,8 @@ public sealed class InGameUi
             }
             else if (window.Id == ClimateWindowId)
             {
-                DrawClimateDashboard(spriteBatch, pixel, font, window.ContentBounds, mouse,
-                    plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime);
+                DrawClimateDashboard(spriteBatch, pixel, font, window.ContentBounds,
+                    plantCount, herbivoreCount, carnivoreCount, omnivoreCount);
             }
         }
     }
@@ -536,8 +536,8 @@ public sealed class InGameUi
 
 
     private void DrawClimateDashboard(SpriteBatch sb, Texture2D pixel, SpriteFont font,
-        Rectangle content, MouseState mouse, int plantCount, int herbivoreCount,
-        int carnivoreCount, int omnivoreCount, float totalTime)
+        Rectangle content, int plantCount, int herbivoreCount,
+        int carnivoreCount, int omnivoreCount)
     {
         var climate = Climate;
         if (climate == null || World == null)
@@ -587,8 +587,14 @@ public sealed class InGameUi
 
     private void DrawClimateLocalData(SpriteBatch sb, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
     {
-        float pi = MathF.PI;
+        DrawLocalTileData(sb, font, content, climate, ref y);
+        DrawOrbitalData(sb, font, content, climate, ref y);
+        DrawWindData(sb, font, content, climate, ref y);
+        DrawExtremeEventData(sb, font, content, climate, ref y);
+    }
 
+    private void DrawLocalTileData(SpriteBatch sb, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
+    {
         // Local tile data
         Point h = HoverTile ?? SelectedTile ?? new Point(World!.Width / 2, World!.Height / 2);
         int lx = Math.Clamp(h.X, 0, World!.Width - 1);
@@ -609,17 +615,26 @@ public sealed class InGameUi
         DrawLine(sb, font, content.X, y,
             I18n.Format("climate.localseason", localSeasonName), UiTheme.MossSignal);
         y += 22;
+    }
 
+    private void DrawOrbitalData(SpriteBatch sb, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
+    {
         DrawLine(sb, font, content.X, y,
-            I18n.Format("climate.orbit", climate.SunDistanceAU, climate.OrbitalAngle * 180f / pi, climate.OrbitalSpeedKmS),
+            I18n.Format("climate.orbit", climate.SunDistanceAU, climate.OrbitalAngle * 180f / MathF.PI, climate.OrbitalSpeedKmS),
             UiTheme.WarmParchment);
         y += 18;
+    }
 
+    private void DrawWindData(SpriteBatch sb, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
+    {
         DrawLine(sb, font, content.X, y,
-            I18n.Format("climate.wind", climate.WindSpeed, climate.WindDirection * 180f / pi),
+            I18n.Format("climate.wind", climate.WindSpeed, climate.WindDirection * 180f / MathF.PI),
             UiTheme.WarmParchment);
         y += 18;
+    }
 
+    private void DrawExtremeEventData(SpriteBatch sb, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
+    {
         if (climate.IsExtremeEvent)
         {
             DrawLine(sb, font, content.X, y,
