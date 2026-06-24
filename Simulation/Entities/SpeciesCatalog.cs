@@ -230,6 +230,9 @@ public static class SpeciesCatalogStore
 
     public static SpeciesCatalogDocument Load(string path)
     {
+        if (path.Contains("..", StringComparison.Ordinal))
+            throw new ArgumentException("Path traversal is not allowed.", nameof(path));
+
         string json = File.ReadAllText(path);
         return JsonSerializer.Deserialize<SpeciesCatalogDocument>(json, Options)
             ?? throw new InvalidDataException("Species catalog is empty.");
@@ -237,6 +240,9 @@ public static class SpeciesCatalogStore
 
     public static void Save(string path, SpeciesCatalogDocument document)
     {
+        if (path.Contains("..", StringComparison.Ordinal))
+            throw new ArgumentException("Path traversal is not allowed.", nameof(path));
+
         string? directory = Path.GetDirectoryName(Path.GetFullPath(path));
         if (directory is not null)
             Directory.CreateDirectory(directory);
