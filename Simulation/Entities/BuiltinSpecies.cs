@@ -31,7 +31,11 @@ internal static class BuiltinSpecies
         RegisterOmnivores();
         RegisterMisc();
         RegisterMarineMammalsAndSemiAquatic();
-        RegisterMiscRemaining();
+        RegisterPrehistoric();
+        RegisterAmphibiansAndSpecialFish();
+        RegisterCarnivorousPlants();
+        RegisterInsects();
+        RegisterCrustaceans();
     }
 
     private static void RegisterLandPlants()
@@ -168,7 +172,7 @@ internal static class BuiltinSpecies
         RegisterAnimal("Hippopotamus", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Herd, biomes: LandAndShallow, size: 1.6f);
     }
 
-    private static void RegisterMiscRemaining()
+    private static void RegisterPrehistoric()
     {
         RegisterAnimal("Mammoth", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd,
             biomes: [BiomeType.Tundra, BiomeType.Snow, BiomeType.Mountain], size: 2.5f);
@@ -178,10 +182,18 @@ internal static class BuiltinSpecies
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.Beach], size: 0.8f);
         RegisterAnimal("Trilobite", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Swarm,
             biomes: Shallow, size: 0.3f);
+    }
+
+    private static void RegisterAmphibiansAndSpecialFish()
+    {
         RegisterAnimal("Pufferfish", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary,
             biomes: ShallowOrDeep, size: 0.5f);
         RegisterAnimal("PoisonFrog", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Swamp, BiomeType.Forest], size: 0.4f, hibernates: true);
+    }
+
+    private static void RegisterCarnivorousPlants()
+    {
         RegisterPlant("Belladonna", PlantReproductionMode.Seeds, PollinationMode.Insects,
             biomes: [BiomeType.Forest, BiomeType.Swamp],
             minTemperature: 5f, maxTemperature: 32f);
@@ -191,6 +203,10 @@ internal static class BuiltinSpecies
         RegisterPlant("PitcherPlant", PlantReproductionMode.Seeds, PollinationMode.Insects,
             biomes: [BiomeType.Swamp, BiomeType.Forest],
             minTemperature: 8f, maxTemperature: 35f);
+    }
+
+    private static void RegisterInsects()
+    {
         RegisterAnimal("Ant", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Swarm,
             biomes: Land, size: 0.2f, hibernates: true);
         RegisterAnimal("Bee", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Swarm,
@@ -201,6 +217,10 @@ internal static class BuiltinSpecies
             biomes: [BiomeType.Grassland, BiomeType.Forest], size: 0.3f);
         RegisterAnimal("Dragonfly", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Swamp, BiomeType.ShallowWater], size: 0.25f);
+    }
+
+    private static void RegisterCrustaceans()
+    {
         RegisterAnimal("Crab", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Beach, BiomeType.ShallowWater], size: 0.3f);
         RegisterAnimal("Lobster", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Solitary,
