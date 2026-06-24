@@ -12,9 +12,9 @@ public static class Logger
     private static readonly string LogFile = Path.Combine(LogDir, $"pitlife_{DateTime.Now:yyyyMMdd_HHmmss}.log");
     private static readonly object Lock = new();
     private static readonly List<string> Buffer = [];
-    private const int BufferSize = 50;
+    private const int BufferSize = 100;
     private static readonly List<string> _recentEvents = [];
-    private const int MaxRecentEvents = 20;
+    private const int MaxRecentEvents = 50;
 
     public static IReadOnlyList<string> RecentEvents
     {
