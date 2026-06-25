@@ -67,12 +67,11 @@ internal sealed class FeedingModule : IBehaviorModule
         {
             self.Energy -= fruit.Value.EnergyValue * 2f;
             self.RememberDanger(fruit.Value.Position);
+            return true;
         }
-        else
-        {
-            self.Energy = Math.Min(self.Energy + fruit.Value.EnergyValue, self.MaxEnergy);
-            self.RememberFood(fruit.Value.Position);
-        }
+
+        self.Energy = Math.Min(self.Energy + fruit.Value.EnergyValue, self.MaxEnergy);
+        self.RememberFood(fruit.Value.Position);
         return true;
     }
 
@@ -80,17 +79,21 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         var eaten = Math.Min(food.Energy, rate * dt);
         food.Energy -= eaten;
+        ProcessPlantDigestion(self, food, eaten);
+        self.RememberFood(food.Position);
+        if (food.Energy <= 0) food.Die(DeathCause.Predation);
+    }
+
+    private static void ProcessPlantDigestion(Creature self, Plant food, float eaten)
+    {
         if (food.IsPoisonous && self.Genome.PlantRecognition < 0.5f)
         {
             self.Energy -= eaten * 3f;
             self.RememberDanger(food.Position);
+            return;
         }
-        else
-        {
-            self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
-        }
-        self.RememberFood(food.Position);
-        if (food.Energy <= 0) food.Die(DeathCause.Predation);
+
+        self.Energy = Math.Min(self.Energy + eaten * 2f, self.MaxEnergy);
     }
 
     private static void ConsumePlantOmnivore(Creature self, Plant food, float dt, float rate)
