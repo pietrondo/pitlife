@@ -266,36 +266,35 @@ public abstract class Creature
             return;
 
         var mate = ecosystem.FindNearestMate(this);
-        if (mate != null && DistanceTo(mate) < VisionPixels * 0.5f)
+        if (mate == null || DistanceTo(mate) >= VisionPixels * 0.5f) return;
+
+        if (Gender == Gender.Male)
         {
-            if (Gender == Gender.Male)
+            var rivals = ecosystem.FindNeighbors(this, VisionPixels * 0.3f,
+                c => c != this && c.Species == Species && c.Gender == Gender.Male && c.IsAdult);
+            foreach (var rival in rivals)
             {
-                var rivals = ecosystem.FindNeighbors(this, VisionPixels * 0.3f,
-                    c => c != this && c.Species == Species && c.Gender == Gender.Male && c.IsAdult);
-                foreach (var rival in rivals)
-                {
-                    if (rival.AttackPower * rival.Genome.Aggression > AttackPower * Genome.Aggression)
-                        return;
-                }
+                if (rival.AttackPower * rival.Genome.Aggression > AttackPower * Genome.Aggression)
+                    return;
             }
-
-            if (timeSinceLastReproduction < ReproductionCooldown ||
-                ecosystem.TotalTime - mate.LastReproductionTime < mate.ReproductionCooldown)
-                return;
-
-            int litter = Math.Min(LitterSize, mate.LitterSize);
-            for (int i = 0; i < litter && IsAlive && mate.IsAlive; i++)
-            {
-                var child = ReproduceWith(mate, ecosystem.Random);
-                if (child != null)
-                {
-                    ecosystem.AddCreature(child);
-                    ecosystem.Metrics.RecordBirth();
-                }
-            }
-            LastReproductionTime = ecosystem.TotalTime;
-            mate.LastReproductionTime = ecosystem.TotalTime;
         }
+
+        if (timeSinceLastReproduction < ReproductionCooldown ||
+            ecosystem.TotalTime - mate.LastReproductionTime < mate.ReproductionCooldown)
+            return;
+
+        int litter = Math.Min(LitterSize, mate.LitterSize);
+        for (int i = 0; i < litter && IsAlive && mate.IsAlive; i++)
+        {
+            var child = ReproduceWith(mate, ecosystem.Random);
+            if (child != null)
+            {
+                ecosystem.AddCreature(child);
+                ecosystem.Metrics.RecordBirth();
+            }
+        }
+        LastReproductionTime = ecosystem.TotalTime;
+        mate.LastReproductionTime = ecosystem.TotalTime;
     }
 
     internal void GrowFor(float seconds) => Age += seconds;
