@@ -19,15 +19,14 @@ internal sealed class SocialModule : IBehaviorModule
 
         var infant = infants[0];
         var predator = ecosystem.FindNearestPredator(infant);
-        if (predator != null && infant.DistanceTo(predator) < 40f)
+        if (predator == null || infant.DistanceTo(predator) >= 40f) return;
+
+        self.MoveToward(predator.Position, dt, null);
+        if (self.DistanceTo(predator) < 10f)
         {
-            self.MoveToward(predator.Position, dt, null);
-            if (self.DistanceTo(predator) < 10f)
-            {
-                float damage = 15f * dt;
-                predator.Energy -= damage;
-                if (predator.Energy <= 0) predator.Die(DeathCause.Combat);
-            }
+            var damage = 15f * dt;
+            predator.Energy -= damage;
+            if (predator.Energy <= 0) predator.Die(DeathCause.Combat);
         }
     }
 
@@ -37,7 +36,7 @@ internal sealed class SocialModule : IBehaviorModule
         if (behavior == SocialBehavior.None)
             return false;
 
-        float s = self.Genome.Sociability;
+        var s = self.Genome.Sociability;
         switch (behavior)
         {
             case SocialBehavior.Herd:
@@ -45,7 +44,7 @@ internal sealed class SocialModule : IBehaviorModule
 
             case SocialBehavior.Pack:
                 {
-                    bool flockMoved = ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.2f, separationWeight: 1.0f, alignmentWeight: 1.5f, separationDist: 25f);
+                    var flockMoved = ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.2f, separationWeight: 1.0f, alignmentWeight: 1.5f, separationDist: 25f);
                     var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, n => n.Species == self.Species);
                     if (neighbors.Count > 0)
                     {
@@ -90,14 +89,14 @@ internal sealed class SocialModule : IBehaviorModule
 
         Vector2 avgPosition = Vector2.Zero;
         Vector2 avgFacing = Vector2.Zero;
-        int separationCount = 0;
+        var separationCount = 0;
 
         foreach (var neighbor in neighbors)
         {
             avgPosition += neighbor.Position;
             avgFacing += neighbor.Facing;
 
-            float dist = Vector2.Distance(self.Position, neighbor.Position);
+            var dist = Vector2.Distance(self.Position, neighbor.Position);
             if (dist > 0 && dist < separationDist)
             {
                 Vector2 diff = self.Position - neighbor.Position;
@@ -142,63 +141,61 @@ internal sealed class SocialModule : IBehaviorModule
     private static bool ApplyPairBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
     {
         var partner = ecosystem.FindNearestSameSpecies(self);
-        if (partner != null && self.DistanceTo(partner) < self.VisionPixels)
-        {
-            float dist = self.DistanceTo(partner);
-            if (dist > 30f)
-            {
-                self.MoveToward(partner.Position, dt * 0.6f, world);
-            }
-            else if (dist < 15f)
-            {
-                self.MoveAwayFrom(partner.Position, dt * 0.4f, world);
-            }
-            else
-            {
-                self.MoveToward(partner.Position, dt * 0.2f, world);
-            }
+        if (partner == null || self.DistanceTo(partner) >= self.VisionPixels)
+            return false;
 
-            if (dist < 50f)
-            {
-                self.Energy = Math.Min(self.MaxEnergy, self.Energy + 2f * dt);
-            }
-            return true;
+        var dist = self.DistanceTo(partner);
+        if (dist > 30f)
+        {
+            self.MoveToward(partner.Position, dt * 0.6f, world);
         }
-        return false;
+        else if (dist < 15f)
+        {
+            self.MoveAwayFrom(partner.Position, dt * 0.4f, world);
+        }
+        else
+        {
+            self.MoveToward(partner.Position, dt * 0.2f, world);
+        }
+
+        if (dist < 50f)
+        {
+            self.Energy = Math.Min(self.MaxEnergy, self.Energy + 2f * dt);
+        }
+        return true;
     }
 
     private static bool ApplySolitaryBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
     {
         var neighbor = ecosystem.FindNearestSameSpecies(self);
-        if (neighbor != null && self.DistanceTo(neighbor) < self.VisionPixels * 0.5f)
+        if (neighbor == null || self.DistanceTo(neighbor) >= self.VisionPixels * 0.5f)
+            return false;
+
+        var dist = self.DistanceTo(neighbor);
+        self.MoveAwayFrom(neighbor.Position, dt, world);
+        self.Energy -= 3f * dt;
+
+        if (self.Energy < self.MaxEnergy * 0.3f)
         {
-            float dist = self.DistanceTo(neighbor);
-            self.MoveAwayFrom(neighbor.Position, dt, world);
-            self.Energy -= 3f * dt;
-
-            if (self.Energy < self.MaxEnergy * 0.3f)
-            {
-                self.MoveAwayFrom(neighbor.Position, dt * 2.0f, world);
-                if (ecosystem.Random.NextDouble() < 0.1 * dt)
-                    Core.Logger.Event("FLEE", $"{self.Species} fled from rival at ({self.Position.X:F0},{self.Position.Y:F0})");
-                return true;
-            }
-
-            if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
-            {
-                self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f) * (0.5f + self.Genome.Aggression);
-                neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f) * (0.5f + neighbor.Genome.Aggression);
-
-                if (self.Energy <= 0) self.Die(DeathCause.Combat);
-                if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);
-
-                if (ecosystem.Random.NextDouble() < 0.1 * dt)
-                {
-                    Logger.Event("COMBAT", $"{self.Species} fought same-species rival at ({self.Position.X:F0},{self.Position.Y:F0})");
-                }
-            }
+            self.MoveAwayFrom(neighbor.Position, dt * 2.0f, world);
+            if (ecosystem.Random.NextDouble() < 0.1 * dt)
+                Core.Logger.Event("FLEE", $"{self.Species} fled from rival at ({self.Position.X:F0},{self.Position.Y:F0})");
             return true;
         }
-        return false;
+
+        if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
+        {
+            self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f) * (0.5f + self.Genome.Aggression);
+            neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f) * (0.5f + neighbor.Genome.Aggression);
+
+            if (self.Energy <= 0) self.Die(DeathCause.Combat);
+            if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);
+
+            if (ecosystem.Random.NextDouble() < 0.1 * dt)
+            {
+                Logger.Event("COMBAT", $"{self.Species} fought same-species rival at ({self.Position.X:F0},{self.Position.Y:F0})");
+            }
+        }
+        return true;
     }
 }
