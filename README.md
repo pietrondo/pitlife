@@ -1,6 +1,6 @@
 # PitLife
 
-Simulatore di ecosistema 2D data-driven con creature che vivono, si nutrono, si riproducono, evolvono e interagiscono in un mondo dinamico con 15 biomi, 86+ specie, stagioni orbitali, clima, cataclismi e recupero ambientale.
+Simulatore di ecosistema 2D data-driven con creature che vivono, si nutrono, si riproducono, evolvono e interagiscono in un mondo dinamico con 15 biomi, 122+ specie, stagioni orbitali, clima, cataclismi e recupero ambientale.
 
 ## Come Giocare
 
@@ -89,7 +89,7 @@ Mostra dati globali e locali in tempo reale:
 
 ### Simulazione
 - **15 biomi**: DeepOcean, ShallowWater, Beach, Desert, Savanna, Grassland, Forest, DenseForest, Swamp, Tundra, Mountain, Snow, CoralReef, Cave, Volcano
-- **86+ specie** tra piante, erbivori, carnivori, onnivori, insetti e preistorici
+- **122+ specie** tra piante, erbivori, carnivori, onnivori, insetti e preistorici
 - **Ciclo giorno/notte** con 4 fasi e overlay visivo
 - **Stagioni orbitali**: orbita ellittica (e=0.12), perielio/afelio, gradiente latitudinale (equatore caldo, poli freddi, modello climatico sferoide oblato)
 - **Clima per-tile**: temperatura da orbita + latitudine + bioma, stress termico, eventi estremi
@@ -97,6 +97,8 @@ Mostra dati globali e locali in tempo reale:
 - **Overlay stagionale**: tinta semi-trasparente sulla mappa per stagione
 - **Cataclismi**: modificano visibilmente il terreno con recupero graduale
 - **Elevazione in metri**: da -700m (oceano profondo) a 4000m (picco montuoso)
+- **Decorazioni**: Elementi visivi per-tile (per-tile decorations) e onde sull'acqua.
+- **Audio Procedurale**: Effetti sonori generati proceduralmente durante il gameplay.
 
 ### Genetica ed Evoluzione
 - **Genoma diploide**: 11 loci con alleli, dominanza e ricombinazione
@@ -105,6 +107,7 @@ Mostra dati globali e locali in tempo reale:
 - **Deriva genetica**: fluttuazioni casuali in popolazioni piccole
 - **Inbreeding**: coefficiente di parentela e depressione genetica
 - **Evoluzione visibile**: colore genome riflesso nello sprite
+- **Albero Filogenetico**: Lineage tree display per tracciare la discendenza e l'evoluzione delle creature.
 
 ### Ecologia
 - **Rete trofica**: 5 livelli trofici, efficienza energetica 10%
@@ -116,6 +119,8 @@ Mostra dati globali e locali in tempo reale:
 - **Malattie**: epidemie con trasmissione, immunità e recupero
 - **Simbiosi**: mutualismo implicito (api-fiori, pesci pulitori)
 - **Migrazioni**: home range, movimento stagionale
+- **Dinamiche Trofiche**: Cicli di Lotka-Volterra e trophic dynamics wiring.
+- **Frutti**: Meccanica dei frutti disponibili sulle piante.
 
 ### Flora e Fasce Climatiche
 - **24 specie vegetali** con range termico specifico
@@ -135,6 +140,10 @@ Mostra dati globali e locali in tempo reale:
 - **Difese**: statistiche di attacco/difesa basate sul genoma
 - **Fuga per bassa energia**: istinto di sopravvivenza dinamico per evitare combattimenti quando deboli
 
+### Performance e Architettura
+- **Ottimizzazioni**: Multi-thread world gen, object pooling per ridurre le allocazioni e menu perf optimization.
+- **Data-Driven Config**: Tutte le logiche (specie, bilanciamento ecosistema, malattie, clima, atmosfera, comportamenti) sono configurate tramite file esterni data-driven.
+
 ### UI
 - **Tema foresta**: palette verde/marrone con finestre draggable
 - **Toolbar in basso**: statistiche, creature, velocità, cataclismi, clima, menu
@@ -147,6 +156,8 @@ Mostra dati globali e locali in tempo reale:
 - **I18n**: Italiano/Inglese con toggle nel menu
 - **Persistenza**: salvataggio/caricamento mondo, preferenze lingua
 - **Log**: flush automatico su uscita, rotazione 5 file
+- **SpeciesCyclopedia**: Enciclopedia in-game per esplorare i dettagli di tutte le specie.
+- **Menu Continua**: Bottone 'Continua' nel main menu per riprendere rapidamente la partita in corso.
 
 ## Requisiti
 
