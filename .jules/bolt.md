@@ -17,3 +17,6 @@ Wait... `Game1.cs` only uses `PixelWorldRenderer`. `WorldRenderer` is unused or 
 In `PixelWorldRenderer.Draw`, `pw` and `ph` represent the total scaled pixel width and height of the world map. Currently it loops 3x3 times, drawing the world from `dx=-1` to `dx=1` and `dy=-1` to `dy=1`. This is 9 `sb.Draw` calls.
 If we check whether `camera.VisibleArea.Intersects(...)` before drawing, we can cull up to 8 of those 9 draw calls, leaving only 1 to 4 draw calls at map wrap boundaries!
 This perfectly fits Bolt's philosophy: "Measure first, optimize second. If it's off-screen, it doesn't exist. Rely on pure mathematical grid coordinates for culling... minimizes Draw Calls."
+## 2024-05-18 - Culling PixelWorldRenderer
+**Learning:** Hardcoded loops from -1 to 1 for full texture draws cause immense fill rate issues when most wraps are off-screen. Mathematical boundaries calculated via `camera.VisibleArea` and texture dimensions (`MathF.Floor((float)visible.Left / pw)`) effectively cull grid chunks perfectly.
+**Action:** Always prefer mathematical intersections and exact boundary start/end limits for tile or wrapped grid rendering over fixed loops and naive off-screen drawing.
