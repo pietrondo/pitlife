@@ -8,7 +8,7 @@ public class Omnivore : Creature
     public float AttackDamage => 12f * Genome.Size;
 
     public Omnivore(Vector2 position, Genome genome, string species = "Omnivore")
-        : base(position, genome, CreatureType.Omnivore) { Species = species; Behavior = new BaseBehavior(); }
+        : base(position, genome, CreatureType.Omnivore) { Species = species; }
     public override bool IsAquatic => Species == "Jellyfish";
 
     protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
