@@ -30,7 +30,7 @@ internal static class BuiltinSpecies
 
     private static void RegisterFlora()
     {
-        RegisterLandPlants();
+        RegisterTerrestrialPlants();
         RegisterAquaticPlants();
         RegisterCarnivorousPlants();
     }
@@ -40,14 +40,14 @@ internal static class BuiltinSpecies
         RegisterHerbivores();
         RegisterCarnivores();
         RegisterOmnivores();
-        RegisterMarineMammalsAndSemiAquatic();
+        RegisterMarineMammals();
         RegisterPrehistoric();
         RegisterInsects();
         RegisterCrustaceans();
         RegisterAmphibians();
     }
 
-    private static void RegisterLandPlants()
+    private static void RegisterTerrestrialPlants()
     {
         // Plants (Land)
         RegisterPlant("Clover", PlantReproductionMode.Vegetative,
@@ -167,7 +167,7 @@ internal static class BuiltinSpecies
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest], size: 0.8f, hibernates: true);
     }
 
-    private static void RegisterMarineMammalsAndSemiAquatic()
+    private static void RegisterMarineMammals()
     {
         // New Marine Mammals and Semi-Aquatic Creatures
         RegisterAnimal("Dolphin", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Pack, biomes: ShallowOrDeep, size: 1.0f);
