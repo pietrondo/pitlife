@@ -49,42 +49,37 @@ internal static class BuiltinSpecies
 
     private static void RegisterTerrestrialPlants()
     {
-        // Plants (Land)
+        RegisterGrassesAndFlowers();
+        RegisterFungi();
+        RegisterTreesAndShrubs();
+        RegisterOtherLandPlants();
+    }
+
+    private static void RegisterGrassesAndFlowers()
+    {
         RegisterPlant("Clover", PlantReproductionMode.Vegetative,
             minTemperature: -15f, maxTemperature: 35f);
         RegisterPlant("Poppy", PlantReproductionMode.Seeds, PollinationMode.Insects,
             minTemperature: -5f, maxTemperature: 35f);
-        RegisterPlant("Mushroom", PlantReproductionMode.Spores,
-            minTemperature: -5f, maxTemperature: 28f);
         RegisterPlant("GrassTuft", PlantReproductionMode.Seeds, PollinationMode.Wind,
             minTemperature: -15f, maxTemperature: 45f);
-        RegisterPlant("Cactus", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            minTemperature: 15f, maxTemperature: 55f);
-        RegisterPlant("Moss", PlantReproductionMode.Spores,
-            minTemperature: -30f, maxTemperature: 25f);
-        RegisterPlant("BerryBush", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            minTemperature: -10f, maxTemperature: 35f);
-        RegisterPlant("Pine", PlantReproductionMode.Seeds, PollinationMode.Wind,
-            minTemperature: -25f, maxTemperature: 30f);
-        RegisterPlant("Toadstool", PlantReproductionMode.Spores,
-            minTemperature: -5f, maxTemperature: 30f);
-        RegisterPlant("OakTree", PlantReproductionMode.Seeds, PollinationMode.Wind,
-            minTemperature: -10f, maxTemperature: 32f);
-        RegisterPlant("PineTree", PlantReproductionMode.Seeds, PollinationMode.Wind,
-            minTemperature: -25f, maxTemperature: 25f);
-        RegisterPlant("Juniper", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            minTemperature: -20f, maxTemperature: 35f);
-        RegisterPlant("Bamboo", PlantReproductionMode.Seeds, PollinationMode.Wind,
-            minTemperature: 5f, maxTemperature: 48f);
         RegisterPlant("Lavender", PlantReproductionMode.Seeds, PollinationMode.Insects,
             [BiomeType.Desert, BiomeType.Savanna, BiomeType.Grassland, BiomeType.Mountain],
             minTemperature: 0f, maxTemperature: 45f);
-        RegisterPlant("Fern", PlantReproductionMode.Spores, biomes:
-            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp],
-            minTemperature: 0f, maxTemperature: 32f);
         RegisterPlant("Sunflower", PlantReproductionMode.Seeds, PollinationMode.Insects,
             [BiomeType.Savanna, BiomeType.Grassland],
             minTemperature: 10f, maxTemperature: 40f);
+        RegisterPlant("Belladonna", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            biomes: [BiomeType.Forest, BiomeType.Swamp],
+            minTemperature: 5f, maxTemperature: 32f);
+    }
+
+    private static void RegisterFungi()
+    {
+        RegisterPlant("Mushroom", PlantReproductionMode.Spores,
+            minTemperature: -5f, maxTemperature: 28f);
+        RegisterPlant("Toadstool", PlantReproductionMode.Spores,
+            minTemperature: -5f, maxTemperature: 30f);
         RegisterPlant("Chanterelle", PlantReproductionMode.Spores, biomes:
             [BiomeType.Forest, BiomeType.DenseForest],
             minTemperature: 0f, maxTemperature: 28f);
@@ -94,9 +89,33 @@ internal static class BuiltinSpecies
         RegisterPlant("OysterMushroom", PlantReproductionMode.Spores, biomes:
             [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp],
             minTemperature: 0f, maxTemperature: 32f);
-        RegisterPlant("Belladonna", PlantReproductionMode.Seeds, PollinationMode.Insects,
-            biomes: [BiomeType.Forest, BiomeType.Swamp],
-            minTemperature: 5f, maxTemperature: 32f);
+    }
+
+    private static void RegisterTreesAndShrubs()
+    {
+        RegisterPlant("BerryBush", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: -10f, maxTemperature: 35f);
+        RegisterPlant("Pine", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -25f, maxTemperature: 30f);
+        RegisterPlant("OakTree", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -10f, maxTemperature: 32f);
+        RegisterPlant("PineTree", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: -25f, maxTemperature: 25f);
+        RegisterPlant("Juniper", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: -20f, maxTemperature: 35f);
+        RegisterPlant("Bamboo", PlantReproductionMode.Seeds, PollinationMode.Wind,
+            minTemperature: 5f, maxTemperature: 48f);
+    }
+
+    private static void RegisterOtherLandPlants()
+    {
+        RegisterPlant("Cactus", PlantReproductionMode.Seeds, PollinationMode.Insects,
+            minTemperature: 15f, maxTemperature: 55f);
+        RegisterPlant("Moss", PlantReproductionMode.Spores,
+            minTemperature: -30f, maxTemperature: 25f);
+        RegisterPlant("Fern", PlantReproductionMode.Spores, biomes:
+            [BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp],
+            minTemperature: 0f, maxTemperature: 32f);
     }
 
     private static void RegisterAquaticPlants()
@@ -116,40 +135,78 @@ internal static class BuiltinSpecies
 
     private static void RegisterHerbivores()
     {
-        // Herbivores
-        RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 0.6f);
+        RegisterHoofedHerbivores();
+        RegisterAquaticHerbivores();
+        RegisterOtherHerbivores();
+    }
+
+    private static void RegisterHoofedHerbivores()
+    {
         RegisterAnimal("Deer", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
         RegisterAnimal("Sheep", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
         RegisterAnimal("Horse", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
         RegisterAnimal("Goat", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
-        RegisterAnimal("Tuna", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow);
-        RegisterAnimal("Lizard", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.5f, hibernates: true);
-        RegisterAnimal("Turtle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, hibernates: true);
-        RegisterAnimal("Salmon", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow, size: 0.9f);
         RegisterAnimal("Moose", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp,
                 BiomeType.Tundra, BiomeType.Mountain, BiomeType.Snow], size: 1.4f);
         RegisterAnimal("Gazelle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land);
+    }
+
+    private static void RegisterAquaticHerbivores()
+    {
+        RegisterAnimal("Tuna", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow);
+        RegisterAnimal("Salmon", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.School, biomes: Shallow, size: 0.9f);
+    }
+
+    private static void RegisterOtherHerbivores()
+    {
+        RegisterAnimal("Rabbit", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 0.6f);
+        RegisterAnimal("Lizard", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.5f, hibernates: true);
+        RegisterAnimal("Turtle", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, hibernates: true);
         RegisterAnimal("Kangaroo", CreatureType.Herbivore, isAquatic: false, social: SocialBehavior.Herd, biomes: Land, size: 1.1f);
     }
 
     private static void RegisterCarnivores()
     {
-        // Carnivores
-        RegisterAnimal("Fox", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
+        RegisterFelines();
+        RegisterCanines();
+        RegisterBirdsOfPrey();
+        RegisterAquaticCarnivores();
+        RegisterOtherCarnivores();
+    }
+
+    private static void RegisterFelines()
+    {
         RegisterAnimal("Lynx", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Tiger", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Lion", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
         RegisterAnimal("Leopard", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
-        RegisterAnimal("Crocodile", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, hibernates: true);
-        RegisterAnimal("Snake", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.6f, hibernates: true);
-        RegisterAnimal("Eagle", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pair, biomes: Land, size: 0.7f);
+        RegisterAnimal("Cheetah", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.9f);
+    }
+
+    private static void RegisterCanines()
+    {
+        RegisterAnimal("Fox", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land);
         RegisterAnimal("Wolf", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pack, biomes: Land);
-        RegisterAnimal("Shark", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Deep, size: 1.2f);
-        RegisterAnimal("Piranha", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow, size: 0.7f);
+    }
+
+    private static void RegisterBirdsOfPrey()
+    {
+        RegisterAnimal("Eagle", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Pair, biomes: Land, size: 0.7f);
         RegisterAnimal("Owl", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary,
             biomes: [BiomeType.Grassland, BiomeType.Forest, BiomeType.DenseForest, BiomeType.Swamp], size: 0.7f);
-        RegisterAnimal("Cheetah", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.9f);
+    }
+
+    private static void RegisterAquaticCarnivores()
+    {
+        RegisterAnimal("Shark", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Deep, size: 1.2f);
+        RegisterAnimal("Piranha", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Shallow, size: 0.7f);
+    }
+
+    private static void RegisterOtherCarnivores()
+    {
+        RegisterAnimal("Crocodile", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, hibernates: true);
+        RegisterAnimal("Snake", CreatureType.Carnivore, isAquatic: false, social: SocialBehavior.Solitary, biomes: Land, size: 0.6f, hibernates: true);
     }
 
     private static void RegisterOmnivores()

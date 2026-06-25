@@ -1,4 +1,0 @@
-🎯 **What:** Documented `RegisterAll` method in `BuiltinSpecies.cs` with an XML summary explaining its modular extraction.
-💡 **Why:** The codebase already had `RegisterAll` successfully broken down into sub-methods, so adding documentation resolves the issue by clarifying the method's refactored state and structure.
-✅ **Verification:** Verified tests pass properly.
-✨ **Result:** Improved code readability by explicitly documenting the lifecycle and structure of the global registry initialization.
