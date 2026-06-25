@@ -26,12 +26,12 @@ public sealed class InGameUi
     private Rectangle _toolbarRect;
 
     private readonly UiWindowManager _windowManager = new();
-    private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics"));
-    private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature"));
-    private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange"));
+    private readonly UiButton _statisticsButton = new(I18n.T("toolbar.statistics")) { ShortcutHint = "F2" };
+    private readonly UiButton _creatureButton = new(I18n.T("toolbar.creature")) { ShortcutHint = "F3" };
+    private readonly UiButton _arrangeButton = new(I18n.T("toolbar.arrange")) { ShortcutHint = "F5" };
     private readonly UiButton _menuButton = new(I18n.T("toolbar.menu"));
-    private readonly UiButton _cataclysmButton = new(I18n.T("toolbar.cataclysm"));
-    private readonly UiButton _climateButton = new(I18n.T("toolbar.climate"));
+    private readonly UiButton _cataclysmButton = new(I18n.T("toolbar.cataclysm")) { ShortcutHint = "F8" };
+    private readonly UiButton _climateButton = new(I18n.T("toolbar.climate")) { ShortcutHint = "F9" };
     private readonly UiButton _speedDownButton = new("<");
     private readonly UiButton _speedUpButton = new(">");
 

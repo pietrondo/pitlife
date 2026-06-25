@@ -295,7 +295,7 @@ public sealed class MainMenu
             0 => MenuAction.StartGame,
             1 => OpenWorldGenPanel(),
             2 => OpenWorldGenPanel(),
-            3 => MenuAction.SaveGame,
+            3 => GameInProgress ? MenuAction.SaveGame : MenuAction.None,
             4 => MenuAction.LoadGame,
             5 => OpenOptions(),
             6 => MenuAction.ShowHelp,
@@ -600,6 +600,7 @@ public sealed class MainMenu
         _mainButtons[0].Text = GameInProgress ? I18n.T("menu.continue") : I18n.T("menu.start");
         _mainButtons[1].Text = I18n.T("menu.newWorld");
         _mainButtons[2].Text = I18n.T("menu.saveGame");
+        _mainButtons[2].IsDisabled = !GameInProgress;
         _mainButtons[3].Text = I18n.T("menu.loadGame");
         _mainButtons[4].Text = I18n.T("menu.options");
         _mainButtons[5].Text = I18n.T("menu.help");
