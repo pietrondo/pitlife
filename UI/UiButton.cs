@@ -10,15 +10,18 @@ public sealed class UiButton
     public Rectangle Bounds { get; set; }
     public bool IsDestructive { get; init; }
     public object? Tag { get; set; }
+    public bool IsDisabled { get; set; }
+    public string? ShortcutHint { get; set; }
 
     public UiButton(string text)
     {
         Text = text;
     }
 
-    public bool IsHovered(MouseState mouse) => Bounds.Contains(mouse.Position);
+    public bool IsHovered(MouseState mouse) => !IsDisabled && Bounds.Contains(mouse.Position);
 
     public bool WasClicked(MouseState mouse, MouseState previousMouse) =>
+        !IsDisabled &&
         IsHovered(mouse) &&
         mouse.LeftButton == ButtonState.Released &&
         previousMouse.LeftButton == ButtonState.Pressed;
@@ -26,8 +29,8 @@ public sealed class UiButton
     public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool isFocused)
     {
         bool hovered = IsHovered(mouse);
-        Color fill = hovered || isFocused ? UiTheme.ForestNight : UiTheme.DeepGrove;
-        Color border = IsDestructive ? UiTheme.DangerClay : UiTheme.BarkEdge;
+        Color fill = IsDisabled ? UiTheme.DeepGrove : (hovered || isFocused ? UiTheme.ForestNight : UiTheme.DeepGrove);
+        Color border = IsDisabled ? UiTheme.BarkEdge : (IsDestructive ? UiTheme.DangerClay : UiTheme.BarkEdge);
 
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 4, Bounds.Y + 4, Bounds.Width, Bounds.Height), UiTheme.Shadow);
         UiPrimitives.Fill(spriteBatch, pixel, Bounds, fill);
@@ -50,6 +53,17 @@ public sealed class UiButton
         if (hovered && mouse.LeftButton == ButtonState.Pressed)
             position.Y += 2f;
 
-        spriteBatch.DrawString(font, Text, position, UiTheme.WarmParchment, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        Color textColor = IsDisabled ? UiTheme.MutedStone : UiTheme.WarmParchment;
+        spriteBatch.DrawString(font, Text, position, textColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+
+        if (!string.IsNullOrEmpty(ShortcutHint))
+        {
+            float hintScale = 0.8f;
+            Vector2 hintSize = font.MeasureString(ShortcutHint) * hintScale;
+            Vector2 hintPos = new(
+                Bounds.Center.X - hintSize.X / 2f,
+                Bounds.Bottom - hintSize.Y - 2);
+            spriteBatch.DrawString(font, ShortcutHint, hintPos, UiTheme.MutedStone, 0f, Vector2.Zero, hintScale, SpriteEffects.None, 0f);
+        }
     }
 }
