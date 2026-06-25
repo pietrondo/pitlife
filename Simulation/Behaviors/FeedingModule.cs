@@ -45,7 +45,7 @@ internal sealed class FeedingModule : IBehaviorModule
             : ecosystem.FindNearestPlantFor(self);
 
         if (food == null)
-            return TryEatCarcass(self, ecosystem, dt);
+            return TryScavengeCarcass(self, ecosystem, dt);
 
         if (self.DistanceTo(food) >= 12f)
         {
@@ -108,7 +108,7 @@ internal sealed class FeedingModule : IBehaviorModule
 
         Creature? prey = ecosystem.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= self.VisionPixels)
-            return TryEatCarcass(self, ecosystem, dt);
+            return TryScavengeCarcass(self, ecosystem, dt);
 
         if (self.DistanceTo(prey) >= 10f)
         {
@@ -191,11 +191,11 @@ internal sealed class FeedingModule : IBehaviorModule
     private static bool TryFeedNearbyCarnivore(Creature self, Ecosystem ecosystem, float dt, World world)
     {
         if (self is not Carnivore carn)
-            return TryEatCarcass(self, ecosystem, dt);
+            return TryScavengeCarcass(self, ecosystem, dt);
 
         Creature? prey = ecosystem.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= 10f)
-            return TryEatCarcass(self, ecosystem, dt);
+            return TryScavengeCarcass(self, ecosystem, dt);
 
         AttackPrey(self, prey, carn.AttackDamage * dt);
         return true;
@@ -213,7 +213,7 @@ internal sealed class FeedingModule : IBehaviorModule
 
         Plant? food = ecosystem.FindNearestPlantFor(self);
         if (food == null || self.DistanceTo(food) >= 12f)
-            return TryEatCarcass(self, ecosystem, dt);
+            return TryScavengeCarcass(self, ecosystem, dt);
 
         ConsumePlantOmnivore(self, food, dt, 8f);
         return true;
@@ -233,7 +233,7 @@ internal sealed class FeedingModule : IBehaviorModule
         return false;
     }
 
-    private static bool TryEatCarcass(Creature self, Ecosystem ecosystem, float dt)
+    private static bool TryScavengeCarcass(Creature self, Ecosystem ecosystem, float dt)
     {
         foreach (var c in ecosystem.Creatures)
         {
