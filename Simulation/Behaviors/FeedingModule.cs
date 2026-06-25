@@ -226,14 +226,13 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
         if (tile.GrassAmount <= 0.001f) return false;
+
         var grazeRate = 3f * dt;
         var eaten = tile.EatGrass(grazeRate);
-        if (eaten > 0)
-        {
-            self.Energy = Math.Min(self.Energy + eaten * 8f, self.MaxEnergy);
-            return true;
-        }
-        return false;
+        if (eaten <= 0) return false;
+
+        self.Energy = Math.Min(self.Energy + eaten * 8f, self.MaxEnergy);
+        return true;
     }
 
     private static bool TryScavengeCarcass(Creature self, Ecosystem ecosystem, float dt)
