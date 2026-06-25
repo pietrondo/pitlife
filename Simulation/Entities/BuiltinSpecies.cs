@@ -22,12 +22,18 @@ internal static class BuiltinSpecies
     ];
 
 
+    /// <summary>
+    /// Registers all builtin flora and fauna species into the global registry.
+    /// </summary>
     public static void RegisterAll()
     {
         RegisterFlora();
         RegisterFauna();
     }
 
+    /// <summary>
+    /// Registers all flora species, including terrestrial, aquatic, and carnivorous plants.
+    /// </summary>
     private static void RegisterFlora()
     {
         RegisterTerrestrialPlants();
@@ -35,6 +41,9 @@ internal static class BuiltinSpecies
         RegisterCarnivorousPlants();
     }
 
+    /// <summary>
+    /// Registers all fauna species, categorized by their diet and habitat.
+    /// </summary>
     private static void RegisterFauna()
     {
         RegisterHerbivores();
@@ -226,15 +235,29 @@ internal static class BuiltinSpecies
 
     private static void RegisterMarineMammals()
     {
-        // New Marine Mammals and Semi-Aquatic Creatures
+        RegisterCetaceans();
+        RegisterPinnipeds();
+        RegisterOtherSemiAquatic();
+    }
+
+    private static void RegisterCetaceans()
+    {
         RegisterAnimal("Dolphin", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Pack, biomes: ShallowOrDeep, size: 1.0f);
         RegisterAnimal("Whale", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Herd, biomes: Deep, size: 2.0f);
-        RegisterAnimal("Manatee", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Shallow, size: 1.3f);
         RegisterAnimal("Orca", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Pack, biomes: Deep, size: 1.8f);
+    }
+
+    private static void RegisterPinnipeds()
+    {
         RegisterAnimal("Seal", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.0f);
         RegisterAnimal("SeaLion", CreatureType.Carnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.1f);
-        RegisterAnimal("Otter", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Pair, biomes: Shallow, size: 0.8f);
         RegisterAnimal("Walrus", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Herd, biomes: ShallowOrDeep, size: 1.5f);
+    }
+
+    private static void RegisterOtherSemiAquatic()
+    {
+        RegisterAnimal("Manatee", CreatureType.Herbivore, isAquatic: true, social: SocialBehavior.Solitary, biomes: Shallow, size: 1.3f);
+        RegisterAnimal("Otter", CreatureType.Omnivore, isAquatic: true, social: SocialBehavior.Pair, biomes: Shallow, size: 0.8f);
         RegisterAnimal("Hippopotamus", CreatureType.Omnivore, isAquatic: false, social: SocialBehavior.Herd, biomes: LandAndShallow, size: 1.6f);
     }
 
