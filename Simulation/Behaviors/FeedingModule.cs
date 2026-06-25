@@ -40,9 +40,7 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         if (TryEatNearbyFruit(self, ecosystem)) return true;
 
-        Plant? food = self is Herbivore h
-            ? ecosystem.FindNearestPlant(h)
-            : ecosystem.FindNearestPlantFor(self);
+        Plant? food = FindFoodPlant(self, ecosystem);
 
         if (food == null)
             return TryScavengeCarcass(self, ecosystem, dt);
@@ -180,9 +178,7 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static bool TryFeedNearbyHerbivore(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        Plant? food = self is Herbivore h
-            ? ecosystem.FindNearestPlant(h)
-            : ecosystem.FindNearestPlantFor(self);
+        Plant? food = FindFoodPlant(self, ecosystem);
 
         if (food == null || self.DistanceTo(food) >= 12f)
             return TryGraze(self, world, dt);
@@ -206,13 +202,8 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static bool TryFeedNearbyOmnivore(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        Creature? prey = ecosystem.FindNearestPrey(self);
-        if (prey != null && self.DistanceTo(prey) < 10f)
-        {
-            var attackDamage = self is Omnivore om ? om.AttackDamage : 12f;
-            AttackPrey(self, prey, attackDamage * dt);
+        if (TryAttackNearbyPrey(self, ecosystem, dt))
             return true;
-        }
 
         Plant? food = ecosystem.FindNearestPlantFor(self);
         if (food == null || self.DistanceTo(food) >= 12f)
@@ -248,5 +239,23 @@ internal sealed class FeedingModule : IBehaviorModule
             return true;
         }
         return false;
+    }
+
+    private static Plant? FindFoodPlant(Creature self, Ecosystem ecosystem)
+    {
+        return self is Herbivore h
+            ? ecosystem.FindNearestPlant(h)
+            : ecosystem.FindNearestPlantFor(self);
+    }
+
+    private static bool TryAttackNearbyPrey(Creature self, Ecosystem ecosystem, float dt)
+    {
+        Creature? prey = ecosystem.FindNearestPrey(self);
+        if (prey == null || self.DistanceTo(prey) >= 10f)
+            return false;
+
+        var attackDamage = self is Omnivore om ? om.AttackDamage : 12f;
+        AttackPrey(self, prey, attackDamage * dt);
+        return true;
     }
 }
