@@ -27,6 +27,7 @@ Thumbs.db
 .claude/
 .claude.json*
 .beads/
+.opencode/
 AGENTS.md
 CLAUDE.md
 .design-context.md
