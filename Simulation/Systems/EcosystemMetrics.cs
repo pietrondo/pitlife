@@ -73,14 +73,11 @@ public sealed class EcosystemMetrics : ISimulationSystem
     public void Update(Ecosystem ecosystem)
     {
         TotalTime = ecosystem.TotalTime;
-        Plants = ecosystem.PlantCount;
-        Herbivores = ecosystem.HerbivoreCount;
-        Carnivores = ecosystem.CarnivoreCount;
-        Omnivores = ecosystem.OmnivoreCount;
-        TotalCreatures = ecosystem.Creatures.Count(c => c != null && c.IsAlive);
+        UpdateBasicStats(ecosystem);
 
-        var aliveBySpecies = new Dictionary<string, int>(StringComparer.Ordinal);
         var aliveCreatures = new List<Creature>();
+        var aliveBySpecies = new Dictionary<string, int>(StringComparer.Ordinal);
+
         foreach (var c in ecosystem.Creatures)
         {
             if (c == null || !c.IsAlive) continue;
@@ -89,6 +86,22 @@ public sealed class EcosystemMetrics : ISimulationSystem
             aliveBySpecies[c.Species] = count + 1;
         }
 
+        UpdateSpeciesStats(aliveBySpecies);
+        UpdateSubspeciesStats(aliveCreatures);
+        UpdateTrophicStats(aliveCreatures);
+    }
+
+    private void UpdateBasicStats(Ecosystem ecosystem)
+    {
+        Plants = ecosystem.PlantCount;
+        Herbivores = ecosystem.HerbivoreCount;
+        Carnivores = ecosystem.CarnivoreCount;
+        Omnivores = ecosystem.OmnivoreCount;
+        TotalCreatures = ecosystem.Creatures.Count(c => c != null && c.IsAlive);
+    }
+
+    private void UpdateSpeciesStats(Dictionary<string, int> aliveBySpecies)
+    {
         SpeciesPopulations.Clear();
         foreach (var kvp in aliveBySpecies.OrderByDescending(kvp => kvp.Value))
             SpeciesPopulations[kvp.Key] = kvp.Value;
@@ -103,7 +116,10 @@ public sealed class EcosystemMetrics : ISimulationSystem
             if (count > prevMax)
                 SpeciesMaxPopulation[species] = count;
         }
+    }
 
+    private void UpdateSubspeciesStats(List<Creature> aliveCreatures)
+    {
         var subspeciesByKey = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var c in aliveCreatures)
         {
@@ -116,30 +132,36 @@ public sealed class EcosystemMetrics : ISimulationSystem
         foreach (var kvp in subspeciesByKey.OrderByDescending(kvp => kvp.Value))
             SubspeciesCounts[kvp.Key] = kvp.Value;
         TotalSubspecies = subspeciesByKey.Count;
+    }
 
+    private void UpdateTrophicStats(List<Creature> aliveCreatures)
+    {
         if (aliveCreatures.Count > 0)
         {
             int t1 = 0, t2 = 0, t3p = 0;
+            float totalHet = 0f;
+            float totalInb = 0f;
+            int geneticCount = 0;
+
             foreach (var c in aliveCreatures)
             {
                 int level = FoodWeb.TrophicLevel(c.CreatureType);
                 if (level == 1) t1++;
                 else if (level == 2) t2++;
                 else t3p++;
+
+                if (c.CreatureType != CreatureType.Plant)
+                {
+                    totalHet += c.Genome.Heterozygosity;
+                    totalInb += c.InbreedingCoefficient;
+                    geneticCount++;
+                }
             }
+
             TrophicLevel1 = t1;
             TrophicLevel2 = t2;
             TrophicLevel3Plus = t3p;
-            float totalHet = 0f;
-            float totalInb = 0f;
-            int geneticCount = 0;
-            foreach (var c in aliveCreatures)
-            {
-                if (c.CreatureType == CreatureType.Plant) continue;
-                totalHet += c.Genome.Heterozygosity;
-                totalInb += c.InbreedingCoefficient;
-                geneticCount++;
-            }
+
             if (geneticCount > 0)
             {
                 MeanHeterozygosity = totalHet / geneticCount;
