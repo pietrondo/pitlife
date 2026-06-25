@@ -39,11 +39,22 @@ public sealed class PixelWorldRenderer : IDisposable
         }
 
         int pw = _world.PixelWidth, ph = _world.PixelHeight;
-        for (int dy = -1; dy <= 1; dy++)
-            for (int dx = -1; dx <= 1; dx++)
+        var visible = camera.VisibleArea;
+
+        int startX = (int)MathF.Floor((float)visible.Left / pw);
+        int endX = (int)MathF.Floor((float)visible.Right / pw);
+        int startY = (int)MathF.Floor((float)visible.Top / ph);
+        int endY = (int)MathF.Floor((float)visible.Bottom / ph);
+
+        for (int dy = startY; dy <= endY; dy++)
+        {
+            for (int dx = startX; dx <= endX; dx++)
+            {
                 sb.Draw(_worldTexture,
                     new Rectangle(dx * pw, dy * ph, pw + 1, ph + 1),
                     Color.White);
+            }
+        }
     }
 
     private void RedrawWorldTexture(GraphicsDevice gd)
