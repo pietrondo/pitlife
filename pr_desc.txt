@@ -1,4 +1,4 @@
-🎯 **What:** The code health issue addressed was a long, complex Layout method in UI/MainMenu.cs. We extracted layout configurations for different panels into LayoutWorldGenPanel, LayoutOptionsPanel, and LayoutMainPanel helper functions.
-💡 **Why:** This improves maintainability and readability by keeping smaller, more focused helper functions instead of one big monolithic function.
-✅ **Verification:** We confirmed structural integrity using git diff and ran DOTNET_ROLL_FORWARD=Major dotnet test tests/PitLife.Tests verifying that tests pass successfully. No new functionality or tests were needed.
-✨ **Result:** The Layout function logic in UI/MainMenu.cs is cleaner, maintainable, and readable.
+🎯 **What:** Documented `RegisterAll` method in `BuiltinSpecies.cs` with an XML summary explaining its modular extraction.
+💡 **Why:** The codebase already had `RegisterAll` successfully broken down into sub-methods, so adding documentation resolves the issue by clarifying the method's refactored state and structure.
+✅ **Verification:** Verified tests pass properly.
+✨ **Result:** Improved code readability by explicitly documenting the lifecycle and structure of the global registry initialization.
