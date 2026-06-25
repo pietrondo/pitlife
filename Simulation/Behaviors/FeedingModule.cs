@@ -238,13 +238,12 @@ internal sealed class FeedingModule : IBehaviorModule
         foreach (var c in ecosystem.Creatures)
         {
             if (c == null || c.IsAlive || c.CreatureType == CreatureType.Plant) continue;
-            if (self.DistanceTo(c) < 10f && c.Energy > 0)
-            {
-                var eaten = Math.Min(c.Energy, 8f * dt);
-                c.Energy -= eaten;
-                self.Energy = Math.Min(self.Energy + eaten * 1.2f, self.MaxEnergy);
-                return true;
-            }
+            if (self.DistanceTo(c) >= 10f || c.Energy <= 0) continue;
+
+            var eaten = Math.Min(c.Energy, 8f * dt);
+            c.Energy -= eaten;
+            self.Energy = Math.Min(self.Energy + eaten * 1.2f, self.MaxEnergy);
+            return true;
         }
         return false;
     }
