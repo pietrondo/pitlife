@@ -39,6 +39,7 @@ public class BalanceConfigData
     public WindBalance Wind { get; set; } = new();
     public MovementBalance Movement { get; set; } = new();
     public InbreedingBalance Inbreeding { get; set; } = new();
+    public TrophicBalance Trophic { get; set; } = new();
 }
 
 public class CreatureBalance
@@ -102,4 +103,34 @@ public class InbreedingBalance
 {
     public float CoefficientImpact { get; set; } = 0.5f;
     public float MinFitness { get; set; } = 0.5f;
+}
+
+public class TrophicBalance
+{
+    public float SampleInterval { get; set; } = 5f;
+    public float LotkaVolterraDefaultRatio { get; set; } = 10f;
+    public float PreyBoomRatioThreshold { get; set; } = 5f;
+    public float PredatorPressureRatioThreshold { get; set; } = 2f;
+
+    public float PreyBoomHerbivoreBirthBonus { get; set; } = 1.3f;
+    public float PreyBoomHerbivoreDeathPenalty { get; set; } = 0.7f;
+    public float PreyBoomCarnivoreBirthBonus { get; set; } = 1.5f;
+    public float PreyBoomCarnivoreDeathPenalty { get; set; } = 0.5f;
+
+    public float PredatorPressureHerbivoreBirthBonus { get; set; } = 0.6f;
+    public float PredatorPressureHerbivoreDeathPenalty { get; set; } = 2f;
+    public float PredatorPressureCarnivoreBirthBonus { get; set; } = 0.4f;
+    public float PredatorPressureCarnivoreDeathPenalty { get; set; } = 2f;
+
+    public float OvergrazingPlantRatio { get; set; } = 3f;
+    public float OvergrazingDeathPenaltyMultiplier { get; set; } = 1.5f;
+    public float OvergrazingBirthBonusMultiplier { get; set; } = 0.5f;
+
+    public float PlantOvergrowthHerbivoreRatio { get; set; } = 5f;
+    public float PlantOvergrowthBirthBonusMultiplier { get; set; } = 1.3f;
+
+    public float MinBirthBonus { get; set; } = 0.2f;
+    public float MaxBirthBonus { get; set; } = 2f;
+    public float MinDeathPenalty { get; set; } = 0.3f;
+    public float MaxDeathPenalty { get; set; } = 3f;
 }

@@ -23,7 +23,7 @@ public sealed class TrophicDynamics
     public string CurrentPhaseLabel { get; private set; } = "Balanced";
 
     private float _timeSinceLastSample;
-    private const float SampleInterval = 5f; // record state every 5 seconds
+
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed);
 
@@ -47,7 +47,7 @@ public sealed class TrophicDynamics
 
         // Sample population for historical tracking
         _timeSinceLastSample += dt;
-        if (_timeSinceLastSample >= SampleInterval)
+        if (_timeSinceLastSample >= BalanceConfig.Data.Trophic.SampleInterval)
         {
             _timeSinceLastSample = 0f;
             HerbivorePeak = Math.Max(HerbivorePeak, herbivores);
@@ -59,27 +59,27 @@ public sealed class TrophicDynamics
         // Lotka-Volterra: compute predator-prey ratio
         // When predators >> prey: prey drops, then predators starve
         // When prey >> predators: prey booms, then predators follow
-        float ratio = carnivores > 0 ? (float)herbivores / carnivores : 10f;
+        float ratio = carnivores > 0 ? (float)herbivores / carnivores : BalanceConfig.Data.Trophic.LotkaVolterraDefaultRatio;
 
         // Prey (herbivore) dynamics
         // Prey reproduce more when predators are scarce (high ratio)
-        if (ratio > 5f)
+        if (ratio > BalanceConfig.Data.Trophic.PreyBoomRatioThreshold)
         {
             // Prey boom: lots of herbivores, few carnivores
-            HerbivoreBirthBonus = 1.3f;
-            HerbivoreDeathPenalty = 0.7f;
-            CarnivoreBirthBonus = 1.5f; // predators get bonus from abundant food
-            CarnivoreDeathPenalty = 0.5f;
+            HerbivoreBirthBonus = BalanceConfig.Data.Trophic.PreyBoomHerbivoreBirthBonus;
+            HerbivoreDeathPenalty = BalanceConfig.Data.Trophic.PreyBoomHerbivoreDeathPenalty;
+            CarnivoreBirthBonus = BalanceConfig.Data.Trophic.PreyBoomCarnivoreBirthBonus; // predators get bonus from abundant food
+            CarnivoreDeathPenalty = BalanceConfig.Data.Trophic.PreyBoomCarnivoreDeathPenalty;
             CurrentPhaseLabel = "Prey Boom";
             CyclePhase = 1f;
         }
-        else if (ratio < 2f)
+        else if (ratio < BalanceConfig.Data.Trophic.PredatorPressureRatioThreshold)
         {
             // Predator pressure: many carnivores per herbivore
-            HerbivoreBirthBonus = 0.6f;
-            HerbivoreDeathPenalty = 2f; // prey death rate doubles
-            CarnivoreBirthBonus = 0.4f; // predator birth slows (overcrowding)
-            CarnivoreDeathPenalty = 2f; // predators starve from competition
+            HerbivoreBirthBonus = BalanceConfig.Data.Trophic.PredatorPressureHerbivoreBirthBonus;
+            HerbivoreDeathPenalty = BalanceConfig.Data.Trophic.PredatorPressureHerbivoreDeathPenalty; // prey death rate doubles
+            CarnivoreBirthBonus = BalanceConfig.Data.Trophic.PredatorPressureCarnivoreBirthBonus; // predator birth slows (overcrowding)
+            CarnivoreDeathPenalty = BalanceConfig.Data.Trophic.PredatorPressureCarnivoreDeathPenalty; // predators starve from competition
             CurrentPhaseLabel = "Predator Pressure";
             CyclePhase = -1f;
         }
@@ -95,24 +95,24 @@ public sealed class TrophicDynamics
         }
 
         // Additional plant-herbivore coupling
-        if (plants > 0 && herbivores > plants * 3)
+        if (plants > 0 && herbivores > plants * BalanceConfig.Data.Trophic.OvergrazingPlantRatio)
         {
             // Overgrazing: too many herbivores for available plants
-            HerbivoreDeathPenalty *= 1.5f;
-            HerbivoreBirthBonus *= 0.5f;
+            HerbivoreDeathPenalty *= BalanceConfig.Data.Trophic.OvergrazingDeathPenaltyMultiplier;
+            HerbivoreBirthBonus *= BalanceConfig.Data.Trophic.OvergrazingBirthBonusMultiplier;
             CurrentPhaseLabel = "Overgrazing";
         }
-        else if (herbivores > 0 && plants > herbivores * 5)
+        else if (herbivores > 0 && plants > herbivores * BalanceConfig.Data.Trophic.PlantOvergrowthHerbivoreRatio)
         {
             // Plant overgrowth: lots of food, few consumers
-            HerbivoreBirthBonus *= 1.3f;
+            HerbivoreBirthBonus *= BalanceConfig.Data.Trophic.PlantOvergrowthBirthBonusMultiplier;
         }
 
         // Clamp multipliers to reasonable ranges
-        HerbivoreBirthBonus = Math.Clamp(HerbivoreBirthBonus, 0.2f, 2f);
-        HerbivoreDeathPenalty = Math.Clamp(HerbivoreDeathPenalty, 0.3f, 3f);
-        CarnivoreBirthBonus = Math.Clamp(CarnivoreBirthBonus, 0.2f, 2f);
-        CarnivoreDeathPenalty = Math.Clamp(CarnivoreDeathPenalty, 0.3f, 3f);
+        HerbivoreBirthBonus = Math.Clamp(HerbivoreBirthBonus, BalanceConfig.Data.Trophic.MinBirthBonus, BalanceConfig.Data.Trophic.MaxBirthBonus);
+        HerbivoreDeathPenalty = Math.Clamp(HerbivoreDeathPenalty, BalanceConfig.Data.Trophic.MinDeathPenalty, BalanceConfig.Data.Trophic.MaxDeathPenalty);
+        CarnivoreBirthBonus = Math.Clamp(CarnivoreBirthBonus, BalanceConfig.Data.Trophic.MinBirthBonus, BalanceConfig.Data.Trophic.MaxBirthBonus);
+        CarnivoreDeathPenalty = Math.Clamp(CarnivoreDeathPenalty, BalanceConfig.Data.Trophic.MinDeathPenalty, BalanceConfig.Data.Trophic.MaxDeathPenalty);
     }
 
     public string GetStatusLine()

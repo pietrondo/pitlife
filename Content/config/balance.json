@@ -48,5 +48,28 @@
   "inbreeding": {
     "coefficientImpact": 0.5,
     "minFitness": 0.5
+  },
+  "trophic": {
+    "sampleInterval": 5.0,
+    "lotkaVolterraDefaultRatio": 10.0,
+    "preyBoomRatioThreshold": 5.0,
+    "predatorPressureRatioThreshold": 2.0,
+    "preyBoomHerbivoreBirthBonus": 1.3,
+    "preyBoomHerbivoreDeathPenalty": 0.7,
+    "preyBoomCarnivoreBirthBonus": 1.5,
+    "preyBoomCarnivoreDeathPenalty": 0.5,
+    "predatorPressureHerbivoreBirthBonus": 0.6,
+    "predatorPressureHerbivoreDeathPenalty": 2.0,
+    "predatorPressureCarnivoreBirthBonus": 0.4,
+    "predatorPressureCarnivoreDeathPenalty": 2.0,
+    "overgrazingPlantRatio": 3.0,
+    "overgrazingDeathPenaltyMultiplier": 1.5,
+    "overgrazingBirthBonusMultiplier": 0.5,
+    "plantOvergrowthHerbivoreRatio": 5.0,
+    "plantOvergrowthBirthBonusMultiplier": 1.3,
+    "minBirthBonus": 0.2,
+    "maxBirthBonus": 2.0,
+    "minDeathPenalty": 0.3,
+    "maxDeathPenalty": 3.0
   }
 }
