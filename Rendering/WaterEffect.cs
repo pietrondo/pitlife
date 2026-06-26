@@ -5,15 +5,29 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the WaterEffect.
+/// </summary>
 public sealed class WaterEffect
 {
     private float _time;
 
+    /// <summary>
+    /// Executes the Update.
+    /// </summary>
+    /// <param name="dt">The dt parameter.</param>
     public void Update(float dt)
     {
         _time += dt;
     }
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="pixel">The pixel parameter.</param>
+    /// <param name="world">The world parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
     public void Draw(SpriteBatch sb, Texture2D pixel, World world, Camera camera)
     {
         int tileSize = world.TileSize;

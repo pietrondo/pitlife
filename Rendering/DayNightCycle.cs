@@ -3,19 +3,37 @@ using Microsoft.Xna.Framework;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the DayNightCycle.
+/// </summary>
 public class DayNightCycle
 {
     public const float DayLength = 120f;
 
+    /// <summary>
+    /// Gets or sets the TimeOfDay.
+    /// </summary>
     public float TimeOfDay { get; private set; }
+    /// <summary>
+    /// Gets or sets the Phase.
+    /// </summary>
     public DayPhase Phase { get; private set; }
 
+    /// <summary>
+    /// Executes the Update.
+    /// </summary>
+    /// <param name="totalTime">The totalTime parameter.</param>
     public void Update(float totalTime)
     {
         TimeOfDay = totalTime % DayLength;
         Phase = GetPhase(TimeOfDay);
     }
 
+    /// <summary>
+    /// Executes the GetPhase.
+    /// </summary>
+    /// <param name="timeOfDay">The timeOfDay parameter.</param>
+    /// <returns>Returns the DayPhase result.</returns>
     public static DayPhase GetPhase(float timeOfDay)
     {
         float t = timeOfDay / DayLength;
@@ -29,6 +47,10 @@ public class DayNightCycle
         };
     }
 
+    /// <summary>
+    /// Executes the GetOverlayColor.
+    /// </summary>
+    /// <returns>Returns the Color result.</returns>
     public Color GetOverlayColor()
     {
         float t = TimeOfDay / DayLength;

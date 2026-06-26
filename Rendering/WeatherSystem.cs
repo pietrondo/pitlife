@@ -5,6 +5,9 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the WeatherSystem.
+/// </summary>
 public sealed class WeatherSystem
 {
     private struct Particle
@@ -20,6 +23,14 @@ public sealed class WeatherSystem
     private const int MaxRain = 200;
     private const int MaxSnow = 150;
 
+    /// <summary>
+    /// Executes the Update.
+    /// </summary>
+    /// <param name="climate">The climate parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
+    /// <param name="dt">The dt parameter.</param>
+    /// <param name="worldW">The worldW parameter.</param>
+    /// <param name="worldH">The worldH parameter.</param>
     public void Update(ClimateSystem climate, Camera camera, float dt, int worldW, int worldH)
     {
         bool isSnow = climate.CurrentSeason == Season.Winter || climate.TemperatureModifier < -0.05f;
@@ -76,6 +87,12 @@ public sealed class WeatherSystem
         }
     }
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="pixel">The pixel parameter.</param>
+    /// <param name="isSnow">The isSnow parameter.</param>
     public void Draw(SpriteBatch sb, Texture2D pixel, bool isSnow)
     {
         for (int i = 0; i < _count; i++)

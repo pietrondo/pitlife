@@ -22,6 +22,8 @@ public sealed class SpeciesCatalogRuntime
 
     public IReadOnlyList<SpeciesCatalogValidationError> LoadAndApply(string path, string repositoryRoot)
     {
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(repositoryRoot);
         if (!File.Exists(path))
             return Array.Empty<SpeciesCatalogValidationError>();
 
@@ -43,6 +45,8 @@ public sealed class SpeciesCatalogRuntime
         SpeciesCatalogDocument document,
         string repositoryRoot)
     {
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(repositoryRoot);
         IReadOnlyList<SpeciesCatalogValidationError> errors = Validate(document, repositoryRoot);
         if (errors.Count > 0)
             return errors;
@@ -64,6 +68,8 @@ public sealed class SpeciesCatalogRuntime
         SpeciesCatalogDocument document,
         string repositoryRoot)
     {
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(repositoryRoot);
         string[] builtInKeys = SpeciesRegistry.All
             .Where(key => !_customKeys.Contains(key))
             .ToArray();
@@ -75,6 +81,9 @@ public sealed class SpeciesCatalogRuntime
         string path,
         string repositoryRoot)
     {
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(repositoryRoot);
         IReadOnlyList<SpeciesCatalogValidationError> errors = Validate(document, repositoryRoot);
         if (errors.Count > 0)
             return errors;

@@ -8,6 +8,9 @@ using PitLife.Core;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the CreatureRenderer.
+/// </summary>
 public class CreatureRenderer
 {
     private readonly Ecosystem _ecosystem;
@@ -20,30 +23,70 @@ public class CreatureRenderer
     private Texture2D? _carnivoreTexture;
     private Texture2D? _omnivoreTexture;
 
+    /// <summary>
+    /// Initializes a new instance of the CreatureRenderer.
+    /// </summary>
+    /// <param name="ecosystem">The ecosystem parameter.</param>
     public CreatureRenderer(Ecosystem ecosystem) => _ecosystem = ecosystem;
 
+    /// <summary>
+    /// Executes the LoadContent.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
     public void LoadContent(GraphicsDevice gd)
     {
         _pixelTexture = new Texture2D(gd, 1, 1);
         _pixelTexture.SetData([Color.White]);
     }
 
+    /// <summary>
+    /// Executes the SetPlantTexture.
+    /// </summary>
+    /// <param name="t">The t parameter.</param>
     public void SetPlantTexture(Texture2D? t) => _plantTexture = t;
+    /// <summary>
+    /// Executes the SetHerbivoreTexture.
+    /// </summary>
+    /// <param name="t">The t parameter.</param>
     public void SetHerbivoreTexture(Texture2D? t) => _herbivoreTexture = t;
+    /// <summary>
+    /// Executes the SetCarnivoreTexture.
+    /// </summary>
+    /// <param name="t">The t parameter.</param>
     public void SetCarnivoreTexture(Texture2D? t) => _carnivoreTexture = t;
+    /// <summary>
+    /// Executes the SetOmnivoreTexture.
+    /// </summary>
+    /// <param name="t">The t parameter.</param>
     public void SetOmnivoreTexture(Texture2D? t) => _omnivoreTexture = t;
+    /// <summary>
+    /// Executes the RegisterSpeciesTexture.
+    /// </summary>
+    /// <param name="species">The species parameter.</param>
+    /// <param name="t">The t parameter.</param>
     public void RegisterSpeciesTexture(string species, Texture2D? t)
     {
         if (t != null)
             _speciesTextures[species] = t;
     }
 
+    /// <summary>
+    /// Executes the RegisterGenderedSpeciesTexture.
+    /// </summary>
+    /// <param name="species">The species parameter.</param>
+    /// <param name="male">The male parameter.</param>
+    /// <param name="female">The female parameter.</param>
     public void RegisterGenderedSpeciesTexture(string species, Texture2D? male, Texture2D? female)
     {
         if (male != null && female != null)
             _genderedSpeciesTextures[species] = (male, female);
     }
 
+    /// <summary>
+    /// Executes the LoadFromRegistry.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
+    /// <param name="assets">The assets parameter.</param>
     public void LoadFromRegistry(GraphicsDevice gd, IEnumerable<SpeciesAsset> assets)
     {
         foreach (var asset in assets)
@@ -60,6 +103,11 @@ public class CreatureRenderer
         }
     }
 
+    /// <summary>
+    /// Executes the LoadGenderedFromRegistry.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
+    /// <param name="assets">The assets parameter.</param>
     public void LoadGenderedFromRegistry(GraphicsDevice gd, IEnumerable<GenderedSpeciesAsset> assets)
     {
         foreach (var a in assets)
@@ -80,6 +128,13 @@ public class CreatureRenderer
         return null;
     }
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
+    /// <param name="dayNightOverlay">The dayNightOverlay parameter.</param>
+    /// <param name="font">The font parameter.</param>
     public void Draw(SpriteBatch sb, Camera camera, Color? dayNightOverlay = null, SpriteFont? font = null)
     {
         if (_pixelTexture == null) return;
