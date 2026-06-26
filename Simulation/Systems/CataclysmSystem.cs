@@ -18,7 +18,12 @@ public sealed class CataclysmSystem
     public float AnimTimer { get; private set; }
     public float AnimDuration { get; private set; } = 1.5f;
 
-    private float _cooldownTimer = 120f;
+    private float _cooldownTimer;
+
+    public CataclysmSystem()
+    {
+        _cooldownTimer = CataclysmConfig.Data.InitialCooldown;
+    }
 
     public void Tick(Ecosystem eco, GameTime gameTime)
     {
@@ -28,7 +33,7 @@ public sealed class CataclysmSystem
     }
 
     public void Initialize(World world) { }
-    public void Reset() { IsActive = false; ActiveEvent = ""; GrassMultiplier = 1f; _cooldownTimer = 0; }
+    public void Reset() { IsActive = false; ActiveEvent = ""; GrassMultiplier = 1f; _cooldownTimer = CataclysmConfig.Data.InitialCooldown; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)
     {
@@ -70,7 +75,7 @@ public sealed class CataclysmSystem
         _cooldownTimer -= dt;
         if (_cooldownTimer > 0) return;
 
-        _cooldownTimer = 180f + (float)rng.NextDouble() * 420f;
+        _cooldownTimer = CataclysmConfig.Data.CooldownMin + (float)rng.NextDouble() * CataclysmConfig.Data.CooldownMax;
 
         if (rng.NextDouble() < 0.3f)
         {
@@ -90,12 +95,12 @@ public sealed class CataclysmSystem
             case 0:
                 ActiveEvent = "Asteroid Impact";
                 GrassMultiplier = 0f;
-                Timer = 60f;
+                Timer = CataclysmConfig.Data.AsteroidDuration;
                 break;
             case 1:
                 ActiveEvent = "Ice Age";
                 GrassMultiplier = 0.1f;
-                Timer = 120f;
+                Timer = CataclysmConfig.Data.IceAgeDuration;
                 break;
             case 2:
                 ActiveEvent = "Supervolcano";
@@ -110,9 +115,9 @@ public sealed class CataclysmSystem
             ImpactRadius = radius * ecosystem.World.TileSize;
             ImpactColor = ActiveEvent switch
             {
-                "Asteroid Impact" => new Color(255, 100, 30, (int)200),
-                "Supervolcano" => new Color(255, 50, 10, (int)200),
-                "Ice Age" => new Color(100, 200, 255, (int)150),
+                "Asteroid Impact" => CataclysmConfig.Data.Colors.Asteroid.ToColor(),
+                "Supervolcano" => CataclysmConfig.Data.Colors.Supervolcano.ToColor(),
+                "Ice Age" => CataclysmConfig.Data.Colors.IceAge.ToColor(),
                 _ => Color.Transparent
             };
             AnimTimer = 0;
@@ -126,8 +131,8 @@ public sealed class CataclysmSystem
     {
         int radius = ActiveEvent switch
         {
-            "Asteroid Impact" => 8,
-            "Supervolcano" => 5,
+            "Asteroid Impact" => CataclysmConfig.Data.Radii.Earthquake, // Originally hardcoded 8, Asteroid was 6 in TriggerAt.
+            "Supervolcano" => CataclysmConfig.Data.Radii.Supervolcano,
             _ => 0
         };
         if (radius <= 0) return 0;
@@ -169,7 +174,7 @@ public sealed class CataclysmSystem
             if (nearWater && rng.NextDouble() < 0.4f)
             {
                 Logger.Event("CATACLYSM", $"Chain: Earthquake → Tsunami at ({tx},{ty})");
-                ImpactColor = new Color(30, 100, 200, 180);
+                ImpactColor = CataclysmConfig.Data.Colors.Tsunami.ToColor();
                 ActiveEvent = "Tsunami";
                 GrassMultiplier = 2.5f;
                 IsActive = true;
@@ -194,17 +199,22 @@ public sealed class CataclysmSystem
         GrassMultiplier = type switch { "Drought" => 0.1f, "Flood" => 2.5f, _ => 0.2f };
         int tx = (int)(position.X / ecosystem.World.TileSize);
         int ty = (int)(position.Y / ecosystem.World.TileSize);
-        int radius = type switch { "Asteroid" => 6, "Supervolcano" => 5, "Earthquake" => 8, _ => 3 };
+        int radius = type switch {
+            "Asteroid" => CataclysmConfig.Data.Radii.Asteroid,
+            "Supervolcano" => CataclysmConfig.Data.Radii.Supervolcano,
+            "Earthquake" => CataclysmConfig.Data.Radii.Earthquake,
+            _ => CataclysmConfig.Data.Radii.DefaultRadius
+        };
         ImpactPosition = position;
         ImpactRadius = radius * ecosystem.World.TileSize;
         ImpactColor = type switch
         {
-            "Asteroid" => new Color(255, 100, 30, (int)200),
-            "Supervolcano" => new Color(255, 50, 10, (int)200),
-            "Earthquake" => new Color(180, 140, 100, (int)150),
-            "IceAge" => new Color(100, 200, 255, (int)150),
-            "Drought" => new Color(255, 180, 40, (int)150),
-            "Flood" => new Color(40, 140, 255, (int)150),
+            "Asteroid" => CataclysmConfig.Data.Colors.Asteroid.ToColor(),
+            "Supervolcano" => CataclysmConfig.Data.Colors.Supervolcano.ToColor(),
+            "Earthquake" => CataclysmConfig.Data.Colors.Earthquake.ToColor(),
+            "IceAge" => CataclysmConfig.Data.Colors.IceAge.ToColor(),
+            "Drought" => CataclysmConfig.Data.Colors.Drought.ToColor(),
+            "Flood" => CataclysmConfig.Data.Colors.Flood.ToColor(),
             _ => Color.Transparent
         };
         for (int dy = -radius; dy <= radius; dy++)
