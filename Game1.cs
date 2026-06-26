@@ -387,7 +387,7 @@ public class Game1 : Game
     {
         if (_screen != GameScreen.MainMenu) return false;
 
-        if (!_mainMenu.IsWorldGenPanelOpen)
+        if (!_mainMenu.IsWorldGenPanelOpen && !_paused)
         {
             _ecosystem.SimulationSpeed = 0.35f;
             _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
