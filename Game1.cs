@@ -143,7 +143,7 @@ public class Game1 : Game
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
 
-        _logo = LoadTexture("Content/assets/logo.png");
+        _logo = LoadTexture("Content/logo.png");
         _contentLoaded = true;
     }
 
