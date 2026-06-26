@@ -84,7 +84,7 @@ public class Game1 : Game
     {
         LoadSettings();
         _speciesCatalogRuntime.CatalogChanged += OnSpeciesCatalogChanged;
-        string bundledCatalog = Path.Combine(Content.RootDirectory, "species.json");
+        var bundledCatalog = Path.Combine(Content.RootDirectory, "species.json");
         if (File.Exists(bundledCatalog))
         {
             var bundledErrors = _speciesCatalogRuntime.LoadAndApply(bundledCatalog, Directory.GetCurrentDirectory());
@@ -159,7 +159,7 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (_showLoadingTimer > 0)
         {
             _showLoadingTimer -= dt;
@@ -179,115 +179,13 @@ public class Game1 : Game
         UpdateFPS(gameTime);
         var kbd = Keyboard.GetState();
         var mouse = Mouse.GetState();
-        bool escapePressed = kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape);
-        bool gamepadBack = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
+        var escapePressed = kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape);
+        var gamepadBack = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
 
         _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
         _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
 
-        if (_screen == GameScreen.MainMenu)
-        {
-            if (!_mainMenu.IsWorldGenPanelOpen)
-            {
-                _ecosystem.SimulationSpeed = 0.35f;
-                _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
-                _dayNight.Update(_ecosystem.TotalTime);
-            }
-
-            if (_helpScreen.IsActive)
-            {
-                _helpScreen.Update(
-                    mouse,
-                    _prevMouse,
-                    kbd,
-                    _prevKbd,
-                    GraphicsDevice.Viewport.Width,
-                    GraphicsDevice.Viewport.Height);
-                if (gamepadBack)
-                    _helpScreen.Hide();
-                _prevKbd = kbd;
-        _prevMouse = mouse;
-                base.Update(gameTime);
-                return;
-            }
-
-            _menuInputCooldown = Math.Max(0f, _menuInputCooldown - dt);
-            MenuAction action = _menuInputCooldown > 0f
-                ? MenuAction.None
-                : _mainMenu.Update(
-                    mouse,
-                    _prevMouse,
-                    kbd,
-                    _prevKbd,
-                    GraphicsDevice.Viewport.Width,
-                    GraphicsDevice.Viewport.Height,
-                    _graphics.IsFullScreen);
-
-            switch (action)
-            {
-                case MenuAction.StartGame:
-                    _screen = GameScreen.Playing;
-                    _paused = false;
-                    _controller.SetPause(false);
-                    break;
-                case MenuAction.NewWorld:
-                    _mainMenu.CloseWorldGenPanel();
-                    _mainMenu.GameInProgress = false;
-                    _pendingWorldGen = true;
-                    _pendingSeed = null;
-                    _pendingOptions = _mainMenu.CurrentOptions;
-                    _showLoadingTimer = 1.5f;
-                    break;
-                case MenuAction.NewWorldWithSeed:
-                    _mainMenu.CloseWorldGenPanel();
-                    _mainMenu.GameInProgress = false;
-                    _pendingWorldGen = true;
-                    _pendingSeed = _mainMenu.Seed;
-                    _pendingOptions = _mainMenu.CurrentOptions;
-                    _showLoadingTimer = 1.5f;
-                    break;
-                case MenuAction.SaveGame:
-                    SaveSystem.Save("savegame.json", _ecosystem);
-                    _menuInputCooldown = 0.5f;
-                    break;
-                case MenuAction.LoadGame:
-                    try
-                    {
-                        var saveData = SaveSystem.Load("savegame.json");
-                        if (saveData != null)
-                        {
-                            RestoreLoadedEcosystem(saveData);
-                            _screen = GameScreen.Playing;
-                            _paused = false;
-                            _controller.SetPause(false);
-    }
-}
-                    catch (InvalidDataException ex)
-                    {
-                        Logger.Error($"Failed to load save: {ex.Message}");
-                    }
-                    _menuInputCooldown = 0.5f;
-                    break;
-                case MenuAction.ToggleFullscreen:
-                    _graphics.ToggleFullScreen();
-                    _menuInputCooldown = 0.5f;
-                    break;
-                case MenuAction.ShowHelp:
-                    _helpScreen.Show();
-                    break;
-                case MenuAction.Exit:
-                    Exit();
-                    break;
-            }
-
-            if (gamepadBack)
-                Exit();
-
-            _prevKbd = kbd;
-            _prevMouse = mouse;
-            base.Update(gameTime);
-            return;
-        }
+        if (UpdateMainMenu(gameTime, dt, kbd, mouse, gamepadBack)) return;
 
         if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
             _showDebugOverlay = !_showDebugOverlay;
@@ -298,21 +196,21 @@ public class Game1 : Game
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
         {
             _speciesEditor.Toggle();
-        if (_cyclopedia.IsOpen)
-        {
-            if (escapePressed)
-                _cyclopedia.Close();
-            else
-                _cyclopedia.Update(mouse, _prevMouse, kbd, _prevKbd,
-                    GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            if (_cyclopedia.IsOpen)
+            {
+                if (escapePressed)
+                    _cyclopedia.Close();
+                else
+                    _cyclopedia.Update(mouse, _prevMouse, kbd, _prevKbd,
+                        GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
-            _prevKbd = kbd;
-            _prevMouse = mouse;
-            base.Update(gameTime);
-            return;
-        }
+                _prevKbd = kbd;
+                _prevMouse = mouse;
+                base.Update(gameTime);
+                return;
+            }
 
-        if (_speciesEditor.IsOpen)
+            if (_speciesEditor.IsOpen)
             {
                 _inGameUi.CloseAllWindows();
                 if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
@@ -354,7 +252,7 @@ public class Game1 : Game
             return;
         }
 
-        bool pointerOverUi = _inGameUi.Update(
+        var pointerOverUi = _inGameUi.Update(
             mouse,
             _prevMouse,
             kbd,
@@ -363,8 +261,8 @@ public class Game1 : Game
             GraphicsDevice.Viewport.Height);
 
         var worldMouse = _camera.ScreenToWorld(mouse.X, mouse.Y);
-        int hx = (int)(worldMouse.X / _ecosystem.World.TileSize);
-        int hy = (int)(worldMouse.Y / _ecosystem.World.TileSize);
+        var hx = (int)(worldMouse.X / _ecosystem.World.TileSize);
+        var hy = (int)(worldMouse.Y / _ecosystem.World.TileSize);
         _inGameUi.HoverTile = new Point(
             Math.Clamp(hx, 0, _ecosystem.World.Width - 1),
             Math.Clamp(hy, 0, _ecosystem.World.Height - 1));
@@ -392,16 +290,16 @@ public class Game1 : Game
         }
 
         _spawnPanel.SetViewportHeight(GraphicsDevice.Viewport.Height);
-        bool cataWasOpen = _cataclysmPanel.IsOpen;
-        bool spawnWasOpen = _spawnPanel.IsOpen;
+        var cataWasOpen = _cataclysmPanel.IsOpen;
+        var spawnWasOpen = _spawnPanel.IsOpen;
         if (kbd.IsKeyDown(Keys.F8) && !_prevKbd.IsKeyDown(Keys.F8))
             _cataclysmPanel.Toggle();
         if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
         {
             _spawnPanel.Toggle();
         }
-        bool spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
-        bool cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
+        var spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
+        var cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
 
         if ((_cataclysmPanel.IsOpen && !cataWasOpen) || (_spawnPanel.IsOpen && !spawnWasOpen))
@@ -416,9 +314,9 @@ public class Game1 : Game
         }
 
         // ── Mutual exclusion: only one mode active ────────────
-        bool spawnJustSelected = _spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata;
-        bool speciesJustSelected = _spawnPanel.SelectedSpeciesKey != null && _spawnPanel.SelectedSpeciesKey != _prevSpawnSpecies;
-        bool panelJustSelected = _cataclysmPanel.SelectedType != null && _cataclysmPanel.SelectedType != _prevPanelCata;
+        var spawnJustSelected = _spawnPanel.SelectedCataclysm != null && _spawnPanel.SelectedCataclysm != _prevSpawnCata;
+        var speciesJustSelected = _spawnPanel.SelectedSpeciesKey != null && _spawnPanel.SelectedSpeciesKey != _prevSpawnSpecies;
+        var panelJustSelected = _cataclysmPanel.SelectedType != null && _cataclysmPanel.SelectedType != _prevPanelCata;
 
         if (spawnJustSelected || speciesJustSelected)
         {
@@ -461,6 +359,138 @@ public class Game1 : Game
             }
         }
 
+        HandleInputShortcuts(dt, kbd);
+        _prevKbd = kbd;
+
+        _controller.Advance(dt);
+        _paused = _controller.IsPaused;
+        _displayPlants = _controller.PlantCount;
+        _displayHerbivores = _controller.HerbivoreCount;
+        _displayCarnivores = _controller.CarnivoreCount;
+        _displayOmnivores = _controller.OmnivoreCount;
+        _displayTime = _controller.TotalTime;
+
+        _weather.Update(_ecosystem.Climate, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
+        _waterEffect.Update(dt);
+
+        _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
+            dt * _controller.CurrentSpeed);
+
+        HandleMouseClicks(mouse, pointerOverUi, spawnPanelConsumed, cataConsumed);
+        _prevMouse = mouse;
+        _gameFrame++;
+
+        base.Update(gameTime);
+    }
+
+    private bool UpdateMainMenu(GameTime gameTime, float dt, KeyboardState kbd, MouseState mouse, bool gamepadBack)
+    {
+        if (_screen != GameScreen.MainMenu) return false;
+
+        if (!_mainMenu.IsWorldGenPanelOpen)
+        {
+            _ecosystem.SimulationSpeed = 0.35f;
+            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
+            _dayNight.Update(_ecosystem.TotalTime);
+        }
+
+        if (_helpScreen.IsActive)
+        {
+            _helpScreen.Update(
+                mouse,
+                _prevMouse,
+                kbd,
+                _prevKbd,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height);
+            if (gamepadBack)
+                _helpScreen.Hide();
+            _prevKbd = kbd;
+            _prevMouse = mouse;
+            base.Update(gameTime);
+            return true;
+        }
+
+        _menuInputCooldown = Math.Max(0f, _menuInputCooldown - dt);
+        MenuAction action = _menuInputCooldown > 0f
+            ? MenuAction.None
+            : _mainMenu.Update(
+                mouse,
+                _prevMouse,
+                kbd,
+                _prevKbd,
+                GraphicsDevice.Viewport.Width,
+                GraphicsDevice.Viewport.Height,
+                _graphics.IsFullScreen);
+
+        switch (action)
+        {
+            case MenuAction.StartGame:
+                _screen = GameScreen.Playing;
+                _paused = false;
+                _controller.SetPause(false);
+                break;
+            case MenuAction.NewWorld:
+                _mainMenu.CloseWorldGenPanel();
+                _mainMenu.GameInProgress = false;
+                _pendingWorldGen = true;
+                _pendingSeed = null;
+                _pendingOptions = _mainMenu.CurrentOptions;
+                _showLoadingTimer = 1.5f;
+                break;
+            case MenuAction.NewWorldWithSeed:
+                _mainMenu.CloseWorldGenPanel();
+                _mainMenu.GameInProgress = false;
+                _pendingWorldGen = true;
+                _pendingSeed = _mainMenu.Seed;
+                _pendingOptions = _mainMenu.CurrentOptions;
+                _showLoadingTimer = 1.5f;
+                break;
+            case MenuAction.SaveGame:
+                SaveSystem.Save("savegame.json", _ecosystem);
+                _menuInputCooldown = 0.5f;
+                break;
+            case MenuAction.LoadGame:
+                try
+                {
+                    var saveData = SaveSystem.Load("savegame.json");
+                    if (saveData != null)
+                    {
+                        RestoreLoadedEcosystem(saveData);
+                        _screen = GameScreen.Playing;
+                        _paused = false;
+                        _controller.SetPause(false);
+                    }
+                }
+                catch (InvalidDataException ex)
+                {
+                    Logger.Error($"Failed to load save: {ex.Message}");
+                }
+                _menuInputCooldown = 0.5f;
+                break;
+            case MenuAction.ToggleFullscreen:
+                _graphics.ToggleFullScreen();
+                _menuInputCooldown = 0.5f;
+                break;
+            case MenuAction.ShowHelp:
+                _helpScreen.Show();
+                break;
+            case MenuAction.Exit:
+                Exit();
+                break;
+        }
+
+        if (gamepadBack)
+            Exit();
+
+        _prevKbd = kbd;
+        _prevMouse = mouse;
+        base.Update(gameTime);
+        return true;
+    }
+
+    private void HandleInputShortcuts(float dt, KeyboardState kbd)
+    {
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.Up) && _prevKbd.IsKeyUp(Keys.Up))
             _controller.SetSpeed(Math.Min(3, _controller.SpeedLevel + 1));
@@ -480,24 +510,12 @@ public class Game1 : Game
             _controller.SetSpeed(Math.Max(0, _controller.SpeedLevel - 1));
             _inGameUi.SpeedDownRequested = false;
         }
-        _prevKbd = kbd;
+    }
 
-        _controller.Advance(dt);
-        _paused = _controller.IsPaused;
-        _displayPlants = _controller.PlantCount;
-        _displayHerbivores = _controller.HerbivoreCount;
-        _displayCarnivores = _controller.CarnivoreCount;
-        _displayOmnivores = _controller.OmnivoreCount;
-        _displayTime = _controller.TotalTime;
-
-        _weather.Update(_ecosystem.Climate, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
-        _waterEffect.Update(dt);
-
-        _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
-            dt * _controller.CurrentSpeed);
-
+    private void HandleMouseClicks(MouseState mouse, bool pointerOverUi, bool spawnPanelConsumed, bool cataConsumed)
+    {
         // Cataclysm placement when selected (require at least 1 frame delay after selection)
-        bool cataReady = _cataSelectedFrame > 0 && (_gameFrame - _cataSelectedFrame) >= 1;
+        var cataReady = _cataSelectedFrame > 0 && (_gameFrame - _cataSelectedFrame) >= 1;
         if (_cataclysmPanel.SelectedType != null && cataReady &&
             !pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
@@ -509,7 +527,6 @@ public class Game1 : Game
             _prevPanelCata = null;
             _cataSelectedFrame = 0;
         }
-        // Cataclysm placement from InGameUi window
         else if (_inGameUi.SelectedCataclysm != null &&
             !pointerOverUi && !spawnPanelConsumed && !cataConsumed &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
@@ -519,14 +536,13 @@ public class Game1 : Game
             _worldRenderer.Invalidate();
             _inGameUi.SelectedCataclysm = null;
         }
-        // Spawn creature only when panel is open, species selected, click is NOT on any panel
         else if (_spawnPanel.IsOpen && _spawnPanel.SelectedSpeciesKey != null &&
             !spawnPanelConsumed && !cataConsumed && !pointerOverUi &&
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var spawnPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            int spawned = 0;
-            for (int i = 0; i < 3; i++)
+            var spawned = 0;
+            for (var i = 0; i < 3; i++)
             {
                 var offset = new Vector2((float)(_ecosystem.Random.NextDouble() - 0.5) * 40,
                     (float)(_ecosystem.Random.NextDouble() - 0.5) * 40);
@@ -543,7 +559,6 @@ public class Game1 : Game
             {
                 var tile = _ecosystem.World.GetTileAtPosition(spawnPos.X, spawnPos.Y);
                 Logger.Warn($"Spawn failed for {_spawnPanel.SelectedSpeciesKey} at ({spawnPos.X:F0}, {spawnPos.Y:F0}) - biome={tile.Biome}. Try a different location.");
-                // Keep species selected so player can try another spot
             }
         }
         else if (!pointerOverUi && !spawnPanelConsumed && !cataConsumed && cataReady &&
@@ -571,18 +586,14 @@ public class Game1 : Game
             }
             else
             {
-                int tileX = (int)(worldPos.X / _ecosystem.World.TileSize);
-                int tileY = (int)(worldPos.Y / _ecosystem.World.TileSize);
+                var tileX = (int)(worldPos.X / _ecosystem.World.TileSize);
+                var tileY = (int)(worldPos.Y / _ecosystem.World.TileSize);
                 tileX = Math.Clamp(tileX, 0, _ecosystem.World.Width - 1);
                 tileY = Math.Clamp(tileY, 0, _ecosystem.World.Height - 1);
                 _inGameUi.SelectedTile = new Point(tileX, tileY);
                 _inGameUi.OpenTerrainWindow(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             }
         }
-        _prevMouse = mouse;
-        _gameFrame++;
-
-        base.Update(gameTime);
     }
 
     internal static Creature? FindClosestCreature(
@@ -591,13 +602,13 @@ public class Game1 : Game
         float selectionRadius = 30f)
     {
         Creature? closest = null;
-        float closestDistance = selectionRadius;
+        var closestDistance = selectionRadius;
         foreach (Creature creature in creatures)
         {
             if (!creature.IsAlive)
                 continue;
 
-            float distance = Vector2.Distance(worldPosition, creature.Position);
+            var distance = Vector2.Distance(worldPosition, creature.Position);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -609,7 +620,7 @@ public class Game1 : Game
 
     private void GenerateNewWorld(int? seedOverride, Simulation.WorldGenOptions? worldGenOptions = null)
     {
-        int seed = seedOverride ?? new Random().Next();
+        var seed = seedOverride ?? new Random().Next();
         var wgOpts = worldGenOptions ?? Simulation.WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
         _ecosystem = new Ecosystem(wgOpts, seed);
         _ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
@@ -620,7 +631,7 @@ public class Game1 : Game
         _controller = new SimulationController(_ecosystem, _dayNight);
         _waterEffect = new WaterEffect();
         ResetWorldSessionState();
-        
+
         _worldRenderer.LoadContent(GraphicsDevice);
         _creatureRenderer.LoadContent(GraphicsDevice);
         _minimap.LoadContent(GraphicsDevice);
@@ -836,13 +847,13 @@ public class Game1 : Game
             Season.Winter => new Color(60, 80, 160, 10),
             _ => Color.Transparent
         };
-        float tempAlpha = Math.Clamp((_ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
+        var tempAlpha = Math.Clamp((_ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
         Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
         _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), seasonTint);
         _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), tempBlend);
         _spriteBatch.End();
 
-        bool isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
+        var isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _weather.Draw(_spriteBatch, _uiPixel, isSnow);
         _waterEffect.Draw(_spriteBatch, _uiPixel, _ecosystem.World, _camera);
@@ -874,17 +885,17 @@ public class Game1 : Game
 
     private void DrawHUD(SpriteBatch sb, SpriteFont font)
     {
-        string speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
-        float years = _displayTime / 480f + 1;
-        string hud = $"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | {speed}";
+        var speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
+        var years = _displayTime / 480f + 1;
+        var hud = $"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | {speed}";
         sb.DrawString(font, hud, new Vector2(10, 10), Color.White);
         sb.DrawString(font, I18n.T("hud.controls"),
             new Vector2(10, 32), new Color(160, 160, 160));
-        string phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
+        var phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
         sb.DrawString(font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
-        string seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
+        var seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
         sb.DrawString(font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
-        string seedLabel = $"Seed: {_ecosystem.Seed}";
+        var seedLabel = $"Seed: {_ecosystem.Seed}";
         sb.DrawString(font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
     }
 
@@ -947,9 +958,9 @@ public class Game1 : Game
     {
         var m = _ecosystem.Metrics;
         m.FPS = _currentFPS;
-        int y = GraphicsDevice.Viewport.Height - 100;
-        int x = 8;
-        int lineH = 14;
+        var y = GraphicsDevice.Viewport.Height - 100;
+        var x = 8;
+        var lineH = 14;
 
         if (_ecosystem.Disease.HasOutbreak)
         {
@@ -984,21 +995,21 @@ public class Game1 : Game
 
     private void DrawLoadingScreen(SpriteBatch sb)
     {
-        int vw = GraphicsDevice.Viewport.Width;
-        int vh = GraphicsDevice.Viewport.Height;
+        var vw = GraphicsDevice.Viewport.Width;
+        var vh = GraphicsDevice.Viewport.Height;
         GraphicsDevice.Clear(new Color(11, 23, 18));
 
-        string text = "LOADING...";
+        var text = "LOADING...";
         var size = _font.MeasureString(text);
         sb.DrawString(_font, text, new Vector2((vw - size.X) / 2, vh / 2 - 40), UiTheme.MossSignal);
 
-        int barW = 300;
-        int barH = 16;
-        int barX = (vw - barW) / 2;
-        int barY = vh / 2;
+        var barW = 300;
+        var barH = 16;
+        var barX = (vw - barW) / 2;
+        var barY = vh / 2;
         UiPrimitives.Fill(sb, _uiPixel, new Rectangle(barX, barY, barW, barH), new Color(20, 40, 30));
-        float progress = 1f - (_showLoadingTimer / 1.5f);
-        int fillW = (int)(barW * progress);
+        var progress = 1f - (_showLoadingTimer / 1.5f);
+        var fillW = (int)(barW * progress);
         UiPrimitives.Fill(sb, _uiPixel, new Rectangle(barX + 2, barY + 2, fillW - 4, barH - 4), UiTheme.MossSignal);
         UiPrimitives.Border(sb, _uiPixel, new Rectangle(barX, barY, barW, barH), 2, UiTheme.BarkEdge);
     }
