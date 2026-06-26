@@ -5,9 +5,8 @@ using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-public sealed class EcosystemMetrics : ISimulationSystem
+public sealed class EcosystemMetrics
 {
-    public SimulationPhase Phase => SimulationPhase.LateUpdate;
     public float TotalTime { get; private set; }
     public float FPS { get; set; }
     public int TotalCreatures { get; private set; }
@@ -73,105 +72,53 @@ public sealed class EcosystemMetrics : ISimulationSystem
     public void Update(Ecosystem ecosystem)
     {
         TotalTime = ecosystem.TotalTime;
-        UpdateBasicStats(ecosystem);
+        var aliveCreatures = ecosystem.Creatures.Where(c => c != null && c.IsAlive).ToList();
 
-        var aliveCreatures = new List<Creature>();
-        var aliveBySpecies = new Dictionary<string, int>(StringComparer.Ordinal);
+        TotalCreatures = aliveCreatures.Count;
+        var byType = aliveCreatures.GroupBy(c => c.CreatureType).ToDictionary(g => g.Key, g => g.Count());
+        Plants = byType.GetValueOrDefault(CreatureType.Plant);
+        Herbivores = byType.GetValueOrDefault(CreatureType.Herbivore);
+        Carnivores = byType.GetValueOrDefault(CreatureType.Carnivore);
+        Omnivores = byType.GetValueOrDefault(CreatureType.Omnivore);
 
-        foreach (var c in ecosystem.Creatures)
-        {
-            if (c == null || !c.IsAlive) continue;
-            aliveCreatures.Add(c);
-            aliveBySpecies.TryGetValue(c.Species, out int count);
-            aliveBySpecies[c.Species] = count + 1;
-        }
-
-        UpdateSpeciesStats(aliveBySpecies);
-        UpdateSubspeciesStats(aliveCreatures);
-        UpdateTrophicStats(aliveCreatures);
-    }
-
-    private void UpdateBasicStats(Ecosystem ecosystem)
-    {
-        Plants = ecosystem.PlantCount;
-        Herbivores = ecosystem.HerbivoreCount;
-        Carnivores = ecosystem.CarnivoreCount;
-        Omnivores = ecosystem.OmnivoreCount;
-        TotalCreatures = ecosystem.Creatures.Count(c => c != null && c.IsAlive);
-    }
-
-    private void UpdateSpeciesStats(Dictionary<string, int> aliveBySpecies)
-    {
+        var bySpecies = aliveCreatures.GroupBy(c => c.Species).ToDictionary(g => g.Key, g => g.Count());
         SpeciesPopulations.Clear();
-        foreach (var kvp in aliveBySpecies.OrderByDescending(kvp => kvp.Value))
-            SpeciesPopulations[kvp.Key] = kvp.Value;
+        foreach (var kvp in bySpecies.OrderByDescending(kvp => kvp.Value)) SpeciesPopulations[kvp.Key] = kvp.Value;
+        SpeciesCount = bySpecies.Count;
 
-        SpeciesCount = aliveBySpecies.Count;
-
-        foreach (var (species, count) in aliveBySpecies)
+        foreach (var (species, count) in bySpecies)
         {
-            if (!SpeciesFirstAppearance.ContainsKey(species))
-                SpeciesFirstAppearance[species] = TotalTime;
+            if (!SpeciesFirstAppearance.ContainsKey(species)) SpeciesFirstAppearance[species] = TotalTime;
             SpeciesMaxPopulation.TryGetValue(species, out int prevMax);
-            if (count > prevMax)
-                SpeciesMaxPopulation[species] = count;
+            if (count > prevMax) SpeciesMaxPopulation[species] = count;
         }
-    }
 
-    private void UpdateSubspeciesStats(List<Creature> aliveCreatures)
-    {
-        var subspeciesByKey = new Dictionary<string, int>(StringComparer.Ordinal);
-        foreach (var c in aliveCreatures)
-        {
-            if (string.IsNullOrEmpty(c.Subspecies)) continue;
-            string key = $"{c.Species}/{c.Subspecies}";
-            subspeciesByKey.TryGetValue(key, out int sc);
-            subspeciesByKey[key] = sc + 1;
-        }
+        var bySubspecies = aliveCreatures.Where(c => !string.IsNullOrEmpty(c.Subspecies))
+                                         .GroupBy(c => $"{c.Species}/{c.Subspecies}")
+                                         .ToDictionary(g => g.Key, g => g.Count());
         SubspeciesCounts.Clear();
-        foreach (var kvp in subspeciesByKey.OrderByDescending(kvp => kvp.Value))
-            SubspeciesCounts[kvp.Key] = kvp.Value;
-        TotalSubspecies = subspeciesByKey.Count;
-    }
+        foreach (var kvp in bySubspecies.OrderByDescending(kvp => kvp.Value)) SubspeciesCounts[kvp.Key] = kvp.Value;
+        TotalSubspecies = bySubspecies.Count;
 
-    private void UpdateTrophicStats(List<Creature> aliveCreatures)
-    {
-        if (aliveCreatures.Count > 0)
+        if (TotalCreatures > 0)
         {
-            int t1 = 0, t2 = 0, t3p = 0;
-            float totalHet = 0f;
-            float totalInb = 0f;
-            int geneticCount = 0;
+            var trophs = aliveCreatures.GroupBy(c => FoodWeb.TrophicLevel(c.CreatureType)).ToDictionary(g => g.Key, g => g.Count());
+            TrophicLevel1 = trophs.GetValueOrDefault(1);
+            TrophicLevel2 = trophs.GetValueOrDefault(2);
+            TrophicLevel3Plus = aliveCreatures.Count(c => FoodWeb.TrophicLevel(c.CreatureType) >= 3);
 
-            foreach (var c in aliveCreatures)
+            var animals = aliveCreatures.Where(c => c.CreatureType != CreatureType.Plant).ToList();
+            if (animals.Count > 0)
             {
-                int level = FoodWeb.TrophicLevel(c.CreatureType);
-                if (level == 1) t1++;
-                else if (level == 2) t2++;
-                else t3p++;
-
-                if (c.CreatureType != CreatureType.Plant)
-                {
-                    totalHet += c.Genome.Heterozygosity;
-                    totalInb += c.InbreedingCoefficient;
-                    geneticCount++;
-                }
+                MeanHeterozygosity = animals.Average(c => c.Genome.Heterozygosity);
+                MeanInbreeding = (float)animals.Average(c => c.InbreedingCoefficient);
             }
-
-            TrophicLevel1 = t1;
-            TrophicLevel2 = t2;
-            TrophicLevel3Plus = t3p;
-
-            if (geneticCount > 0)
-            {
-                MeanHeterozygosity = totalHet / geneticCount;
-                MeanInbreeding = totalInb / geneticCount;
-            }
+            else { MeanHeterozygosity = 0f; MeanInbreeding = 0f; }
         }
         else
         {
-            MeanHeterozygosity = 0f;
-            MeanInbreeding = 0f;
+            TrophicLevel1 = 0; TrophicLevel2 = 0; TrophicLevel3Plus = 0;
+            MeanHeterozygosity = 0f; MeanInbreeding = 0f;
         }
     }
 

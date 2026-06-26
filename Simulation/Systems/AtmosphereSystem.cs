@@ -4,9 +4,8 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class AtmosphereSystem : ISimulationSystem
+public sealed class AtmosphereSystem
 {
-    public SimulationPhase Phase => SimulationPhase.Update;
     public float Oxygen { get; private set; } = AtmosphereConfig.Data.InitialOxygen;
     public float CO2 { get; private set; } = AtmosphereConfig.Data.InitialCO2;
     public float OxygenModifier => MathHelper.Clamp(Oxygen / AtmosphereConfig.Data.OxygenModifierBase, AtmosphereConfig.Data.OxygenModifierMin, AtmosphereConfig.Data.OxygenModifierMax);
