@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "flocking": {
+    "separationWeight": 1.5,
+    "alignmentWeight": 2.0,
+    "cohesionWeight": 0.5,
+    "separationDistance": 30.0,
+    "herdRadius": 0.2
+  },
+  "combat": {
+    "combatDamage": 10.0,
+    "defenseDivisor": 20.0,
+    "aggressionFactor": 25.0
+  }
+}
