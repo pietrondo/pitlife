@@ -23,7 +23,7 @@ internal static class BuiltinSpecies
 
 
     /// <summary>
-    /// Registers all builtin flora and fauna species into the global registry.
+    /// Registers all built-in flora and fauna species into the global registry.
     /// </summary>
     public static void RegisterAll()
     {
@@ -85,10 +85,20 @@ internal static class BuiltinSpecies
 
     private static void RegisterFungi()
     {
+        RegisterCommonFungi();
+        RegisterForestFungi();
+    }
+
+    private static void RegisterCommonFungi()
+    {
         RegisterPlant("Mushroom", PlantReproductionMode.Spores,
             minTemperature: -5f, maxTemperature: 28f);
         RegisterPlant("Toadstool", PlantReproductionMode.Spores,
             minTemperature: -5f, maxTemperature: 30f);
+    }
+
+    private static void RegisterForestFungi()
+    {
         RegisterPlant("Chanterelle", PlantReproductionMode.Spores, biomes:
             [BiomeType.Forest, BiomeType.DenseForest],
             minTemperature: 0f, maxTemperature: 28f);
