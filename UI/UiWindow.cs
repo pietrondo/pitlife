@@ -63,6 +63,13 @@ public sealed class UiWindow
         var position = new Vector2(titleBar.Center.X - size.X / 2f, titleBar.Center.Y - size.Y / 2f);
         spriteBatch.DrawString(font, Title, position, UiTheme.WarmParchment, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
 
+        if (IsDraggable)
+        {
+            string collapseIcon = IsCollapsed ? "[+]" : "[-]";
+            Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
+            spriteBatch.DrawString(font, collapseIcon, new Vector2(titleBar.X + 8, titleBar.Center.Y - iconSize.Y / 2f), UiTheme.MutedStone, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+        }
+
         if (ShowCloseButton)
         {
             Rectangle close = CloseButtonBounds;
