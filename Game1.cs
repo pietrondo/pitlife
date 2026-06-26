@@ -625,6 +625,8 @@ public class Game1 : Game
         _ecosystem = new Ecosystem(wgOpts, seed);
         _ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
         _ecosystem.Initialize(60, 20, 15, 150);
+        _worldRenderer?.Dispose();
+        _creatureRenderer?.Dispose();
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
@@ -689,6 +691,8 @@ public class Game1 : Game
         _ecosystem.FlushPending();
         _ecosystem.UpdateStats();
 
+        _worldRenderer?.Dispose();
+        _creatureRenderer?.Dispose();
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
