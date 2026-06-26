@@ -59,8 +59,6 @@ public class Ecosystem
 
     public int Seed { get; }
 
-    private readonly List<ISimulationSystem> _systems = new();
-
     public Ecosystem(int worldWidth, int worldHeight, int seed)
     {
         Seed = seed;
@@ -87,19 +85,17 @@ public class Ecosystem
 
     private void InitSystems()
     {
-        _systems.Add(Climate);
-        _systems.Add(Disease);
-        _systems.Add(Atmosphere);
-        _systems.Add(Cataclysms);
-        _systems.Add(Trophic);
-        _systems.Add(Fruits);
-        if (Flow != null) _systems.Add(Flow);
-        _systems.Add(Metrics);
-        var sorted = _systems.OrderBy(s => s.Phase).ToList();
-        _systems.Clear();
-        _systems.AddRange(sorted);
-        foreach (var sys in _systems)
-            sys.Initialize(World);
+        // EarlyUpdate
+        Climate.Initialize(World);
+        Atmosphere.Initialize(World);
+        Trophic.Initialize(World);
+        // Update
+        Disease.Initialize(World);
+        Cataclysms.Initialize(World);
+        if (Flow != null) Flow.Initialize(World);
+        Fruits.Initialize(World);
+        // LateUpdate
+        Metrics.Initialize(World);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -270,8 +266,17 @@ public class Ecosystem
 
         FlushPending();
         ProcessDeaths(dt);
-        foreach (var sys in _systems)
-            sys.Tick(this, gameTime);
+        // EarlyUpdate
+        Climate.Tick(this, gameTime);
+        Atmosphere.Tick(this, gameTime);
+        Trophic.Tick(this, gameTime);
+        // Update
+        Disease.Tick(this, gameTime);
+        Cataclysms.Tick(this, gameTime);
+        if (Flow != null) Flow.Tick(this, gameTime);
+        Fruits.Tick(this, gameTime);
+        // LateUpdate
+        Metrics.Tick(this, gameTime);
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
@@ -453,8 +458,17 @@ public class Ecosystem
             OmnivoreCount = 0;
             _spatialGrid.Rebuild(Array.Empty<Creature>());
             _nextIndividualId = 1;
-            foreach (var sys in _systems)
-                sys.Reset();
+            // EarlyUpdate
+            Climate.Reset();
+            Atmosphere.Reset();
+            Trophic.Reset();
+            // Update
+            Disease.Reset();
+            Cataclysms.Reset();
+            if (Flow != null) Flow.Reset();
+            Fruits.Reset();
+            // LateUpdate
+            Metrics.Reset();
         }
     }
 }

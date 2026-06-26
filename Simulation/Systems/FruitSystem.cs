@@ -36,9 +36,8 @@ public struct Fruit
     }
 }
 
-public sealed class FruitSystem : ISimulationSystem
+public sealed class FruitSystem
 {
-    public SimulationPhase Phase => SimulationPhase.Update;
 
     private const int MaxFruits = 500;
     private readonly Fruit[] _fruits = new Fruit[MaxFruits];
