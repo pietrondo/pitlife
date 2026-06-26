@@ -93,19 +93,7 @@ public sealed class FruitSystem
             if (_fruitCount >= MaxFruits) break;
 
             // Pick a random alive plant
-            int idx = eco.Random.Next(eco.Creatures.Count);
-            int tries = 0;
-            Creature? plant = null;
-            while (tries < 50)
-            {
-                var candidate = eco.Creatures[(idx + tries) % eco.Creatures.Count];
-                if (candidate.IsAlive && candidate.CreatureType == CreatureType.Plant)
-                {
-                    plant = candidate;
-                    break;
-                }
-                tries++;
-            }
+            Creature? plant = TryFindRandomFruitPlant(eco);
             if (plant == null) continue;
 
             var def = SpeciesRegistry.Get(plant.Species);
@@ -142,6 +130,21 @@ public sealed class FruitSystem
                     _fruits[i] = _fruits[_fruitCount];
                 return fruit;
             }
+        }
+        return null;
+    }
+    private Creature? TryFindRandomFruitPlant(Ecosystem eco)
+    {
+        int idx = eco.Random.Next(eco.Creatures.Count);
+        int tries = 0;
+        while (tries < 50)
+        {
+            var candidate = eco.Creatures[(idx + tries) % eco.Creatures.Count];
+            if (candidate.IsAlive && candidate.CreatureType == CreatureType.Plant)
+            {
+                return candidate;
+            }
+            tries++;
         }
         return null;
     }
