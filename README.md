@@ -142,10 +142,13 @@ Mostra dati globali e locali in tempo reale:
 
 ### Performance e Architettura
 - **Ottimizzazioni**: Multi-thread world gen, object pooling per ridurre le allocazioni e menu perf optimization.
+- **Ottimizzazioni Rendering**: Implementato Grid Culling rigoroso in `PixelWorldRenderer` per ridurre drasticamente i draw calls, minimizzando l'impatto sulla GPU.
+- **Gestione File Robusta**: Fixata la gestione dei file con cattura di eccezioni per evitare crash imprevisti durante I/O.
 - **Data-Driven Config**: Tutte le logiche (specie, bilanciamento ecosistema, malattie, clima, atmosfera, comportamenti) sono configurate tramite file esterni data-driven.
 
 ### UI
 - **Tema foresta**: palette verde/marrone con finestre draggable
+- **Feedback Visivo e Accessibilità**: Aggiunti stati disabilitati per i bottoni e tooltip per le scorciatoie da tastiera, migliorando la UX e l'usabilità generale.
 - **Toolbar in basso**: statistiche, creature, velocità, cataclismi, clima, menu
 - **Loading screen**: barra di caricamento animata all'avvio e durante world gen
 - **Pannelli esclusivi**: aprire un pannello chiude automaticamente gli altri
