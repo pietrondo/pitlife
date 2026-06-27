@@ -886,19 +886,29 @@ public class Game1 : Game
             _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
         _ecosystem.Cataclysms.Draw(_spriteBatch, _uiPixel);
-        DrawFruits(_spriteBatch);
+        DrawFruits(_spriteBatch, _camera.VisibleArea);
         _spriteBatch.End();
 
         _camera.Position = savedPos;
     }
 
-    private void DrawFruits(SpriteBatch sb)
+    private void DrawFruits(SpriteBatch sb, Rectangle visibleArea)
     {
+        var left = visibleArea.X - 2;
+        var top = visibleArea.Y - 2;
+        var right = visibleArea.Right + 2;
+        var bottom = visibleArea.Bottom + 2;
+
         foreach (var fruit in _ecosystem.Fruits.Fruits)
         {
             if (!fruit.IsAlive) continue;
+            var px = (int)fruit.Position.X;
+            var py = (int)fruit.Position.Y;
+
+            if (px < left || px > right || py < top || py > bottom) continue;
+
             var color = fruit.GetColor();
-            sb.Draw(_uiPixel, new Rectangle((int)fruit.Position.X - 1, (int)fruit.Position.Y - 1, 2, 2), color);
+            sb.Draw(_uiPixel, new Rectangle(px - 1, py - 1, 2, 2), color);
         }
     }
 
