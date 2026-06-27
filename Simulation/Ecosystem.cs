@@ -22,17 +22,19 @@ public class Ecosystem
     public int HerbivoreCount { get; private set; }
     public int CarnivoreCount { get; private set; }
     public int OmnivoreCount { get; private set; }
-    public EcosystemMetrics Metrics { get; } = new();
     public float PopulationPressure { get; private set; } = 1f;
-    public ClimateSystem Climate { get; } = new();
-    public DiseaseSystem Disease { get; } = new();
     public PhylogeneticGraph Phylogeny { get; } = new();
-    public AtmosphereSystem Atmosphere { get; } = new();
-    public CataclysmSystem Cataclysms { get; } = new();
-    public TrophicDynamics Trophic { get; } = new();
-    public FruitSystem Fruits { get; } = new();
     public CreaturePool Pool { get; } = new();
-    public FlowSimulation? Flow { get; private set; }
+    public SimulationPipeline Pipeline { get; } = new();
+    public SpatialIndex Spatial { get; }
+    public EcosystemMetrics Metrics => Pipeline.Get<EcosystemMetrics>()!;
+    public ClimateSystem Climate => Pipeline.Get<ClimateSystem>()!;
+    public DiseaseSystem Disease => Pipeline.Get<DiseaseSystem>()!;
+    public AtmosphereSystem Atmosphere => Pipeline.Get<AtmosphereSystem>()!;
+    public CataclysmSystem Cataclysms => Pipeline.Get<CataclysmSystem>()!;
+    public TrophicDynamics Trophic => Pipeline.Get<TrophicDynamics>()!;
+    public FruitSystem Fruits => Pipeline.Get<FruitSystem>()!;
+    public FlowSimulation? Flow => Pipeline.Get<FlowSimulation>();
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
@@ -40,7 +42,6 @@ public class Ecosystem
     private readonly List<Creature> _pendingAdd = new();
     private readonly List<Creature> _pendingRemove = new();
     private readonly object _lock = new();
-    private readonly SpatialGrid _spatialGrid;
     private CreatureSpawner _spawner = null!;
     private ulong _nextIndividualId = 1;
 
@@ -64,9 +65,8 @@ public class Ecosystem
         Seed = seed;
         World = new World(worldWidth, worldHeight, seed);
         Random = new Random(seed);
-        _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        Spatial = new SpatialIndex(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
-        Flow = new FlowSimulation(World);
         InitSystems();
         Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
     }
@@ -76,26 +76,23 @@ public class Ecosystem
         Seed = seed;
         World = new World(options, seed);
         Random = new Random(seed);
-        _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        Spatial = new SpatialIndex(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
-        Flow = new FlowSimulation(World);
         InitSystems();
         Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
     }
 
     private void InitSystems()
     {
-        // EarlyUpdate
-        Climate.Initialize(World);
-        Atmosphere.Initialize(World);
-        Trophic.Initialize(World);
-        // Update
-        Disease.Initialize(World);
-        Cataclysms.Initialize(World);
-        if (Flow != null) Flow.Initialize(World);
-        Fruits.Initialize(World);
-        // LateUpdate
-        Metrics.Initialize(World);
+        Pipeline.Add(new ClimateSystem());
+        Pipeline.Add(new AtmosphereSystem());
+        Pipeline.Add(new TrophicDynamics());
+        Pipeline.Add(new DiseaseSystem());
+        Pipeline.Add(new CataclysmSystem());
+        Pipeline.Add(new FlowSimulation(World));
+        Pipeline.Add(new FruitSystem());
+        Pipeline.Add(new EcosystemMetrics());
+        Pipeline.Initialize(World);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -176,7 +173,7 @@ public class Ecosystem
         if (_pendingRemove.Count == 0) return;
         var remove = new HashSet<Creature>(_pendingRemove);
         foreach (var creature in remove)
-            _spatialGrid.Remove(creature);
+            Spatial.Remove(creature);
         Creatures.RemoveAll(c => remove.Contains(c));
         _pendingRemove.Clear();
     }
@@ -188,7 +185,7 @@ public class Ecosystem
         {
             if (Creatures.Count >= MaxCreatures) break;
             Creatures.Add(c);
-            _spatialGrid.Update(c);
+            Spatial.Update(c);
         }
         _pendingAdd.Clear();
     }
@@ -240,7 +237,7 @@ public class Ecosystem
     {
         var dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
         TotalTime += dt;
-        _spatialGrid.Rebuild(Creatures);
+        Spatial.Rebuild(Creatures);
 
         var count = Creatures.Count;
         for (var i = count - 1; i >= 0; i--)
@@ -259,24 +256,14 @@ public class Ecosystem
                     Logger.Error($"Creature update failed for {c.Species}: {ex.Message}");
                     c.Die();
                 }
-                _spatialGrid.Update(c);
+                Spatial.Update(c);
                 c.ApplyWindDrift(Climate.WindDirection, Climate.WindSpeed, dt, World);
             }
         }
 
         FlushPending();
         ProcessDeaths(dt);
-        // EarlyUpdate
-        Climate.Tick(this, gameTime);
-        Atmosphere.Tick(this, gameTime);
-        Trophic.Tick(this, gameTime);
-        // Update
-        Disease.Tick(this, gameTime);
-        Cataclysms.Tick(this, gameTime);
-        if (Flow != null) Flow.Tick(this, gameTime);
-        Fruits.Tick(this, gameTime);
-        // LateUpdate
-        Metrics.Tick(this, gameTime);
+        Pipeline.Tick(this, gameTime);
         var grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
@@ -299,7 +286,7 @@ public class Ecosystem
                     if (tile.GrassAmount < tile.MaxGrass)
                         tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
                     tile.SoilNutrients = Math.Min(2f, tile.SoilNutrients + 0.1f);
-                    _spatialGrid.Remove(c);
+                    Spatial.Remove(c);
                     Pool.Return(c);
                     Creatures.RemoveAt(i);
                 }
@@ -355,33 +342,12 @@ public class Ecosystem
         }
     }
 
-    public Plant? FindNearestPlant(Herbivore seeker) => FindNearest<Plant>(seeker);
-    public Plant? FindNearestPlantFor(Creature seeker) => FindNearest<Plant>(seeker);
-
-    public Creature? FindNearestPrey(Creature seeker)
-    {
-        return _spatialGrid.FindNearest(seeker, c =>
-            c.CreatureType != CreatureType.Carnivore &&
-            c.CreatureType != seeker.CreatureType &&
-            (c.CreatureType != CreatureType.Plant || seeker is not Herbivore and not Omnivore));
-    }
-
-    public Creature? FindNearestSameSpecies(Creature seeker)
-    {
-        return _spatialGrid.FindNearest(seeker, c => c != seeker && c.Species == seeker.Species);
-    }
-
-    public Creature? FindNearestMate(Creature seeker)
-    {
-        if (!seeker.IsAdult || seeker.Gender is not (Gender.Male or Gender.Female))
-            return null;
-        return _spatialGrid.FindNearest(seeker, seeker.CanMateWith);
-    }
-
-    public Creature? FindNearestPredator(Creature seeker)
-    {
-        return _spatialGrid.FindNearest(seeker, c => c.CreatureType == CreatureType.Carnivore);
-    }
+    public Plant? FindNearestPlant(Herbivore seeker) => Spatial.FindNearestPlant(seeker);
+    public Plant? FindNearestPlantFor(Creature seeker) => Spatial.FindNearestPlantFor(seeker);
+    public Creature? FindNearestPrey(Creature seeker) => Spatial.FindNearestPrey(seeker);
+    public Creature? FindNearestSameSpecies(Creature seeker) => Spatial.FindNearestSameSpecies(seeker);
+    public Creature? FindNearestMate(Creature seeker) => Spatial.FindNearestMate(seeker);
+    public Creature? FindNearestPredator(Creature seeker) => Spatial.FindNearestPredator(seeker);
 
     public void TrySpreadPlant(Plant plant)
     {
@@ -435,14 +401,9 @@ public class Ecosystem
         }
     }
 
-    private T? FindNearest<T>(Creature seeker) where T : Creature
-    {
-        return _spatialGrid.FindNearest(seeker, c => c is T) as T;
-    }
-
     public List<Creature> FindNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
     {
-        return _spatialGrid.GetNeighbors(seeker, radius, predicate);
+        return Spatial.FindNeighbors(seeker, radius, predicate);
     }
 
     public void Clear()
@@ -457,19 +418,9 @@ public class Ecosystem
             HerbivoreCount = 0;
             CarnivoreCount = 0;
             OmnivoreCount = 0;
-            _spatialGrid.Rebuild(Array.Empty<Creature>());
+            Spatial.Rebuild(Array.Empty<Creature>());
             _nextIndividualId = 1;
-            // EarlyUpdate
-            Climate.Reset();
-            Atmosphere.Reset();
-            Trophic.Reset();
-            // Update
-            Disease.Reset();
-            Cataclysms.Reset();
-            if (Flow != null) Flow.Reset();
-            Fruits.Reset();
-            // LateUpdate
-            Metrics.Reset();
+            Pipeline.Reset();
         }
     }
 }

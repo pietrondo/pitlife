@@ -4,8 +4,9 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class TrophicDynamics
+public sealed class TrophicDynamics : ISimulationSystem
 {
+    public UpdatePhase Phase => UpdatePhase.EarlyUpdate;
 
     // Prey (herbivore) population growth rates
     public float HerbivoreBirthBonus { get; private set; } = 1f;
@@ -131,6 +132,6 @@ public sealed class TrophicDynamics
 
     public string GetStatusLine()
     {
-        return $"Trophic: {CurrentPhaseLabel} | H:{HerbivoreBirthBonus:F1}/{HerbivoreDeathPenalty:F1} C:{CarnivoreBirthBonus:F1}/{CarnivoreDeathPenalty:F1}";
+        return $"Trophic: {CurrentPhaseLabel} | H:{HerbivoreBirthBonus:F1}/{HerbivoreDeathPenalty:F1} C:{CarnivoreBirthBonus:F1}/{CarnivoreDeathPenalty:F1}".Replace(',', '.');
     }
 }

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-internal sealed class RiverSystem
+internal sealed class RiverSystem : ISimulationSystem
 {
+    public UpdatePhase Phase => UpdatePhase.Update;
     private readonly World _world;
 
     public RiverSystem(World world)
@@ -163,4 +165,8 @@ internal sealed class RiverSystem
             System.Buffers.ArrayPool<bool>.Shared.Return(visited);
         }
     }
+
+    public void Initialize(World world) { }
+    public void Tick(Ecosystem eco, GameTime gameTime) { }
+    public void Reset() { }
 }

@@ -5,8 +5,9 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class CataclysmSystem
+public sealed class CataclysmSystem : ISimulationSystem
 {
+    public UpdatePhase Phase => UpdatePhase.Update;
     public bool IsActive { get; private set; }
     public string ActiveEvent { get; private set; } = "";
     public float Timer { get; private set; }
