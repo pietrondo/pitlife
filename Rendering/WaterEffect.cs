@@ -31,10 +31,11 @@ public sealed class WaterEffect
     public void Draw(SpriteBatch sb, Texture2D pixel, World world, Camera camera)
     {
         int tileSize = world.TileSize;
-        int viewLeft = Math.Max(0, (int)(camera.Position.X - camera.ViewportWidth / 2f) / tileSize - 1);
-        int viewTop = Math.Max(0, (int)(camera.Position.Y - camera.ViewportHeight / 2f) / tileSize - 1);
-        int viewRight = Math.Min(world.Width, viewLeft + camera.ViewportWidth / tileSize + 3);
-        int viewBottom = Math.Min(world.Height, viewTop + camera.ViewportHeight / tileSize + 3);
+        Rectangle visible = camera.VisibleArea;
+        int viewLeft = Math.Max(0, visible.Left / tileSize - 1);
+        int viewTop = Math.Max(0, visible.Top / tileSize - 1);
+        int viewRight = Math.Min(world.Width, visible.Right / tileSize + 2);
+        int viewBottom = Math.Min(world.Height, visible.Bottom / tileSize + 2);
 
         for (int ty = viewTop; ty < viewBottom; ty++)
         {

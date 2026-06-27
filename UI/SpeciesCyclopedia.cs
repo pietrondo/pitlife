@@ -61,39 +61,14 @@ public sealed class SpeciesCyclopedia
         _panelX = viewportWidth / 2 - 360;
         _panelY = 40;
 
-        HandleSearchInput(mouse, prevMouse, kbd, prevKbd);
+        DrawSearchInput(mouse, prevMouse, kbd, prevKbd);
         HandleFilterTabs(mouse, prevMouse);
-
-        // Scroll with mouse wheel
-        int scrollDelta = mouse.ScrollWheelValue - prevMouse.ScrollWheelValue;
-        if (scrollDelta != 0)
-        {
-            _scrollOffset = Math.Clamp(_scrollOffset - scrollDelta / 40, 0, Math.Max(0, _maxScroll));
-        }
-
-        // Card click
+        HandleScroll(mouse, prevMouse);
         HandleCardClick(mouse, prevMouse);
-
-        // Detail view: back
-        if (_selectedDef != null && Pressed(kbd, prevKbd, Keys.Escape))
-        {
-            _selectedDef = null;
-            _selectedIndex = -1;
-        }
-
-        // Keyboard navigation
-        if (_selectedDef == null)
-        {
-            if (Pressed(kbd, prevKbd, Keys.Down)) NavigateSelection(1);
-            if (Pressed(kbd, prevKbd, Keys.Up)) NavigateSelection(-1);
-            if (Pressed(kbd, prevKbd, Keys.Enter)) OpenSelectedDetail();
-        }
+        HandleKeyboardNavigation(kbd, prevKbd);
     }
 
-    /// <summary>
-    /// Handles the search input field logic.
-    /// </summary>
-    private void HandleSearchInput(MouseState mouse, MouseState prevMouse, KeyboardState kbd, KeyboardState prevKbd)
+    private void DrawSearchInput(MouseState mouse, MouseState prevMouse, KeyboardState kbd, KeyboardState prevKbd)
     {
         if (Pressed(kbd, prevKbd, Keys.F) && kbd.IsKeyDown(Keys.LeftControl))
             _searchActive = true;
@@ -111,9 +86,6 @@ public sealed class SpeciesCyclopedia
         }
     }
 
-    /// <summary>
-    /// Handles clicks on the filter tabs.
-    /// </summary>
     private void HandleFilterTabs(MouseState mouse, MouseState prevMouse)
     {
         int tabX = _panelX + PanelPadding;
@@ -130,6 +102,31 @@ public sealed class SpeciesCyclopedia
                 _scrollOffset = 0;
             }
             tabX += 108;
+        }
+    }
+
+    private void HandleScroll(MouseState mouse, MouseState prevMouse)
+    {
+        int scrollDelta = mouse.ScrollWheelValue - prevMouse.ScrollWheelValue;
+        if (scrollDelta != 0)
+        {
+            _scrollOffset = Math.Clamp(_scrollOffset - scrollDelta / 40, 0, Math.Max(0, _maxScroll));
+        }
+    }
+
+    private void HandleKeyboardNavigation(KeyboardState kbd, KeyboardState prevKbd)
+    {
+        if (_selectedDef != null && Pressed(kbd, prevKbd, Keys.Escape))
+        {
+            _selectedDef = null;
+            _selectedIndex = -1;
+        }
+
+        if (_selectedDef == null)
+        {
+            if (Pressed(kbd, prevKbd, Keys.Down)) NavigateSelection(1);
+            if (Pressed(kbd, prevKbd, Keys.Up)) NavigateSelection(-1);
+            if (Pressed(kbd, prevKbd, Keys.Enter)) OpenSelectedDetail();
         }
     }
 

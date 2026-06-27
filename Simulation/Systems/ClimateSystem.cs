@@ -65,9 +65,6 @@ public sealed class ClimateSystem
         UpdateExtremeEvents(totalTime, rng);
     }
 
-    /// <summary>
-    /// Updates orbital position, distance, and seasons based on elapsed time.
-    /// </summary>
     private void UpdateOrbitalMechanics(float totalTime)
     {
         OrbitalAngle = totalTime / OrbitalPeriod * MathF.PI * 2 % (MathF.PI * 2);
@@ -103,18 +100,12 @@ public sealed class ClimateSystem
         EnergyModifier -= orbitalBoost * 0.5f;
     }
 
-    /// <summary>
-    /// Updates wind direction and speed.
-    /// </summary>
     private void UpdateWind(Random rng)
     {
         WindDirection = (WindDirection + ClimateConfig.Data.Wind.DirectionChangeRate * (float)rng.NextDouble()) % (MathF.PI * 2);
         WindSpeed = ClimateConfig.Data.Wind.BaseSpeed + (float)rng.NextDouble() * ClimateConfig.Data.Wind.SpeedChangeRate + Math.Abs(TemperatureModifier) * 2f;
     }
 
-    /// <summary>
-    /// Checks and triggers or updates random extreme weather events.
-    /// </summary>
     private void UpdateExtremeEvents(float totalTime, Random rng)
     {
         if (_extremeEventTimer > 0)

@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -22,6 +23,14 @@ public sealed class InGameUi
     public const string CataclysmWindowId = "cataclysm";
     public const string ClimateWindowId = "climate";
     public string? SelectedCataclysm { get; set; }
+
+    private readonly StringBuilder _speedSb = new StringBuilder(16);
+    private readonly StringBuilder _valueSb = new StringBuilder(16);
+    private readonly StringBuilder _speciesSb = new StringBuilder(64);
+    private readonly StringBuilder _creatureGenSb = new StringBuilder(128);
+    private readonly StringBuilder _creatureLineageSb = new StringBuilder(128);
+
+    private readonly StringBuilder _tempSb = new StringBuilder(32);
 
     private Rectangle _toolbarRect;
 
@@ -133,48 +142,7 @@ public sealed class InGameUi
         LayoutToolbar(viewportHeight);
 
         HandleKeyboardShortcuts(keyboard, previousKeyboard, viewportWidth, viewportHeight);
-        bool toolbarConsumed = HandleToolbarButtons(mouse, previousMouse, viewportWidth, viewportHeight);
 
-        HandleCataclysmClick(mouse, previousMouse);
-
-        bool overToolbar = _toolbarRect.Contains(mouse.Position);
-        return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
-    }
-
-    /// <summary>
-    /// Handles keyboard shortcuts for toggling UI windows.
-    /// </summary>
-    private void HandleKeyboardShortcuts(KeyboardState keyboard, KeyboardState previousKeyboard, int viewportWidth, int viewportHeight)
-    {
-        if (Pressed(keyboard, previousKeyboard, Keys.F2))
-        {
-            _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-        if (Pressed(keyboard, previousKeyboard, Keys.F3))
-        {
-            _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-        if (Pressed(keyboard, previousKeyboard, Keys.F5))
-            _windowManager.TileWindows(viewportWidth, viewportHeight);
-        if (Pressed(keyboard, previousKeyboard, Keys.F8))
-        {
-            _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-        if (Pressed(keyboard, previousKeyboard, Keys.F9))
-        {
-            _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-    }
-
-    /// <summary>
-    /// Handles mouse clicks on toolbar buttons.
-    /// </summary>
-    private bool HandleToolbarButtons(MouseState mouse, MouseState previousMouse, int viewportWidth, int viewportHeight)
-    {
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
         {
@@ -220,7 +188,37 @@ public sealed class InGameUi
             SpeedUpRequested = true;
             toolbarConsumed = true;
         }
-        return toolbarConsumed;
+
+        HandleCataclysmClick(mouse, previousMouse);
+
+        bool overToolbar = _toolbarRect.Contains(mouse.Position);
+        return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
+    }
+
+    private void HandleKeyboardShortcuts(KeyboardState keyboard, KeyboardState previousKeyboard, int viewportWidth, int viewportHeight)
+    {
+        if (Pressed(keyboard, previousKeyboard, Keys.F2))
+        {
+            _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F3))
+        {
+            _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F5))
+            _windowManager.TileWindows(viewportWidth, viewportHeight);
+        if (Pressed(keyboard, previousKeyboard, Keys.F8))
+        {
+            _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F9))
+        {
+            _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
     }
 
     public void Draw(
@@ -240,16 +238,6 @@ public sealed class InGameUi
         EcosystemMetrics? metrics = null)
     {
         LayoutToolbar(viewportHeight);
-        DrawToolbar(spriteBatch, pixel, font, mouse, paused, speed);
-
-        DrawWindows(spriteBatch, pixel, font, mouse, selectedCreature, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
-    }
-
-    /// <summary>
-    /// Draws the bottom toolbar and its buttons.
-    /// </summary>
-    private void DrawToolbar(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool paused, float speed)
-    {
         var toolbar = _toolbarRect;
         UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
         UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
@@ -258,22 +246,18 @@ public sealed class InGameUi
         _arrangeButton.Draw(spriteBatch, pixel, font, mouse, false);
         _speedDownButton.Draw(spriteBatch, pixel, font, mouse, false);
         // Speed label between arrows
-        var speedLabel = paused ? I18n.T("hud.paused") : $"{speed:0.#}x";
-        var slSize = font.MeasureString(speedLabel);
+        _speedSb.Clear();
+        if (paused) _speedSb.Append(I18n.T("hud.paused"));
+        else { _speedSb.Append(Math.Round(speed, 1)); _speedSb.Append('x'); }
+        var slSize = font.MeasureString(_speedSb);
         var sx = _speedDownButton.Bounds.Right + (_speedUpButton.Bounds.X - _speedDownButton.Bounds.Right) / 2f - slSize.X / 2f;
         var sy = _speedDownButton.Bounds.Center.Y - slSize.Y / 2;
-        spriteBatch.DrawString(font, speedLabel, new Vector2(sx, sy), Color.White);
+        spriteBatch.DrawString(font, _speedSb, new Vector2(sx, sy), Color.White);
         _speedUpButton.Draw(spriteBatch, pixel, font, mouse, false);
         _cataclysmButton.Draw(spriteBatch, pixel, font, mouse, false);
         _climateButton.Draw(spriteBatch, pixel, font, mouse, false);
         _menuButton.Draw(spriteBatch, pixel, font, mouse, false);
-    }
 
-    /// <summary>
-    /// Draws all open windows and their contents.
-    /// </summary>
-    private void DrawWindows(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, Creature? selectedCreature, int plantCount, int herbivoreCount, int carnivoreCount, int omnivoreCount, float totalTime, bool paused, float speed, EcosystemMetrics? metrics)
-    {
         foreach (UiWindow window in _windowManager.Windows)
         {
             if (!window.IsOpen)
@@ -313,7 +297,7 @@ public sealed class InGameUi
         }
     }
 
-    private static int DrawStatistics(
+    private int DrawStatistics(
         SpriteBatch spriteBatch,
         Texture2D pixel,
         SpriteFont font,
@@ -357,8 +341,9 @@ public sealed class InGameUi
             {
                 if (shown >= 14) break;
                 Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
-                spriteBatch.DrawString(font, $"{kvp.Value} {I18n.Species(kvp.Key)}",
-                    new Vector2(content.X, y), col);
+                _speciesSb.Clear();
+                _speciesSb.Append(kvp.Value).Append(' ').Append(I18n.Species(kvp.Key));
+                spriteBatch.DrawString(font, _speciesSb, new Vector2(content.X, y), col);
                 y += 13;
                 shown++;
             }
@@ -369,7 +354,7 @@ public sealed class InGameUi
 
     
 
-    private static void DrawInlineBar(SpriteBatch sb, Texture2D pixel, SpriteFont font,
+    private void DrawInlineBar(SpriteBatch sb, Texture2D pixel, SpriteFont font,
         int x, int y, string label, int value, int total, Color color)
     {
         int barW = (int)(120f * (total > 0 ? value / (float)total : 0));
@@ -380,10 +365,13 @@ public sealed class InGameUi
         if (barW > 0)
             UiPrimitives.Fill(sb, pixel, new Rectangle(bg.X, bg.Y, barW, barH), color);
         UiPrimitives.Border(sb, pixel, bg, 1, UiTheme.BarkEdge);
-        sb.DrawString(font, value.ToString(), new Vector2(bg.Right + 4, y - 2), UiTheme.WarmParchment);
+
+        _valueSb.Clear();
+        _valueSb.Append(value);
+        sb.DrawString(font, _valueSb, new Vector2(bg.Right + 4, y - 2), UiTheme.WarmParchment);
     }
 
-    private static void DrawCreature(
+    private void DrawCreature(
         SpriteBatch spriteBatch,
         Texture2D pixel,
         SpriteFont font,
@@ -431,13 +419,22 @@ public sealed class InGameUi
         int genDepth = 0;
         foreach (var kv in lineage.AncestorDepths)
             genDepth = Math.Max(genDepth, kv.Value);
-        string lineageText = lineage.ParentAId > 0
-            ? $"Parents: [{lineage.ParentAId}, {lineage.ParentBId}]  |  ID: {lineage.IndividualId}"
-            : $"ID: {lineage.IndividualId}  |  Founder";
-        DrawLine(spriteBatch, font, content.X, content.Y + 362, lineageText, UiTheme.WarmParchment);
-        DrawLine(spriteBatch, font, content.X, content.Y + 382,
-            $"Ancestors: {lineage.AncestorDepths.Count}  |  MaxGen: {genDepth}  |  Inbreeding: {creature.InbreedingCoefficient:F3}  |  Fitness: {creature.GeneticFitness:F2}",
-            new Color(200, 180, 140));
+        _creatureLineageSb.Clear();
+        if (lineage.ParentAId > 0)
+        {
+            _creatureLineageSb.Append("Parents: [").Append(lineage.ParentAId).Append(", ").Append(lineage.ParentBId).Append("]  |  ID: ").Append(lineage.IndividualId);
+        }
+        else
+        {
+            _creatureLineageSb.Append("ID: ").Append(lineage.IndividualId).Append("  |  Founder");
+        }
+        DrawLine(spriteBatch, font, content.X, content.Y + 362, _creatureLineageSb, UiTheme.WarmParchment);
+
+        _creatureGenSb.Clear();
+        _creatureGenSb.Append("Ancestors: ").Append(lineage.AncestorDepths.Count).Append("  |  MaxGen: ").Append(genDepth)
+            .Append("  |  Inbreeding: ").Append(Math.Round(creature.InbreedingCoefficient, 3))
+            .Append("  |  Fitness: ").Append(Math.Round(creature.GeneticFitness, 2));
+        DrawLine(spriteBatch, font, content.X, content.Y + 382, _creatureGenSb, new Color(200, 180, 140));
     }
 
     private static void DrawProgress(SpriteBatch spriteBatch, Texture2D pixel, Rectangle bounds, float value)
@@ -449,10 +446,17 @@ public sealed class InGameUi
         UiPrimitives.Border(spriteBatch, pixel, bounds, 2, UiTheme.BarkEdge);
     }
 
-    private static void DrawLine(SpriteBatch spriteBatch, SpriteFont font, int x, int y, string text, Color color)
+    private void DrawLine(SpriteBatch spriteBatch, SpriteFont font, int x, int y, string text, Color color)
     {
         spriteBatch.DrawString(font, text, new Vector2(x, y), color);
     }
+
+    private void DrawLine(SpriteBatch spriteBatch, SpriteFont font, int x, int y, StringBuilder text, Color color)
+    {
+        spriteBatch.DrawString(font, text, new Vector2(x, y), color);
+    }
+
+
 
     private void LayoutToolbar(int viewportHeight)
     {
@@ -604,9 +608,10 @@ public sealed class InGameUi
         DrawProgress(sb, pixel, new Rectangle(content.X, y, (int)progressW, 10), climate.SeasonProgress);
         y += 16;
 
-        string tempLabel = $"{(int)(20f + climate.TemperatureModifier * 20f)}°C";
+        _tempSb.Clear();
+        _tempSb.Append((int)(20f + climate.TemperatureModifier * 20f)).Append("°C");
         float tempNorm = Math.Clamp((climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
-        DrawLine(sb, font, content.X, y, I18n.Format("climate.temperature", tempLabel),
+        DrawLine(sb, font, content.X, y, I18n.Format("climate.temperature", _tempSb.ToString()),
             Color.Lerp(new Color(100, 150, 255), new Color(255, 120, 40), tempNorm));
         y += 18;
 

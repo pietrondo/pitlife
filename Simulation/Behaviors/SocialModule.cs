@@ -40,7 +40,12 @@ internal sealed class SocialModule : IBehaviorModule
         switch (behavior)
         {
             case SocialBehavior.Herd:
-                return ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.5f * s, separationWeight: 2.0f * s, alignmentWeight: 0.5f * s, separationDist: 30f);
+                return ApplyFlocking(self, ecosystem, dt, world,
+                    cohesionWeight: SocialConfig.Data.Flocking.CohesionWeight * s,
+                    separationWeight: SocialConfig.Data.Flocking.SeparationWeight * s,
+                    alignmentWeight: SocialConfig.Data.Flocking.AlignmentWeight * s,
+                    separationDist: SocialConfig.Data.Flocking.SeparationDistance,
+                    radius: self.VisionPixels * SocialConfig.Data.Flocking.HerdRadius);
 
             case SocialBehavior.Pack:
                 {
@@ -77,9 +82,11 @@ internal sealed class SocialModule : IBehaviorModule
         float cohesionWeight,
         float separationWeight,
         float alignmentWeight,
-        float separationDist)
+        float separationDist,
+        float radius = -1f)
     {
-        var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels, n => n.Species == self.Species);
+        float actualRadius = radius < 0f ? self.VisionPixels : radius;
+        var neighbors = ecosystem.FindNeighbors(self, actualRadius, n => n.Species == self.Species);
         if (neighbors.Count == 0)
             return false;
 
@@ -193,10 +200,10 @@ internal sealed class SocialModule : IBehaviorModule
             return true;
         }
 
-        if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
+        if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < SocialConfig.Data.Combat.AggressionFactor)
         {
-            self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f) * (0.5f + self.Genome.Aggression);
-            neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f) * (0.5f + neighbor.Genome.Aggression);
+            self.Energy -= SocialConfig.Data.Combat.CombatDamage * dt * Math.Max(0.2f, 1f - neighbor.Defense / SocialConfig.Data.Combat.DefenseDivisor) * (0.5f + self.Genome.Aggression);
+            neighbor.Energy -= SocialConfig.Data.Combat.CombatDamage * dt * Math.Max(0.2f, 1f - self.Defense / SocialConfig.Data.Combat.DefenseDivisor) * (0.5f + neighbor.Genome.Aggression);
 
             if (self.Energy <= 0) self.Die(DeathCause.Combat);
             if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);

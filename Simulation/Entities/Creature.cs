@@ -180,10 +180,10 @@ public abstract class Creature
         CurrentEnergyMultiplier = 1f;
     }
 
-    public virtual void Update(World world, Ecosystem ecosystem, GameTime gameTime)
+    public virtual void Update(World world, Ecosystem ecosystem, float dt)
     {
         if (!IsAlive) return;
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
 
@@ -203,7 +203,7 @@ public abstract class Creature
 
         if (active)
         {
-            Behavior.Update(this, world, ecosystem, gameTime);
+            Behavior.Update(this, world, ecosystem, dt);
             if (!IsAlive) return;
         }
         else
@@ -348,11 +348,20 @@ public abstract class Creature
         float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
         if (tempDiff > 15f && CreatureType != CreatureType.Plant)
             CurrentEnergyMultiplier += tempDiff * 0.02f;
+
+        if (CreatureType != CreatureType.Plant)
+        {
+            var def = SpeciesRegistry.Get(Species);
+            if (def != null)
+            {
+                if (!def.IsValidBiome(tile.Biome))
+                    CurrentEnergyMultiplier += 4.0f;
+                if (!def.IsValidTemperature(tileTemp))
+                    CurrentEnergyMultiplier += 2.0f;
+            }
+        }
     }
 
-    /// <summary>
-    /// Updates multipliers for aquatic creatures based on biome.
-    /// </summary>
     private void UpdateAquaticMultipliers(Tile tile)
     {
         bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
@@ -368,9 +377,6 @@ public abstract class Creature
         }
     }
 
-    /// <summary>
-    /// Updates multipliers for terrestrial creatures based on biome adaptation.
-    /// </summary>
     private void UpdateTerrestrialMultipliers(Tile tile)
     {
         switch (tile.Biome)
@@ -456,6 +462,11 @@ public abstract class Creature
             Genome.ApplyGeneticDrift(random);
         }
 
+        UpdateMovement(dt, world);
+    }
+
+    private void UpdateMovement(float dt, World world)
+    {
         if (Waypoint.HasValue)
             MoveToward(Waypoint.Value, dt, world);
     }
