@@ -239,7 +239,7 @@ public sealed class SpeciesEditorPanel
 
     private int FindBestBiomePreset(IReadOnlyCollection<BiomeType> biomes)
     {
-        for (int i = 0; i < BiomePresets.Length; i++)
+        for (var i = 0; i < BiomePresets.Length; i++)
         {
             if (new HashSet<BiomeType>(BiomePresets[i].Biomes).SetEquals(biomes))
                 return i;
@@ -258,22 +258,22 @@ public sealed class SpeciesEditorPanel
 
     private void Layout(int viewportWidth, int viewportHeight)
     {
-        int width = Math.Min(680, viewportWidth - 32);
-        int height = Math.Min(610, viewportHeight - 80);
+        var width = Math.Min(680, viewportWidth - 32);
+        var height = Math.Min(610, viewportHeight - 80);
         _window.Bounds = new Rectangle((viewportWidth - width) / 2, Math.Max(56, (viewportHeight - height) / 2), width, height);
         Rectangle content = _window.ContentBounds;
-        int fieldWidth = content.Width;
+        var fieldWidth = content.Width;
         _key.Bounds = new Rectangle(content.X, content.Y + 18, fieldWidth, 36);
         _englishName.Bounds = new Rectangle(content.X, content.Y + 82, fieldWidth, 36);
         _italianName.Bounds = new Rectangle(content.X, content.Y + 146, fieldWidth, 36);
         _texturePath.Bounds = new Rectangle(content.X, content.Y + 210, fieldWidth, 36);
 
-        int half = (fieldWidth - 10) / 2;
+        var half = (fieldWidth - 10) / 2;
         _kind.Bounds = new Rectangle(content.X, content.Y + 266, half, 38);
         _social.Bounds = new Rectangle(content.X + half + 10, content.Y + 266, half, 38);
         _biomes.Bounds = new Rectangle(content.X, content.Y + 314, half, 38);
         _reproduction.Bounds = new Rectangle(content.X + half + 10, content.Y + 314, half, 38);
-        int quarter = (fieldWidth - 30) / 4;
+        var quarter = (fieldWidth - 30) / 4;
         _load.Bounds = new Rectangle(content.X, content.Y + 372, quarter, 38);
         _clone.Bounds = new Rectangle(content.X + quarter + 10, content.Y + 372, quarter, 38);
         _clear.Bounds = new Rectangle(content.X + (quarter + 10) * 2, content.Y + 372, quarter, 38);

@@ -4,8 +4,9 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class TrophicDynamics
+public sealed class TrophicDynamics : ISimulationSystem
 {
+    public UpdatePhase Phase => UpdatePhase.EarlyUpdate;
 
     // Prey (herbivore) population growth rates
     public float HerbivoreBirthBonus { get; private set; } = 1f;
@@ -45,6 +46,25 @@ public sealed class TrophicDynamics
         int carnivores = eco.CarnivoreCount;
         int plants = eco.PlantCount;
 
+        UpdatePopulationTracking(dt, herbivores, carnivores);
+
+        // Lotka-Volterra: compute predator-prey ratio
+        // When predators >> prey: prey drops, then predators starve
+        // When prey >> predators: prey booms, then predators follow
+        float ratio = carnivores > 0 ? (float)herbivores / carnivores : BalanceConfig.Data.Trophic.LotkaVolterraDefaultRatio;
+
+        UpdatePredatorPreyDynamics(ratio);
+        ApplyPlantHerbivoreCoupling(herbivores, plants);
+
+        // Clamp multipliers to reasonable ranges
+        HerbivoreBirthBonus = Math.Clamp(HerbivoreBirthBonus, BalanceConfig.Data.Trophic.MinBirthBonus, BalanceConfig.Data.Trophic.MaxBirthBonus);
+        HerbivoreDeathPenalty = Math.Clamp(HerbivoreDeathPenalty, BalanceConfig.Data.Trophic.MinDeathPenalty, BalanceConfig.Data.Trophic.MaxDeathPenalty);
+        CarnivoreBirthBonus = Math.Clamp(CarnivoreBirthBonus, BalanceConfig.Data.Trophic.MinBirthBonus, BalanceConfig.Data.Trophic.MaxBirthBonus);
+        CarnivoreDeathPenalty = Math.Clamp(CarnivoreDeathPenalty, BalanceConfig.Data.Trophic.MinDeathPenalty, BalanceConfig.Data.Trophic.MaxDeathPenalty);
+    }
+
+    private void UpdatePopulationTracking(float dt, int herbivores, int carnivores)
+    {
         // Sample population for historical tracking
         _timeSinceLastSample += dt;
         if (_timeSinceLastSample >= BalanceConfig.Data.Trophic.SampleInterval)
@@ -55,12 +75,10 @@ public sealed class TrophicDynamics
             HerbivoreTrough = Math.Min(HerbivoreTrough, herbivores);
             CarnivoreTrough = Math.Min(CarnivoreTrough, carnivores);
         }
+    }
 
-        // Lotka-Volterra: compute predator-prey ratio
-        // When predators >> prey: prey drops, then predators starve
-        // When prey >> predators: prey booms, then predators follow
-        float ratio = carnivores > 0 ? (float)herbivores / carnivores : BalanceConfig.Data.Trophic.LotkaVolterraDefaultRatio;
-
+    private void UpdatePredatorPreyDynamics(float ratio)
+    {
         // Prey (herbivore) dynamics
         // Prey reproduce more when predators are scarce (high ratio)
         if (ratio > BalanceConfig.Data.Trophic.PreyBoomRatioThreshold)
@@ -93,7 +111,10 @@ public sealed class TrophicDynamics
             CurrentPhaseLabel = "Balanced";
             CyclePhase = 0f;
         }
+    }
 
+    private void ApplyPlantHerbivoreCoupling(int herbivores, int plants)
+    {
         // Additional plant-herbivore coupling
         if (plants > 0 && herbivores > plants * BalanceConfig.Data.Trophic.OvergrazingPlantRatio)
         {
@@ -107,16 +128,10 @@ public sealed class TrophicDynamics
             // Plant overgrowth: lots of food, few consumers
             HerbivoreBirthBonus *= BalanceConfig.Data.Trophic.PlantOvergrowthBirthBonusMultiplier;
         }
-
-        // Clamp multipliers to reasonable ranges
-        HerbivoreBirthBonus = Math.Clamp(HerbivoreBirthBonus, BalanceConfig.Data.Trophic.MinBirthBonus, BalanceConfig.Data.Trophic.MaxBirthBonus);
-        HerbivoreDeathPenalty = Math.Clamp(HerbivoreDeathPenalty, BalanceConfig.Data.Trophic.MinDeathPenalty, BalanceConfig.Data.Trophic.MaxDeathPenalty);
-        CarnivoreBirthBonus = Math.Clamp(CarnivoreBirthBonus, BalanceConfig.Data.Trophic.MinBirthBonus, BalanceConfig.Data.Trophic.MaxBirthBonus);
-        CarnivoreDeathPenalty = Math.Clamp(CarnivoreDeathPenalty, BalanceConfig.Data.Trophic.MinDeathPenalty, BalanceConfig.Data.Trophic.MaxDeathPenalty);
     }
 
     public string GetStatusLine()
     {
-        return $"Trophic: {CurrentPhaseLabel} | H:{HerbivoreBirthBonus:F1}/{HerbivoreDeathPenalty:F1} C:{CarnivoreBirthBonus:F1}/{CarnivoreDeathPenalty:F1}";
+        return $"Trophic: {CurrentPhaseLabel} | H:{HerbivoreBirthBonus:F1}/{HerbivoreDeathPenalty:F1} C:{CarnivoreBirthBonus:F1}/{CarnivoreDeathPenalty:F1}".Replace(',', '.');
     }
 }

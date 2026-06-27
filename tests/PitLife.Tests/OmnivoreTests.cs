@@ -1,7 +1,5 @@
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
-using System;
 using System.Reflection;
 
 namespace PitLife.Tests;

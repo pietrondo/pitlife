@@ -347,6 +347,7 @@ internal static class BuiltinSpecies
             isAquatic: false,
             socialBehavior: SocialBehavior.None,
             validBiomes: biomes ?? Land,
+            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out var age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
             plantReproduction: reproduction,
             pollination: pollination,
             minTemperature: minTemperature,
@@ -365,6 +366,7 @@ internal static class BuiltinSpecies
             isAquatic: true,
             socialBehavior: SocialBehavior.None,
             validBiomes: ShallowOrDeep,
+            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out var age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
             plantReproduction: reproduction,
             pollination: pollination,
             minTemperature: minTemperature,
@@ -388,19 +390,7 @@ internal static class BuiltinSpecies
             socialBehavior: social,
             validBiomes: biomes,
             defaultSize: size,
-            maturityAge: GetMaturityAge(name),
+            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out var age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
             hibernates: hibernates));
     }
-
-    private static float GetMaturityAge(string species) => species switch
-    {
-        "Beetle" or "Butterfly" or "Frog" or "Piranha" or "Rabbit" => 10f,
-        "Tuna" or "Jellyfish" or "Lizard" or "Salmon" => 15f,
-        "Fox" or "Otter" or "Raccoon" => 20f,
-        "Boar" or "Cheetah" or "Gazelle" or "Goat" or "Kangaroo" or "Seal" or
-            "SeaLion" or "Sheep" => 25f,
-        "Horse" or "Hippopotamus" or "Orca" or "Shark" or "Turtle" => 40f,
-        "Walrus" or "Whale" => 50f,
-        _ => 30f
-    };
 }

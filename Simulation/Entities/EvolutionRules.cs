@@ -1,4 +1,5 @@
 using System;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -6,9 +7,9 @@ public static class EvolutionRules
 {
     public static string DetermineEvolvedSpecies(CreatureType kind, Genome genome, string currentSpecies, Random rng)
     {
-        bool isLandMammal = IsLandMammal(currentSpecies);
+        var isLandMammal = IsLandMammal(currentSpecies);
 
-        string? evolved = kind switch
+        var evolved = kind switch
         {
             CreatureType.Herbivore => DetermineHerbivoreEvolution(genome, isLandMammal, rng),
             CreatureType.Carnivore => DetermineCarnivoreEvolution(genome, isLandMammal, rng),
@@ -32,12 +33,13 @@ public static class EvolutionRules
 
     private static string? DetermineHerbivoreEvolution(Genome genome, bool isLandMammal, Random rng)
     {
-        if (genome.WaterAdaptation >= 0.65f)
+        var config = EvolutionConfig.Data.Herbivore;
+        if (genome.WaterAdaptation >= config.WaterAdaptation)
         {
             if (isLandMammal)
             {
-                if (genome.Speed >= 1.2f) return "Dolphin";
-                if (genome.Size >= 1.2f) return "Whale";
+                if (genome.Speed >= config.DolphinSpeed) return "Dolphin";
+                if (genome.Size >= config.WhaleSize) return "Whale";
                 return "Manatee";
             }
             else
@@ -45,35 +47,35 @@ public static class EvolutionRules
                 return rng.Next(2) == 0 ? "Tuna" : "Salmon";
             }
         }
-        if (genome.DesertAdaptation >= 0.45f && genome.Speed >= 1.2f && genome.Size >= 1.0f)
+        if (genome.DesertAdaptation >= config.KangarooDesertAdaptation && genome.Speed >= config.KangarooSpeed && genome.Size >= config.KangarooSize)
         {
             return "Kangaroo";
         }
-        if (genome.DesertAdaptation >= 0.65f && genome.Size <= 0.8f)
+        if (genome.DesertAdaptation >= config.LizardDesertAdaptation && genome.Size <= config.LizardSize)
         {
             return "Lizard";
         }
-        if (genome.DesertAdaptation >= 0.55f && genome.Speed >= 1.1f)
+        if (genome.DesertAdaptation >= config.GazelleDesertAdaptation && genome.Speed >= config.GazelleSpeed)
         {
             return "Gazelle";
         }
-        if (genome.Size <= 0.75f && genome.Speed >= 1.1f)
+        if (genome.Size <= config.RabbitSize && genome.Speed >= config.RabbitSpeed)
         {
             return "Rabbit";
         }
-        if (genome.ColdAdaptation >= 0.55f && genome.Size <= 1.1f)
+        if (genome.ColdAdaptation >= config.GoatColdAdaptation && genome.Size <= config.GoatSize)
         {
             return "Goat";
         }
-        if (genome.Size >= 1.25f && genome.Speed >= 1.1f)
+        if (genome.Size >= config.HorseSize && genome.Speed >= config.HorseSpeed)
         {
             return "Horse";
         }
-        if (genome.Size >= 1.0f && genome.ForestAdaptation >= 0.5f)
+        if (genome.Size >= config.DeerSize && genome.ForestAdaptation >= config.DeerForestAdaptation)
         {
             return "Deer";
         }
-        if (genome.Size >= 0.8f && genome.Size <= 1.2f && genome.Speed <= 0.9f)
+        if (genome.Size >= config.SheepSizeMin && genome.Size <= config.SheepSizeMax && genome.Speed <= config.SheepSpeed)
         {
             return "Sheep";
         }
@@ -82,12 +84,13 @@ public static class EvolutionRules
 
     private static string? DetermineCarnivoreEvolution(Genome genome, bool isLandMammal, Random rng)
     {
-        if (genome.WaterAdaptation >= 0.65f)
+        var config = EvolutionConfig.Data.Carnivore;
+        if (genome.WaterAdaptation >= config.WaterAdaptation)
         {
             if (isLandMammal)
             {
-                if (genome.Size >= 1.2f) return "Orca";
-                if (genome.ColdAdaptation >= 0.5f) return "Seal";
+                if (genome.Size >= config.OrcaSize) return "Orca";
+                if (genome.ColdAdaptation >= config.SealColdAdaptation) return "Seal";
                 return "SeaLion";
             }
             else
@@ -95,35 +98,35 @@ public static class EvolutionRules
                 return rng.Next(2) == 0 ? "Shark" : "Piranha";
             }
         }
-        if (genome.Speed >= 1.4f && (genome.DesertAdaptation >= 0.4f || genome.ForestAdaptation <= 0.4f))
+        if (genome.Speed >= config.CheetahSpeed && (genome.DesertAdaptation >= config.CheetahDesertAdaptation || genome.ForestAdaptation <= config.CheetahForestAdaptation))
         {
             return "Cheetah";
         }
-        if (genome.WaterAdaptation >= 0.45f && genome.DesertAdaptation >= 0.45f)
+        if (genome.WaterAdaptation >= config.CrocodileWaterAdaptation && genome.DesertAdaptation >= config.CrocodileDesertAdaptation)
         {
             return "Crocodile";
         }
-        if (genome.DesertAdaptation >= 0.45f && genome.Speed >= 1.1f)
+        if (genome.DesertAdaptation >= config.LionDesertAdaptation && genome.Speed >= config.LionSpeed)
         {
             return "Lion";
         }
-        if (genome.ColdAdaptation >= 0.45f && genome.Size >= 0.9f)
+        if (genome.ColdAdaptation >= config.WolfColdAdaptation && genome.Size >= config.WolfSize)
         {
             return "Wolf";
         }
-        if (genome.ColdAdaptation >= 0.55f && genome.Size <= 1.0f)
+        if (genome.ColdAdaptation >= config.LynxColdAdaptation && genome.Size <= config.LynxSize)
         {
             return "Lynx";
         }
-        if (genome.ForestAdaptation >= 0.65f && genome.Size >= 1.2f)
+        if (genome.ForestAdaptation >= config.TigerForestAdaptation && genome.Size >= config.TigerSize)
         {
             return "Tiger";
         }
-        if (genome.ForestAdaptation >= 0.5f && genome.Size < 1.2f)
+        if (genome.ForestAdaptation >= config.LeopardForestAdaptation && genome.Size < config.LeopardSize)
         {
             return "Leopard";
         }
-        if (genome.Size <= 0.8f)
+        if (genome.Size <= config.FoxSize)
         {
             return "Fox";
         }
@@ -132,12 +135,13 @@ public static class EvolutionRules
 
     private static string? DetermineOmnivoreEvolution(Genome genome, bool isLandMammal)
     {
-        if (genome.WaterAdaptation >= 0.65f)
+        var config = EvolutionConfig.Data.Omnivore;
+        if (genome.WaterAdaptation >= config.WaterAdaptation)
         {
             if (isLandMammal)
             {
-                if (genome.Size >= 1.3f) return "Hippopotamus";
-                if (genome.ColdAdaptation >= 0.5f) return "Walrus";
+                if (genome.Size >= config.HippopotamusSize) return "Hippopotamus";
+                if (genome.ColdAdaptation >= config.WalrusColdAdaptation) return "Walrus";
                 return "Otter";
             }
             else
@@ -145,19 +149,19 @@ public static class EvolutionRules
                 return "Jellyfish";
             }
         }
-        if (genome.WaterAdaptation >= 0.4f && genome.ForestAdaptation >= 0.4f)
+        if (genome.WaterAdaptation >= config.FrogWaterAdaptation && genome.ForestAdaptation >= config.FrogForestAdaptation)
         {
             return "Frog";
         }
-        if (genome.Size >= 1.3f)
+        if (genome.Size >= config.BearSize)
         {
             return "Bear";
         }
-        if (genome.Size >= 0.9f && genome.Size < 1.3f)
+        if (genome.Size >= config.BoarSizeMin && genome.Size < config.BoarSizeMax)
         {
             return "Boar";
         }
-        if (genome.Size < 0.9f)
+        if (genome.Size < config.RaccoonSize)
         {
             return "Raccoon";
         }

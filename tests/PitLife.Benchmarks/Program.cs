@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
@@ -91,7 +91,7 @@ public class EcosystemTickBenchmarks
     [Benchmark]
     public void TickLoop()
     {
-        for (int i = 0; i < 60; i++)
+        for (var i = 0; i < 60; i++)
         {
             _eco.Tick(new GameTime(TimeSpan.FromSeconds(1.0 / 60.0), TimeSpan.FromSeconds(1.0 / 60.0)));
         }

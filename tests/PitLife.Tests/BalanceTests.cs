@@ -14,7 +14,7 @@ public class BalanceTests
         var eco = new Ecosystem(64, 48, 42);
         eco.Initialize(h: 30, c: 10, o: 8, p: 80);
 
-        for (int i = 0; i < 600; i++)
+        for (var i = 0; i < 600; i++)
             eco.Tick(Tick(0.1f));
 
         Assert.True(eco.Creatures.Count > 0, "Ecosystem collapsed to zero creatures");
@@ -27,7 +27,7 @@ public class BalanceTests
         var eco = new Ecosystem(64, 48, 42) { MaxCreatures = 500 };
         eco.Initialize(h: 30, c: 10, o: 8, p: 80);
 
-        for (int i = 0; i < 600; i++)
+        for (var i = 0; i < 600; i++)
             eco.Tick(Tick(0.1f));
 
         Assert.True(eco.Creatures.Count <= 500, $"Population exploded to {eco.Creatures.Count}");
@@ -65,9 +65,9 @@ public class BalanceTests
         eco.AddCreature(f);
         eco.Tick(Tick(0.1f));
 
-        int initialCount = eco.Creatures.Count;
+        var initialCount = eco.Creatures.Count;
 
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
             eco.Tick(Tick(0.1f));
 
         Assert.True(eco.Creatures.Count > initialCount,
@@ -80,10 +80,10 @@ public class BalanceTests
         var eco = new Ecosystem(64, 48, 42);
         eco.Initialize(h: 30, c: 10, o: 8, p: 80);
 
-        for (int i = 0; i < 600; i++)
+        for (var i = 0; i < 600; i++)
             eco.Tick(Tick(0.1f));
 
-        int totalAnimals = eco.HerbivoreCount + eco.CarnivoreCount + eco.OmnivoreCount;
+        var totalAnimals = eco.HerbivoreCount + eco.CarnivoreCount + eco.OmnivoreCount;
         Assert.True(totalAnimals > 0, "All animals died");
         Assert.True(eco.PlantCount > 0, "Plants extinct — herbivores will starve");
     }
@@ -94,17 +94,17 @@ public class BalanceTests
         var eco = new Ecosystem(64, 48, 42);
         eco.Initialize(h: 30, c: 10, o: 8, p: 80);
 
-        for (int i = 0; i < 300; i++)
+        for (var i = 0; i < 300; i++)
             eco.Tick(Tick(0.1f));
 
-        int popAt30s = eco.Creatures.Count;
+        var popAt30s = eco.Creatures.Count;
 
-        for (int i = 0; i < 300; i++)
+        for (var i = 0; i < 300; i++)
             eco.Tick(Tick(0.1f));
 
-        int popAt60s = eco.Creatures.Count;
+        var popAt60s = eco.Creatures.Count;
 
-        double ratio = popAt60s / (double)Math.Max(1, popAt30s);
+        var ratio = popAt60s / (double)Math.Max(1, popAt30s);
         Assert.True(ratio is > 0.1 and < 10.0,
             $"Population unstable: {popAt30s} at 30s → {popAt60s} at 60s (ratio {ratio:F2})");
     }

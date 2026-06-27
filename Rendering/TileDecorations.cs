@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using PitLife.Simulation;
 
 namespace PitLife.Rendering;
@@ -24,7 +23,7 @@ public static class TileDecorations
     public static DecorationType GetDecoration(BiomeType biome, int tileX, int tileY, int seed, float vegetation)
     {
         var rng = new Random(seed ^ (tileX * 73856093) ^ (tileY * 19349663));
-        float roll = (float)rng.NextDouble();
+        var roll = (float)rng.NextDouble();
 
         return biome switch
         {

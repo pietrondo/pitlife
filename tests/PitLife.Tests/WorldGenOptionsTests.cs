@@ -1,6 +1,4 @@
-using System.Linq;
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -20,10 +18,10 @@ public class WorldGenOptionsTests
     public void Pangea_ProducesLargeCentralLandmass()
     {
         var world = new World(WorldGenOptions.Pangea() with { MapWidth = 96, MapHeight = 72 }, 42);
-        int landCells = 0;
-        for (int i = 0; i < world.Width * world.Height; i++)
+        var landCells = 0;
+        for (var i = 0; i < world.Width * world.Height; i++)
             if (world.ContinentMask[i] > 0.5f) landCells++;
-        double landRatio = landCells / (double)(world.Width * world.Height);
+        var landRatio = landCells / (double)(world.Width * world.Height);
         Assert.InRange(landRatio, 0.50, 0.70);
     }
 
@@ -31,10 +29,10 @@ public class WorldGenOptionsTests
     public void Archipelago_ProducesManySmallIslands()
     {
         var world = new World(WorldGenOptions.Archipelago() with { MapWidth = 96, MapHeight = 72 }, 42);
-        int landCells = 0;
-        for (int i = 0; i < world.Width * world.Height; i++)
+        var landCells = 0;
+        for (var i = 0; i < world.Width * world.Height; i++)
             if (world.ContinentMask[i] > 0.5f) landCells++;
-        double landRatio = landCells / (double)(world.Width * world.Height);
+        var landRatio = landCells / (double)(world.Width * world.Height);
         Assert.InRange(landRatio, 0.15, 0.40);
     }
 
@@ -43,8 +41,8 @@ public class WorldGenOptionsTests
     {
         var wet = new World(WorldGenOptions.WetWorld() with { MapWidth = 96, MapHeight = 72 }, 42);
         var dry = new World(WorldGenOptions.DryWorld() with { MapWidth = 96, MapHeight = 72 }, 42);
-        int WetOcean() { int n = 0; for (int i = 0; i < wet.Width * wet.Height; i++) if (wet.ContinentMask[i] <= 0.5f) n++; return n; }
-        int DryOcean() { int n = 0; for (int i = 0; i < dry.Width * dry.Height; i++) if (dry.ContinentMask[i] <= 0.5f) n++; return n; }
+        int WetOcean() { var n = 0; for (var i = 0; i < wet.Width * wet.Height; i++) if (wet.ContinentMask[i] <= 0.5f) n++; return n; }
+        int DryOcean() { var n = 0; for (var i = 0; i < dry.Width * dry.Height; i++) if (dry.ContinentMask[i] <= 0.5f) n++; return n; }
         Assert.True(WetOcean() > DryOcean(), "WetWorld should have more ocean cells than DryWorld");
     }
 
@@ -120,8 +118,8 @@ public class WorldGenOptionsTests
         var shallow = new World(WorldGenOptions.Pangea() with { SeaLevel = 0.25f, MapWidth = 96, MapHeight = 72 }, 99);
         var deep = new World(WorldGenOptions.Pangea() with { SeaLevel = 0.75f, MapWidth = 96, MapHeight = 72 }, 99);
         int LandCells(float[] mask) => mask.Count(c => c > 0.5f);
-        int shallowLand = LandCells(shallow.ContinentMask);
-        int deepLand = LandCells(deep.ContinentMask);
+        var shallowLand = LandCells(shallow.ContinentMask);
+        var deepLand = LandCells(deep.ContinentMask);
         Assert.True(shallowLand > deepLand,
             $"Shallow sea (0.25) should have more land ({shallowLand}) than deep sea 0.75 ({deepLand})");
     }

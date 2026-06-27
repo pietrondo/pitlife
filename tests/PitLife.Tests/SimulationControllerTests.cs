@@ -17,7 +17,7 @@ public class SimulationControllerTests
     public void Advance_TicksSimulation_WhenRunning()
     {
         var (c, eco, _) = MakeController();
-        float initialTime = eco.TotalTime;
+        var initialTime = eco.TotalTime;
         c.Advance(0.5f);
         Assert.True(eco.TotalTime > initialTime);
     }
@@ -27,7 +27,7 @@ public class SimulationControllerTests
     {
         var (c, eco, _) = MakeController();
         c.SetPause(true);
-        float initialTime = eco.TotalTime;
+        var initialTime = eco.TotalTime;
         c.Advance(0.5f);
         Assert.Equal(initialTime, eco.TotalTime);
     }

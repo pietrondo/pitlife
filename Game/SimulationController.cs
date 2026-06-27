@@ -36,8 +36,8 @@ public sealed class SimulationController
     {
         if (_paused)
         {
-        _dayNight.Update(_ecosystem.TotalTime);
-        _ecosystem.CurrentDayPhase = _dayNight.Phase;
+            _dayNight.Update(_ecosystem.TotalTime);
+            _ecosystem.CurrentDayPhase = _dayNight.Phase;
             return;
         }
 

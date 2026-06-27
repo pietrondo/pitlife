@@ -28,7 +28,7 @@ public sealed class UiButton
 
     public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool isFocused)
     {
-        bool hovered = IsHovered(mouse);
+        var hovered = IsHovered(mouse);
         Color fill = IsDisabled ? UiTheme.DeepGrove : (hovered || isFocused ? UiTheme.ForestNight : UiTheme.DeepGrove);
         Color border = IsDisabled ? UiTheme.BarkEdge : (IsDestructive ? UiTheme.DangerClay : UiTheme.BarkEdge);
 
@@ -58,7 +58,7 @@ public sealed class UiButton
 
         if (!string.IsNullOrEmpty(ShortcutHint))
         {
-            float hintScale = 0.8f;
+            var hintScale = 0.8f;
             Vector2 hintSize = font.MeasureString(ShortcutHint) * hintScale;
             Vector2 hintPos = new(
                 Bounds.Center.X - hintSize.X / 2f,

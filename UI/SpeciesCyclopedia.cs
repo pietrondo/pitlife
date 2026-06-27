@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PitLife.Localization;
 using PitLife.Simulation;
 
 namespace PitLife.UI;
@@ -61,7 +59,15 @@ public sealed class SpeciesCyclopedia
         _panelX = viewportWidth / 2 - 360;
         _panelY = 40;
 
-        // Search input
+        DrawSearchInput(mouse, prevMouse, kbd, prevKbd);
+        HandleFilterTabs(mouse, prevMouse);
+        HandleScroll(mouse, prevMouse);
+        HandleCardClick(mouse, prevMouse);
+        HandleKeyboardNavigation(kbd, prevKbd);
+    }
+
+    private void DrawSearchInput(MouseState mouse, MouseState prevMouse, KeyboardState kbd, KeyboardState prevKbd)
+    {
         if (Pressed(kbd, prevKbd, Keys.F) && kbd.IsKeyDown(Keys.LeftControl))
             _searchActive = true;
         if (_searchActive && Pressed(kbd, prevKbd, Keys.Escape))
@@ -76,10 +82,12 @@ public sealed class SpeciesCyclopedia
                 RefreshFilteredList();
             }
         }
+    }
 
-        // Filter tabs
-        int tabX = _panelX + PanelPadding;
-        for (int i = 0; i < Filters.Length; i++)
+    private void HandleFilterTabs(MouseState mouse, MouseState prevMouse)
+    {
+        var tabX = _panelX + PanelPadding;
+        for (var i = 0; i < Filters.Length; i++)
         {
             var tabRect = new Rectangle(tabX, _panelY, 100, 28);
             if (mouse.LeftButton == ButtonState.Pressed && prevMouse.LeftButton == ButtonState.Released
@@ -93,25 +101,25 @@ public sealed class SpeciesCyclopedia
             }
             tabX += 108;
         }
+    }
 
-        // Scroll with mouse wheel
-        int scrollDelta = mouse.ScrollWheelValue - prevMouse.ScrollWheelValue;
+    private void HandleScroll(MouseState mouse, MouseState prevMouse)
+    {
+        var scrollDelta = mouse.ScrollWheelValue - prevMouse.ScrollWheelValue;
         if (scrollDelta != 0)
         {
             _scrollOffset = Math.Clamp(_scrollOffset - scrollDelta / 40, 0, Math.Max(0, _maxScroll));
         }
+    }
 
-        // Card click
-        HandleCardClick(mouse, prevMouse);
-
-        // Detail view: back
+    private void HandleKeyboardNavigation(KeyboardState kbd, KeyboardState prevKbd)
+    {
         if (_selectedDef != null && Pressed(kbd, prevKbd, Keys.Escape))
         {
             _selectedDef = null;
             _selectedIndex = -1;
         }
 
-        // Keyboard navigation
         if (_selectedDef == null)
         {
             if (Pressed(kbd, prevKbd, Keys.Down)) NavigateSelection(1);
@@ -136,16 +144,16 @@ public sealed class SpeciesCyclopedia
     {
         if (mouse.LeftButton != ButtonState.Pressed || prevMouse.LeftButton != ButtonState.Released) return;
 
-        int cardAreaStartY = _panelY + TitleHeight + PanelPadding - _scrollOffset;
-        int cols = (_viewportW - _panelX * 2 - PanelPadding * 2) / (CardWidth + Gap);
+        var cardAreaStartY = _panelY + TitleHeight + PanelPadding - _scrollOffset;
+        var cols = (_viewportW - _panelX * 2 - PanelPadding * 2) / (CardWidth + Gap);
         if (cols < 1) cols = 1;
 
-        for (int i = 0; i < _filteredSpecies.Length; i++)
+        for (var i = 0; i < _filteredSpecies.Length; i++)
         {
-            int row = i / cols;
-            int col = i % cols;
-            int cx = _panelX + PanelPadding + col * (CardWidth + Gap);
-            int cy = cardAreaStartY + row * (CardHeight + Gap);
+            var row = i / cols;
+            var col = i % cols;
+            var cx = _panelX + PanelPadding + col * (CardWidth + Gap);
+            var cy = cardAreaStartY + row * (CardHeight + Gap);
 
             if (cy + CardHeight < _panelY + TitleHeight || cy > _viewportH - 20) continue;
 
@@ -188,7 +196,7 @@ public sealed class SpeciesCyclopedia
         DrawText(sb, font, _panelX + PanelPadding, _panelY + 8, "ENCYCLOPEDIA", UiTheme.MossSignal);
 
         // Search bar
-        int searchX = _panelX + PanelPadding + 440;
+        var searchX = _panelX + PanelPadding + 440;
         if (_searchActive)
         {
             _searchInput.Bounds = new Rectangle(searchX, _panelY + 6, 180, 24);
@@ -200,15 +208,15 @@ public sealed class SpeciesCyclopedia
         }
 
         // Filter tabs
-        int tabX = _panelX + PanelPadding;
-        int tabsY = _panelY + TitleHeight - 8;
-        for (int i = 0; i < Filters.Length; i++)
+        var tabX = _panelX + PanelPadding;
+        var tabsY = _panelY + TitleHeight - 8;
+        for (var i = 0; i < Filters.Length; i++)
         {
             var tabRect = new Rectangle(tabX, tabsY, 100, 28);
-            bool active = _activeFilter == Filters[i];
+            var active = _activeFilter == Filters[i];
             UiPrimitives.Fill(sb, pixel, tabRect, active ? UiTheme.MossSignal : UiTheme.DeepGrove);
             UiPrimitives.Border(sb, pixel, tabRect, 1, UiTheme.BarkEdge);
-            string label = Filters[i] switch
+            var label = Filters[i] switch
             {
                 CreatureType.Plant => "🌿 Piante",
                 CreatureType.Herbivore => "🐇 Erbivori",
@@ -242,32 +250,32 @@ public sealed class SpeciesCyclopedia
 
     private void DrawCardList(SpriteBatch sb, Texture2D pixel, SpriteFont font)
     {
-        int contentY = _panelY + TitleHeight + 30 + PanelPadding - _scrollOffset;
-        int contentH = _viewportH - contentY + _scrollOffset - 60;
-        int cols = Math.Max(1, (panelRect().Width - PanelPadding * 2) / (CardWidth + Gap));
+        var contentY = _panelY + TitleHeight + 30 + PanelPadding - _scrollOffset;
+        var contentH = _viewportH - contentY + _scrollOffset - 60;
+        var cols = Math.Max(1, (panelRect().Width - PanelPadding * 2) / (CardWidth + Gap));
 
-        for (int i = 0; i < _filteredSpecies.Length; i++)
+        for (var i = 0; i < _filteredSpecies.Length; i++)
         {
-            int row = i / cols;
-            int col = i % cols;
-            int cx = _panelX + PanelPadding + col * (CardWidth + Gap);
-            int cy = contentY + row * (CardHeight + Gap);
+            var row = i / cols;
+            var col = i % cols;
+            var cx = _panelX + PanelPadding + col * (CardWidth + Gap);
+            var cy = contentY + row * (CardHeight + Gap);
 
             if (cy + CardHeight < _panelY + TitleHeight + 30 || cy > _viewportH - 20) continue;
 
             var cardRect = new Rectangle(cx, cy, CardWidth, CardHeight);
-            bool selected = i == _selectedIndex;
+            var selected = i == _selectedIndex;
             UiPrimitives.Fill(sb, pixel, cardRect, selected ? new Color(30, 60, 40) : UiTheme.DeepGrove);
             UiPrimitives.Border(sb, pixel, cardRect, 2, selected ? UiTheme.MossSignal : UiTheme.BarkEdge);
 
             var def = SpeciesRegistry.Get(_filteredSpecies[i]);
             if (def == null) continue;
 
-            string name = _filteredSpecies[i];
-            string sizeStr = def.Kind == CreatureType.Plant ? "" : $"Size: {def.DefaultSize:F1}";
-            string social = def.Kind != CreatureType.Plant ? def.SocialBehavior.ToString() : "";
-            string biomeStr = def.ValidBiomes.Count > 6 ? $"{def.ValidBiomes.Count} biomes" : string.Join(", ", def.ValidBiomes.Take(3));
-            string traits = "";
+            var name = _filteredSpecies[i];
+            var sizeStr = def.Kind == CreatureType.Plant ? "" : $"Size: {def.DefaultSize:F1}";
+            var social = def.Kind != CreatureType.Plant ? def.SocialBehavior.ToString() : "";
+            var biomeStr = def.ValidBiomes.Count > 6 ? $"{def.ValidBiomes.Count} biomes" : string.Join(", ", def.ValidBiomes.Take(3));
+            var traits = "";
             if (def.IsAquatic) traits += "Aquatic ";
             if (def.Hibernates) traits += "Hibernates ";
             if (def.PlantReproduction.HasValue) traits += def.PlantReproduction.Value.ToString();
@@ -288,9 +296,9 @@ public sealed class SpeciesCyclopedia
     {
         if (_selectedDef == null) return;
 
-        int contentX = _panelX + PanelPadding;
-        int contentY = _panelY + TitleHeight + 36;
-        int y = contentY;
+        var contentX = _panelX + PanelPadding;
+        var contentY = _panelY + TitleHeight + 36;
+        var y = contentY;
 
         DrawText(sb, font, contentX, y, $"SPECIE: {_selectedDef.Species}", UiTheme.MossSignal);
         y += 28;

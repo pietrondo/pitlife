@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -34,7 +33,7 @@ public static class Logger
         {
             var files = Directory.GetFiles(LogDir, "pitlife_*.log")
                 .OrderByDescending(f => f).ToArray();
-            for (int i = 5; i < files.Length; i++)
+            for (var i = 5; i < files.Length; i++)
                 File.Delete(files[i]);
         }
         catch (Exception ex) { Console.Error.WriteLine($"Log rotation failed: {ex.Message}"); }
@@ -86,7 +85,7 @@ public static class Logger
 
     private static void Write(string level, string message)
     {
-        string line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{level}] {message}";
+        var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{level}] {message}";
         lock (Lock)
         {
             Buffer.Add(line);

@@ -57,7 +57,7 @@ public class AssetQualityTests
     [Fact]
     public void RegisteredSpeciesTextures_AreValidRgbaPngs()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         foreach (SpeciesAsset asset in AssetRegistry.SpeciesTextures)
         {
             PngPixels image = DecodeRgbaPng(Path.Combine(root, asset.Path));
@@ -69,14 +69,14 @@ public class AssetQualityTests
     [Fact]
     public void GeneratedAndStandardizedAssets_HaveExpectedDimensionsAndQuality()
     {
-        string root = FindRepositoryRoot();
-        foreach ((string relativePath, int expectedSize) in ExpectedStandardSizes)
+        var root = FindRepositoryRoot();
+        foreach ((var relativePath, var expectedSize) in ExpectedStandardSizes)
         {
             PngPixels image = DecodeRgbaPng(Path.Combine(root, relativePath));
             Assert.Equal(expectedSize, image.Width);
             Assert.Equal(expectedSize, image.Height);
 
-            int area = image.Width * image.Height;
+            var area = image.Width * image.Height;
             Assert.InRange(image.VisiblePixels, Math.Max(16, area / 50), area * 9 / 10);
             Assert.True(image.TransparentPixels > area / 20, $"Asset needs transparent margin: {relativePath}");
             Assert.True(image.DistinctVisibleColors >= 8, $"Asset has insufficient color detail: {relativePath}");
@@ -86,8 +86,8 @@ public class AssetQualityTests
     [Fact]
     public void NewSpeciesAssets_AreVisuallyDistinctFiles()
     {
-        string root = FindRepositoryRoot();
-        string[] hashes = NewSpeciesAssets
+        var root = FindRepositoryRoot();
+        var hashes = NewSpeciesAssets
             .Select(path => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(Path.Combine(root, path)))))
             .ToArray();
 
@@ -97,18 +97,18 @@ public class AssetQualityTests
     private static PngPixels DecodeRgbaPng(string path)
     {
         Assert.True(File.Exists(path), $"Missing PNG asset: {path}");
-        byte[] png = File.ReadAllBytes(path);
+        var png = File.ReadAllBytes(path);
         ReadOnlySpan<byte> signature = [137, 80, 78, 71, 13, 10, 26, 10];
         Assert.True(png.AsSpan(0, 8).SequenceEqual(signature), $"Invalid PNG signature: {path}");
 
-        int width = 0;
-        int height = 0;
+        var width = 0;
+        var height = 0;
         using var idat = new MemoryStream();
-        int offset = 8;
+        var offset = 8;
         while (offset < png.Length)
         {
-            int length = BinaryPrimitives.ReadInt32BigEndian(png.AsSpan(offset, 4));
-            string type = System.Text.Encoding.ASCII.GetString(png, offset + 4, 4);
+            var length = BinaryPrimitives.ReadInt32BigEndian(png.AsSpan(offset, 4));
+            var type = System.Text.Encoding.ASCII.GetString(png, offset + 4, 4);
             ReadOnlySpan<byte> data = png.AsSpan(offset + 8, length);
             if (type == "IHDR")
             {
@@ -132,21 +132,21 @@ public class AssetQualityTests
         using (var zlib = new ZLibStream(idat, CompressionMode.Decompress, leaveOpen: true))
             zlib.CopyTo(decompressed);
 
-        byte[] filtered = decompressed.ToArray();
-        int stride = width * 4;
+        var filtered = decompressed.ToArray();
+        var stride = width * 4;
         Assert.Equal((stride + 1) * height, filtered.Length);
-        byte[] pixels = new byte[stride * height];
-        for (int y = 0; y < height; y++)
+        var pixels = new byte[stride * height];
+        for (var y = 0; y < height; y++)
         {
-            int sourceRow = y * (stride + 1);
-            int targetRow = y * stride;
-            byte filter = filtered[sourceRow];
-            for (int x = 0; x < stride; x++)
+            var sourceRow = y * (stride + 1);
+            var targetRow = y * stride;
+            var filter = filtered[sourceRow];
+            for (var x = 0; x < stride; x++)
             {
-                byte raw = filtered[sourceRow + 1 + x];
-                byte left = x >= 4 ? pixels[targetRow + x - 4] : (byte)0;
-                byte up = y > 0 ? pixels[targetRow - stride + x] : (byte)0;
-                byte upperLeft = y > 0 && x >= 4 ? pixels[targetRow - stride + x - 4] : (byte)0;
+                var raw = filtered[sourceRow + 1 + x];
+                var left = x >= 4 ? pixels[targetRow + x - 4] : (byte)0;
+                var up = y > 0 ? pixels[targetRow - stride + x] : (byte)0;
+                var upperLeft = y > 0 && x >= 4 ? pixels[targetRow - stride + x - 4] : (byte)0;
                 pixels[targetRow + x] = filter switch
                 {
                     0 => raw,
@@ -159,9 +159,9 @@ public class AssetQualityTests
             }
         }
 
-        int visible = 0;
+        var visible = 0;
         var colors = new HashSet<int>();
-        for (int i = 0; i < pixels.Length; i += 4)
+        for (var i = 0; i < pixels.Length; i += 4)
         {
             if (pixels[i + 3] == 0)
                 continue;
@@ -175,10 +175,10 @@ public class AssetQualityTests
 
     private static byte Paeth(byte left, byte up, byte upperLeft)
     {
-        int prediction = left + up - upperLeft;
-        int leftDistance = Math.Abs(prediction - left);
-        int upDistance = Math.Abs(prediction - up);
-        int upperLeftDistance = Math.Abs(prediction - upperLeft);
+        var prediction = left + up - upperLeft;
+        var leftDistance = Math.Abs(prediction - left);
+        var upDistance = Math.Abs(prediction - up);
+        var upperLeftDistance = Math.Abs(prediction - upperLeft);
         return leftDistance <= upDistance && leftDistance <= upperLeftDistance
             ? left
             : upDistance <= upperLeftDistance ? up : upperLeft;

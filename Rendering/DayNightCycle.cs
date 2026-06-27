@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 
 namespace PitLife.Rendering;
@@ -36,7 +35,7 @@ public class DayNightCycle
     /// <returns>Returns the DayPhase result.</returns>
     public static DayPhase GetPhase(float timeOfDay)
     {
-        float t = timeOfDay / DayLength;
+        var t = timeOfDay / DayLength;
         return t switch
         {
             < 0.10f => DayPhase.Dawn,
@@ -53,7 +52,7 @@ public class DayNightCycle
     /// <returns>Returns the Color result.</returns>
     public Color GetOverlayColor()
     {
-        float t = TimeOfDay / DayLength;
+        var t = TimeOfDay / DayLength;
         return t switch
         {
             < 0.10f => LerpColor(NightColor, DawnColor, t / 0.10f),

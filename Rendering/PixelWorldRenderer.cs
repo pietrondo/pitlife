@@ -12,6 +12,7 @@ public sealed class PixelWorldRenderer : IDisposable
 {
     private readonly World _world;
     private Texture2D? _worldTexture;
+    private Color[]? _textureData;
     private bool _needsRedraw = true;
     private int _renderScale = 8;
 
@@ -30,10 +31,17 @@ public sealed class PixelWorldRenderer : IDisposable
     /// <param name="gd">The gd parameter.</param>
     public void LoadContent(GraphicsDevice gd)
     {
-        int texWidth = _world.Width * _renderScale;
-        int texHeight = _world.Height * _renderScale;
+        var texWidth = _world.Width * _renderScale;
+        var texHeight = _world.Height * _renderScale;
         _worldTexture?.Dispose();
         _worldTexture = new Texture2D(gd, texWidth, texHeight);
+
+        var requiredSize = texWidth * texHeight;
+        if (_textureData == null || _textureData.Length != requiredSize)
+        {
+            _textureData = new Color[requiredSize];
+        }
+
         _needsRedraw = true;
     }
 
@@ -60,14 +68,14 @@ public sealed class PixelWorldRenderer : IDisposable
         int pw = _world.PixelWidth, ph = _world.PixelHeight;
         var visible = camera.VisibleArea;
 
-        int startX = (int)MathF.Floor((float)visible.Left / pw);
-        int endX = (int)MathF.Floor((float)visible.Right / pw);
-        int startY = (int)MathF.Floor((float)visible.Top / ph);
-        int endY = (int)MathF.Floor((float)visible.Bottom / ph);
+        var startX = (int)MathF.Floor((float)visible.Left / pw);
+        var endX = (int)MathF.Floor((float)visible.Right / pw);
+        var startY = (int)MathF.Floor((float)visible.Top / ph);
+        var endY = (int)MathF.Floor((float)visible.Bottom / ph);
 
-        for (int dy = startY; dy <= endY; dy++)
+        for (var dy = startY; dy <= endY; dy++)
         {
-            for (int dx = startX; dx <= endX; dx++)
+            for (var dx = startX; dx <= endX; dx++)
             {
                 sb.Draw(_worldTexture,
                     new Rectangle(dx * pw, dy * ph, pw + 1, ph + 1),
@@ -78,25 +86,25 @@ public sealed class PixelWorldRenderer : IDisposable
 
     private void RedrawWorldTexture(GraphicsDevice gd)
     {
-        if (_worldTexture == null) return;
+        if (_worldTexture == null || _textureData == null) return;
 
-        int width = _worldTexture.Width;
-        int height = _worldTexture.Height;
-        Color[] data = new Color[width * height];
+        var width = _worldTexture.Width;
+        var height = _worldTexture.Height;
+        Color[] data = _textureData;
 
-        for (int y = 0; y < height; y++)
+        for (var y = 0; y < height; y++)
         {
-            for (int x = 0; x < width; x++)
+            for (var x = 0; x < width; x++)
             {
-                float worldX = x * _world.TileSize / (float)_renderScale;
-                float worldY = y * _world.TileSize / (float)_renderScale;
-                int tileX = Math.Clamp((int)(worldX / _world.TileSize), 0, _world.Width - 1);
-                int tileY = Math.Clamp((int)(worldY / _world.TileSize), 0, _world.Height - 1);
-                int idx = tileY * _world.Width + tileX;
+                var worldX = x * _world.TileSize / (float)_renderScale;
+                var worldY = y * _world.TileSize / (float)_renderScale;
+                var tileX = Math.Clamp((int)(worldX / _world.TileSize), 0, _world.Width - 1);
+                var tileY = Math.Clamp((int)(worldY / _world.TileSize), 0, _world.Height - 1);
+                var idx = tileY * _world.Width + tileX;
 
                 // Position within tile (0..1)
-                float lx = (worldX / _world.TileSize) - tileX;
-                float ly = (worldY / _world.TileSize) - tileY;
+                var lx = (worldX / _world.TileSize) - tileX;
+                var ly = (worldY / _world.TileSize) - tileY;
 
                 var biome = _world.Tiles[tileX, tileY].Biome;
                 Color pixelColor = GetBiomeRenderColor(biome);
@@ -107,14 +115,14 @@ public sealed class PixelWorldRenderer : IDisposable
                 {
                     var nb = _world.Tiles[nx, ny].Biome;
                     if (nb == biome) return pixelColor;
-                    float t = 1f - proximity; // 0 at boundary, 1 deep inside
-                    int hash = (x * 3 + y * 7) & 7; // 0..7
+                    var t = 1f - proximity; // 0 at boundary, 1 deep inside
+                    var hash = (x * 3 + y * 7) & 7; // 0..7
                     return hash < t * 8f ? pixelColor : GetBiomeRenderColor(nb);
                 }
 
-                if (lx < 0.25f && tileX > 0)               pixelColor = BlendEdge(tileX - 1, tileY, lx / 0.25f);
+                if (lx < 0.25f && tileX > 0) pixelColor = BlendEdge(tileX - 1, tileY, lx / 0.25f);
                 else if (lx > 0.75f && tileX < _world.Width - 1) pixelColor = BlendEdge(tileX + 1, tileY, (1f - lx) / 0.25f);
-                if (ly < 0.25f && tileY > 0)               pixelColor = BlendEdge(tileX, tileY - 1, ly / 0.25f);
+                if (ly < 0.25f && tileY > 0) pixelColor = BlendEdge(tileX, tileY - 1, ly / 0.25f);
                 else if (ly > 0.75f && tileY < _world.Height - 1) pixelColor = BlendEdge(tileX, tileY + 1, (1f - ly) / 0.25f);
 
                 if (_world.RiverMask[idx])
@@ -132,20 +140,20 @@ public sealed class PixelWorldRenderer : IDisposable
 
     private void DrawDecorations(Color[] data, int texWidth, int texHeight)
     {
-        for (int ty = 0; ty < _world.Height; ty++)
+        for (var ty = 0; ty < _world.Height; ty++)
         {
-            for (int tx = 0; tx < _world.Width; tx++)
+            for (var tx = 0; tx < _world.Width; tx++)
             {
-                float vegetation = _world.Tiles[tx, ty].Vegetation;
-                int seed = _world.Width * 7919 + _world.Height;
+                var vegetation = _world.Tiles[tx, ty].Vegetation;
+                var seed = _world.Width * 7919 + _world.Height;
                 var deco = TileDecorations.GetDecoration(_world.Tiles[tx, ty].Biome, tx, ty, seed, vegetation);
                 if (deco == TileDecorations.DecorationType.None) continue;
 
                 var color = TileDecorations.GetColor(deco, tx, ty, seed);
 
                 // Draw at center of tile in world texture space
-                int cx = tx * _renderScale + _renderScale / 2;
-                int cy = ty * _renderScale + _renderScale / 2;
+                var cx = tx * _renderScale + _renderScale / 2;
+                var cy = ty * _renderScale + _renderScale / 2;
 
                 switch (deco)
                 {
@@ -220,6 +228,7 @@ public sealed class PixelWorldRenderer : IDisposable
     {
         _worldTexture?.Dispose();
         _worldTexture = null;
+        _textureData = null;
     }
 
     // Static accessors for testing
@@ -296,44 +305,44 @@ public sealed class FastNoiseLite
         const float F2 = 0.366025403f; // 0.5 * (Sqrt(3) - 1)
         const float G2 = 0.211324865f; // (3 - Sqrt(3)) / 6
 
-        float s = (x + y) * F2;
-        int i = (int)MathF.Floor(x + s);
-        int j = (int)MathF.Floor(y + s);
-        float t = (i + j) * G2;
-        float X0 = i - t;
-        float Y0 = j - t;
-        float x0 = x - X0;
-        float y0 = y - Y0;
+        var s = (x + y) * F2;
+        var i = (int)MathF.Floor(x + s);
+        var j = (int)MathF.Floor(y + s);
+        var t = (i + j) * G2;
+        var X0 = i - t;
+        var Y0 = j - t;
+        var x0 = x - X0;
+        var y0 = y - Y0;
 
         int i1, j1;
         if (x0 > y0) { i1 = 1; j1 = 0; }
         else { i1 = 0; j1 = 1; }
 
-        float x1 = x0 - i1 + G2;
-        float y1 = y0 - j1 + G2;
-        float x2 = x0 - 1 + 2 * G2;
-        float y2 = y0 - 1 + 2 * G2;
+        var x1 = x0 - i1 + G2;
+        var y1 = y0 - j1 + G2;
+        var x2 = x0 - 1 + 2 * G2;
+        var y2 = y0 - 1 + 2 * G2;
 
-        int ii = i & 255;
-        int jj = j & 255;
+        var ii = i & 255;
+        var jj = j & 255;
 
         float n0 = 0, n1 = 0, n2 = 0;
 
-        float t0 = 0.5f - x0 * x0 - y0 * y0;
+        var t0 = 0.5f - x0 * x0 - y0 * y0;
         if (t0 >= 0)
         {
             t0 *= t0;
             n0 = t0 * t0 * Grad(Perm(ii + Perm(jj)), x0, y0);
         }
 
-        float t1 = 0.5f - x1 * x1 - y1 * y1;
+        var t1 = 0.5f - x1 * x1 - y1 * y1;
         if (t1 >= 0)
         {
             t1 *= t1;
             n1 = t1 * t1 * Grad(Perm(ii + i1 + Perm(jj + j1)), x1, y1);
         }
 
-        float t2 = 0.5f - x2 * x2 - y2 * y2;
+        var t2 = 0.5f - x2 * x2 - y2 * y2;
         if (t2 >= 0)
         {
             t2 *= t2;
@@ -345,19 +354,19 @@ public sealed class FastNoiseLite
 
     private float Perlin(float x, float y)
     {
-        int X = (int)MathF.Floor(x) & 255;
-        int Y = (int)MathF.Floor(y) & 255;
+        var X = (int)MathF.Floor(x) & 255;
+        var Y = (int)MathF.Floor(y) & 255;
         x -= MathF.Floor(x);
         y -= MathF.Floor(y);
-        float u = Fade(x);
-        float v = Fade(y);
+        var u = Fade(x);
+        var v = Fade(y);
 
-        int A = Perm(X) + Y;
-        int AA = Perm(A);
-        int AB = Perm(A + 1);
-        int B = Perm(X + 1) + Y;
-        int BA = Perm(B);
-        int BB = Perm(B + 1);
+        var A = Perm(X) + Y;
+        var AA = Perm(A);
+        var AB = Perm(A + 1);
+        var B = Perm(X + 1) + Y;
+        var BA = Perm(B);
+        var BB = Perm(B + 1);
 
         return Lerp(v, Lerp(u, Grad(Perm(AA), x, y), Grad(Perm(BA), x - 1, y)),
                          Lerp(u, Grad(Perm(AB), x, y - 1), Grad(Perm(BB), x - 1, y - 1)));
@@ -365,18 +374,18 @@ public sealed class FastNoiseLite
 
     private float Value(float x, float y)
     {
-        int X = (int)MathF.Floor(x);
-        int Y = (int)MathF.Floor(y);
-        float fx = x - X;
-        float fy = y - Y;
+        var X = (int)MathF.Floor(x);
+        var Y = (int)MathF.Floor(y);
+        var fx = x - X;
+        var fy = y - Y;
 
-        float v00 = Val(X, Y);
-        float v10 = Val(X + 1, Y);
-        float v01 = Val(X, Y + 1);
-        float v11 = Val(X + 1, Y + 1);
+        var v00 = Val(X, Y);
+        var v10 = Val(X + 1, Y);
+        var v01 = Val(X, Y + 1);
+        var v11 = Val(X + 1, Y + 1);
 
-        float v0 = Lerp(fx, v00, v10);
-        float v1 = Lerp(fx, v01, v11);
+        var v0 = Lerp(fx, v00, v10);
+        var v1 = Lerp(fx, v01, v11);
         return Lerp(fy, v0, v1);
     }
 
@@ -388,9 +397,9 @@ public sealed class FastNoiseLite
     private static float Lerp(float t, float a, float b) => a + t * (b - a);
     private static float Grad(int hash, float x, float y)
     {
-        int h = hash & 15;
-        float u = h < 8 ? x : y;
-        float v = h < 4 ? y : h == 12 || h == 14 ? x : 0;
+        var h = hash & 15;
+        var u = h < 8 ? x : y;
+        var v = h < 4 ? y : h == 12 || h == 14 ? x : 0;
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 
