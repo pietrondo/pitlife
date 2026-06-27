@@ -17,6 +17,7 @@ public sealed class AudioSystem : IDisposable
 
     public void LoadTone(string key, float frequency, float duration, float volume = 0.3f)
     {
+        ArgumentNullException.ThrowIfNull(key);
         int sampleRate = 44100;
         int samples = (int)(sampleRate * duration);
         var buffer = new byte[samples * 2]; // 16-bit mono
@@ -35,6 +36,7 @@ public sealed class AudioSystem : IDisposable
 
     public void LoadClick(string key, float volume = 0.4f)
     {
+        ArgumentNullException.ThrowIfNull(key);
         int sampleRate = 44100;
         int samples = 800; // ~18ms click
         var buffer = new byte[samples * 2];
@@ -72,6 +74,7 @@ public sealed class AudioSystem : IDisposable
 
     public void Play(string key, float volume = 1f)
     {
+        ArgumentNullException.ThrowIfNull(key);
         if (!_audioEnabled || !_sounds.TryGetValue(key, out var effect)) return;
         try
         {

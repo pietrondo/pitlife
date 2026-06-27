@@ -168,13 +168,31 @@ public sealed class SpawnPanel
 
         if (!IsOpen) return;
 
+        DrawPanelBackground(sb, pixel, font);
+        DrawTabButtons(sb, pixel, font, mouse);
+
+        if (ShowCataclysms)
+        {
+            DrawCataclysmButtons(sb, pixel, font, mouse);
+            return;
+        }
+
+        DrawCategoryButtons(sb, pixel, font, mouse);
+        DrawSpeciesList(sb, pixel, font, mouse);
+        DrawSelectedSpeciesHint(sb, font);
+    }
+
+    private void DrawPanelBackground(SpriteBatch sb, Texture2D pixel, SpriteFont font)
+    {
         UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(11, 23, 18, 235));
         UiPrimitives.Border(sb, pixel, _panelBounds, 2, new Color(107, 81, 55));
 
         sb.DrawString(font, I18n.T("spawn.title"),
             new Vector2(_panelBounds.X + 10, _panelBounds.Y + 6), UiTheme.MossSignal);
+    }
 
-        // Tab: Spawn / Cataclysms
+    private void DrawTabButtons(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
+    {
         var tabSpawn = new UiButton("Spawn");
         var tabCata = new UiButton("Cataclysms");
         tabSpawn.Bounds = new Rectangle(_panelBounds.X + 60, _panelBounds.Y + 6, 60, 20);
@@ -183,19 +201,19 @@ public sealed class SpawnPanel
         tabCata.Draw(sb, pixel, font, mouse, ShowCataclysms);
         if (WasClicked(mouse, previousMouseState) && tabSpawn.Bounds.Contains(mouse.Position)) ShowCataclysms = false;
         if (WasClicked(mouse, previousMouseState) && tabCata.Bounds.Contains(mouse.Position)) ShowCataclysms = true;
+    }
 
-        if (ShowCataclysms)
-        {
-            DrawCataclysmButtons(sb, pixel, font, mouse);
-            return;
-        }
-
+    private void DrawCategoryButtons(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
+    {
         foreach (var btn in _categoryButtons)
         {
             bool isSelected = btn.Tag as string == _state.SelectedCategory;
             btn.Draw(sb, pixel, font, mouse, isSelected);
         }
+    }
 
+    private void DrawSpeciesList(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
+    {
         if (_state.SelectedCategory != null)
         {
             _searchInput.Draw(sb, pixel, font, mouse);
@@ -223,7 +241,10 @@ public sealed class SpawnPanel
 
             DrawScrollBar(sb, pixel);
         }
+    }
 
+    private void DrawSelectedSpeciesHint(SpriteBatch sb, SpriteFont font)
+    {
         if (_state.SelectedSpeciesKey != null)
         {
             string selectedName = I18n.Species(_state.SelectedSpeciesKey!);

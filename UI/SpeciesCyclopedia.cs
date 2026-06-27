@@ -61,7 +61,15 @@ public sealed class SpeciesCyclopedia
         _panelX = viewportWidth / 2 - 360;
         _panelY = 40;
 
-        // Search input
+        DrawSearchInput(mouse, prevMouse, kbd, prevKbd);
+        HandleFilterTabs(mouse, prevMouse);
+        HandleScroll(mouse, prevMouse);
+        HandleCardClick(mouse, prevMouse);
+        HandleKeyboardNavigation(kbd, prevKbd);
+    }
+
+    private void DrawSearchInput(MouseState mouse, MouseState prevMouse, KeyboardState kbd, KeyboardState prevKbd)
+    {
         if (Pressed(kbd, prevKbd, Keys.F) && kbd.IsKeyDown(Keys.LeftControl))
             _searchActive = true;
         if (_searchActive && Pressed(kbd, prevKbd, Keys.Escape))
@@ -76,8 +84,10 @@ public sealed class SpeciesCyclopedia
                 RefreshFilteredList();
             }
         }
+    }
 
-        // Filter tabs
+    private void HandleFilterTabs(MouseState mouse, MouseState prevMouse)
+    {
         int tabX = _panelX + PanelPadding;
         for (int i = 0; i < Filters.Length; i++)
         {
@@ -93,25 +103,25 @@ public sealed class SpeciesCyclopedia
             }
             tabX += 108;
         }
+    }
 
-        // Scroll with mouse wheel
+    private void HandleScroll(MouseState mouse, MouseState prevMouse)
+    {
         int scrollDelta = mouse.ScrollWheelValue - prevMouse.ScrollWheelValue;
         if (scrollDelta != 0)
         {
             _scrollOffset = Math.Clamp(_scrollOffset - scrollDelta / 40, 0, Math.Max(0, _maxScroll));
         }
+    }
 
-        // Card click
-        HandleCardClick(mouse, prevMouse);
-
-        // Detail view: back
+    private void HandleKeyboardNavigation(KeyboardState kbd, KeyboardState prevKbd)
+    {
         if (_selectedDef != null && Pressed(kbd, prevKbd, Keys.Escape))
         {
             _selectedDef = null;
             _selectedIndex = -1;
         }
 
-        // Keyboard navigation
         if (_selectedDef == null)
         {
             if (Pressed(kbd, prevKbd, Keys.Down)) NavigateSelection(1);

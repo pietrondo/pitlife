@@ -5,22 +5,37 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the WaterEffect.
+/// </summary>
 public sealed class WaterEffect
 {
     private float _time;
 
+    /// <summary>
+    /// Executes the Update.
+    /// </summary>
+    /// <param name="dt">The dt parameter.</param>
     public void Update(float dt)
     {
         _time += dt;
     }
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="pixel">The pixel parameter.</param>
+    /// <param name="world">The world parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
     public void Draw(SpriteBatch sb, Texture2D pixel, World world, Camera camera)
     {
         int tileSize = world.TileSize;
-        int viewLeft = Math.Max(0, (int)(camera.Position.X - camera.ViewportWidth / 2f) / tileSize - 1);
-        int viewTop = Math.Max(0, (int)(camera.Position.Y - camera.ViewportHeight / 2f) / tileSize - 1);
-        int viewRight = Math.Min(world.Width, viewLeft + camera.ViewportWidth / tileSize + 3);
-        int viewBottom = Math.Min(world.Height, viewTop + camera.ViewportHeight / tileSize + 3);
+        Rectangle visible = camera.VisibleArea;
+        int viewLeft = Math.Max(0, visible.Left / tileSize - 1);
+        int viewTop = Math.Max(0, visible.Top / tileSize - 1);
+        int viewRight = Math.Min(world.Width, visible.Right / tileSize + 2);
+        int viewBottom = Math.Min(world.Height, visible.Bottom / tileSize + 2);
 
         for (int ty = viewTop; ty < viewBottom; ty++)
         {

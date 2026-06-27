@@ -6,6 +6,9 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the Minimap.
+/// </summary>
 public class Minimap
 {
     public const int Size = 160;
@@ -16,12 +19,21 @@ public class Minimap
     private Texture2D? _pixelTexture;
     private Color[]? _terrainBuffer;
 
+    /// <summary>
+    /// Initializes a new instance of the Minimap.
+    /// </summary>
+    /// <param name="ecosystem">The ecosystem parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
     public Minimap(Ecosystem ecosystem, Camera camera)
     {
         _ecosystem = ecosystem;
         _camera = camera;
     }
 
+    /// <summary>
+    /// Executes the LoadContent.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
     public void LoadContent(GraphicsDevice gd)
     {
         _pixelTexture = new Texture2D(gd, 1, 1);
@@ -29,6 +41,9 @@ public class Minimap
         RebuildTerrainBuffer();
     }
 
+    /// <summary>
+    /// Executes the RebuildTerrainBuffer.
+    /// </summary>
     public void RebuildTerrainBuffer()
     {
         int worldW = _ecosystem.World.PixelWidth;
@@ -45,6 +60,12 @@ public class Minimap
         }
     }
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="viewportWidth">The viewportWidth parameter.</param>
+    /// <param name="viewportHeight">The viewportHeight parameter.</param>
     public void Draw(SpriteBatch sb, int viewportWidth, int viewportHeight)
     {
         if (_pixelTexture == null || _terrainBuffer == null) return;
@@ -61,6 +82,12 @@ public class Minimap
         DrawViewportRect(sb, x, y);
     }
 
+    /// <summary>
+    /// Executes the GetBounds.
+    /// </summary>
+    /// <param name="viewportWidth">The viewportWidth parameter.</param>
+    /// <param name="viewportHeight">The viewportHeight parameter.</param>
+    /// <returns>Returns the Rectangle result.</returns>
     public Rectangle GetBounds(int viewportWidth, int viewportHeight)
     {
         int x = viewportWidth - Size - Margin;
@@ -68,6 +95,13 @@ public class Minimap
         return new Rectangle(x, y, Size, Size);
     }
 
+    /// <summary>
+    /// Executes the HandleClick.
+    /// </summary>
+    /// <param name="mouse">The mouse parameter.</param>
+    /// <param name="viewportWidth">The viewportWidth parameter.</param>
+    /// <param name="viewportHeight">The viewportHeight parameter.</param>
+    /// <returns>Returns the bool result.</returns>
     public bool HandleClick(MouseState mouse, int viewportWidth, int viewportHeight)
     {
         var bounds = GetBounds(viewportWidth, viewportHeight);
@@ -76,6 +110,13 @@ public class Minimap
         return true;
     }
 
+    /// <summary>
+    /// Executes the HandleDrag.
+    /// </summary>
+    /// <param name="mouse">The mouse parameter.</param>
+    /// <param name="viewportWidth">The viewportWidth parameter.</param>
+    /// <param name="viewportHeight">The viewportHeight parameter.</param>
+    /// <returns>Returns the bool result.</returns>
     public bool HandleDrag(MouseState mouse, int viewportWidth, int viewportHeight)
     {
         var bounds = GetBounds(viewportWidth, viewportHeight);
@@ -178,6 +219,10 @@ public class Minimap
     };
 
     // Static accessor for testing - returns colors in biome order
+    /// <summary>
+    /// Executes the GetBiomeColors.
+    /// </summary>
+    /// <returns>Returns the Color[] result.</returns>
     public static Color[] GetBiomeColors() =>
     [
         new Color(28, 60, 110),    // DeepOcean
@@ -209,9 +254,24 @@ public class Minimap
 
 internal static class UiPrimitivesHelper
 {
+    /// <summary>
+    /// Executes the Fill.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="pixel">The pixel parameter.</param>
+    /// <param name="r">The r parameter.</param>
+    /// <param name="c">The c parameter.</param>
     public static void Fill(SpriteBatch sb, Texture2D pixel, Rectangle r, Color c) =>
         sb.Draw(pixel, r, c);
 
+    /// <summary>
+    /// Executes the Border.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="pixel">The pixel parameter.</param>
+    /// <param name="r">The r parameter.</param>
+    /// <param name="thickness">The thickness parameter.</param>
+    /// <param name="c">The c parameter.</param>
     public static void Border(SpriteBatch sb, Texture2D pixel, Rectangle r, int thickness, Color c)
     {
         sb.Draw(pixel, new Rectangle(r.X, r.Y, r.Width, thickness), c);

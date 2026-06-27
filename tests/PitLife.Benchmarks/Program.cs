@@ -72,6 +72,32 @@ public class SpatialGridBenchmarks
     }
 }
 
+[MemoryDiagnoser]
+[SimpleJob(launchCount: 1, warmupCount: 1, iterationCount: 3)]
+public class EcosystemTickBenchmarks
+{
+    private Ecosystem _eco = null!;
+
+    [Params(1, 10, 100, 1000)]
+    public int CreatureCount { get; set; }
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _eco = new Ecosystem(200, 150, 42);
+        _eco.Initialize(CreatureCount, 0, 0, 0); // h, c, o, p
+    }
+
+    [Benchmark]
+    public void TickLoop()
+    {
+        for (int i = 0; i < 60; i++)
+        {
+            _eco.Tick(new GameTime(TimeSpan.FromSeconds(1.0 / 60.0), TimeSpan.FromSeconds(1.0 / 60.0)));
+        }
+    }
+}
+
 public class Program
 {
     public static void Main(string[] args)
@@ -80,7 +106,8 @@ public class Program
         [
             typeof(EcosystemBenchmarks),
             typeof(WorldGenBenchmarks),
-            typeof(SpatialGridBenchmarks)
+            typeof(SpatialGridBenchmarks),
+            typeof(EcosystemTickBenchmarks)
         ]);
     }
 }

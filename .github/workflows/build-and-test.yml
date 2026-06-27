@@ -39,6 +39,9 @@ jobs:
           Get-ChildItem -Path "dejavu\\dejavu-fonts-ttf-2.37\\ttf" -Filter "*.ttf" | ForEach-Object { $fonts.CopyHere($_.FullName, 0x10) }
         shell: powershell
 
+      - name: Restore tools
+        run: dotnet tool restore
+
       - name: Restore dependencies
         run: dotnet restore
 

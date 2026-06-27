@@ -8,10 +8,10 @@ public sealed class BaseBehavior : ICreatureBehavior
     private readonly FeedingModule _feeding = new();
     private readonly SocialModule _social = new();
 
-    public void Update(Creature self, World world, Ecosystem ecosystem, GameTime gameTime)
+    public void Update(Creature self, World world, Ecosystem ecosystem, float dt)
     {
         if (!self.IsAlive) return;
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         if (dt <= 0) return;
 
         if (_threat.Update(self, world, ecosystem, dt))

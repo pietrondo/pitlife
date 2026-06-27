@@ -8,6 +8,9 @@ namespace PitLife.Rendering;
 public sealed record SpeciesAsset(string Species, string Path);
 public sealed record GenderedSpeciesAsset(string Species, string MalePath, string FemalePath);
 
+/// <summary>
+/// Represents the AssetRegistry.
+/// </summary>
 public static class AssetRegistry
 {
     private static readonly object SpeciesTextureSync = new();
@@ -166,6 +169,9 @@ public static class AssetRegistry
         new("Seagull", "Content/assets/creatures/birds/owls/owl.png"),
     };
 
+    /// <summary>
+    /// Gets or sets the SpeciesTextures.
+    /// </summary>
     public static IReadOnlyList<SpeciesAsset> SpeciesTextures
     {
         get
@@ -175,6 +181,11 @@ public static class AssetRegistry
         }
     }
 
+    /// <summary>
+    /// Executes the RegisterCustomSpeciesTexture.
+    /// </summary>
+    /// <param name="species">The species parameter.</param>
+    /// <param name="path">The path parameter.</param>
     public static void RegisterCustomSpeciesTexture(string species, string path)
     {
         lock (SpeciesTextureSync)

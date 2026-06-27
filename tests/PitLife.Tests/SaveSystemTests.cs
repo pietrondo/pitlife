@@ -409,14 +409,14 @@ public class SaveSystemTests
             var loaded = SaveSystem.Load(filePath);
             Assert.NotNull(loaded);
             Assert.Single(loaded.Creatures);
-
+            
             var c = loaded.Creatures[0];
             Assert.Equal("Clover", c.Species);
             Assert.Equal(5, c.PositionX);
             Assert.Equal(5, c.PositionY);
             Assert.Equal(10, c.Energy);
             Assert.Equal(1, c.Age);
-
+            
             // Check default fields that were missing
             Assert.Equal(Gender.None, c.Gender); // Default enum value
             Assert.Equal(0, c.FacingX); // Default
@@ -464,7 +464,7 @@ public class SaveSystemTests
     {
         string filePath = "test_serialize_save.json";
         var mockEcosystem = new Mock<Ecosystem>(10, 10, 42) { CallBase = true };
-
+        
         var genome = new Genome { Size = 1.0f };
         var creature = new Plant(new Vector2(5, 5), genome, "Clover");
         mockEcosystem.Object.AddCreature(creature);
@@ -474,7 +474,7 @@ public class SaveSystemTests
         {
             SaveSystem.Save(filePath, mockEcosystem.Object);
             Assert.True(File.Exists(filePath));
-
+            
             string json = File.ReadAllText(filePath);
             Assert.Contains("\"Seed\": 42", json);
             Assert.Contains("\"WorldWidth\": 10", json);
@@ -519,7 +519,7 @@ public class SaveSystemTests
             Assert.Equal(8, loaded.WorldWidth);
             Assert.Equal(8, loaded.WorldHeight);
             Assert.Equal(5.5f, loaded.TotalTime);
-
+            
             Assert.Single(loaded.Creatures);
             var c = loaded.Creatures[0];
             Assert.Equal("Clover", c.Species);

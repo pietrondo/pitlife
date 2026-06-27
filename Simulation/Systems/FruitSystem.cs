@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -39,8 +40,8 @@ public struct Fruit
 public sealed class FruitSystem
 {
 
-    private const int MaxFruits = 500;
-    private readonly Fruit[] _fruits = new Fruit[MaxFruits];
+
+    private Fruit[] _fruits = [];
     private int _fruitCount;
     private float _spawnTimer;
 
@@ -48,7 +49,13 @@ public sealed class FruitSystem
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed);
 
-    public void Initialize(World world) { }
+    public void Initialize(World world)
+    {
+        if (_fruits == null || _fruits.Length != FruitConfig.Data.MaxFruits)
+        {
+            _fruits = new Fruit[FruitConfig.Data.MaxFruits];
+        }
+    }
 
     public void Reset()
     {
@@ -76,9 +83,9 @@ public sealed class FruitSystem
 
         // Spawn new fruits from plants
         _spawnTimer -= dt;
-        if (_spawnTimer <= 0 && _fruitCount < MaxFruits)
+        if (_spawnTimer <= 0 && _fruitCount < FruitConfig.Data.MaxFruits)
         {
-            _spawnTimer = 3f + (float)eco.Random.NextDouble() * 5f;
+            _spawnTimer = FruitConfig.Data.SpawnTimerBase + (float)eco.Random.NextDouble() * FruitConfig.Data.SpawnTimerVariance;
             SpawnFruits(eco);
         }
     }
@@ -87,10 +94,10 @@ public sealed class FruitSystem
     {
         if (eco.Creatures.Count == 0) return;
 
-        int attempts = 10;
+        int attempts = FruitConfig.Data.SpawnAttempts;
         for (int a = 0; a < attempts; a++)
         {
-            if (_fruitCount >= MaxFruits) break;
+            if (_fruitCount >= FruitConfig.Data.MaxFruits) break;
 
             // Pick a random alive plant
             Creature? plant = TryFindRandomFruitPlant(eco);
@@ -100,17 +107,17 @@ public sealed class FruitSystem
             if (def == null || def.PlantReproduction != PlantReproductionMode.Seeds) continue;
 
             // Spawn fruit near the plant
-            float offsetX = (float)(eco.Random.NextDouble() - 0.5) * 40f;
-            float offsetY = (float)(eco.Random.NextDouble() - 0.5) * 40f;
+            float offsetX = (float)(eco.Random.NextDouble() - 0.5) * FruitConfig.Data.SpawnOffsetMax;
+            float offsetY = (float)(eco.Random.NextDouble() - 0.5) * FruitConfig.Data.SpawnOffsetMax;
             var pos = new Vector2(
                 Math.Clamp(plant.Position.X + offsetX, 0, eco.World.PixelWidth - 1),
                 Math.Clamp(plant.Position.Y + offsetY, 0, eco.World.PixelHeight - 1));
 
-            float energyValue = 5f + (float)eco.Random.NextDouble() * 10f;
-            float lifetime = 20f + (float)eco.Random.NextDouble() * 30f;
+            float energyValue = FruitConfig.Data.EnergyValueBase + (float)eco.Random.NextDouble() * FruitConfig.Data.EnergyValueVariance;
+            float lifetime = FruitConfig.Data.LifetimeBase + (float)eco.Random.NextDouble() * FruitConfig.Data.LifetimeVariance;
 
             bool poisonous = plant.Species is "Belladonna" or "VenusFlyTrap" or "PitcherPlant";
-            float toxicity = poisonous ? 0.6f + (float)eco.Random.NextDouble() * 0.3f : 0f;
+            float toxicity = poisonous ? FruitConfig.Data.PoisonousToxicityBase + (float)eco.Random.NextDouble() * FruitConfig.Data.PoisonousToxicityVariance : 0f;
 
             _fruits[_fruitCount++] = new Fruit(pos, energyValue, lifetime, plant.Species, poisonous, toxicity);
         }
@@ -137,7 +144,7 @@ public sealed class FruitSystem
     {
         int idx = eco.Random.Next(eco.Creatures.Count);
         int tries = 0;
-        while (tries < 50)
+        while (tries < FruitConfig.Data.FindPlantMaxTries)
         {
             var candidate = eco.Creatures[(idx + tries) % eco.Creatures.Count];
             if (candidate.IsAlive && candidate.CreatureType == CreatureType.Plant)

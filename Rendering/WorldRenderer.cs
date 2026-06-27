@@ -7,6 +7,9 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the WorldRenderer.
+/// </summary>
 public class WorldRenderer
 {
     private readonly World _world;
@@ -58,14 +61,37 @@ public class WorldRenderer
         new(240, 245, 250),  // Snow edge
     };
 
+    /// <summary>
+    /// Initializes a new instance of the WorldRenderer.
+    /// </summary>
+    /// <param name="world">The world parameter.</param>
     public WorldRenderer(World world) => _world = world;
 
+    /// <summary>
+    /// Executes the LoadContent.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
     public void LoadContent(GraphicsDevice gd)
     {
         _pixel = new Texture2D(gd, 1, 1);
         _pixel.SetData([Color.White]);
     }
 
+    /// <summary>
+    /// Executes the SetTileTextures.
+    /// </summary>
+    /// <param name="ocean">The ocean parameter.</param>
+    /// <param name="shallow">The shallow parameter.</param>
+    /// <param name="beach">The beach parameter.</param>
+    /// <param name="desert">The desert parameter.</param>
+    /// <param name="savanna">The savanna parameter.</param>
+    /// <param name="grass">The grass parameter.</param>
+    /// <param name="forest">The forest parameter.</param>
+    /// <param name="dense">The dense parameter.</param>
+    /// <param name="swamp">The swamp parameter.</param>
+    /// <param name="tundra">The tundra parameter.</param>
+    /// <param name="mountain">The mountain parameter.</param>
+    /// <param name="snow">The snow parameter.</param>
     public void SetTileTextures(
         Texture2D? ocean, Texture2D? shallow, Texture2D? beach,
         Texture2D? desert, Texture2D? savanna, Texture2D? grass,
@@ -86,6 +112,11 @@ public class WorldRenderer
         _texSnow = snow;
     }
 
+    /// <summary>
+    /// Executes the LoadFromRegistry.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
+    /// <param name="assets">The assets parameter.</param>
     public void LoadFromRegistry(GraphicsDevice gd, IEnumerable<SpeciesAsset> assets)
     {
         foreach (var a in assets)
@@ -136,6 +167,11 @@ public class WorldRenderer
         _ => null
     };
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
     public void Draw(SpriteBatch sb, Camera camera)
     {
         Rectangle v = camera.VisibleArea;

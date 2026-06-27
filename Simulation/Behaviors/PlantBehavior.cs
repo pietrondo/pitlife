@@ -5,11 +5,11 @@ namespace PitLife.Simulation;
 
 public sealed class PlantBehavior : ICreatureBehavior
 {
-    public void Update(Creature self, World world, Ecosystem ecosystem, GameTime gameTime)
+    public void Update(Creature self, World world, Ecosystem ecosystem, float dt)
     {
         if (!self.IsAlive) return;
         if (self is not Plant plant) return;
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
 
         var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
         float sunlight = tile.Vegetation * 0.5f + 0.5f;

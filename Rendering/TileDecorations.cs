@@ -5,10 +5,22 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the TileDecorations.
+/// </summary>
 public static class TileDecorations
 {
     public enum DecorationType { None, Tree, Rock, Flower, Bush, Mushroom, Cactus, Coral }
 
+    /// <summary>
+    /// Executes the GetDecoration.
+    /// </summary>
+    /// <param name="biome">The biome parameter.</param>
+    /// <param name="tileX">The tileX parameter.</param>
+    /// <param name="tileY">The tileY parameter.</param>
+    /// <param name="seed">The seed parameter.</param>
+    /// <param name="vegetation">The vegetation parameter.</param>
+    /// <returns>Returns the DecorationType result.</returns>
     public static DecorationType GetDecoration(BiomeType biome, int tileX, int tileY, int seed, float vegetation)
     {
         var rng = new Random(seed ^ (tileX * 73856093) ^ (tileY * 19349663));
@@ -59,6 +71,14 @@ public static class TileDecorations
         };
     }
 
+    /// <summary>
+    /// Executes the GetColor.
+    /// </summary>
+    /// <param name="deco">The deco parameter.</param>
+    /// <param name="tileX">The tileX parameter.</param>
+    /// <param name="tileY">The tileY parameter.</param>
+    /// <param name="seed">The seed parameter.</param>
+    /// <returns>Returns the Color result.</returns>
     public static Color GetColor(DecorationType deco, int tileX, int tileY, int seed)
     {
         var rng = new Random(seed ^ (tileX * 19349663) ^ (tileY * 73856093));
