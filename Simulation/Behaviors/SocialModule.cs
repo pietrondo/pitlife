@@ -13,8 +13,8 @@ internal sealed class SocialModule : IBehaviorModule
 
     public void DefendInfants(Creature self, Ecosystem ecosystem, float dt)
     {
-        bool IsInfant(Creature c) => c.IsBaby && c.Parent == self && c.IsAlive;
-        var infants = ecosystem.FindNeighbors(self, 40f, IsInfant);
+        var infants = ecosystem.FindNeighbors(self, 40f,
+            c => c.IsBaby && c.Parent == self && c.IsAlive);
         if (infants.Count == 0) return;
 
         var infant = infants[0];
@@ -40,13 +40,17 @@ internal sealed class SocialModule : IBehaviorModule
         switch (behavior)
         {
             case SocialBehavior.Herd:
-                return ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.5f * s, separationWeight: 2.0f * s, alignmentWeight: 0.5f * s, separationDist: 30f);
+                return ApplyFlocking(self, ecosystem, dt, world,
+                    cohesionWeight: SocialConfig.Data.Flocking.CohesionWeight * s,
+                    separationWeight: SocialConfig.Data.Flocking.SeparationWeight * s,
+                    alignmentWeight: SocialConfig.Data.Flocking.AlignmentWeight * s,
+                    separationDist: SocialConfig.Data.Flocking.SeparationDistance,
+                    radius: self.VisionPixels * SocialConfig.Data.Flocking.HerdRadius);
 
             case SocialBehavior.Pack:
                 {
                     var flockMoved = ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.2f, separationWeight: 1.0f, alignmentWeight: 1.5f, separationDist: 25f);
-                    bool IsSame(Creature n) => n.Species == self.Species;
-                    var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, IsSame);
+                    var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, n => n.Species == self.Species);
                     if (neighbors.Count > 0)
                     {
                         self.Energy = Math.Min(self.MaxEnergy, self.Energy + 5f * dt);
@@ -78,10 +82,11 @@ internal sealed class SocialModule : IBehaviorModule
         float cohesionWeight,
         float separationWeight,
         float alignmentWeight,
-        float separationDist)
+        float separationDist,
+        float radius = -1f)
     {
-        bool IsSame(Creature n) => n.Species == self.Species;
-        var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels, IsSame);
+        float actualRadius = radius < 0f ? self.VisionPixels : radius;
+        var neighbors = ecosystem.FindNeighbors(self, actualRadius, n => n.Species == self.Species);
         if (neighbors.Count == 0)
             return false;
 
@@ -185,10 +190,10 @@ internal sealed class SocialModule : IBehaviorModule
             return true;
         }
 
-        if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < 20f)
+        if ((self.CreatureType == CreatureType.Carnivore || self.CreatureType == CreatureType.Omnivore) && dist < SocialConfig.Data.Combat.AggressionFactor)
         {
-            self.Energy -= 10f * dt * Math.Max(0.2f, 1f - neighbor.Defense / 25f) * (0.5f + self.Genome.Aggression);
-            neighbor.Energy -= 10f * dt * Math.Max(0.2f, 1f - self.Defense / 25f) * (0.5f + neighbor.Genome.Aggression);
+            self.Energy -= SocialConfig.Data.Combat.CombatDamage * dt * Math.Max(0.2f, 1f - neighbor.Defense / SocialConfig.Data.Combat.DefenseDivisor) * (0.5f + self.Genome.Aggression);
+            neighbor.Energy -= SocialConfig.Data.Combat.CombatDamage * dt * Math.Max(0.2f, 1f - self.Defense / SocialConfig.Data.Combat.DefenseDivisor) * (0.5f + neighbor.Genome.Aggression);
 
             if (self.Energy <= 0) self.Die(DeathCause.Combat);
             if (neighbor.Energy <= 0) neighbor.Die(DeathCause.Combat);

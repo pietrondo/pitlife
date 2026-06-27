@@ -180,10 +180,10 @@ public abstract class Creature
         CurrentEnergyMultiplier = 1f;
     }
 
-    public virtual void Update(World world, Ecosystem ecosystem, GameTime gameTime)
+    public virtual void Update(World world, Ecosystem ecosystem, float dt)
     {
         if (!IsAlive) return;
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
 
@@ -203,7 +203,7 @@ public abstract class Creature
 
         if (active)
         {
-            Behavior.Update(this, world, ecosystem, gameTime);
+            Behavior.Update(this, world, ecosystem, dt);
             if (!IsAlive) return;
         }
         else
@@ -337,21 +337,48 @@ public abstract class Creature
 
         if (IsAquatic)
         {
-            bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
-            if (inWater)
-            {
-                CurrentSpeedMultiplier = 1.0f;
-                CurrentEnergyMultiplier = 1.0f;
-            }
-            else
-            {
-                CurrentSpeedMultiplier = 0.3f;
-                CurrentEnergyMultiplier = 2.5f;
-            }
+            UpdateAquaticMultipliers(tile);
             return;
         }
 
-        // Terrestrial creature
+        UpdateTerrestrialMultipliers(tile);
+
+        int tileY = (int)(Position.Y / ecosystem.World.TileSize);
+        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
+        float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
+        if (tempDiff > 15f && CreatureType != CreatureType.Plant)
+            CurrentEnergyMultiplier += tempDiff * 0.02f;
+
+        if (CreatureType != CreatureType.Plant)
+        {
+            var def = SpeciesRegistry.Get(Species);
+            if (def != null)
+            {
+                if (!def.IsValidBiome(tile.Biome))
+                    CurrentEnergyMultiplier += 4.0f;
+                if (!def.IsValidTemperature(tileTemp))
+                    CurrentEnergyMultiplier += 2.0f;
+            }
+        }
+    }
+
+    private void UpdateAquaticMultipliers(Tile tile)
+    {
+        bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
+        if (inWater)
+        {
+            CurrentSpeedMultiplier = 1.0f;
+            CurrentEnergyMultiplier = 1.0f;
+        }
+        else
+        {
+            CurrentSpeedMultiplier = 0.3f;
+            CurrentEnergyMultiplier = 2.5f;
+        }
+    }
+
+    private void UpdateTerrestrialMultipliers(Tile tile)
+    {
         switch (tile.Biome)
         {
             case BiomeType.Desert:
@@ -386,12 +413,6 @@ public abstract class Creature
                 CurrentEnergyMultiplier = 1.0f;
                 break;
         }
-
-        int tileY = (int)(Position.Y / ecosystem.World.TileSize);
-        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
-        float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
-        if (tempDiff > 15f && CreatureType != CreatureType.Plant)
-            CurrentEnergyMultiplier += tempDiff * 0.02f;
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Unknown)
@@ -441,6 +462,11 @@ public abstract class Creature
             Genome.ApplyGeneticDrift(random);
         }
 
+        UpdateMovement(dt, world);
+    }
+
+    private void UpdateMovement(float dt, World world)
+    {
         if (Waypoint.HasValue)
             MoveToward(Waypoint.Value, dt, world);
     }

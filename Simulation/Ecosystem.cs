@@ -39,7 +39,6 @@ public class Ecosystem
 
     private readonly List<Creature> _pendingAdd = new();
     private readonly List<Creature> _pendingRemove = new();
-    private readonly HashSet<Creature> _removalSet = new();
     private readonly object _lock = new();
     private readonly SpatialGrid _spatialGrid;
     private CreatureSpawner _spawner = null!;
@@ -172,40 +171,14 @@ public class Ecosystem
         }
     }
 
-
     private void FlushRemovals()
     {
         if (_pendingRemove.Count == 0) return;
-
-        _removalSet.Clear();
-        for (int i = 0; i < _pendingRemove.Count; i++)
-        {
-            var creature = _pendingRemove[i];
+        var remove = new HashSet<Creature>(_pendingRemove);
+        foreach (var creature in remove)
             _spatialGrid.Remove(creature);
-            _removalSet.Add(creature);
-        }
-
-        int writeIdx = 0;
-        for (int i = 0; i < Creatures.Count; i++)
-        {
-            var creature = Creatures[i];
-            if (!_removalSet.Contains(creature))
-            {
-                if (writeIdx != i)
-                {
-                    Creatures[writeIdx] = creature;
-                }
-                writeIdx++;
-            }
-        }
-
-        if (writeIdx < Creatures.Count)
-        {
-            Creatures.RemoveRange(writeIdx, Creatures.Count - writeIdx);
-        }
-
+        Creatures.RemoveAll(c => remove.Contains(c));
         _pendingRemove.Clear();
-        _removalSet.Clear();
     }
 
     private void FlushAdditions()
@@ -263,16 +236,11 @@ public class Ecosystem
         return new Vector2(World.TileSize, World.TileSize);
     }
 
-    private readonly GameTime _reusableGameTime = new GameTime();
-
     public void Tick(GameTime gameTime)
     {
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
         TotalTime += dt;
         _spatialGrid.Rebuild(Creatures);
-
-        _reusableGameTime.TotalGameTime = gameTime.TotalGameTime;
-        _reusableGameTime.ElapsedGameTime = TimeSpan.FromSeconds(dt);
 
         int count = Creatures.Count;
         for (int i = count - 1; i >= 0; i--)
@@ -284,7 +252,7 @@ public class Ecosystem
             {
                 try
                 {
-                    c.Update(World, this, _reusableGameTime);
+                    c.Update(World, this, dt);
                 }
                 catch (Exception ex)
                 {
@@ -360,7 +328,6 @@ public class Ecosystem
         HerbivoreCount = herbivores;
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
-        Metrics.Update(this);
 
         foreach (var species in _knownSpecies.ToArray())
         {
@@ -391,19 +358,15 @@ public class Ecosystem
 
     public Creature? FindNearestPrey(Creature seeker)
     {
-        bool IsPrey(Creature c)
-        {
-            return c.CreatureType != CreatureType.Carnivore &&
-                   c.CreatureType != seeker.CreatureType &&
-                   (c.CreatureType != CreatureType.Plant || (seeker is not Herbivore && seeker is not Omnivore));
-        }
-        return _spatialGrid.FindNearest(seeker, IsPrey);
+        return _spatialGrid.FindNearest(seeker, c =>
+            c.CreatureType != CreatureType.Carnivore &&
+            c.CreatureType != seeker.CreatureType &&
+            (c.CreatureType != CreatureType.Plant || seeker is not Herbivore and not Omnivore));
     }
 
     public Creature? FindNearestSameSpecies(Creature seeker)
     {
-        bool IsSameSpecies(Creature c) => c != seeker && c.Species == seeker.Species;
-        return _spatialGrid.FindNearest(seeker, IsSameSpecies);
+        return _spatialGrid.FindNearest(seeker, c => c != seeker && c.Species == seeker.Species);
     }
 
     public Creature? FindNearestMate(Creature seeker)
@@ -415,8 +378,7 @@ public class Ecosystem
 
     public Creature? FindNearestPredator(Creature seeker)
     {
-        static bool IsPredator(Creature c) => c.CreatureType == CreatureType.Carnivore;
-        return _spatialGrid.FindNearest(seeker, IsPredator);
+        return _spatialGrid.FindNearest(seeker, c => c.CreatureType == CreatureType.Carnivore);
     }
 
     public void TrySpreadPlant(Plant plant)
@@ -473,8 +435,7 @@ public class Ecosystem
 
     private T? FindNearest<T>(Creature seeker) where T : Creature
     {
-        static bool IsType(Creature c) => c is T;
-        return _spatialGrid.FindNearest(seeker, IsType) as T;
+        return _spatialGrid.FindNearest(seeker, c => c is T) as T;
     }
 
     public List<Creature> FindNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
