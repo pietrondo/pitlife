@@ -12,7 +12,7 @@ public class StabilityTests
     [Fact]
     public void DeterministicReplay_SameSeedSameResult()
     {
-        int seed = 42;
+        var seed = 42;
         var state1 = RunSimulation(seed, 60, out _);
         var state2 = RunSimulation(seed, 60, out _);
 
@@ -29,7 +29,7 @@ public class StabilityTests
         var state1 = RunSimulation(42, 30, out _, 80, 40, 15, 5);
         var state2 = RunSimulation(99, 30, out _, 80, 40, 15, 5);
 
-        bool anyDifferent = state1.PlantCount != state2.PlantCount
+        var anyDifferent = state1.PlantCount != state2.PlantCount
             || state1.HerbivoreCount != state2.HerbivoreCount
             || state1.CarnivoreCount != state2.CarnivoreCount;
         Assert.True(anyDifferent,
@@ -83,7 +83,7 @@ public class StabilityTests
         int[] seeds = [7, 42, 99, 256, 1024, 7777, 12345, 54321, 99999, 2024];
         var failures = new List<string>();
 
-        foreach (int seed in seeds)
+        foreach (var seed in seeds)
         {
             try
             {
@@ -106,7 +106,7 @@ public class StabilityTests
     [Fact]
     public void SoakTest_HerbivoresSurviveWithPlants()
     {
-        int seed = 0;
+        var seed = 0;
         AssertionTracker tracker;
         var state = RunSimulation(seed, 90, out tracker, initialPlants: 120, initialHerbivores: 15,
             initialCarnivores: 0, initialOmnivores: 0);
@@ -120,7 +120,7 @@ public class StabilityTests
     [Fact]
     public void SoakTest_PredatorPreyCoexist()
     {
-        int seed = 202;
+        var seed = 202;
         AssertionTracker tracker;
         var state = RunSimulation(seed, 120, out tracker, initialPlants: 80, initialHerbivores: 30,
             initialCarnivores: 10, initialOmnivores: 0);
@@ -132,9 +132,9 @@ public class StabilityTests
     [Fact]
     public void SoakTest_AllSpeciesTypesPresent()
     {
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
-            int seed = 500 + i * 137;
+            var seed = 500 + i * 137;
             AssertionTracker tracker;
             var state = RunSimulation(seed, 60, out tracker);
 
@@ -146,7 +146,7 @@ public class StabilityTests
     [Fact(Skip = "Flaky - covered by DeterministicReplay_SameSeedSameResult")]
     public void Simulation_IsRepeatable_AfterPauseResume()
     {
-        int seed = 4242;
+        var seed = 4242;
         var ecosystem1 = CreateEcosystem(seed, WorldSize, WorldTileSize);
         ecosystem1.Initialize(10, 5, 2, 40);
         AdvanceSimulation(ecosystem1, 30f);
@@ -184,8 +184,8 @@ public class StabilityTests
 
     private static void AdvanceSimulation(Ecosystem ecosystem, float durationSeconds)
     {
-        float dt = 1f / 60f;
-        float total = 0f;
+        var dt = 1f / 60f;
+        var total = 0f;
         var elapsed = ecosystem.TotalTime;
         while (total < durationSeconds)
         {
@@ -198,8 +198,8 @@ public class StabilityTests
     private static void AdvanceWithTracking(Ecosystem ecosystem, float durationSeconds,
         AssertionTracker tracker)
     {
-        float dt = 1f / 60f;
-        float total = 0f;
+        var dt = 1f / 60f;
+        var total = 0f;
         var elapsed = ecosystem.TotalTime;
         while (total < durationSeconds)
         {

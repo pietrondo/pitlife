@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -13,10 +12,10 @@ public static class BehaviorConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "behaviors.json");
+            var path = Path.Combine("Content", "config", "behaviors.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<BehaviorConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

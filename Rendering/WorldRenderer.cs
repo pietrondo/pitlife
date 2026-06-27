@@ -175,15 +175,15 @@ public class WorldRenderer
     public void Draw(SpriteBatch sb, Camera camera)
     {
         Rectangle v = camera.VisibleArea;
-        int ts = _world.TileSize;
-        int sx = Math.Max(0, v.X / ts - 1);
-        int sy = Math.Max(0, v.Y / ts - 1);
-        int ex = Math.Min(_world.Width, (v.X + v.Width) / ts + 2);
-        int ey = Math.Min(_world.Height, (v.Y + v.Height) / ts + 2);
+        var ts = _world.TileSize;
+        var sx = Math.Max(0, v.X / ts - 1);
+        var sy = Math.Max(0, v.Y / ts - 1);
+        var ex = Math.Min(_world.Width, (v.X + v.Width) / ts + 2);
+        var ey = Math.Min(_world.Height, (v.Y + v.Height) / ts + 2);
 
-        for (int y = sy; y < ey; y++)
+        for (var y = sy; y < ey; y++)
         {
-            for (int x = sx; x < ex; x++)
+            for (var x = sx; x < ex; x++)
             {
                 var t = _world.Tiles[x, y];
                 BiomeType b = t.Biome;

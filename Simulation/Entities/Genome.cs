@@ -48,11 +48,11 @@ public struct Genome
 
     public void ApplyGeneticDrift(Random rng)
     {
-        float drift = (float)(rng.NextDouble() - 0.5) * 0.02f;
+        var drift = (float)(rng.NextDouble() - 0.5) * 0.02f;
         Speed = MathHelper.Clamp(Speed + drift, 0.5f, 2f);
         Size = MathHelper.Clamp(Size + drift, 0.5f, 2f);
         Metabolism = MathHelper.Clamp(Metabolism + drift, 0.5f, 2f);
-        float adaptDrift = (float)(rng.NextDouble() - 0.5) * 0.01f;
+        var adaptDrift = (float)(rng.NextDouble() - 0.5) * 0.01f;
         DesertAdaptation = MathHelper.Clamp(DesertAdaptation + adaptDrift, 0f, 1f);
         ColdAdaptation = MathHelper.Clamp(ColdAdaptation + adaptDrift, 0f, 1f);
     }

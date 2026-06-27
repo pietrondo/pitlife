@@ -18,15 +18,15 @@ public sealed class AudioSystem : IDisposable
     public void LoadTone(string key, float frequency, float duration, float volume = 0.3f)
     {
         ArgumentNullException.ThrowIfNull(key);
-        int sampleRate = 44100;
-        int samples = (int)(sampleRate * duration);
+        var sampleRate = 44100;
+        var samples = (int)(sampleRate * duration);
         var buffer = new byte[samples * 2]; // 16-bit mono
 
-        for (int i = 0; i < samples; i++)
+        for (var i = 0; i < samples; i++)
         {
-            float t = (float)i / sampleRate;
-            float envelope = 1f - (t / duration);
-            short value = (short)(MathF.Sin(2f * MathF.PI * frequency * t) * envelope * volume * 32767f);
+            var t = (float)i / sampleRate;
+            var envelope = 1f - (t / duration);
+            var value = (short)(MathF.Sin(2f * MathF.PI * frequency * t) * envelope * volume * 32767f);
             buffer[i * 2] = (byte)(value & 0xFF);
             buffer[i * 2 + 1] = (byte)((value >> 8) & 0xFF);
         }
@@ -37,16 +37,16 @@ public sealed class AudioSystem : IDisposable
     public void LoadClick(string key, float volume = 0.4f)
     {
         ArgumentNullException.ThrowIfNull(key);
-        int sampleRate = 44100;
-        int samples = 800; // ~18ms click
+        var sampleRate = 44100;
+        var samples = 800; // ~18ms click
         var buffer = new byte[samples * 2];
 
-        for (int i = 0; i < samples; i++)
+        for (var i = 0; i < samples; i++)
         {
-            float t = (float)i / sampleRate;
-            float envelope = MathF.Exp(-t * 200f);
-            float noise = (float)new Random((int)(t * 1000000)).NextDouble() * 2f - 1f;
-            short value = (short)(noise * envelope * volume * 32767f);
+            var t = (float)i / sampleRate;
+            var envelope = MathF.Exp(-t * 200f);
+            var noise = (float)new Random((int)(t * 1000000)).NextDouble() * 2f - 1f;
+            var value = (short)(noise * envelope * volume * 32767f);
             buffer[i * 2] = (byte)(value & 0xFF);
             buffer[i * 2 + 1] = (byte)((value >> 8) & 0xFF);
         }

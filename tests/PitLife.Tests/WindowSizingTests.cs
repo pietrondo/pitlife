@@ -1,6 +1,4 @@
-using PitLife.Simulation;
 using PitLife.UI;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -28,8 +26,8 @@ public class WindowSizingTests
             Bounds = new Microsoft.Xna.Framework.Rectangle(32, 88, 320, 340)
         };
 
-        int contentHeight = window.ContentBounds.Height;
-        int neededHeight = 0;
+        var contentHeight = window.ContentBounds.Height;
+        var neededHeight = 0;
         neededHeight += 22;  // time
         neededHeight += 32;  // speed
         neededHeight += 22;  // total
@@ -54,8 +52,8 @@ public class WindowSizingTests
             Bounds = new Microsoft.Xna.Framework.Rectangle(32, 88, 320, 280)
         };
 
-        int contentHeight = window.ContentBounds.Height;
-        int neededHeight = 0;
+        var contentHeight = window.ContentBounds.Height;
+        var neededHeight = 0;
         neededHeight += 22;
         neededHeight += 32;
         neededHeight += 22;
@@ -92,4 +90,3 @@ public class WindowSizingTests
         Assert.Equal(200, window.Bounds.Height);
     }
 }
-

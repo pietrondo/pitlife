@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -13,10 +12,10 @@ public static class ClimateConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "climate.json");
+            var path = Path.Combine("Content", "config", "climate.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<ClimateConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -88,11 +87,21 @@ public class TemperatureConfig
     public float OceanModeration { get; set; } = 5f;
     public Dictionary<string, float> BiomeTempOffsets { get; set; } = new()
     {
-        ["DeepOcean"] = 0f, ["ShallowWater"] = 0f, ["CoralReef"] = 0f,
-        ["Beach"] = 2f, ["Desert"] = 8f, ["Savanna"] = 4f,
-        ["Grassland"] = 0f, ["Forest"] = -2f, ["DenseForest"] = -4f,
-        ["Swamp"] = 0f, ["Tundra"] = -5f, ["Mountain"] = -8f,
-        ["Snow"] = -15f, ["Cave"] = -5f, ["Volcano"] = 10f
+        ["DeepOcean"] = 0f,
+        ["ShallowWater"] = 0f,
+        ["CoralReef"] = 0f,
+        ["Beach"] = 2f,
+        ["Desert"] = 8f,
+        ["Savanna"] = 4f,
+        ["Grassland"] = 0f,
+        ["Forest"] = -2f,
+        ["DenseForest"] = -4f,
+        ["Swamp"] = 0f,
+        ["Tundra"] = -5f,
+        ["Mountain"] = -8f,
+        ["Snow"] = -15f,
+        ["Cave"] = -5f,
+        ["Volcano"] = 10f
     };
 }
 

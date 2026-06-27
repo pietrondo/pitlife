@@ -12,10 +12,10 @@ public static class FruitConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "fruit.json");
+            var path = Path.Combine("Content", "config", "fruit.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<FruitConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,

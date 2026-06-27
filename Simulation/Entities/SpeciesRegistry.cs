@@ -109,7 +109,7 @@ public static class SpeciesRegistry
     {
         try
         {
-            string path = Path.Combine("Content", "config", "species.json");
+            var path = Path.Combine("Content", "config", "species.json");
             if (!File.Exists(path)) return;
             SpeciesJsonLoader.Load(path);
         }

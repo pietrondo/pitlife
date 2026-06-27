@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -62,7 +61,7 @@ public class Camera
     public void HandleInput(float dt)
     {
         var kbd = Keyboard.GetState();
-        float speed = 300f / Zoom;
+        var speed = 300f / Zoom;
         float nx = Position.X, ny = Position.Y;
         if (kbd.IsKeyDown(Keys.W) || kbd.IsKeyDown(Keys.Up)) ny -= speed * dt;
         if (kbd.IsKeyDown(Keys.S) || kbd.IsKeyDown(Keys.Down)) ny += speed * dt;
@@ -71,10 +70,10 @@ public class Camera
         Position = ClampPosition(new Vector2(nx, ny));
 
         var scroll = Mouse.GetState().ScrollWheelValue;
-        int diff = scroll - _lastScroll;
+        var diff = scroll - _lastScroll;
         if (diff != 0)
         {
-            float delta = diff / 120f;
+            var delta = diff / 120f;
             Zoom = MathHelper.Clamp(Zoom + delta * 0.1f, 0.25f, 4f);
             _lastScroll = scroll;
             Position = ClampPosition(Position);

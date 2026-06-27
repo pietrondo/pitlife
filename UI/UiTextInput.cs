@@ -64,13 +64,13 @@ public sealed class UiTextInput
             }
             else if (key >= Keys.A && key <= Keys.Z && !IsNumericOnly && Text.Length < MaxLength)
             {
-                bool shift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
-                char c = shift ? char.ToUpper((char)('A' + (key - Keys.A))) : char.ToLower((char)('A' + (key - Keys.A)));
+                var shift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
+                var c = shift ? char.ToUpper((char)('A' + (key - Keys.A))) : char.ToLower((char)('A' + (key - Keys.A)));
                 Text += c;
             }
             else if (!IsNumericOnly && Text.Length < MaxLength)
             {
-                bool shift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
+                var shift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
                 Text += key switch
                 {
                     Keys.OemPeriod => ".",
@@ -87,7 +87,7 @@ public sealed class UiTextInput
 
     public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse)
     {
-        bool hovered = Bounds.Contains(mouse.Position);
+        var hovered = Bounds.Contains(mouse.Position);
         Color fill = IsFocused ? UiTheme.ForestNight : (hovered ? UiTheme.DeepGrove : UiTheme.Shadow);
         Color border = IsFocused ? UiTheme.MossSignal : UiTheme.BarkEdge;
 
@@ -96,12 +96,12 @@ public sealed class UiTextInput
         UiPrimitives.Border(spriteBatch, pixel, Bounds, 2, border);
 
         // Text
-        string displayText = Text.Length > 0 ? Text : Placeholder;
+        var displayText = Text.Length > 0 ? Text : Placeholder;
         Color textColor = Text.Length > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
 
         // Measure and clip text if too long
         Vector2 textSize = font.MeasureString(displayText);
-        float scale = 1.0f;
+        var scale = 1.0f;
         if (textSize.X * scale > Bounds.Width - 16)
         {
             scale = (Bounds.Width - 16) / textSize.X;
@@ -125,9 +125,9 @@ public sealed class UiTextInput
 
             if (_showCursor)
             {
-                string textBeforeCursor = Text;
+                var textBeforeCursor = Text;
                 Vector2 cursorPos = font.MeasureString(textBeforeCursor) * scale;
-                int cursorX = Bounds.X + 8 + (int)cursorPos.X;
+                var cursorX = Bounds.X + 8 + (int)cursorPos.X;
                 if (cursorX < Bounds.Right - 4)
                 {
                     UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(cursorX, Bounds.Y + 6, 2, Bounds.Height - 12), UiTheme.WarmParchment);
@@ -143,7 +143,7 @@ public sealed class UiTextInput
 
     public int GetNumericValue()
     {
-        if (int.TryParse(Text, out int result))
+        if (int.TryParse(Text, out var result))
             return result;
         return 0;
     }

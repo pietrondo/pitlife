@@ -88,14 +88,14 @@ public sealed class HelpScreen
 
     private void DrawHelpContent(SpriteBatch spriteBatch, SpriteFont font)
     {
-        int contentX = _window.Bounds.X + 24;
-        int contentY = _window.Bounds.Y + 48;
-        int lineHeight = 20;
-        float scale = 0.9f;
+        var contentX = _window.Bounds.X + 24;
+        var contentY = _window.Bounds.Y + 48;
+        var lineHeight = 20;
+        var scale = 0.9f;
 
         void DrawLine(string text, Color color, bool isHeader = false)
         {
-            float lineScale = isHeader ? 1.0f : scale;
+            var lineScale = isHeader ? 1.0f : scale;
             spriteBatch.DrawString(font, text, new Vector2(contentX, contentY), color, 0f, Vector2.Zero, lineScale, SpriteEffects.None, 0f);
             contentY += (int)(lineHeight * lineScale);
         }
@@ -139,17 +139,17 @@ public sealed class HelpScreen
 
     private void Layout(int viewportWidth, int viewportHeight)
     {
-        int panelWidth = Math.Min(700, viewportWidth - 48);
-        int panelHeight = Math.Min(600, viewportHeight - 64);
-        int panelX = (viewportWidth - panelWidth) / 2;
-        int panelY = (viewportHeight - panelHeight) / 2;
+        var panelWidth = Math.Min(700, viewportWidth - 48);
+        var panelHeight = Math.Min(600, viewportHeight - 64);
+        var panelX = (viewportWidth - panelWidth) / 2;
+        var panelY = (viewportHeight - panelHeight) / 2;
 
         _window.Bounds = new Rectangle(panelX, panelY, panelWidth, panelHeight);
         _window.Title = I18n.T("help.title");
 
         // Back button at bottom center
-        int buttonWidth = 120;
-        int buttonHeight = 44;
+        var buttonWidth = 120;
+        var buttonHeight = 44;
         _backButton.Bounds = new Rectangle(
             viewportWidth / 2 - buttonWidth / 2,
             panelY + panelHeight - buttonHeight - 16,

@@ -27,7 +27,7 @@ public class UiWindowManagerTests
         manager.Add(first);
         manager.Add(second);
 
-        bool closed = manager.CloseTopWindow();
+        var closed = manager.CloseTopWindow();
 
         Assert.True(closed);
         Assert.True(first.IsOpen);

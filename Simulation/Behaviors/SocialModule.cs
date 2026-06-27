@@ -85,7 +85,7 @@ internal sealed class SocialModule : IBehaviorModule
         float separationDist,
         float radius = -1f)
     {
-        float actualRadius = radius < 0f ? self.VisionPixels : radius;
+        var actualRadius = radius < 0f ? self.VisionPixels : radius;
         var neighbors = ecosystem.FindNeighbors(self, actualRadius, n => n.Species == self.Species);
         if (neighbors.Count == 0)
             return false;

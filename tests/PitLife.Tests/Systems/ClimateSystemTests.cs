@@ -1,5 +1,4 @@
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests.Systems;
 
@@ -47,10 +46,10 @@ public class ClimateSystemTests
         var rng = new Moq.Mock<System.Random>().Object;
 
         climate.Update(ClimateSystem.SeasonLength * 3.5f, rng);
-        float springRegen = climate.GrassRegenModifier;
+        var springRegen = climate.GrassRegenModifier;
 
         climate.Update(ClimateSystem.SeasonLength * 2.5f, rng);
-        float winterRegen = climate.GrassRegenModifier;
+        var winterRegen = climate.GrassRegenModifier;
 
         Assert.True(springRegen > winterRegen,
             $"Spring regen {springRegen} should exceed winter {winterRegen}");
@@ -63,10 +62,10 @@ public class ClimateSystemTests
         var rng = new Moq.Mock<System.Random>().Object;
 
         climate.Update(ClimateSystem.SeasonLength * 0.5f, rng);
-        float summerEnergy = climate.EnergyModifier;
+        var summerEnergy = climate.EnergyModifier;
 
         climate.Update(ClimateSystem.SeasonLength * 2.5f, rng);
-        float winterEnergy = climate.EnergyModifier;
+        var winterEnergy = climate.EnergyModifier;
 
         Assert.True(winterEnergy > summerEnergy,
             $"Winter energy {winterEnergy} should exceed summer {summerEnergy}");
@@ -79,7 +78,7 @@ public class ClimateSystemTests
         var c2 = new ClimateSystem();
         var rng = new Moq.Mock<System.Random>().Object;
 
-        float t = 150f;
+        var t = 150f;
         c1.Update(t, rng);
         c2.Update(t, rng);
 
@@ -107,10 +106,10 @@ public class ClimateSystemTests
     {
         var climate = new ClimateSystem();
         // Compare latitude modifier to a standard spherical approach to ensure it applies flattening
-        float sphericalLatitude = (100f / 199f - 0.5f) * System.MathF.PI;
-        float sphericalCos = System.MathF.Cos(sphericalLatitude);
+        var sphericalLatitude = (100f / 199f - 0.5f) * System.MathF.PI;
+        var sphericalCos = System.MathF.Cos(sphericalLatitude);
 
-        float modifier = climate.GetLatitudeModifier(100f, 200);
+        var modifier = climate.GetLatitudeModifier(100f, 200);
         // Because of the oblate flattening, the eccentric latitude is slightly different from the pure spherical one
         // meaning the cosine should not be perfectly equal to the unflattened cosine (except at poles/equator).
         Assert.NotEqual(sphericalCos, modifier, 7);

@@ -20,14 +20,14 @@ public static class I18n
     {
         Dictionary<string, string> en = new(StringComparer.Ordinal);
         Dictionary<string, string> itOverrides = new(StringComparer.Ordinal);
-        bool loaded = false;
+        var loaded = false;
 
         try
         {
-            string path = Path.Combine("Content", "config", "i18n.json");
+            var path = Path.Combine("Content", "config", "i18n.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 using var doc = JsonDocument.Parse(json);
                 if (doc.RootElement.TryGetProperty("en", out JsonElement enEl))
                 {
@@ -60,7 +60,7 @@ public static class I18n
 
     public static void SetLanguage(string language)
     {
-        string normalized = language.Trim().ToLowerInvariant();
+        var normalized = language.Trim().ToLowerInvariant();
         if (normalized.StartsWith("it"))
         {
             CurrentLanguage = "it";
@@ -79,7 +79,7 @@ public static class I18n
     }
 
     public static string T(string key) =>
-        _current.TryGetValue(key, out string? value) ? value :
+        _current.TryGetValue(key, out var value) ? value :
         Italian.TryGetValue(key, out value) ? value : key;
 
     public static string Format(string key, params object[] args) =>
@@ -87,8 +87,8 @@ public static class I18n
 
     public static string Species(string species)
     {
-        string key = $"species.{species}";
-        string value = T(key);
+        var key = $"species.{species}";
+        var value = T(key);
         return value == key ? species : value;
     }
 
@@ -99,7 +99,7 @@ public static class I18n
 
     public static void RegisterCustomSpecies(string species, string englishName, string italianName)
     {
-        string key = $"species.{species}";
+        var key = $"species.{species}";
         if (English.ContainsKey(key) || Italian.ContainsKey(key))
             throw new InvalidOperationException($"Localization already registered for species '{species}'.");
         English[key] = englishName;
@@ -108,7 +108,7 @@ public static class I18n
 
     internal static void UnregisterCustomSpecies(string species)
     {
-        string key = $"species.{species}";
+        var key = $"species.{species}";
         English.Remove(key);
         Italian.Remove(key);
     }

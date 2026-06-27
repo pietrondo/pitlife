@@ -1,7 +1,5 @@
-using System;
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -18,7 +16,7 @@ public class AdaptationTests
         {
             return new TestCreature(position, genome);
         }
-        
+
         // Expose ConsumeEnergy for testing
         public void TestConsumeEnergy(float dt) => ConsumeEnergy(dt);
     }
@@ -28,9 +26,9 @@ public class AdaptationTests
     {
         var world = new World(10, 10, 42);
         // Set all tiles to Desert to ensure creature is on desert
-        for (int x = 0; x < world.Width; x++)
+        for (var x = 0; x < world.Width; x++)
         {
-            for (int y = 0; y < world.Height; y++)
+            for (var y = 0; y < world.Height; y++)
             {
                 world.Tiles[x, y].Biome = BiomeType.Desert;
             }
@@ -65,7 +63,7 @@ public class AdaptationTests
 
         // Assert adapted has lower energy multiplier (less drain) than unadapted
         Assert.True(adaptedCreature.CurrentEnergyMultiplier < unadaptedCreature.CurrentEnergyMultiplier);
-        
+
         // Exact expected values:
         // Unadapted energy multiplier: 1.0 + (1.0 - 0.0) * 1.0 = 2.0
         // Adapted energy multiplier: 1.0 + (1.0 - 1.0) * 1.0 = 1.0
@@ -86,7 +84,7 @@ public class AdaptationTests
         var p2 = Genome.Random(rng);
 
         // Force a reproduction and verify child genes are bounded between 0 and 1
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             var child = Genome.Reproduce(p1, p2, rng);
             Assert.InRange(child.DesertAdaptation, 0f, 1f);
@@ -102,15 +100,29 @@ public class AdaptationTests
     {
         var first = new Genome
         {
-            Speed = 0.51f, Size = 0.61f, Metabolism = 0.71f, VisionRange = 1.1f,
-            MutationRate = 0f, DesertAdaptation = 0.11f, ColdAdaptation = 0.21f,
-            ForestAdaptation = 0.31f, WaterAdaptation = 0.41f, Color = Color.Red
+            Speed = 0.51f,
+            Size = 0.61f,
+            Metabolism = 0.71f,
+            VisionRange = 1.1f,
+            MutationRate = 0f,
+            DesertAdaptation = 0.11f,
+            ColdAdaptation = 0.21f,
+            ForestAdaptation = 0.31f,
+            WaterAdaptation = 0.41f,
+            Color = Color.Red
         };
         var second = new Genome
         {
-            Speed = 1.51f, Size = 1.61f, Metabolism = 1.71f, VisionRange = 9.1f,
-            MutationRate = 0f, DesertAdaptation = 0.91f, ColdAdaptation = 0.81f,
-            ForestAdaptation = 0.72f, WaterAdaptation = 0.62f, Color = Color.Blue
+            Speed = 1.51f,
+            Size = 1.61f,
+            Metabolism = 1.71f,
+            VisionRange = 9.1f,
+            MutationRate = 0f,
+            DesertAdaptation = 0.91f,
+            ColdAdaptation = 0.81f,
+            ForestAdaptation = 0.72f,
+            WaterAdaptation = 0.62f,
+            Color = Color.Blue
         };
 
         Genome child = Genome.Reproduce(first, second, new Random(7));
@@ -136,7 +148,7 @@ public class AdaptationTests
             Size = 1.1f
         };
 
-        string evolved = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, kangarooGenome, "Rabbit", rng);
+        var evolved = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Herbivore, kangarooGenome, "Rabbit", rng);
         Assert.Equal("Kangaroo", evolved);
 
         // A standard carnivore genome that matches Cheetah conditions:
@@ -148,7 +160,7 @@ public class AdaptationTests
             ForestAdaptation = 0.2f
         };
 
-        string evolvedCarnivore = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Carnivore, cheetahGenome, "Fox", rng);
+        var evolvedCarnivore = SpeciesRegistry.DetermineEvolvedSpecies(CreatureType.Carnivore, cheetahGenome, "Fox", rng);
         Assert.Equal("Cheetah", evolvedCarnivore);
     }
 }

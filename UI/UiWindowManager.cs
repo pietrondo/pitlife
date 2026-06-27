@@ -20,7 +20,7 @@ public sealed class UiWindowManager
     public bool IsActive(UiWindow window)
     {
         if (!window.IsOpen) return false;
-        for (int i = _windows.Count - 1; i >= 0; i--)
+        for (var i = _windows.Count - 1; i >= 0; i--)
         {
             if (_windows[i].IsOpen)
                 return _windows[i] == window;
@@ -30,12 +30,12 @@ public sealed class UiWindowManager
 
     public void TileWindows(int viewportWidth, int viewportHeight)
     {
-        int startX = 32;
-        int startY = 88;
-        int gap = 16;
-        int currentX = startX;
-        int currentY = startY;
-        int maxRowHeight = 0;
+        var startX = 32;
+        var startY = 88;
+        var gap = 16;
+        var currentX = startX;
+        var currentY = startY;
+        var maxRowHeight = 0;
 
         foreach (UiWindow window in _windows)
         {
@@ -102,7 +102,7 @@ public sealed class UiWindowManager
 
     public bool CloseTopWindow()
     {
-        for (int i = _windows.Count - 1; i >= 0; i--)
+        for (var i = _windows.Count - 1; i >= 0; i--)
         {
             if (!_windows[i].IsOpen)
                 continue;
@@ -121,7 +121,7 @@ public sealed class UiWindowManager
         if (HandleDraggedWindow(mouse, viewportWidth, viewportHeight))
             return true;
 
-        bool pressed = mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released;
+        var pressed = mouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released;
         if (pressed && HandleWindowPress(mouse))
             return true;
 
@@ -152,7 +152,7 @@ public sealed class UiWindowManager
 
     private bool HandleWindowPress(MouseState mouse)
     {
-        for (int i = _windows.Count - 1; i >= 0; i--)
+        for (var i = _windows.Count - 1; i >= 0; i--)
         {
             UiWindow window = _windows[i];
             if (TryHandleWindowPress(window, mouse))
@@ -172,7 +172,7 @@ public sealed class UiWindowManager
         // Double click detection on title bar to collapse/expand
         var now = System.DateTime.UtcNow;
         var elapsed = now - _lastClickTime;
-        bool isDoubleClick = _lastClickedWindowId == window.Id && elapsed.TotalMilliseconds < 350;
+        var isDoubleClick = _lastClickedWindowId == window.Id && elapsed.TotalMilliseconds < 350;
         _lastClickTime = now;
         _lastClickedWindowId = window.Id;
 
@@ -200,7 +200,7 @@ public sealed class UiWindowManager
 
     public bool IsPointerOverWindow(Point point)
     {
-        for (int i = _windows.Count - 1; i >= 0; i--)
+        for (var i = _windows.Count - 1; i >= 0; i--)
         {
             if (_windows[i].IsOpen && _windows[i].Bounds.Contains(point))
                 return true;
@@ -227,10 +227,10 @@ public sealed class UiWindowManager
     {
         // Allow the window to be dragged partially off-screen,
         // but keep the title bar clickable. Title bar height is 40px.
-        int minX = -bounds.Width + 40;
-        int maxX = viewportWidth - 40;
-        int minY = 56; // Keep below top HUD
-        int maxY = viewportHeight - 56 - 40; // Keep above toolbar
+        var minX = -bounds.Width + 40;
+        var maxX = viewportWidth - 40;
+        var minY = 56; // Keep below top HUD
+        var maxY = viewportHeight - 56 - 40; // Keep above toolbar
 
         return new Rectangle(
             System.Math.Clamp(bounds.X, minX, maxX),

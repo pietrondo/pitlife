@@ -30,33 +30,33 @@ public sealed class WaterEffect
     /// <param name="camera">The camera parameter.</param>
     public void Draw(SpriteBatch sb, Texture2D pixel, World world, Camera camera)
     {
-        int tileSize = world.TileSize;
+        var tileSize = world.TileSize;
         Rectangle visible = camera.VisibleArea;
-        int viewLeft = Math.Max(0, visible.Left / tileSize - 1);
-        int viewTop = Math.Max(0, visible.Top / tileSize - 1);
-        int viewRight = Math.Min(world.Width, visible.Right / tileSize + 2);
-        int viewBottom = Math.Min(world.Height, visible.Bottom / tileSize + 2);
+        var viewLeft = Math.Max(0, visible.Left / tileSize - 1);
+        var viewTop = Math.Max(0, visible.Top / tileSize - 1);
+        var viewRight = Math.Min(world.Width, visible.Right / tileSize + 2);
+        var viewBottom = Math.Min(world.Height, visible.Bottom / tileSize + 2);
 
-        for (int ty = viewTop; ty < viewBottom; ty++)
+        for (var ty = viewTop; ty < viewBottom; ty++)
         {
-            for (int tx = viewLeft; tx < viewRight; tx++)
+            for (var tx = viewLeft; tx < viewRight; tx++)
             {
                 var biome = world.Tiles[tx, ty].Biome;
                 if (biome != BiomeType.DeepOcean && biome != BiomeType.ShallowWater && biome != BiomeType.CoralReef)
                     continue;
 
-                float wave = MathF.Sin(tx * 0.7f + ty * 1.1f + _time * 2f) * 0.3f + 0.5f;
+                var wave = MathF.Sin(tx * 0.7f + ty * 1.1f + _time * 2f) * 0.3f + 0.5f;
                 var color = biome == BiomeType.CoralReef
                     ? new Color(30, 180, 200) * ((30 + wave * 40) / 255f)
                     : biome == BiomeType.ShallowWater
                         ? new Color(80, 160, 220) * ((15 + wave * 25) / 255f)
                         : new Color(40, 80, 200) * ((10 + wave * 20) / 255f);
 
-                int px = tx * tileSize;
-                int py = ty * tileSize;
+                var px = tx * tileSize;
+                var py = ty * tileSize;
 
                 // Draw 2-3 wave pixels per tile
-                int waveOffset = (int)(wave * (tileSize / 3));
+                var waveOffset = (int)(wave * (tileSize / 3));
                 sb.Draw(pixel, new Rectangle(px + tileSize / 3 + waveOffset, py + tileSize / 2, 2, 1), color);
                 sb.Draw(pixel, new Rectangle(px + tileSize * 2 / 3 - waveOffset, py + tileSize / 3, 1, 2), color);
                 sb.Draw(pixel, new Rectangle(px + tileSize / 2, py + tileSize * 2 / 3 + waveOffset, 2, 1), color);

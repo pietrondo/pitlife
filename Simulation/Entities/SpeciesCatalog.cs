@@ -91,7 +91,7 @@ public static partial class SpeciesCatalogValidator
 
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var reserved = reservedKeys?.ToHashSet(StringComparer.Ordinal) ?? new HashSet<string>(StringComparer.Ordinal);
-        for (int index = 0; index < document.Species.Count; index++)
+        for (var index = 0; index < document.Species.Count; index++)
         {
             SpeciesCatalogEntry entry = document.Species[index];
             ValidateEntry(entry, index, repositoryRoot, seen, reserved, errors);
@@ -177,7 +177,7 @@ public static partial class SpeciesCatalogValidator
             return;
         }
 
-        string normalized = texturePath.Replace('\\', '/');
+        var normalized = texturePath.Replace('\\', '/');
         if (Path.IsPathRooted(texturePath) ||
             !normalized.StartsWith("Content/assets/", StringComparison.Ordinal) ||
             !normalized.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
@@ -188,15 +188,15 @@ public static partial class SpeciesCatalogValidator
             return;
         }
 
-        string fullPath = Path.GetFullPath(Path.Combine(repositoryRoot, normalized.Replace('/', Path.DirectorySeparatorChar)));
-        string assetsRoot = Path.GetFullPath(Path.Combine(repositoryRoot, "Content", "assets")) + Path.DirectorySeparatorChar;
+        var fullPath = Path.GetFullPath(Path.Combine(repositoryRoot, normalized.Replace('/', Path.DirectorySeparatorChar)));
+        var assetsRoot = Path.GetFullPath(Path.Combine(repositoryRoot, "Content", "assets")) + Path.DirectorySeparatorChar;
         if (!fullPath.StartsWith(assetsRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(fullPath))
         {
             error(nameof(SpeciesCatalogEntry.TexturePath), "Texture file does not exist inside Content/assets.");
             return;
         }
 
-        byte[] header = new byte[26];
+        var header = new byte[26];
         using FileStream stream = File.OpenRead(fullPath);
         if (stream.Read(header, 0, header.Length) != header.Length ||
             !header.AsSpan(0, 8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }))
@@ -205,8 +205,8 @@ public static partial class SpeciesCatalogValidator
             return;
         }
 
-        int width = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(16, 4));
-        int height = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(20, 4));
+        var width = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(16, 4));
+        var height = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(20, 4));
         if (width != height || width is not (32 or 64))
             error(nameof(SpeciesCatalogEntry.TexturePath), "Texture must be a square 32x32 or 64x64 PNG.");
         if (header[24] != 8 || header[25] != 6)
@@ -233,7 +233,7 @@ public static class SpeciesCatalogStore
         if (path.Contains("..", StringComparison.Ordinal))
             throw new ArgumentException("Path traversal is not allowed.", nameof(path));
 
-        string json = File.ReadAllText(path);
+        var json = File.ReadAllText(path);
         return JsonSerializer.Deserialize<SpeciesCatalogDocument>(json, Options)
             ?? throw new InvalidDataException("Species catalog is empty.");
     }
@@ -243,19 +243,19 @@ public static class SpeciesCatalogStore
         if (path.Contains("..", StringComparison.Ordinal))
             throw new ArgumentException("Path traversal is not allowed.", nameof(path));
 
-        string fullBaseDir = Path.GetFullPath(baseDirectory);
+        var fullBaseDir = Path.GetFullPath(baseDirectory);
         if (!fullBaseDir.EndsWith(Path.DirectorySeparatorChar))
             fullBaseDir += Path.DirectorySeparatorChar;
 
-        string fullPath = Path.GetFullPath(Path.Combine(baseDirectory, path));
+        var fullPath = Path.GetFullPath(Path.Combine(baseDirectory, path));
         if (!fullPath.StartsWith(fullBaseDir, StringComparison.OrdinalIgnoreCase))
             throw new UnauthorizedAccessException("Path traversal is not allowed.");
 
-        string? directory = Path.GetDirectoryName(fullPath);
+        var directory = Path.GetDirectoryName(fullPath);
         if (directory is not null)
             Directory.CreateDirectory(directory);
 
-        string temporaryPath = fullPath + ".tmp";
+        var temporaryPath = fullPath + ".tmp";
         try
         {
             File.WriteAllText(temporaryPath, JsonSerializer.Serialize(document, Options));

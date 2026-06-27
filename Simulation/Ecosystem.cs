@@ -100,8 +100,8 @@ public class Ecosystem
 
     public void Initialize(int h, int c, int o, int p)
     {
-        for (int i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");
-        for (int i = 0; i < p / 4; i++) SpawnSpecies<Plant>(AquaticPlantSpecies, "Seaweed");
+        for (var i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");
+        for (var i = 0; i < p / 4; i++) SpawnSpecies<Plant>(AquaticPlantSpecies, "Seaweed");
         SpawnSubset<Herbivore>(HerbivoreSpecies, h, "Gazelle");
         SpawnSubset<Carnivore>(CarnivoreSpecies, c, "Wolf");
         SpawnSubset<Omnivore>(OmnivoreSpecies, o, "Bear");
@@ -113,13 +113,13 @@ public class Ecosystem
 
     private void SpawnSubset<T>(string[] species, int count, string fallback) where T : Creature
     {
-        int maxSpecies = Math.Max(2, count / 5);
+        var maxSpecies = Math.Max(2, count / 5);
         var selected = species.OrderBy(_ => Random.Next()).Take(Math.Min(maxSpecies, species.Length)).ToArray();
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
-            string name = selected[Random.Next(selected.Length)];
+            var name = selected[Random.Next(selected.Length)];
             var pos = RandomPassablePosition(name);
-            int nearby = 0;
+            var nearby = 0;
             foreach (var c in Creatures)
                 if (c.Species == name && Vector2.DistanceSquared(c.Position, pos) < 3600f)
                     nearby++;
@@ -195,7 +195,7 @@ public class Ecosystem
 
     private void SpawnSpecies<T>(string[] species, string defaultSpecies) where T : Creature
     {
-        string name = species[Random.Next(species.Length)];
+        var name = species[Random.Next(species.Length)];
         var pos = RandomPassablePosition(name);
         _spawner.SpawnByName(name, pos);
     }
@@ -209,24 +209,24 @@ public class Ecosystem
     private Vector2 RandomPassablePosition(string species)
     {
         var def = SpeciesRegistry.Get(species);
-        bool isAquatic = def?.IsAquatic ?? false;
+        var isAquatic = def?.IsAquatic ?? false;
 
-        for (int attempt = 0; attempt < 100; attempt++)
+        for (var attempt = 0; attempt < 100; attempt++)
         {
-            float x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
-            float y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
+            var x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
+            var y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
             var tile = World.GetTileAtPosition(x, y);
             if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidClimate(tile.Biome,
                     Climate.GetTileTemperature(tile, y / World.TileSize, World.Height))))
                 return new Vector2(x, y);
         }
 
-        int start = Random.Next(World.Width * World.Height);
-        for (int offset = 0; offset < World.Width * World.Height; offset++)
+        var start = Random.Next(World.Width * World.Height);
+        for (var offset = 0; offset < World.Width * World.Height; offset++)
         {
-            int index = (start + offset) % (World.Width * World.Height);
-            int tileX = index % World.Width;
-            int tileY = index / World.Width;
+            var index = (start + offset) % (World.Width * World.Height);
+            var tileX = index % World.Width;
+            var tileY = index / World.Width;
             var tile = World.GetTile(tileX, tileY);
             if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidClimate(tile.Biome,
                     Climate.GetTileTemperature(tile, tileY, World.Height))))
@@ -238,12 +238,12 @@ public class Ecosystem
 
     public void Tick(GameTime gameTime)
     {
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
+        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
         TotalTime += dt;
         _spatialGrid.Rebuild(Creatures);
 
-        int count = Creatures.Count;
-        for (int i = count - 1; i >= 0; i--)
+        var count = Creatures.Count;
+        for (var i = count - 1; i >= 0; i--)
         {
             if (i >= Creatures.Count) continue;
             var c = Creatures[i];
@@ -277,7 +277,7 @@ public class Ecosystem
         Fruits.Tick(this, gameTime);
         // LateUpdate
         Metrics.Tick(this, gameTime);
-        float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
+        var grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
         UpdateStats();
@@ -285,8 +285,8 @@ public class Ecosystem
 
     private void ProcessDeaths(float dt)
     {
-        double decomposeChance = 1.0 - Math.Exp(-0.02 * dt);
-        for (int i = Creatures.Count - 1; i >= 0; i--)
+        var decomposeChance = 1.0 - Math.Exp(-0.02 * dt);
+        for (var i = Creatures.Count - 1; i >= 0; i--)
         {
             if (i >= Creatures.Count) continue;
             var c = Creatures[i];
@@ -309,7 +309,7 @@ public class Ecosystem
     }
 
     private int _logCounter = 0;
-    
+
     public void UpdateStats()
     {
         int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
@@ -329,6 +329,8 @@ public class Ecosystem
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
 
+        Metrics.Update(this);
+
         foreach (var species in _knownSpecies.ToArray())
         {
             if (!Metrics.SpeciesPopulations.ContainsKey(species) && !string.IsNullOrEmpty(species))
@@ -340,12 +342,12 @@ public class Ecosystem
         foreach (var species in Metrics.SpeciesPopulations.Keys)
             _knownSpecies.Add(species);
 
-        float softCap = MaxCreatures * 0.7f;
-        int aliveCount = plants + herbivores + carnivores + omnivores;
+        var softCap = MaxCreatures * 0.7f;
+        var aliveCount = plants + herbivores + carnivores + omnivores;
         PopulationPressure = aliveCount > softCap
             ? 1f + (aliveCount - softCap) / (MaxCreatures * 0.3f) * 1.5f
             : 1f;
-        
+
         _logCounter++;
         if (_logCounter % 60 == 0) // Log every ~1 second at 60 FPS
         {
@@ -388,11 +390,11 @@ public class Ecosystem
         if (PlantCount + CountPendingPlants() >= PlantCarryingCapacity) return;
         if (plant.Energy < plant.ReproductionThreshold) return;
 
-        float angle = (float)(Random.NextDouble() * Math.PI * 2);
-        float windBias = Climate.WindDirection;
+        var angle = (float)(Random.NextDouble() * Math.PI * 2);
+        var windBias = Climate.WindDirection;
         if (plant.Genome.ForestAdaptation > 0.3f)
             angle = (angle * 0.3f + windBias * 0.7f + (float)Math.PI * 0.5f) % ((float)Math.PI * 2);
-        float dist = 30f + (float)Random.NextDouble() * 40f;
+        var dist = 30f + (float)Random.NextDouble() * 40f;
         Vector2 newPos = plant.Position + new Vector2((float)Math.Cos(angle) * dist, (float)Math.Sin(angle) * dist);
 
         newPos.X = Math.Clamp(newPos.X, 0, World.PixelWidth - 1);
@@ -404,7 +406,7 @@ public class Ecosystem
         var def = SpeciesRegistry.Get(plant.Species);
         if (def != null)
         {
-            int tileY = (int)(newPos.Y / World.TileSize);
+            var tileY = (int)(newPos.Y / World.TileSize);
             if (!def.IsValidClimate(tile.Biome, Climate.GetTileTemperature(tile, tileY, World.Height)))
                 return;
         }
@@ -425,7 +427,7 @@ public class Ecosystem
     {
         lock (_lock)
         {
-            int count = 0;
+            var count = 0;
             foreach (Creature creature in _pendingAdd)
                 if (creature.CreatureType == CreatureType.Plant)
                     count++;

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PitLife.Simulation;
 
@@ -37,7 +36,7 @@ public sealed class PhylogeneticGraph
         {
             foreach (var req in node.MinimumGenomeThresholds)
             {
-                float value = req.Trait switch
+                var value = req.Trait switch
                 {
                     GenomeTrait.Speed => genome.Speed,
                     GenomeTrait.Size => genome.Size,

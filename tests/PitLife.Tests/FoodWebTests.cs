@@ -1,5 +1,4 @@
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -59,14 +58,14 @@ public class FoodWebTests
     [Fact]
     public void EnergyTransfer_SingleStepIs15Percent()
     {
-        float efficiency = FoodWeb.EnergyTransferEfficiency(CreatureType.Plant, CreatureType.Herbivore);
+        var efficiency = FoodWeb.EnergyTransferEfficiency(CreatureType.Plant, CreatureType.Herbivore);
         Assert.Equal(0.15f, efficiency, 2);
     }
 
     [Fact]
     public void EnergyTransfer_TwoStepsIs2Percent()
     {
-        float efficiency = FoodWeb.EnergyTransferEfficiency(CreatureType.Plant, CreatureType.Carnivore);
+        var efficiency = FoodWeb.EnergyTransferEfficiency(CreatureType.Plant, CreatureType.Carnivore);
         Assert.True(efficiency < 0.05f);
     }
 

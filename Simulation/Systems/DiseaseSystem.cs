@@ -22,7 +22,7 @@ public sealed class DiseaseSystem
     {
         var entries = DiseaseConfig.Diseases;
         var result = new DiseaseDef[entries.Count];
-        for (int i = 0; i < entries.Count; i++)
+        for (var i = 0; i < entries.Count; i++)
         {
             var e = entries[i];
             result[i] = new DiseaseDef
@@ -86,7 +86,7 @@ public sealed class DiseaseSystem
     private void SpreadAndProgress(Ecosystem ecosystem, float dt, Random rng)
     {
         var infected = new List<Creature>();
-        int aliveAnimals = 0;
+        var aliveAnimals = 0;
         foreach (var c in ecosystem.Creatures)
         {
             if (c == null || !c.IsAlive || c.CreatureType == CreatureType.Plant) continue;
@@ -126,7 +126,7 @@ public sealed class DiseaseSystem
             return;
         }
 
-        float transmissionChance = _activeDisease.TransmissionRate * dt;
+        var transmissionChance = _activeDisease.TransmissionRate * dt;
         if (rng.NextDouble() >= transmissionChance) return;
 
         var neighbors = ecosystem.FindNeighbors(carrier, 30f,

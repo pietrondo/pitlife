@@ -20,7 +20,7 @@ public sealed class CataclysmPanel
 
     public CataclysmPanel()
     {
-        int toggleY = Margin + 10 + ToggleSize + Margin + 10;
+        var toggleY = Margin + 10 + ToggleSize + Margin + 10;
         _toggleBounds = new Rectangle(Margin, toggleY, ToggleSize, ToggleSize);
     }
 
@@ -63,7 +63,7 @@ public sealed class CataclysmPanel
         if (mouse.LeftButton == ButtonState.Pressed &&
             prevMouse.LeftButton == ButtonState.Released)
         {
-            int y = _panelBounds.Y + 28;
+            var y = _panelBounds.Y + 28;
             foreach (var btn in _buttons)
             {
                 var b = new Rectangle(_panelBounds.X + 8, y, PanelW - 16, 22);
@@ -81,7 +81,7 @@ public sealed class CataclysmPanel
 
     public void Draw(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
     {
-        bool hover = _toggleBounds.Contains(mouse.Position);
+        var hover = _toggleBounds.Contains(mouse.Position);
         Color bg = IsOpen ? new Color(200, 60, 30, 230)
             : (hover ? new Color(80, 30, 20, 240) : new Color(60, 20, 10, 200));
         UiPrimitives.Fill(sb, pixel, _toggleBounds, bg);
@@ -92,18 +92,18 @@ public sealed class CataclysmPanel
 
         if (!IsOpen) return;
 
-        int panelY = _toggleBounds.Y + ToggleSize + 4;
+        var panelY = _toggleBounds.Y + ToggleSize + 4;
         _panelBounds = new Rectangle(Margin, panelY, PanelW, PanelH);
         UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(30, 15, 10, 235));
         UiPrimitives.Border(sb, pixel, _panelBounds, 2, UiTheme.DangerClay);
 
         sb.DrawString(font, I18n.T("toolbar.cataclysm"), new Vector2(_panelBounds.X + 8, _panelBounds.Y + 6), UiTheme.DangerClay);
 
-        int y = _panelBounds.Y + 28;
+        var y = _panelBounds.Y + 28;
         foreach (var btn in _buttons)
         {
             btn.Bounds = new Rectangle(_panelBounds.X + 8, y, PanelW - 16, 22);
-            bool sel = SelectedType == (string)btn.Tag!;
+            var sel = SelectedType == (string)btn.Tag!;
             btn.Draw(sb, pixel, font, mouse, sel);
             y += 26;
         }

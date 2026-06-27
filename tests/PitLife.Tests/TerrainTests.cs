@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
 using PitLife.UI;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -36,12 +35,12 @@ public class TerrainTests
         var uiWorldTile = ui.World.GetTile(3, 4);
         Assert.Same(worldTile, uiWorldTile);
 
-        float elevation = world.ElevationField[4 * world.Width + 3];
-        float uiElevation = ui.World.ElevationField[4 * ui.World.Width + 3];
+        var elevation = world.ElevationField[4 * world.Width + 3];
+        var uiElevation = ui.World.ElevationField[4 * ui.World.Width + 3];
         Assert.Equal(elevation, uiElevation);
 
-        bool isRiver = world.RiverMask[4 * world.Width + 3];
-        bool uiIsRiver = ui.World.RiverMask[4 * ui.World.Width + 3];
+        var isRiver = world.RiverMask[4 * world.Width + 3];
+        var uiIsRiver = ui.World.RiverMask[4 * ui.World.Width + 3];
         Assert.Equal(isRiver, uiIsRiver);
     }
 }
