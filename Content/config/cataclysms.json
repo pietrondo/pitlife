@@ -1,143 +1,17 @@
 {
   "version": 1,
   "massExtinctions": [
-    {
-      "type": 0,
-      "name": "Asteroid Impact",
-      "grassMultiplier": 0.0,
-      "duration": 60.0,
-      "radius": 8,
-      "color": {
-        "r": 255,
-        "g": 100,
-        "b": 30,
-        "a": 200
-      }
-    },
-    {
-      "type": 1,
-      "name": "Ice Age",
-      "grassMultiplier": 0.1,
-      "duration": 120.0,
-      "radius": 0,
-      "color": {
-        "r": 100,
-        "g": 200,
-        "b": 255,
-        "a": 150
-      }
-    },
-    {
-      "type": 2,
-      "name": "Supervolcano",
-      "grassMultiplier": 0.05,
-      "duration": 90.0,
-      "radius": 5,
-      "color": {
-        "r": 255,
-        "g": 50,
-        "b": 10,
-        "a": 200
-      }
-    }
+    { "type": 0, "name": "Asteroid Impact", "grassMultiplier": 0.0, "duration": 60.0, "radius": 8, "color": { "r": 255, "g": 100, "b": 30, "a": 200 } },
+    { "type": 1, "name": "Ice Age", "grassMultiplier": 0.1, "duration": 120.0, "radius": 0, "color": { "r": 100, "g": 200, "b": 255, "a": 150 } },
+    { "type": 2, "name": "Supervolcano", "grassMultiplier": 0.05, "duration": 90.0, "radius": 5, "color": { "r": 255, "g": 50, "b": 10, "a": 200 } }
   ],
   "playerEvents": [
-    {
-      "name": "Asteroid",
-      "duration": 40.0,
-      "grassMultiplier": 0.2,
-      "radius": 6,
-      "color": {
-        "r": 255,
-        "g": 100,
-        "b": 30,
-        "a": 200
-      },
-      "innerBiome": "Volcano",
-      "outerBiome": "Desert",
-      "grassAmount": 0.0,
-      "soilNutrients": 0.1
-    },
-    {
-      "name": "Supervolcano",
-      "duration": 40.0,
-      "grassMultiplier": 0.2,
-      "radius": 5,
-      "color": {
-        "r": 255,
-        "g": 50,
-        "b": 10,
-        "a": 200
-      },
-      "innerBiome": "Volcano",
-      "outerBiome": "Desert",
-      "grassAmount": 0.0,
-      "soilNutrients": 0.1
-    },
-    {
-      "name": "Earthquake",
-      "duration": 40.0,
-      "grassMultiplier": 0.2,
-      "radius": 8,
-      "color": {
-        "r": 180,
-        "g": 140,
-        "b": 100,
-        "a": 150
-      },
-      "innerBiome": "Cave",
-      "outerBiome": "Mountain",
-      "grassAmount": 0.0,
-      "soilNutrients": 0.1
-    },
-    {
-      "name": "IceAge",
-      "duration": 40.0,
-      "grassMultiplier": 0.2,
-      "radius": 3,
-      "color": {
-        "r": 100,
-        "g": 200,
-        "b": 255,
-        "a": 150
-      },
-      "innerBiome": "Snow",
-      "outerBiome": "Tundra",
-      "grassAmount": 0.0,
-      "soilNutrients": 0.1
-    },
-    {
-      "name": "Drought",
-      "duration": 40.0,
-      "grassMultiplier": 0.1,
-      "radius": 3,
-      "color": {
-        "r": 255,
-        "g": 180,
-        "b": 40,
-        "a": 150
-      },
-      "innerBiome": "Desert",
-      "outerBiome": "Desert",
-      "grassAmount": 0.0,
-      "soilNutrients": 0.1
-    },
-    {
-      "name": "Flood",
-      "duration": 40.0,
-      "grassMultiplier": 2.5,
-      "radius": 3,
-      "color": {
-        "r": 40,
-        "g": 140,
-        "b": 255,
-        "a": 150
-      },
-      "innerBiome": "ShallowWater",
-      "outerBiome": "None",
-      "grassAmount": 1.0,
-      "soilNutrients": 2.0
-    }
+    { "name": "Asteroid", "duration": 40.0, "grassMultiplier": 0.2, "radius": 6, "color": { "r": 255, "g": 100, "b": 30, "a": 200 }, "innerBiome": "Volcano", "outerBiome": "Desert", "grassAmount": 0.0, "soilNutrients": 0.1 },
+    { "name": "Supervolcano", "duration": 40.0, "grassMultiplier": 0.2, "radius": 5, "color": { "r": 255, "g": 50, "b": 10, "a": 200 }, "innerBiome": "Volcano", "outerBiome": "Desert", "grassAmount": 0.0, "soilNutrients": 0.1 },
+    { "name": "Earthquake", "duration": 40.0, "grassMultiplier": 0.2, "radius": 8, "color": { "r": 180, "g": 140, "b": 100, "a": 150 }, "innerBiome": "Cave", "outerBiome": "Mountain", "grassAmount": 0.0, "soilNutrients": 0.1 },
+    { "name": "IceAge", "duration": 40.0, "grassMultiplier": 0.2, "radius": 3, "color": { "r": 100, "g": 200, "b": 255, "a": 150 }, "innerBiome": "Snow", "outerBiome": "Tundra", "grassAmount": 0.0, "soilNutrients": 0.1 },
+    { "name": "Drought", "duration": 40.0, "grassMultiplier": 0.1, "radius": 3, "color": { "r": 255, "g": 180, "b": 40, "a": 150 }, "innerBiome": "Desert", "outerBiome": "Desert", "grassAmount": 0.0, "soilNutrients": 0.1 },
+    { "name": "Flood", "duration": 40.0, "grassMultiplier": 2.5, "radius": 3, "color": { "r": 40, "g": 140, "b": 255, "a": 150 }, "innerBiome": "ShallowWater", "outerBiome": "None", "grassAmount": 1.0, "soilNutrients": 2.0 }
   ],
   "chainReactions": {
     "earthquakeTsunamiChance": 0.4,
@@ -152,10 +26,5 @@
     "randomTriggerChance": 0.3,
     "massExtinctionChance": 0.05,
     "massExtinctionMinTime": 120.0
-  },
-  "cooldowns": {
-    "initialCooldown": 120.0,
-    "cooldownMin": 180.0,
-    "cooldownMax": 420.0
   }
 }

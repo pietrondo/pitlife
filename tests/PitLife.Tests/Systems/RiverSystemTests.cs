@@ -2,7 +2,7 @@ using System;
 using PitLife.Simulation;
 using Xunit;
 
-namespace PitLife.Tests;
+namespace PitLife.Tests.Systems;
 
 public class RiverSystemTests
 {

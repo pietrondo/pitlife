@@ -61,12 +61,6 @@ public static class CataclysmConfig
             RandomTriggerChance = 0.3f,
             MassExtinctionChance = 0.05f,
             MassExtinctionMinTime = 120f
-        },
-        Cooldowns: new CooldownDef
-        {
-            InitialCooldown = 120f,
-            CooldownMin = 180f,
-            CooldownMax = 420f
         }
     );
 
@@ -75,8 +69,7 @@ public static class CataclysmConfig
         List<MassExtinctionDef> MassExtinctions,
         List<PlayerEventDef> PlayerEvents,
         ChainReactionDef ChainReactions,
-        ChanceDef Chances,
-        CooldownDef Cooldowns
+        ChanceDef Chances
     );
 
     public sealed record MassExtinctionDef
@@ -128,12 +121,5 @@ public static class CataclysmConfig
         public int A { get; init; }
 
         public Color ToColor() => new Color(R, G, B, A);
-    }
-
-    public sealed record CooldownDef
-    {
-        public float InitialCooldown { get; init; }
-        public float CooldownMin { get; init; }
-        public float CooldownMax { get; init; }
     }
 }

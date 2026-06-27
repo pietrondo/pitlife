@@ -18,12 +18,7 @@ public sealed class CataclysmSystem
     public float AnimTimer { get; private set; }
     public float AnimDuration { get; private set; } = 1.5f;
 
-    private float _cooldownTimer;
-
-    public CataclysmSystem()
-    {
-        _cooldownTimer = CataclysmConfig.Data.Cooldowns.InitialCooldown;
-    }
+    private float _cooldownTimer = 120f;
 
     public void Tick(Ecosystem eco, GameTime gameTime)
     {
@@ -33,7 +28,7 @@ public sealed class CataclysmSystem
     }
 
     public void Initialize(World world) { }
-    public void Reset() { IsActive = false; ActiveEvent = ""; GrassMultiplier = 1f; _cooldownTimer = CataclysmConfig.Data.Cooldowns.InitialCooldown; }
+    public void Reset() { IsActive = false; ActiveEvent = ""; GrassMultiplier = 1f; _cooldownTimer = 0; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)
     {
@@ -75,7 +70,7 @@ public sealed class CataclysmSystem
         _cooldownTimer -= dt;
         if (_cooldownTimer > 0) return;
 
-        _cooldownTimer = CataclysmConfig.Data.Cooldowns.CooldownMin + (float)rng.NextDouble() * CataclysmConfig.Data.Cooldowns.CooldownMax;
+        _cooldownTimer = 180f + (float)rng.NextDouble() * 420f;
 
         if (rng.NextDouble() < CataclysmConfig.Data.Chances.RandomTriggerChance)
         {
