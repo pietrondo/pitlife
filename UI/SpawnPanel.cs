@@ -174,15 +174,7 @@ public sealed class SpawnPanel
         sb.DrawString(font, I18n.T("spawn.title"),
             new Vector2(_panelBounds.X + 10, _panelBounds.Y + 6), UiTheme.MossSignal);
 
-        // Tab: Spawn / Cataclysms
-        var tabSpawn = new UiButton("Spawn");
-        var tabCata = new UiButton("Cataclysms");
-        tabSpawn.Bounds = new Rectangle(_panelBounds.X + 60, _panelBounds.Y + 6, 60, 20);
-        tabCata.Bounds = new Rectangle(_panelBounds.X + 124, _panelBounds.Y + 6, 70, 20);
-        tabSpawn.Draw(sb, pixel, font, mouse, !ShowCataclysms);
-        tabCata.Draw(sb, pixel, font, mouse, ShowCataclysms);
-        if (WasClicked(mouse, previousMouseState) && tabSpawn.Bounds.Contains(mouse.Position)) ShowCataclysms = false;
-        if (WasClicked(mouse, previousMouseState) && tabCata.Bounds.Contains(mouse.Position)) ShowCataclysms = true;
+        DrawTabs(sb, pixel, font, mouse, previousMouseState);
 
         if (ShowCataclysms)
         {
@@ -198,45 +190,76 @@ public sealed class SpawnPanel
 
         if (_state.SelectedCategory != null)
         {
-            _searchInput.Draw(sb, pixel, font, mouse);
-
-            var originalScissor = sb.GraphicsDevice.ScissorRectangle;
-            sb.End();
-            var clipRect = new Rectangle(_speciesScrollArea.X, _speciesScrollArea.Y,
-                _speciesScrollArea.Width, _speciesScrollArea.Height);
-            sb.GraphicsDevice.ScissorRectangle = clipRect;
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
-                SamplerState.PointClamp, rasterizerState: new RasterizerState { ScissorTestEnable = true });
-
-            foreach (var sBtn in _speciesButtons)
-            {
-                if (sBtn.Bounds.Bottom < _speciesScrollArea.Top || sBtn.Bounds.Top > _speciesScrollArea.Bottom)
-                    continue;
-                bool isSel = sBtn.Tag as string == _state.SelectedSpeciesKey;
-                sBtn.Draw(sb, pixel, font, mouse, isSel);
-            }
-
-            sb.End();
-            sb.GraphicsDevice.ScissorRectangle = originalScissor;
-            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
-                SamplerState.PointClamp, rasterizerState: new RasterizerState { ScissorTestEnable = false });
-
-            DrawScrollBar(sb, pixel);
+            DrawSpeciesList(sb, pixel, font, mouse);
         }
 
         if (_state.SelectedSpeciesKey != null)
         {
-            string selectedName = I18n.Species(_state.SelectedSpeciesKey!);
-            string hint = I18n.T("spawn.selected") + ": " + selectedName;
-            sb.DrawString(font, hint,
-                new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 36),
-                UiTheme.MossSignal);
-
-            string clickHint = I18n.T("spawn.hint");
-            sb.DrawString(font, clickHint,
-                new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 22),
-                UiTheme.WarmParchment);
+            DrawHints(sb, font);
         }
+    }
+
+    /// <summary>
+    /// Draws the spawn and cataclysm tabs and handles input.
+    /// </summary>
+    private void DrawTabs(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse, MouseState prevMouse)
+    {
+        var tabSpawn = new UiButton("Spawn");
+        var tabCata = new UiButton("Cataclysms");
+        tabSpawn.Bounds = new Rectangle(_panelBounds.X + 60, _panelBounds.Y + 6, 60, 20);
+        tabCata.Bounds = new Rectangle(_panelBounds.X + 124, _panelBounds.Y + 6, 70, 20);
+        tabSpawn.Draw(sb, pixel, font, mouse, !ShowCataclysms);
+        tabCata.Draw(sb, pixel, font, mouse, ShowCataclysms);
+        if (WasClicked(mouse, prevMouse) && tabSpawn.Bounds.Contains(mouse.Position)) ShowCataclysms = false;
+        if (WasClicked(mouse, prevMouse) && tabCata.Bounds.Contains(mouse.Position)) ShowCataclysms = true;
+    }
+
+    /// <summary>
+    /// Draws the scrollable species list within a scissor rectangle.
+    /// </summary>
+    private void DrawSpeciesList(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
+    {
+        _searchInput.Draw(sb, pixel, font, mouse);
+
+        var originalScissor = sb.GraphicsDevice.ScissorRectangle;
+        sb.End();
+        var clipRect = new Rectangle(_speciesScrollArea.X, _speciesScrollArea.Y,
+            _speciesScrollArea.Width, _speciesScrollArea.Height);
+        sb.GraphicsDevice.ScissorRectangle = clipRect;
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
+            SamplerState.PointClamp, rasterizerState: new RasterizerState { ScissorTestEnable = true });
+
+        foreach (var sBtn in _speciesButtons)
+        {
+            if (sBtn.Bounds.Bottom < _speciesScrollArea.Top || sBtn.Bounds.Top > _speciesScrollArea.Bottom)
+                continue;
+            bool isSel = sBtn.Tag as string == _state.SelectedSpeciesKey;
+            sBtn.Draw(sb, pixel, font, mouse, isSel);
+        }
+
+        sb.End();
+        sb.GraphicsDevice.ScissorRectangle = originalScissor;
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
+            SamplerState.PointClamp, rasterizerState: new RasterizerState { ScissorTestEnable = false });
+
+        DrawScrollBar(sb, pixel);
+    }
+
+    /// <summary>
+    /// Draws the selection hints at the bottom of the panel.
+    /// </summary>
+    private void DrawHints(SpriteBatch sb, SpriteFont font)
+    {
+        string selectedName = I18n.Species(_state.SelectedSpeciesKey!);
+        string hint = I18n.T("spawn.selected") + ": " + selectedName;
+        sb.DrawString(font, hint,
+            new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 36),
+            UiTheme.MossSignal);
+
+        string clickHint = I18n.T("spawn.hint");
+        sb.DrawString(font, clickHint,
+            new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 22),
+            UiTheme.WarmParchment);
     }
 
     private void DrawScrollBar(SpriteBatch sb, Texture2D pixel)

@@ -132,6 +132,20 @@ public sealed class InGameUi
         RefreshText();
         LayoutToolbar(viewportHeight);
 
+        HandleKeyboardShortcuts(keyboard, previousKeyboard, viewportWidth, viewportHeight);
+        bool toolbarConsumed = HandleToolbarButtons(mouse, previousMouse, viewportWidth, viewportHeight);
+
+        HandleCataclysmClick(mouse, previousMouse);
+
+        bool overToolbar = _toolbarRect.Contains(mouse.Position);
+        return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
+    }
+
+    /// <summary>
+    /// Handles keyboard shortcuts for toggling UI windows.
+    /// </summary>
+    private void HandleKeyboardShortcuts(KeyboardState keyboard, KeyboardState previousKeyboard, int viewportWidth, int viewportHeight)
+    {
         if (Pressed(keyboard, previousKeyboard, Keys.F2))
         {
             _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
@@ -154,7 +168,13 @@ public sealed class InGameUi
             _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
             ToolbarButtonClicked?.Invoke();
         }
+    }
 
+    /// <summary>
+    /// Handles mouse clicks on toolbar buttons.
+    /// </summary>
+    private bool HandleToolbarButtons(MouseState mouse, MouseState previousMouse, int viewportWidth, int viewportHeight)
+    {
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
         {
@@ -200,11 +220,7 @@ public sealed class InGameUi
             SpeedUpRequested = true;
             toolbarConsumed = true;
         }
-
-        HandleCataclysmClick(mouse, previousMouse);
-
-        bool overToolbar = _toolbarRect.Contains(mouse.Position);
-        return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
+        return toolbarConsumed;
     }
 
     public void Draw(
@@ -224,6 +240,16 @@ public sealed class InGameUi
         EcosystemMetrics? metrics = null)
     {
         LayoutToolbar(viewportHeight);
+        DrawToolbar(spriteBatch, pixel, font, mouse, paused, speed);
+
+        DrawWindows(spriteBatch, pixel, font, mouse, selectedCreature, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
+    }
+
+    /// <summary>
+    /// Draws the bottom toolbar and its buttons.
+    /// </summary>
+    private void DrawToolbar(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool paused, float speed)
+    {
         var toolbar = _toolbarRect;
         UiPrimitives.Fill(spriteBatch, pixel, toolbar, new Color(UiTheme.DeepGrove, 235));
         UiPrimitives.Border(spriteBatch, pixel, toolbar, 2, UiTheme.BarkEdge);
@@ -241,7 +267,13 @@ public sealed class InGameUi
         _cataclysmButton.Draw(spriteBatch, pixel, font, mouse, false);
         _climateButton.Draw(spriteBatch, pixel, font, mouse, false);
         _menuButton.Draw(spriteBatch, pixel, font, mouse, false);
+    }
 
+    /// <summary>
+    /// Draws all open windows and their contents.
+    /// </summary>
+    private void DrawWindows(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, Creature? selectedCreature, int plantCount, int herbivoreCount, int carnivoreCount, int omnivoreCount, float totalTime, bool paused, float speed, EcosystemMetrics? metrics)
+    {
         foreach (UiWindow window in _windowManager.Windows)
         {
             if (!window.IsOpen)

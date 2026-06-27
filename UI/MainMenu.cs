@@ -329,32 +329,46 @@ public sealed class MainMenu
 
         if (_showWorldGenPanel)
         {
-            int wgCenterX = viewportWidth / 2;
-
-            _presetButton.Draw(spriteBatch, pixel, font, mouse, false);
-            _mapSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
-            _planetButton.Draw(spriteBatch, pixel, font, mouse, false);
-
-            int labelX = _continentInput.Bounds.X - 8;
-            string contLabel = I18n.T("menu.continents") + ":";
-            Vector2 contLabelSize = font.MeasureString(contLabel);
-            spriteBatch.DrawString(font, contLabel, new Vector2(labelX - contLabelSize.X, _continentInput.Bounds.Y + 8), Color.White);
-            _continentInput.Draw(spriteBatch, pixel, font, mouse);
-
-            string seaLabel = I18n.T("menu.seaLevel") + ":";
-            Vector2 seaLabelSize = font.MeasureString(seaLabel);
-            spriteBatch.DrawString(font, seaLabel, new Vector2(labelX - seaLabelSize.X, _seaLevelInput.Bounds.Y + 8), Color.White);
-            _seaLevelInput.Draw(spriteBatch, pixel, font, mouse);
-
-            _islandSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
-
-            _worldGenButtons[0].Draw(spriteBatch, pixel, font, mouse, true);
-            string wgHint = I18n.T("menu.worldGenHint");
-            Vector2 wgHintSize = font.MeasureString(wgHint);
-            spriteBatch.DrawString(font, wgHint, new Vector2(viewportWidth / 2f - wgHintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
+            DrawWorldGenPanel(spriteBatch, pixel, font, mouse, viewportWidth, viewportHeight);
             return;
         }
 
+        DrawMenuButtons(spriteBatch, pixel, font, mouse, viewportWidth, viewportHeight);
+    }
+
+    /// <summary>
+    /// Draws the world generation configuration panel.
+    /// </summary>
+    private void DrawWorldGenPanel(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, int viewportWidth, int viewportHeight)
+    {
+        _presetButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _mapSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
+        _planetButton.Draw(spriteBatch, pixel, font, mouse, false);
+
+        int labelX = _continentInput.Bounds.X - 8;
+        string contLabel = I18n.T("menu.continents") + ":";
+        Vector2 contLabelSize = font.MeasureString(contLabel);
+        spriteBatch.DrawString(font, contLabel, new Vector2(labelX - contLabelSize.X, _continentInput.Bounds.Y + 8), Color.White);
+        _continentInput.Draw(spriteBatch, pixel, font, mouse);
+
+        string seaLabel = I18n.T("menu.seaLevel") + ":";
+        Vector2 seaLabelSize = font.MeasureString(seaLabel);
+        spriteBatch.DrawString(font, seaLabel, new Vector2(labelX - seaLabelSize.X, _seaLevelInput.Bounds.Y + 8), Color.White);
+        _seaLevelInput.Draw(spriteBatch, pixel, font, mouse);
+
+        _islandSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
+
+        _worldGenButtons[0].Draw(spriteBatch, pixel, font, mouse, true);
+        string wgHint = I18n.T("menu.worldGenHint");
+        Vector2 wgHintSize = font.MeasureString(wgHint);
+        spriteBatch.DrawString(font, wgHint, new Vector2(viewportWidth / 2f - wgHintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
+    }
+
+    /// <summary>
+    /// Draws the main menu or options buttons.
+    /// </summary>
+    private void DrawMenuButtons(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, int viewportWidth, int viewportHeight)
+    {
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
         for (int i = 0; i < buttons.Length; i++)
         {

@@ -22,6 +22,33 @@ internal sealed class RiverSystem
         int[] dy = { 0, 1, 1, 1, 0, -1, -1, -1 };
         float[] dd = { 1f, 1.4142135f, 1f, 1.4142135f, 1f, 1.4142135f, 1f, 1.4142135f };
 
+        int[] flowDir = CalculateFlowDirections(W, H, dx, dy, dd, rng);
+        int[] cells = GetSortedCells(W, H);
+        int[] flowAccum = AccumulateFlow(W, H, cells, flowDir, dx, dy);
+
+        for (int i = 0; i < W * H; i++)
+            if (flowAccum[i] > riverThreshold)
+            {
+                _world.RiverMask[i] = true;
+                if (_world.ElevationField[i] > 0.18f) _world.ElevationField[i] = 0.18f;
+            }
+
+        for (int i = 0; i < W * H; i++)
+            if (_world.RiverMask[i])
+            {
+                int rx = i % W;
+                int ry = i / W;
+                _world.Tiles[rx, ry] = new Tile(BiomeType.ShallowWater);
+            }
+
+        PruneDisconnectedRivers();
+    }
+
+    /// <summary>
+    /// Calculates the flow direction for each cell based on elevation drop.
+    /// </summary>
+    private int[] CalculateFlowDirections(int W, int H, int[] dx, int[] dy, float[] dd, Random rng)
+    {
         int[] flowDir = new int[W * H];
         for (int y = 0; y < H; y++)
             for (int x = 0; x < W; x++)
@@ -58,11 +85,25 @@ internal sealed class RiverSystem
 
                 flowDir[idx] = bestDir;
             }
+        return flowDir;
+    }
 
+    /// <summary>
+    /// Returns an array of cell indices sorted by elevation descending.
+    /// </summary>
+    private int[] GetSortedCells(int W, int H)
+    {
         int[] cells = new int[W * H];
         for (int i = 0; i < W * H; i++) cells[i] = i;
         Array.Sort(cells, (a, b) => _world.ElevationField[b].CompareTo(_world.ElevationField[a]));
+        return cells;
+    }
 
+    /// <summary>
+    /// Accumulates water flow down the elevation gradient.
+    /// </summary>
+    private int[] AccumulateFlow(int W, int H, int[] cells, int[] flowDir, int[] dx, int[] dy)
+    {
         int[] flowAccum = new int[W * H];
         for (int i = 0; i < cells.Length; i++)
         {
@@ -77,23 +118,7 @@ internal sealed class RiverSystem
             if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
             flowAccum[ny * W + nx] += flowAccum[idx];
         }
-
-        for (int i = 0; i < W * H; i++)
-            if (flowAccum[i] > riverThreshold)
-            {
-                _world.RiverMask[i] = true;
-                if (_world.ElevationField[i] > 0.18f) _world.ElevationField[i] = 0.18f;
-            }
-
-        for (int i = 0; i < W * H; i++)
-            if (_world.RiverMask[i])
-            {
-                int rx = i % W;
-                int ry = i / W;
-                _world.Tiles[rx, ry] = new Tile(BiomeType.ShallowWater);
-            }
-
-        PruneDisconnectedRivers();
+        return flowAccum;
     }
 
     private void PruneDisconnectedRivers()

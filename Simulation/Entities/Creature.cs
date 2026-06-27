@@ -337,21 +337,42 @@ public abstract class Creature
 
         if (IsAquatic)
         {
-            bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
-            if (inWater)
-            {
-                CurrentSpeedMultiplier = 1.0f;
-                CurrentEnergyMultiplier = 1.0f;
-            }
-            else
-            {
-                CurrentSpeedMultiplier = 0.3f;
-                CurrentEnergyMultiplier = 2.5f;
-            }
+            UpdateAquaticMultipliers(tile);
             return;
         }
 
-        // Terrestrial creature
+        UpdateTerrestrialMultipliers(tile);
+
+        int tileY = (int)(Position.Y / ecosystem.World.TileSize);
+        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
+        float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
+        if (tempDiff > 15f && CreatureType != CreatureType.Plant)
+            CurrentEnergyMultiplier += tempDiff * 0.02f;
+    }
+
+    /// <summary>
+    /// Updates multipliers for aquatic creatures based on biome.
+    /// </summary>
+    private void UpdateAquaticMultipliers(Tile tile)
+    {
+        bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
+        if (inWater)
+        {
+            CurrentSpeedMultiplier = 1.0f;
+            CurrentEnergyMultiplier = 1.0f;
+        }
+        else
+        {
+            CurrentSpeedMultiplier = 0.3f;
+            CurrentEnergyMultiplier = 2.5f;
+        }
+    }
+
+    /// <summary>
+    /// Updates multipliers for terrestrial creatures based on biome adaptation.
+    /// </summary>
+    private void UpdateTerrestrialMultipliers(Tile tile)
+    {
         switch (tile.Biome)
         {
             case BiomeType.Desert:
@@ -386,12 +407,6 @@ public abstract class Creature
                 CurrentEnergyMultiplier = 1.0f;
                 break;
         }
-
-        int tileY = (int)(Position.Y / ecosystem.World.TileSize);
-        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
-        float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
-        if (tempDiff > 15f && CreatureType != CreatureType.Plant)
-            CurrentEnergyMultiplier += tempDiff * 0.02f;
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Unknown)

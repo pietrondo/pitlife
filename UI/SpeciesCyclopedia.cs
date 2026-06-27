@@ -61,38 +61,8 @@ public sealed class SpeciesCyclopedia
         _panelX = viewportWidth / 2 - 360;
         _panelY = 40;
 
-        // Search input
-        if (Pressed(kbd, prevKbd, Keys.F) && kbd.IsKeyDown(Keys.LeftControl))
-            _searchActive = true;
-        if (_searchActive && Pressed(kbd, prevKbd, Keys.Escape))
-            _searchActive = false;
-
-        if (_searchActive)
-        {
-            _searchInput.Update(kbd, prevKbd, mouse, prevMouse);
-            if (_searchInput.Text != _searchText)
-            {
-                _searchText = _searchInput.Text;
-                RefreshFilteredList();
-            }
-        }
-
-        // Filter tabs
-        int tabX = _panelX + PanelPadding;
-        for (int i = 0; i < Filters.Length; i++)
-        {
-            var tabRect = new Rectangle(tabX, _panelY, 100, 28);
-            if (mouse.LeftButton == ButtonState.Pressed && prevMouse.LeftButton == ButtonState.Released
-                && tabRect.Contains(mouse.Position))
-            {
-                _activeFilter = Filters[i];
-                RefreshFilteredList();
-                _selectedIndex = -1;
-                _selectedDef = null;
-                _scrollOffset = 0;
-            }
-            tabX += 108;
-        }
+        HandleSearchInput(mouse, prevMouse, kbd, prevKbd);
+        HandleFilterTabs(mouse, prevMouse);
 
         // Scroll with mouse wheel
         int scrollDelta = mouse.ScrollWheelValue - prevMouse.ScrollWheelValue;
@@ -117,6 +87,49 @@ public sealed class SpeciesCyclopedia
             if (Pressed(kbd, prevKbd, Keys.Down)) NavigateSelection(1);
             if (Pressed(kbd, prevKbd, Keys.Up)) NavigateSelection(-1);
             if (Pressed(kbd, prevKbd, Keys.Enter)) OpenSelectedDetail();
+        }
+    }
+
+    /// <summary>
+    /// Handles the search input field logic.
+    /// </summary>
+    private void HandleSearchInput(MouseState mouse, MouseState prevMouse, KeyboardState kbd, KeyboardState prevKbd)
+    {
+        if (Pressed(kbd, prevKbd, Keys.F) && kbd.IsKeyDown(Keys.LeftControl))
+            _searchActive = true;
+        if (_searchActive && Pressed(kbd, prevKbd, Keys.Escape))
+            _searchActive = false;
+
+        if (_searchActive)
+        {
+            _searchInput.Update(kbd, prevKbd, mouse, prevMouse);
+            if (_searchInput.Text != _searchText)
+            {
+                _searchText = _searchInput.Text;
+                RefreshFilteredList();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles clicks on the filter tabs.
+    /// </summary>
+    private void HandleFilterTabs(MouseState mouse, MouseState prevMouse)
+    {
+        int tabX = _panelX + PanelPadding;
+        for (int i = 0; i < Filters.Length; i++)
+        {
+            var tabRect = new Rectangle(tabX, _panelY, 100, 28);
+            if (mouse.LeftButton == ButtonState.Pressed && prevMouse.LeftButton == ButtonState.Released
+                && tabRect.Contains(mouse.Position))
+            {
+                _activeFilter = Filters[i];
+                RefreshFilteredList();
+                _selectedIndex = -1;
+                _selectedDef = null;
+                _scrollOffset = 0;
+            }
+            tabX += 108;
         }
     }
 

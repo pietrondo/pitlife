@@ -83,6 +83,28 @@ internal sealed class SocialModule : IBehaviorModule
         if (neighbors.Count == 0)
             return false;
 
+        (Vector2 cohesionForce, Vector2 separationForce, Vector2 alignmentForce) = CalculateFlockingForces(self, neighbors, separationDist);
+
+        Vector2 steerDir = cohesionForce * cohesionWeight +
+                           separationForce * separationWeight +
+                           alignmentForce * alignmentWeight;
+
+        if (steerDir.LengthSquared() > 0.001f)
+        {
+            steerDir = Vector2.Normalize(steerDir);
+            Vector2 target = self.Position + steerDir * 100f;
+            self.MoveToward(target, dt, world);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Calculates cohesion, separation, and alignment vectors for flocking behavior.
+    /// </summary>
+    private static (Vector2 cohesion, Vector2 separation, Vector2 alignment) CalculateFlockingForces(Creature self, System.Collections.Generic.List<Creature> neighbors, float separationDist)
+    {
         Vector2 cohesionForce = Vector2.Zero;
         Vector2 separationForce = Vector2.Zero;
         Vector2 alignmentForce = Vector2.Zero;
@@ -123,19 +145,7 @@ internal sealed class SocialModule : IBehaviorModule
         if (avgFacing.LengthSquared() > 0.001f)
             alignmentForce = Vector2.Normalize(avgFacing);
 
-        Vector2 steerDir = cohesionForce * cohesionWeight +
-                           separationForce * separationWeight +
-                           alignmentForce * alignmentWeight;
-
-        if (steerDir.LengthSquared() > 0.001f)
-        {
-            steerDir = Vector2.Normalize(steerDir);
-            Vector2 target = self.Position + steerDir * 100f;
-            self.MoveToward(target, dt, world);
-            return true;
-        }
-
-        return false;
+        return (cohesionForce, separationForce, alignmentForce);
     }
 
     private static bool ApplyPairBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
