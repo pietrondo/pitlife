@@ -1,6 +1,6 @@
 using PitLife.Simulation;
 
-namespace PitLife.Tests;
+namespace PitLife.Tests.Systems;
 
 public class ClimateSystemTests
 {
@@ -8,7 +8,7 @@ public class ClimateSystemTests
     public void Season_ProgressesThroughAllFour()
     {
         var climate = new ClimateSystem();
-        var rng = new System.Random(42);
+        var rng = new Moq.Mock<System.Random>().Object;
 
         climate.Update(0, rng);
         Assert.Equal(Season.Summer, climate.CurrentSeason);
@@ -30,7 +30,7 @@ public class ClimateSystemTests
     public void Season_WrapsAroundYearly()
     {
         var climate = new ClimateSystem();
-        var rng = new System.Random(42);
+        var rng = new Moq.Mock<System.Random>().Object;
 
         climate.Update(ClimateSystem.YearLength + 10, rng);
         Assert.Equal(Season.Summer, climate.CurrentSeason);
@@ -43,7 +43,7 @@ public class ClimateSystemTests
     public void GrassRegen_HighestInSpring()
     {
         var climate = new ClimateSystem();
-        var rng = new System.Random(42);
+        var rng = new Moq.Mock<System.Random>().Object;
 
         climate.Update(ClimateSystem.SeasonLength * 3.5f, rng);
         var springRegen = climate.GrassRegenModifier;
@@ -59,7 +59,7 @@ public class ClimateSystemTests
     public void EnergyModifier_HigherInWinter()
     {
         var climate = new ClimateSystem();
-        var rng = new System.Random(42);
+        var rng = new Moq.Mock<System.Random>().Object;
 
         climate.Update(ClimateSystem.SeasonLength * 0.5f, rng);
         var summerEnergy = climate.EnergyModifier;
@@ -76,7 +76,7 @@ public class ClimateSystemTests
     {
         var c1 = new ClimateSystem();
         var c2 = new ClimateSystem();
-        var rng = new System.Random(42);
+        var rng = new Moq.Mock<System.Random>().Object;
 
         var t = 150f;
         c1.Update(t, rng);
@@ -92,7 +92,7 @@ public class ClimateSystemTests
     public void SeasonProgress_BetweenZeroAndOne()
     {
         var climate = new ClimateSystem();
-        var rng = new System.Random(42);
+        var rng = new Moq.Mock<System.Random>().Object;
 
         for (float t = 0; t < ClimateSystem.YearLength * 2; t += 10f)
         {

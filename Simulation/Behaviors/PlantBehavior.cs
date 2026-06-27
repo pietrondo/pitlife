@@ -5,15 +5,15 @@ namespace PitLife.Simulation;
 
 public sealed class PlantBehavior : ICreatureBehavior
 {
-    public void Update(Creature self, World world, Ecosystem ecosystem, GameTime gameTime)
+    public void Update(Creature self, World world, Ecosystem ecosystem, float dt)
     {
         if (!self.IsAlive) return;
         if (self is not Plant plant) return;
-        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
 
         var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
-        var sunlight = tile.Vegetation * 0.5f + 0.5f;
-        var energyGain = plant.GrowthRate * sunlight * dt;
+        float sunlight = tile.Vegetation * 0.5f + 0.5f;
+        float energyGain = plant.GrowthRate * sunlight * dt;
         self.Energy = Math.Min(self.Energy + energyGain, self.MaxEnergy);
 
         if (self.Energy >= self.ReproductionThreshold)

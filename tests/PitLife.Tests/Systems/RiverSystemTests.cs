@@ -1,6 +1,6 @@
 using PitLife.Simulation;
 
-namespace PitLife.Tests;
+namespace PitLife.Tests.Systems;
 
 public class RiverSystemTests
 {

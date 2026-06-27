@@ -8,10 +8,10 @@ public sealed class BaseBehavior : ICreatureBehavior
     private readonly FeedingModule _feeding = new();
     private readonly SocialModule _social = new();
 
-    public void Update(Creature self, World world, Ecosystem ecosystem, GameTime gameTime)
+    public void Update(Creature self, World world, Ecosystem ecosystem, float dt)
     {
         if (!self.IsAlive) return;
-        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         if (dt <= 0) return;
 
         if (_threat.Update(self, world, ecosystem, dt))
@@ -20,7 +20,7 @@ public sealed class BaseBehavior : ICreatureBehavior
         if (self.Thirst > 30f && self.CreatureType != CreatureType.Plant)
         {
             var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
-            var nearWater = tile.Biome is BiomeType.ShallowWater or BiomeType.DeepOcean or BiomeType.CoralReef
+            bool nearWater = tile.Biome is BiomeType.ShallowWater or BiomeType.DeepOcean or BiomeType.CoralReef
                 || world.IsRiverAt(self.Position.X, self.Position.Y);
             if (nearWater)
             {
@@ -47,7 +47,7 @@ public sealed class BaseBehavior : ICreatureBehavior
         if (_social.Update(self, world, ecosystem, dt))
             return;
 
-        var wanderSpeed = self.CreatureType switch
+        float wanderSpeed = self.CreatureType switch
         {
             CreatureType.Carnivore => 100f,
             CreatureType.Omnivore => 90f,

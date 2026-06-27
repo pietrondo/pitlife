@@ -17,40 +17,75 @@ public static class PopulationGenetics
         IEnumerable<Creature> creatures,
         string? species = null)
     {
-        Creature[] population = creatures
-            .Where(creature => creature.IsAlive &&
-                (species is null || string.Equals(creature.Species, species, StringComparison.Ordinal)))
-            .ToArray();
-        if (population.Length == 0)
+        int popSize = 0;
+        float sumHetero = 0f;
+        float sumInbreeding = 0f;
+
+        Span<int> onesCounts = stackalloc int[64];
+
+        if (creatures is List<Creature> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                var creature = list[i];
+                if (creature == null || !creature.IsAlive) continue;
+                if (species != null && !string.Equals(creature.Species, species, StringComparison.Ordinal)) continue;
+
+                popSize++;
+                var profile = creature.Genome.EnsureGeneticProfile();
+                sumHetero += profile.Heterozygosity;
+                sumInbreeding += creature.InbreedingCoefficient;
+
+                for (int marker = 0; marker < 64; marker++)
+                {
+                    ulong bit = 1UL << marker;
+                    if ((profile.MarkerHaplotypeA & bit) != 0) onesCounts[marker]++;
+                    if ((profile.MarkerHaplotypeB & bit) != 0) onesCounts[marker]++;
+                }
+            }
+        }
+        else
+        {
+            foreach (var creature in creatures)
+            {
+                if (creature == null || !creature.IsAlive) continue;
+                if (species != null && !string.Equals(creature.Species, species, StringComparison.Ordinal)) continue;
+
+                popSize++;
+                var profile = creature.Genome.EnsureGeneticProfile();
+                sumHetero += profile.Heterozygosity;
+                sumInbreeding += creature.InbreedingCoefficient;
+
+                for (int marker = 0; marker < 64; marker++)
+                {
+                    ulong bit = 1UL << marker;
+                    if ((profile.MarkerHaplotypeA & bit) != 0) onesCounts[marker]++;
+                    if ((profile.MarkerHaplotypeB & bit) != 0) onesCounts[marker]++;
+                }
+            }
+        }
+
+        if (popSize == 0)
             return new PopulationGeneticMetrics(0, 0f, 0f, 0, 0f);
 
-        GeneticProfile[] profiles = population
-            .Select(creature => creature.Genome.EnsureGeneticProfile())
-            .ToArray();
-        var individualHeterozygosity = profiles.Average(profile => profile.Heterozygosity);
-        var expectedHeterozygosity = 0f;
-        var polymorphicMarkers = 0;
-        var alleleCount = profiles.Length * 2;
-        for (var marker = 0; marker < 64; marker++)
+        float expectedHeterozygosity = 0f;
+        int polymorphicMarkers = 0;
+        int alleleCount = popSize * 2;
+
+        for (int marker = 0; marker < 64; marker++)
         {
-            var bit = 1UL << marker;
-            var ones = 0;
-            foreach (GeneticProfile profile in profiles)
-            {
-                if ((profile.MarkerHaplotypeA & bit) != 0) ones++;
-                if ((profile.MarkerHaplotypeB & bit) != 0) ones++;
-            }
-            var frequency = ones / (float)alleleCount;
+            int ones = onesCounts[marker];
+            float frequency = ones / (float)alleleCount;
             expectedHeterozygosity += 2f * frequency * (1f - frequency);
             if (ones > 0 && ones < alleleCount)
                 polymorphicMarkers++;
         }
 
         return new PopulationGeneticMetrics(
-            population.Length,
-            individualHeterozygosity,
+            popSize,
+            sumHetero / popSize,
             expectedHeterozygosity / 64f,
             polymorphicMarkers,
-            population.Average(creature => creature.InbreedingCoefficient));
+            sumInbreeding / popSize);
     }
 }
