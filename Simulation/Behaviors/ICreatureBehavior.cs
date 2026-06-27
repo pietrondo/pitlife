@@ -4,5 +4,5 @@ namespace PitLife.Simulation;
 
 public interface ICreatureBehavior
 {
-    void Update(Creature self, World world, Ecosystem ecosystem, GameTime gameTime);
+    void Update(Creature self, World world, Ecosystem ecosystem, float dt);
 }

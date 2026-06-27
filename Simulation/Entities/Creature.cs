@@ -180,10 +180,10 @@ public abstract class Creature
         CurrentEnergyMultiplier = 1f;
     }
 
-    public virtual void Update(World world, Ecosystem ecosystem, GameTime gameTime)
+    public virtual void Update(World world, Ecosystem ecosystem, float dt)
     {
         if (!IsAlive) return;
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
 
@@ -203,7 +203,7 @@ public abstract class Creature
 
         if (active)
         {
-            Behavior.Update(this, world, ecosystem, gameTime);
+            Behavior.Update(this, world, ecosystem, dt);
             if (!IsAlive) return;
         }
         else
