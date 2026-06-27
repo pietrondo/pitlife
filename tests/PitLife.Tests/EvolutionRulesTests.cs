@@ -9,11 +9,11 @@ namespace PitLife.Tests;
 public class EvolutionRulesTests
 {
     private delegate void GenomeModifier(ref Genome genome);
-
+    
     private static Genome CreateGenomeRef(GenomeModifier? modifier = null)
     {
         var genome = Genome.Random(new Random(0));
-
+        
         // Overwrite fields to safe defaults so they don't unexpectedly trigger other branches
         genome.Speed = 1f;
         genome.Size = 1f;
@@ -24,12 +24,12 @@ public class EvolutionRulesTests
         genome.ColdAdaptation = 0f;
         genome.ForestAdaptation = 0f;
         genome.WaterAdaptation = 0f;
-
+        
         if (modifier != null)
         {
             modifier(ref genome);
         }
-
+        
         return genome;
     }
 
@@ -50,11 +50,11 @@ public class EvolutionRulesTests
             g.WaterAdaptation = EvolutionConfig.Data.Herbivore.WaterAdaptation + 0.1f;
             g.Speed = EvolutionConfig.Data.Herbivore.DolphinSpeed + 0.1f;
         });
-
+        
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, startSpecies, new Random(0));
         Assert.Equal(expected, result);
     }
-
+    
     [Theory]
     [InlineData("Rabbit", "Whale")]
     public void DetermineEvolvedSpecies_Herbivore_WaterAdaptation_LandMammal_Whale(string startSpecies, string expected)
@@ -62,13 +62,13 @@ public class EvolutionRulesTests
         var genome = CreateGenomeRef((ref Genome g) => {
             g.WaterAdaptation = EvolutionConfig.Data.Herbivore.WaterAdaptation + 0.1f;
             g.Speed = EvolutionConfig.Data.Herbivore.DolphinSpeed - 0.1f;
-            g.Size = EvolutionConfig.Data.Herbivore.WhaleSize + 0.1f;
+            g.Size = EvolutionConfig.Data.Herbivore.WhaleSize + 0.1f; 
         });
-
+        
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, startSpecies, new Random(0));
         Assert.Equal(expected, result);
     }
-
+    
     [Theory]
     [InlineData("Rabbit", "Manatee")]
     public void DetermineEvolvedSpecies_Herbivore_WaterAdaptation_LandMammal_Manatee(string startSpecies, string expected)
@@ -76,13 +76,13 @@ public class EvolutionRulesTests
         var genome = CreateGenomeRef((ref Genome g) => {
             g.WaterAdaptation = EvolutionConfig.Data.Herbivore.WaterAdaptation + 0.1f;
             g.Speed = EvolutionConfig.Data.Herbivore.DolphinSpeed - 0.1f;
-            g.Size = EvolutionConfig.Data.Herbivore.WhaleSize - 0.1f;
+            g.Size = EvolutionConfig.Data.Herbivore.WhaleSize - 0.1f; 
         });
-
+        
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, startSpecies, new Random(0));
         Assert.Equal(expected, result);
     }
-
+    
     [Theory]
     [InlineData(0, "Tuna")]
     [InlineData(1, "Salmon")]
@@ -95,7 +95,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", rng);
         Assert.Equal(expected, result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Kangaroo()
     {
@@ -107,7 +107,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Kangaroo", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Lizard()
     {
@@ -119,7 +119,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Lizard", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Gazelle()
     {
@@ -131,7 +131,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Gazelle", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Rabbit()
     {
@@ -143,19 +143,19 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Rabbit", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Goat()
     {
         var genome = CreateGenomeRef((ref Genome g) => {
             g.ColdAdaptation = EvolutionConfig.Data.Herbivore.GoatColdAdaptation + 0.1f;
             g.Size = EvolutionConfig.Data.Herbivore.GoatSize - 0.1f;
-            g.Speed = EvolutionConfig.Data.Herbivore.RabbitSpeed - 0.1f; // Prevent Rabbit
+            g.Speed = EvolutionConfig.Data.Herbivore.RabbitSpeed - 0.1f; // Prevent Rabbit 
         });
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Goat", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Horse()
     {
@@ -168,7 +168,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Horse", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Deer()
     {
@@ -182,7 +182,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Deer", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_Sheep()
     {
@@ -196,7 +196,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "Bird", new Random(0));
         Assert.Equal("Sheep", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Herbivore_NoEvolution()
     {
@@ -205,13 +205,13 @@ public class EvolutionRulesTests
             g.DesertAdaptation = 0f;
             g.ColdAdaptation = 0f;
             g.ForestAdaptation = 0f;
-            g.Size = (EvolutionConfig.Data.Herbivore.SheepSizeMin + EvolutionConfig.Data.Herbivore.SheepSizeMax) / 2f;
+            g.Size = (EvolutionConfig.Data.Herbivore.SheepSizeMin + EvolutionConfig.Data.Herbivore.SheepSizeMax) / 2f; 
             g.Speed = EvolutionConfig.Data.Herbivore.SheepSpeed + 0.1f; // Too fast for Sheep
         });
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Herbivore, genome, "BaseHerbivore", new Random(0));
         Assert.Equal("BaseHerbivore", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Orca()
     {
@@ -222,7 +222,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Wolf", new Random(0));
         Assert.Equal("Orca", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Seal()
     {
@@ -234,7 +234,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Wolf", new Random(0));
         Assert.Equal("Seal", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_SeaLion()
     {
@@ -246,7 +246,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Wolf", new Random(0));
         Assert.Equal("SeaLion", result);
     }
-
+    
     [Theory]
     [InlineData(0, "Shark")]
     [InlineData(1, "Piranha")]
@@ -259,7 +259,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", rng);
         Assert.Equal(expected, result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Cheetah_Desert()
     {
@@ -270,7 +270,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Cheetah", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Cheetah_Forest()
     {
@@ -282,7 +282,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Cheetah", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Crocodile()
     {
@@ -294,7 +294,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Crocodile", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Lion()
     {
@@ -306,7 +306,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Lion", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Wolf()
     {
@@ -320,7 +320,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Wolf", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Lynx()
     {
@@ -334,7 +334,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Lynx", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Tiger()
     {
@@ -349,7 +349,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Tiger", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Leopard()
     {
@@ -364,7 +364,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Leopard", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_Fox()
     {
@@ -379,7 +379,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "Bird", new Random(0));
         Assert.Equal("Fox", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Carnivore_NoEvolution()
     {
@@ -391,7 +391,7 @@ public class EvolutionRulesTests
             g.Size = EvolutionConfig.Data.Carnivore.FoxSize + 0.05f; // not fox
             g.Speed = EvolutionConfig.Data.Carnivore.LionSpeed - 0.1f; // not cheetah or lion
         });
-
+        
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Carnivore, genome, "BaseCarnivore", new Random(0));
         Assert.Equal("BaseCarnivore", result);
     }
@@ -406,7 +406,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Boar", new Random(0));
         Assert.Equal("Hippopotamus", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Walrus()
     {
@@ -418,7 +418,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Boar", new Random(0));
         Assert.Equal("Walrus", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Otter()
     {
@@ -430,7 +430,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Boar", new Random(0));
         Assert.Equal("Otter", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Jellyfish()
     {
@@ -440,7 +440,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Bird", new Random(0));
         Assert.Equal("Jellyfish", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Frog()
     {
@@ -451,7 +451,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Bird", new Random(0));
         Assert.Equal("Frog", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Bear()
     {
@@ -462,7 +462,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Bird", new Random(0));
         Assert.Equal("Bear", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Boar()
     {
@@ -473,7 +473,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Bird", new Random(0));
         Assert.Equal("Boar", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_Raccoon()
     {
@@ -484,7 +484,7 @@ public class EvolutionRulesTests
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "Bird", new Random(0));
         Assert.Equal("Raccoon", result);
     }
-
+    
     [Fact]
     public void DetermineEvolvedSpecies_Omnivore_NoEvolution()
     {
@@ -493,7 +493,7 @@ public class EvolutionRulesTests
             g.ForestAdaptation = 0f;
             g.Size = float.NaN; // The only way to not match Bear, Boar, or Raccoon sizes!
         });
-
+        
         string result = EvolutionRules.DetermineEvolvedSpecies(CreatureType.Omnivore, genome, "BaseOmnivore", new Random(0));
         Assert.Equal("BaseOmnivore", result);
     }

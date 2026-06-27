@@ -34,32 +34,23 @@ public sealed class EcosystemMetrics
     public Dictionary<string, float> SpeciesFirstAppearance { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, int> SpeciesMaxPopulation { get; } = new(StringComparer.Ordinal);
 
-    private int _totalBirths;
-    private int _totalDeaths;
-    private int _starvationDeaths;
-    private int _oldAgeDeaths;
-    private int _predationDeaths;
-    private int _combatDeaths;
-
     public void RecordBirth()
     {
-        _totalBirths++;
-        TotalBirths = _totalBirths;
+        TotalBirths++;
     }
 
     public void RecordDeath(string species, DeathCause cause)
     {
-        _totalDeaths++;
-        TotalDeaths = _totalDeaths;
+        TotalDeaths++;
         LastDeathCause = cause;
         LastDeathSpecies = species;
 
         switch (cause)
         {
-            case DeathCause.Starvation: _starvationDeaths++; StarvationDeaths = _starvationDeaths; break;
-            case DeathCause.OldAge: _oldAgeDeaths++; OldAgeDeaths = _oldAgeDeaths; break;
-            case DeathCause.Predation: _predationDeaths++; PredationDeaths = _predationDeaths; break;
-            case DeathCause.Combat: _combatDeaths++; CombatDeaths = _combatDeaths; break;
+            case DeathCause.Starvation: StarvationDeaths++; break;
+            case DeathCause.OldAge: OldAgeDeaths++; break;
+            case DeathCause.Predation: PredationDeaths++; break;
+            case DeathCause.Combat: CombatDeaths++; break;
         }
     }
 
@@ -124,12 +115,6 @@ public sealed class EcosystemMetrics
 
     public void ResetCounters()
     {
-        _totalBirths = 0;
-        _totalDeaths = 0;
-        _starvationDeaths = 0;
-        _oldAgeDeaths = 0;
-        _predationDeaths = 0;
-        _combatDeaths = 0;
         TotalBirths = 0;
         TotalDeaths = 0;
         StarvationDeaths = 0;

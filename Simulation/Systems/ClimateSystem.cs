@@ -60,6 +60,13 @@ public sealed class ClimateSystem
 
     public void Update(float totalTime, Random rng)
     {
+        UpdateOrbitalMechanics(totalTime);
+        UpdateWind(rng);
+        UpdateExtremeEvents(totalTime, rng);
+    }
+
+    private void UpdateOrbitalMechanics(float totalTime)
+    {
         OrbitalAngle = totalTime / OrbitalPeriod * MathF.PI * 2 % (MathF.PI * 2);
         float cosTheta = MathF.Cos(OrbitalAngle);
         float semiLatus = OrbitalAU * (1f - Eccentricity * Eccentricity);
@@ -91,10 +98,16 @@ public sealed class ClimateSystem
         float orbitalBoost = TemperatureModifier * ClimateConfig.Data.Orbital.OrbitalBoostRatio;
         GrassRegenModifier += orbitalBoost;
         EnergyModifier -= orbitalBoost * 0.5f;
+    }
 
+    private void UpdateWind(Random rng)
+    {
         WindDirection = (WindDirection + ClimateConfig.Data.Wind.DirectionChangeRate * (float)rng.NextDouble()) % (MathF.PI * 2);
         WindSpeed = ClimateConfig.Data.Wind.BaseSpeed + (float)rng.NextDouble() * ClimateConfig.Data.Wind.SpeedChangeRate + Math.Abs(TemperatureModifier) * 2f;
+    }
 
+    private void UpdateExtremeEvents(float totalTime, Random rng)
+    {
         if (_extremeEventTimer > 0)
         {
             _extremeEventTimer -= 1f / 60f;
