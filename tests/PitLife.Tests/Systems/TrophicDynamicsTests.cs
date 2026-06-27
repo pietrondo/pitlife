@@ -197,7 +197,7 @@ public class TrophicDynamicsTests
         SetCount(eco, "PopulationPressure", 1);
         
         float energyBefore = herbivore.Energy;
-        herbivore.ApplyClimateAndPopulationPressure(eco);
+        float tempEnergy = herbivore.Energy; herbivore.EnvironmentState.ApplyClimateAndPopulationPressure(ref tempEnergy, herbivore.EnergyConsumption, herbivore.CreatureType, herbivore.Position, eco); herbivore.Energy = tempEnergy;
         float energyAfter = herbivore.Energy;
         
         Assert.True(energyBefore > energyAfter);
@@ -208,7 +208,7 @@ public class TrophicDynamicsTests
 
         var herbivoreBalanced = CreateHerbivore();
         herbivoreBalanced.Energy = 100f;
-        herbivoreBalanced.ApplyClimateAndPopulationPressure(ecoBalanced);
+        float tempEnergyBalanced = herbivoreBalanced.Energy; herbivoreBalanced.EnvironmentState.ApplyClimateAndPopulationPressure(ref tempEnergyBalanced, herbivoreBalanced.EnergyConsumption, herbivoreBalanced.CreatureType, herbivoreBalanced.Position, ecoBalanced); herbivoreBalanced.Energy = tempEnergyBalanced;
         float energyAfterBalanced = herbivoreBalanced.Energy;
 
         float dropPressure = energyBefore - energyAfter;
