@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using PitLife.Core;
@@ -409,9 +410,17 @@ public class Ecosystem
                 return;
         }
 
-        var sameSpeciesNearby = FindNeighbors(plant, 80f, c => c is Plant p && p.Species == plant.Species);
-        if (sameSpeciesNearby.Count >= 4)
-            return;
+        var buffer = System.Buffers.ArrayPool<Creature>.Shared.Rent(16);
+        try
+        {
+            int count = FindNeighbors(plant, 80f, ref buffer, c => c is Plant p && p.Species == plant.Species);
+            if (count >= 4)
+                return;
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<Creature>.Shared.Return(buffer, clearArray: true);
+        }
 
         Genome childGenome = Genome.Reproduce(plant.Genome, plant.Genome, Random);
         var child = new Plant(newPos, childGenome, plant.Species);
@@ -436,6 +445,63 @@ public class Ecosystem
     private T? FindNearest<T>(Creature seeker) where T : Creature
     {
         return _spatialGrid.FindNearest(seeker, c => c is T) as T;
+    }
+
+private Dictionary<(int X, int Y), HashSet<Creature>>? _cachedBuckets;
+    private int _cachedCellSize;
+    private int _cachedColumns;
+    private int _cachedRows;
+
+    private void EnsureGridCached()
+    {
+        if (_cachedBuckets == null)
+        {
+            _cachedBuckets = (Dictionary<(int X, int Y), HashSet<Creature>>?)typeof(SpatialGrid).GetField("_buckets", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(_spatialGrid);
+            _cachedCellSize = (int)(typeof(SpatialGrid).GetField("_cellSize", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(_spatialGrid) ?? 1);
+            _cachedColumns = (int)(typeof(SpatialGrid).GetField("_columns", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(_spatialGrid) ?? 1);
+            _cachedRows = (int)(typeof(SpatialGrid).GetField("_rows", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(_spatialGrid) ?? 1);
+        }
+    }
+
+    public int FindNeighbors(Creature seeker, float radius, ref Creature[] results, Func<Creature, bool> predicate)
+    {
+        EnsureGridCached();
+        int count = 0;
+        float radiusSquared = radius * radius;
+        var position = seeker.Position;
+
+        int minCellX = Math.Clamp((int)((position.X - radius) / _cachedCellSize), 0, _cachedColumns - 1);
+        int maxCellX = Math.Clamp((int)((position.X + radius) / _cachedCellSize), 0, _cachedColumns - 1);
+        int minCellY = Math.Clamp((int)((position.Y - radius) / _cachedCellSize), 0, _cachedRows - 1);
+        int maxCellY = Math.Clamp((int)((position.Y + radius) / _cachedCellSize), 0, _cachedRows - 1);
+
+        for (int y = minCellY; y <= maxCellY; y++)
+        {
+            for (int x = minCellX; x <= maxCellX; x++)
+            {
+                if (_cachedBuckets == null || !_cachedBuckets.TryGetValue((x, y), out var bucket))
+                    continue;
+
+                foreach (var candidate in bucket)
+                {
+                    if (candidate == seeker || !candidate.IsAlive || !predicate(candidate))
+                        continue;
+
+                    if (Vector2.DistanceSquared(position, candidate.Position) <= radiusSquared)
+                    {
+                        if (count == results.Length)
+                        {
+                            var newResults = System.Buffers.ArrayPool<Creature>.Shared.Rent(results.Length * 2);
+                            Array.Copy(results, newResults, count);
+                            System.Buffers.ArrayPool<Creature>.Shared.Return(results, clearArray: true);
+                            results = newResults;
+                        }
+                        results[count++] = candidate;
+                    }
+                }
+            }
+        }
+        return count;
     }
 
     public List<Creature> FindNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)

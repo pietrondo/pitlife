@@ -49,15 +49,20 @@ public sealed class FlowSimulation :  IDisposable
         _timeAccum = 0f;
 
         int w = _world.Width, h = _world.Height;
-        var nw = new float[w, h];
-        var nl = new float[w, h];
+        var nw = System.Buffers.ArrayPool<float>.Shared.Rent(w * h);
+        var nl = System.Buffers.ArrayPool<float>.Shared.Rent(w * h);
+        try
+        {
+            Array.Clear(nw, 0, w * h);
+            Array.Clear(nl, 0, w * h);
 
         for (int y = 2; y < h - 2; y += 2)
             for (int x = 2; x < w - 2; x += 2)
             {
                 float myElev = _world.ElevationField[y * w + x];
                 float w0 = _water[x, y], l0 = _lava[x, y];
-                nw[x, y] = w0; nl[x, y] = l0;
+                int idx = y * w + x;
+                nw[idx] = w0; nl[idx] = l0;
                 Vector2 bestDir = Vector2.Zero;
                 float bestDiff = 0;
 
@@ -71,24 +76,39 @@ public sealed class FlowSimulation :  IDisposable
                         if (diff > bestDiff) { bestDiff = diff; bestDir = new Vector2(dx, dy); }
                         float rate = diff * 0.1f;
                         float wf = Math.Min(w0 * rate, w0 * 0.25f);
-                        nw[x, y] -= wf; nw[x + dx, y + dy] += wf;
+                        nw[idx] -= wf; nw[(y + dy) * w + (x + dx)] += wf;
                         float lf = Math.Min(l0 * rate * 0.3f, l0 * 0.1f);
-                        nl[x, y] -= lf; nl[x + dx, y + dy] += lf;
+                        nl[idx] -= lf; nl[(y + dy) * w + (x + dx)] += lf;
                     }
 
                 _flowDir[x, y] = bestDir;
 
                 float temp = TileTemperature(x, y, _world.Tiles[x, y].Biome);
-                nw[x, y] = Math.Max(0, nw[x, y] - w0 * 0.01f * (1f + temp / 40f));
+                nw[idx] = Math.Max(0, nw[idx] - w0 * 0.01f * (1f + temp / 40f));
 
                 if (_world.Tiles[x, y].Biome == BiomeType.Volcano)
-                    nl[x, y] = Math.Min(1f, nl[x, y] + 0.1f);
+                    nl[idx] = Math.Min(1f, nl[idx] + 0.1f);
                 if (_world.RiverMask[y * w + x])
-                    nw[x, y] = Math.Min(1f, nw[x, y] + 0.05f);
+                    nw[idx] = Math.Min(1f, nw[idx] + 0.05f);
             }
 
-        _water = nw; _lava = nl;
-        _dirty = true;
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    int idx = y * w + x;
+                    _water[x, y] = nw[idx];
+                    _lava[x, y] = nl[idx];
+                }
+            }
+
+            _dirty = true;
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<float>.Shared.Return(nw);
+            System.Buffers.ArrayPool<float>.Shared.Return(nl);
+        }
     }
 
     private static float TileTemperature(int x, int y, BiomeType biome)

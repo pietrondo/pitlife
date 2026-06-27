@@ -6,6 +6,8 @@ namespace PitLife.Simulation;
 
 internal sealed class SocialModule : IBehaviorModule
 {
+    [ThreadStatic] private static Creature? ts_self;
+
     public bool Update(Creature self, World world, Ecosystem ecosystem, float dt)
     {
         return ApplySocialBehavior(self, ecosystem, dt, world);
@@ -13,20 +15,29 @@ internal sealed class SocialModule : IBehaviorModule
 
     public void DefendInfants(Creature self, Ecosystem ecosystem, float dt)
     {
-        var infants = ecosystem.FindNeighbors(self, 40f,
-            c => c.IsBaby && c.Parent == self && c.IsAlive);
-        if (infants.Count == 0) return;
-
-        var infant = infants[0];
-        var predator = ecosystem.FindNearestPredator(infant);
-        if (predator == null || infant.DistanceTo(predator) >= 40f) return;
-
-        self.MoveToward(predator.Position, dt, null);
-        if (self.DistanceTo(predator) < 10f)
+        ts_self = self;
+        var buffer = System.Buffers.ArrayPool<Creature>.Shared.Rent(16);
+        try
         {
-            var damage = 15f * dt;
-            predator.Energy -= damage;
-            if (predator.Energy <= 0) predator.Die(DeathCause.Combat);
+            int count = ecosystem.FindNeighbors(self, 40f, ref buffer, IsInfant);
+            if (count == 0) return;
+
+            var infant = buffer[0];
+            var predator = ecosystem.FindNearestPredator(infant);
+            if (predator == null || infant.DistanceTo(predator) >= 40f) return;
+
+            self.MoveToward(predator.Position, dt, null);
+            if (self.DistanceTo(predator) < 10f)
+            {
+                var damage = 15f * dt;
+                predator.Energy -= damage;
+                if (predator.Energy <= 0) predator.Die(DeathCause.Combat);
+            }
+        }
+        finally
+        {
+            ts_self = null;
+            System.Buffers.ArrayPool<Creature>.Shared.Return(buffer, clearArray: true);
         }
     }
 
@@ -50,10 +61,20 @@ internal sealed class SocialModule : IBehaviorModule
             case SocialBehavior.Pack:
                 {
                     var flockMoved = ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.2f, separationWeight: 1.0f, alignmentWeight: 1.5f, separationDist: 25f);
-                    var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, n => n.Species == self.Species);
-                    if (neighbors.Count > 0)
+                    ts_self = self;
+                    var packBuffer = System.Buffers.ArrayPool<Creature>.Shared.Rent(16);
+                    try
                     {
-                        self.Energy = Math.Min(self.MaxEnergy, self.Energy + 5f * dt);
+                        int packCount = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, ref packBuffer, IsSameSpecies);
+                        if (packCount > 0)
+                        {
+                            self.Energy = Math.Min(self.MaxEnergy, self.Energy + 5f * dt);
+                        }
+                    }
+                    finally
+                    {
+                        ts_self = null;
+                        System.Buffers.ArrayPool<Creature>.Shared.Return(packBuffer, clearArray: true);
                     }
                     return flockMoved;
                 }
@@ -86,63 +107,35 @@ internal sealed class SocialModule : IBehaviorModule
         float radius = -1f)
     {
         float actualRadius = radius < 0f ? self.VisionPixels : radius;
-        var neighbors = ecosystem.FindNeighbors(self, actualRadius, n => n.Species == self.Species);
-        if (neighbors.Count == 0)
-            return false;
-
-        Vector2 cohesionForce = Vector2.Zero;
-        Vector2 separationForce = Vector2.Zero;
-        Vector2 alignmentForce = Vector2.Zero;
-
-        Vector2 avgPosition = Vector2.Zero;
-        Vector2 avgFacing = Vector2.Zero;
-        var separationCount = 0;
-
-        foreach (var neighbor in neighbors)
+        ts_self = self;
+        var buffer = System.Buffers.ArrayPool<Creature>.Shared.Rent(64);
+        try
         {
-            avgPosition += neighbor.Position;
-            avgFacing += neighbor.Facing;
+            int count = ecosystem.FindNeighbors(self, actualRadius, ref buffer, IsSameSpecies);
+            if (count == 0)
+                return false;
 
-            var dist = Vector2.Distance(self.Position, neighbor.Position);
-            if (dist > 0 && dist < separationDist)
+            var (cohesionForce, separationForce, alignmentForce) = CalculateFlockingForces(self, buffer, count, separationDist);
+
+            Vector2 steerDir = cohesionForce * cohesionWeight +
+                               separationForce * separationWeight +
+                               alignmentForce * alignmentWeight;
+
+            if (steerDir.LengthSquared() > 0.001f)
             {
-                Vector2 diff = self.Position - neighbor.Position;
-                diff /= dist;
-                diff /= dist;
-                separationForce += diff;
-                separationCount++;
+                steerDir = Vector2.Normalize(steerDir);
+                Vector2 target = self.Position + steerDir * 100f;
+                self.MoveToward(target, dt, world);
+                return true;
             }
+
+            return false;
         }
-
-        avgPosition /= neighbors.Count;
-        cohesionForce = avgPosition - self.Position;
-        if (cohesionForce.LengthSquared() > 0.001f)
-            cohesionForce = Vector2.Normalize(cohesionForce);
-
-        if (separationCount > 0)
+        finally
         {
-            separationForce /= separationCount;
-            if (separationForce.LengthSquared() > 0.001f)
-                separationForce = Vector2.Normalize(separationForce);
+            ts_self = null;
+            System.Buffers.ArrayPool<Creature>.Shared.Return(buffer, clearArray: true);
         }
-
-        avgFacing /= neighbors.Count;
-        if (avgFacing.LengthSquared() > 0.001f)
-            alignmentForce = Vector2.Normalize(avgFacing);
-
-        Vector2 steerDir = cohesionForce * cohesionWeight +
-                           separationForce * separationWeight +
-                           alignmentForce * alignmentWeight;
-
-        if (steerDir.LengthSquared() > 0.001f)
-        {
-            steerDir = Vector2.Normalize(steerDir);
-            Vector2 target = self.Position + steerDir * 100f;
-            self.MoveToward(target, dt, world);
-            return true;
-        }
-
-        return false;
     }
 
     private static bool ApplyPairBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
@@ -204,5 +197,55 @@ internal sealed class SocialModule : IBehaviorModule
             }
         }
         return true;
+    }
+
+    private static bool IsInfant(Creature c) => c.IsBaby && ts_self != null && c.Parent == ts_self && c.IsAlive;
+    private static bool IsSameSpecies(Creature c) => ts_self != null && c.Species == ts_self.Species;
+
+    private static (Vector2 cohesion, Vector2 separation, Vector2 alignment) CalculateFlockingForces(
+        Creature self, Creature[] neighbors, int count, float separationDist)
+    {
+        Vector2 cohesionForce = Vector2.Zero;
+        Vector2 separationForce = Vector2.Zero;
+        Vector2 alignmentForce = Vector2.Zero;
+
+        Vector2 avgPosition = Vector2.Zero;
+        Vector2 avgFacing = Vector2.Zero;
+        var separationCount = 0;
+
+        for (int i = 0; i < count; i++)
+        {
+            var neighbor = neighbors[i];
+            avgPosition += neighbor.Position;
+            avgFacing += neighbor.Facing;
+
+            var dist = Vector2.Distance(self.Position, neighbor.Position);
+            if (dist > 0 && dist < separationDist)
+            {
+                Vector2 diff = self.Position - neighbor.Position;
+                diff /= dist;
+                diff /= dist;
+                separationForce += diff;
+                separationCount++;
+            }
+        }
+
+        avgPosition /= count;
+        cohesionForce = avgPosition - self.Position;
+        if (cohesionForce.LengthSquared() > 0.001f)
+            cohesionForce = Vector2.Normalize(cohesionForce);
+
+        if (separationCount > 0)
+        {
+            separationForce /= separationCount;
+            if (separationForce.LengthSquared() > 0.001f)
+                separationForce = Vector2.Normalize(separationForce);
+        }
+
+        avgFacing /= count;
+        if (avgFacing.LengthSquared() > 0.001f)
+            alignmentForce = Vector2.Normalize(avgFacing);
+
+        return (cohesionForce, separationForce, alignmentForce);
     }
 }
