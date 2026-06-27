@@ -1,8 +1,5 @@
-using System;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests.Behaviors;
 
@@ -85,7 +82,7 @@ public class FeedingModuleTests
         eco.World.Tiles[tx, ty] = tile;
 
         var module = new FeedingModule();
-        bool acted = module.Update(herb, eco.World, eco, 0.1f);
+        var acted = module.Update(herb, eco.World, eco, 0.1f);
 
         Assert.False(acted);
     }
@@ -98,7 +95,7 @@ public class FeedingModuleTests
         carn.Energy = carn.MaxEnergy * 0.85f; // Threshold is 0.8f for carnivores
 
         var module = new FeedingModule();
-        bool acted = module.Update(carn, eco.World, eco, 0.1f);
+        var acted = module.Update(carn, eco.World, eco, 0.1f);
 
         Assert.False(acted);
     }
@@ -118,8 +115,8 @@ public class FeedingModuleTests
         countField?.SetValue(eco.Fruits, 1);
 
         var module = new FeedingModule();
-        float energyBefore = herb.Energy;
-        bool acted = module.Update(herb, eco.World, eco, 0.1f);
+        var energyBefore = herb.Energy;
+        var acted = module.Update(herb, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(herb.Energy > energyBefore);
@@ -147,8 +144,8 @@ public class FeedingModuleTests
         countField?.SetValue(eco.Fruits, 1);
 
         var module = new FeedingModule();
-        float energyBefore = toxicHerb.Energy;
-        bool acted = module.Update(toxicHerb, eco.World, eco, 0.1f);
+        var energyBefore = toxicHerb.Energy;
+        var acted = module.Update(toxicHerb, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(toxicHerb.Energy < energyBefore); // Toxic damage
@@ -164,10 +161,10 @@ public class FeedingModuleTests
         var plant = CreatePlant(new Vector2(10, 10), eco, 100f);
 
         var module = new FeedingModule();
-        float herbEnergyBefore = herb.Energy;
-        float plantEnergyBefore = plant.Energy;
+        var herbEnergyBefore = herb.Energy;
+        var plantEnergyBefore = plant.Energy;
 
-        bool acted = module.Update(herb, eco.World, eco, 0.1f);
+        var acted = module.Update(herb, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(herb.Energy > herbEnergyBefore);
@@ -186,7 +183,7 @@ public class FeedingModuleTests
         var module = new FeedingModule();
         var posBefore = herb.Position;
 
-        bool acted = module.Update(herb, eco.World, eco, 0.1f);
+        var acted = module.Update(herb, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.NotEqual(posBefore, herb.Position);
@@ -203,10 +200,10 @@ public class FeedingModuleTests
         prey.Energy = 100f; // Ensure prey doesn't instantly die from low energy
 
         var module = new FeedingModule();
-        float preyEnergyBefore = prey.Energy;
-        float carnEnergyBefore = carn.Energy;
+        var preyEnergyBefore = prey.Energy;
+        var carnEnergyBefore = carn.Energy;
 
-        bool acted = module.Update(carn, eco.World, eco, 0.1f);
+        var acted = module.Update(carn, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(prey.Energy < preyEnergyBefore);
@@ -240,7 +237,7 @@ public class FeedingModuleTests
         var module = new FeedingModule();
 
         // Attack weak prey
-        float weakPreyEnergyBefore = weakPrey.Energy;
+        var weakPreyEnergyBefore = weakPrey.Energy;
 
         // Set attack damage manually by extracting attack preys and calculating difference,
         // Or we can just run the module and use reflection if necessary, but module.Update does the attack
@@ -250,28 +247,17 @@ public class FeedingModuleTests
         eco.AddCreature(weakPrey);
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
         module.Update(carn, eco.World, eco, 0.1f);
-        float damageToWeak = weakPreyEnergyBefore - weakPrey.Energy;
+        var damageToWeak = weakPreyEnergyBefore - weakPrey.Energy;
 
         // Clear grid and set up new state to attack strong prey
         eco.Creatures.Remove(weakPrey);
-        var field = eco.GetType().GetField("_spatialGrid", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var grid = (SpatialGrid)field?.GetValue(eco)!;
-
-        var bucketsField = grid.GetType().GetField("_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var locationsField = grid.GetType().GetField("_locations", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        var buckets = bucketsField?.GetValue(grid);
-        buckets?.GetType().GetMethod("Clear")?.Invoke(buckets, null);
-
-        var locations = locationsField?.GetValue(grid);
-        locations?.GetType().GetMethod("Clear")?.Invoke(locations, null);
-        grid.Update(carn);
+        eco.Spatial.Rebuild(eco.Creatures);
 
         eco.AddCreature(strongPrey);
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
-        float strongPreyEnergyBefore = strongPrey.Energy;
+        var strongPreyEnergyBefore = strongPrey.Energy;
         module.Update(carn, eco.World, eco, 0.1f);
-        float damageToStrong = strongPreyEnergyBefore - strongPrey.Energy;
+        var damageToStrong = strongPreyEnergyBefore - strongPrey.Energy;
 
         Assert.True(damageToWeak > damageToStrong);
     }
@@ -288,9 +274,9 @@ public class FeedingModuleTests
         var plant = CreatePlant(new Vector2(10, 10), eco, 100f);
 
         var module = new FeedingModule();
-        float herbEnergyBefore = herb.Energy;
+        var herbEnergyBefore = herb.Energy;
 
-        bool acted = module.Update(herb, eco.World, eco, 0.1f);
+        var acted = module.Update(herb, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(herb.Energy > herbEnergyBefore); // Still feeds successfully
@@ -308,9 +294,9 @@ public class FeedingModuleTests
         prey.Toxicity = 1.0f; // Toxic prey
 
         var module = new FeedingModule();
-        float carnEnergyBefore = carn.Energy;
+        var carnEnergyBefore = carn.Energy;
 
-        bool acted = module.Update(carn, eco.World, eco, 0.1f);
+        var acted = module.Update(carn, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         // Energy gain is reduced due to toxicity
@@ -327,10 +313,10 @@ public class FeedingModuleTests
         var plant = CreatePlant(new Vector2(10, 10), eco, 100f);
 
         var module = new FeedingModule();
-        float omnEnergyBefore = omn.Energy;
-        float plantEnergyBefore = plant.Energy;
+        var omnEnergyBefore = omn.Energy;
+        var plantEnergyBefore = plant.Energy;
 
-        bool acted = module.Update(omn, eco.World, eco, 0.1f);
+        var acted = module.Update(omn, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(omn.Energy > omnEnergyBefore);
@@ -350,9 +336,9 @@ public class FeedingModuleTests
         typeof(Creature).GetProperty("IsAlive")?.SetValue(carcass, false);
 
         var module = new FeedingModule();
-        float carnEnergyBefore = carn.Energy;
+        var carnEnergyBefore = carn.Energy;
 
-        bool acted = module.Update(carn, eco.World, eco, 0.1f);
+        var acted = module.Update(carn, eco.World, eco, 0.1f);
 
         Assert.True(acted);
         Assert.True(carn.Energy > carnEnergyBefore);
@@ -370,9 +356,9 @@ public class FeedingModuleTests
 
         // Use TryGraze directly (it's internal static, we need to access via reflection or Update)
         var module = new FeedingModule();
-        float herbEnergyBefore = herb.Energy;
+        var herbEnergyBefore = herb.Energy;
 
-        bool acted = module.Update(herb, eco.World, eco, 0.1f);
+        var acted = module.Update(herb, eco.World, eco, 0.1f);
 
         // Herbivore feeds from grass if no plant/fruit found
         Assert.True(acted);

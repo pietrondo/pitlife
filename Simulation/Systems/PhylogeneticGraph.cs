@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-public sealed class PhylogeneticGraph
+public sealed class PhylogeneticGraph : ISimulationSystem
 {
+    public UpdatePhase Phase => UpdatePhase.LateUpdate;
     private readonly Dictionary<string, PhylogeneticNode> _nodes = new(StringComparer.Ordinal);
     public IReadOnlyDictionary<string, PhylogeneticNode> Nodes => _nodes;
 
@@ -37,7 +38,7 @@ public sealed class PhylogeneticGraph
         {
             foreach (var req in node.MinimumGenomeThresholds)
             {
-                float value = req.Trait switch
+                var value = req.Trait switch
                 {
                     GenomeTrait.Speed => genome.Speed,
                     GenomeTrait.Size => genome.Size,
@@ -116,6 +117,10 @@ public sealed class PhylogeneticGraph
 
         return errors;
     }
+
+    public void Initialize(World world) { }
+    public void Tick(Ecosystem eco, GameTime gameTime) { }
+    public void Reset() { }
 }
 
 public sealed class PhylogeneticNode

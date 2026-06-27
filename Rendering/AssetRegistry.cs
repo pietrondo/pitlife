@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using PitLife.Simulation;
 
 namespace PitLife.Rendering;
@@ -200,7 +199,7 @@ public static class AssetRegistry
     {
         lock (SpeciesTextureSync)
         {
-            int index = SpeciesTextureEntries.FindIndex(asset => asset.Species == species);
+            var index = SpeciesTextureEntries.FindIndex(asset => asset.Species == species);
             if (index < 0)
                 return false;
             SpeciesTextureEntries.RemoveAt(index);

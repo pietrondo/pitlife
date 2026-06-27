@@ -66,7 +66,7 @@ public class PopulationGeneticsTests
         firstChild.GrowFor(60f);
         secondChild.GrowFor(60f);
         firstChild.Energy = secondChild.Energy = 1000f;
-        float unrelatedMaxEnergy = 50f * firstChild.Genome.Size;
+        var unrelatedMaxEnergy = 50f * firstChild.Genome.Size;
 
         TestCreature inbredChild = Assert.IsType<TestCreature>(
             firstChild.ReproduceWith(secondChild, new Random(5)));

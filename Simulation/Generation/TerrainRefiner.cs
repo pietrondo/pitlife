@@ -20,17 +20,17 @@ internal sealed class TerrainRefiner
 
         Parallel.For(0, h, y =>
         {
-            for (int x = 0; x < w; x++)
+            for (var x = 0; x < w; x++)
                 tmp[x, y] = _world.Tiles[x, y].Biome;
         });
 
         Parallel.For(1, h - 1, y =>
         {
-            for (int x = 1; x < w - 1; x++)
+            for (var x = 1; x < w - 1; x++)
             {
                 var b = _world.Tiles[x, y].Biome;
                 if (b == BiomeType.DeepOcean || b == BiomeType.ShallowWater) continue;
-                int matches = 0;
+                var matches = 0;
                 if (_world.Tiles[x - 1, y].Biome == b) matches++;
                 if (_world.Tiles[x + 1, y].Biome == b) matches++;
                 if (_world.Tiles[x, y - 1].Biome == b) matches++;
@@ -41,7 +41,7 @@ internal sealed class TerrainRefiner
 
         Parallel.For(1, h - 1, y =>
         {
-            for (int x = 1; x < w - 1; x++)
+            for (var x = 1; x < w - 1; x++)
                 _world.Tiles[x, y].Biome = tmp[x, y];
         });
     }
@@ -50,11 +50,11 @@ internal sealed class TerrainRefiner
     {
         Span<BiomeType> nb = [_world.Tiles[x - 1, y].Biome, _world.Tiles[x + 1, y].Biome,
                              _world.Tiles[x, y - 1].Biome, _world.Tiles[x, y + 1].Biome];
-        int bestCount = 0;
+        var bestCount = 0;
         BiomeType best = _world.Tiles[x, y].Biome;
         foreach (var b in nb)
         {
-            int c = 0;
+            var c = 0;
             foreach (var n in nb) if (n == b) c++;
             if (c > bestCount) { bestCount = c; best = b; }
         }
@@ -66,8 +66,8 @@ internal sealed class TerrainRefiner
         int w = _world.Width, h = _world.Height;
         Parallel.For(0, h, y =>
         {
-            int iLeft = y * w + 0;
-            int iRight = y * w + (w - 1);
+            var iLeft = y * w + 0;
+            var iRight = y * w + (w - 1);
             _world.Tiles[w - 1, y] = _world.Tiles[0, y];
             _world.ElevationField[iRight] = _world.ElevationField[iLeft];
             _world.ContinentMask[iRight] = _world.ContinentMask[iLeft];
@@ -75,8 +75,8 @@ internal sealed class TerrainRefiner
         });
         Parallel.For(0, w, x =>
         {
-            int iTop = 0 * w + x;
-            int iBot = (h - 1) * w + x;
+            var iTop = 0 * w + x;
+            var iBot = (h - 1) * w + x;
             _world.Tiles[x, h - 1] = _world.Tiles[x, 0];
             _world.ElevationField[iBot] = _world.ElevationField[iTop];
             _world.ContinentMask[iBot] = _world.ContinentMask[iTop];
@@ -96,17 +96,17 @@ internal sealed class TerrainRefiner
         };
 
         var present = new HashSet<BiomeType>();
-        for (int y = 0; y < _world.Height; y++)
-            for (int x = 0; x < _world.Width; x++)
+        for (var y = 0; y < _world.Height; y++)
+            for (var x = 0; x < _world.Width; x++)
                 present.Add(_world.Tiles[x, y].Biome);
 
         if (!present.Contains(BiomeType.Grassland))
         {
-            bool placed = false;
-            for (int y = 0; y < _world.Height && !placed; y++)
-                for (int x = 0; x < _world.Width && !placed; x++)
+            var placed = false;
+            for (var y = 0; y < _world.Height && !placed; y++)
+                for (var x = 0; x < _world.Width && !placed; x++)
                 {
-                    int i = y * _world.Width + x;
+                    var i = y * _world.Width + x;
                     if (_world.RiverMask[i]) continue;
                     var b = _world.Tiles[x, y].Biome;
                     if (b == BiomeType.DeepOcean || b == BiomeType.ShallowWater) continue;
@@ -115,8 +115,8 @@ internal sealed class TerrainRefiner
                     placed = true;
                 }
             if (!placed)
-                for (int y = 0; y < _world.Height && !placed; y++)
-                    for (int x = 0; x < _world.Width && !placed; x++)
+                for (var y = 0; y < _world.Height && !placed; y++)
+                    for (var x = 0; x < _world.Width && !placed; x++)
                     {
                         if (_world.RiverMask[y * _world.Width + x]) continue;
                         _world.Tiles[x, y] = new Tile(BiomeType.Grassland);
@@ -128,11 +128,11 @@ internal sealed class TerrainRefiner
         foreach (var biome in allFifteen)
         {
             if (present.Contains(biome)) continue;
-            for (int y = 0; y < _world.Height && !present.Contains(biome); y++)
+            for (var y = 0; y < _world.Height && !present.Contains(biome); y++)
             {
-                for (int x = 0; x < _world.Width && !present.Contains(biome); x++)
+                for (var x = 0; x < _world.Width && !present.Contains(biome); x++)
                 {
-                    int i = y * _world.Width + x;
+                    var i = y * _world.Width + x;
                     if (_world.RiverMask[i]) continue;
                     if (_world.Tiles[x, y].Biome != BiomeType.Grassland) continue;
                     _world.Tiles[x, y] = new Tile(biome);

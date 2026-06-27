@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -93,10 +92,10 @@ public class PopulationEcologyTests
         ecosystem.Initialize(1, 1, 0, 2);
         ecosystem.UpdateStats();
 
-        int initialSpecies = ecosystem.Metrics.SpeciesCount;
+        var initialSpecies = ecosystem.Metrics.SpeciesCount;
         Assert.True(initialSpecies > 0);
 
-        for (int i = 0; i < 300; i++)
+        for (var i = 0; i < 300; i++)
         {
             var gameTime = new GameTime(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
             ecosystem.Tick(gameTime);

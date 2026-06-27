@@ -47,10 +47,10 @@ public static class FoodWeb
 
     public static float EnergyTransferEfficiency(CreatureType from, CreatureType to)
     {
-        int fromLevel = TrophicLevel(from);
-        int toLevel = TrophicLevel(to);
+        var fromLevel = TrophicLevel(from);
+        var toLevel = TrophicLevel(to);
         if (toLevel <= fromLevel) return 0f;
-        int steps = toLevel - fromLevel;
+        var steps = toLevel - fromLevel;
         return steps switch
         {
             1 => 0.15f,
@@ -73,7 +73,7 @@ public static class FoodWeb
     {
         var chain = new List<string> { top.ToString() };
         var current = top;
-        for (int i = 0; i < depth && current != CreatureType.Plant; i++)
+        for (var i = 0; i < depth && current != CreatureType.Plant; i++)
         {
             current = current switch
             {

@@ -1,7 +1,5 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PitLife.UI;
-using Xunit;
 using Xunit.Abstractions;
 using System.Reflection;
 

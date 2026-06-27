@@ -70,7 +70,7 @@ public sealed class SpeciesCatalogRuntime
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(repositoryRoot);
-        string[] builtInKeys = SpeciesRegistry.All
+        var builtInKeys = SpeciesRegistry.All
             .Where(key => !_customKeys.Contains(key))
             .ToArray();
         return SpeciesCatalogValidator.Validate(document, repositoryRoot, builtInKeys);
@@ -106,7 +106,7 @@ public sealed class SpeciesCatalogRuntime
 
     private void Clear(bool notify)
     {
-        foreach (string key in _customKeys)
+        foreach (var key in _customKeys)
         {
             SpeciesRegistry.Unregister(key);
             AssetRegistry.UnregisterCustomSpeciesTexture(key);

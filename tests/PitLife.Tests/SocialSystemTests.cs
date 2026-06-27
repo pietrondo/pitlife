@@ -252,4 +252,3 @@ public class SocialSystemTests
         Assert.True(t2.Energy > 4f, $"t2 Energy: {t2.Energy}");
     }
 }
-

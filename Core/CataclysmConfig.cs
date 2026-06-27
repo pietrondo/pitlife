@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -14,10 +13,10 @@ public static class CataclysmConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "cataclysms.json");
+            var path = Path.Combine("Content", "config", "cataclysms.json");
             if (!File.Exists(path)) return Fallback;
 
-            string json = File.ReadAllText(path);
+            var json = File.ReadAllText(path);
             var doc = JsonSerializer.Deserialize<CataclysmConfigDoc>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,

@@ -23,8 +23,8 @@ public class BehaviorTests
         wolf.Position = startPos + new Vector2(5, 0);
         eco.AddCreature(wolf);
 
-        float energyBefore = herbivore.Energy;
-        for (int i = 0; i < 10; i++)
+        var energyBefore = herbivore.Energy;
+        for (var i = 0; i < 10; i++)
             eco.Tick(new GameTime(System.TimeSpan.FromSeconds(0.1), System.TimeSpan.FromSeconds(0.1)));
 
         Assert.True(herbivore.IsAlive, "Herbivore died during test");
@@ -43,10 +43,10 @@ public class BehaviorTests
         var herbivore = new Herbivore(plant.Position + new Vector2(2, 0),
             Genome.Random(new Random(1)), "Rabbit");
         herbivore.Activity = ActivityPattern.Diurnal;
-        float energyBefore = herbivore.Energy;
+        var energyBefore = herbivore.Energy;
         eco.AddCreature(herbivore);
 
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
             eco.Tick(new GameTime(System.TimeSpan.FromSeconds(0.1), System.TimeSpan.FromSeconds(0.1)));
 
         Assert.True(herbivore.Energy >= energyBefore);
@@ -56,13 +56,13 @@ public class BehaviorTests
     public void PlantBehavior_GrowsWithSunlight()
     {
         var plant = new Plant(new Vector2(32, 32), Genome.Random(new Random(1)), "Clover");
-        float energyBefore = plant.Energy;
+        var energyBefore = plant.Energy;
 
         var eco = new Ecosystem(64, 48, 42);
         eco.Initialize(h: 0, c: 0, o: 0, p: 0);
         eco.AddCreature(plant);
 
-        for (int i = 0; i < 30; i++)
+        for (var i = 0; i < 30; i++)
             eco.Tick(new GameTime(System.TimeSpan.FromSeconds(0.1), System.TimeSpan.FromSeconds(0.1)));
 
         Assert.True(plant.Energy > energyBefore || plant.IsAdult,

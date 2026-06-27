@@ -4,8 +4,9 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class ClimateSystem
+public sealed class ClimateSystem : ISimulationSystem
 {
+    public UpdatePhase Phase => UpdatePhase.EarlyUpdate;
 
     public const float PlanetRadiusKm = 6371f;
     public const float DefaultOrbitalAU = 1f;
@@ -60,12 +61,19 @@ public sealed class ClimateSystem
 
     public void Update(float totalTime, Random rng)
     {
+        UpdateOrbitalMechanics(totalTime);
+        UpdateWind(rng);
+        UpdateExtremeEvents(totalTime, rng);
+    }
+
+    private void UpdateOrbitalMechanics(float totalTime)
+    {
         OrbitalAngle = totalTime / OrbitalPeriod * MathF.PI * 2 % (MathF.PI * 2);
-        float cosTheta = MathF.Cos(OrbitalAngle);
-        float semiLatus = OrbitalAU * (1f - Eccentricity * Eccentricity);
+        var cosTheta = MathF.Cos(OrbitalAngle);
+        var semiLatus = OrbitalAU * (1f - Eccentricity * Eccentricity);
         SunDistanceAU = semiLatus / (1f + Eccentricity * cosTheta);
 
-        float orbitalCircumference = 2f * MathF.PI * OrbitalAU * ClimateConfig.Data.Orbital.KmPerAU;
+        var orbitalCircumference = 2f * MathF.PI * OrbitalAU * ClimateConfig.Data.Orbital.KmPerAU;
         OrbitalSpeedKmS = orbitalCircumference / (ClimateConfig.Data.Orbital.OrbitalPeriod * ClimateConfig.Data.Orbital.KmPerAU) * OrbitalAU;
 
         TemperatureModifier = cosTheta * ClimateConfig.Data.Orbital.TemperatureModifierAmplitude;
@@ -88,13 +96,19 @@ public sealed class ClimateSystem
 
         (GrassRegenModifier, EnergyModifier) = SeasonMods(CurrentSeason);
 
-        float orbitalBoost = TemperatureModifier * ClimateConfig.Data.Orbital.OrbitalBoostRatio;
+        var orbitalBoost = TemperatureModifier * ClimateConfig.Data.Orbital.OrbitalBoostRatio;
         GrassRegenModifier += orbitalBoost;
         EnergyModifier -= orbitalBoost * 0.5f;
+    }
 
+    private void UpdateWind(Random rng)
+    {
         WindDirection = (WindDirection + ClimateConfig.Data.Wind.DirectionChangeRate * (float)rng.NextDouble()) % (MathF.PI * 2);
         WindSpeed = ClimateConfig.Data.Wind.BaseSpeed + (float)rng.NextDouble() * ClimateConfig.Data.Wind.SpeedChangeRate + Math.Abs(TemperatureModifier) * 2f;
+    }
 
+    private void UpdateExtremeEvents(float totalTime, Random rng)
+    {
         if (_extremeEventTimer > 0)
         {
             _extremeEventTimer -= 1f / 60f;
@@ -137,17 +151,17 @@ public sealed class ClimateSystem
 
     public float GetLatitudeModifier(float tileY, int worldHeight)
     {
-        float normalizedY = tileY / Math.Max(1, worldHeight - 1);
-        float latitude = (normalizedY - 0.5f) * MathF.PI;
-        float flattening = 1.0f / 298.257f;
-        float eccentricLat = MathF.Atan((1.0f - flattening) * MathF.Tan(latitude));
+        var normalizedY = tileY / Math.Max(1, worldHeight - 1);
+        var latitude = (normalizedY - 0.5f) * MathF.PI;
+        var flattening = 1.0f / 298.257f;
+        var eccentricLat = MathF.Atan((1.0f - flattening) * MathF.Tan(latitude));
         return MathF.Cos(eccentricLat);
     }
 
     public Season GetLocalSeason(float tileY, int worldHeight)
     {
-        float normalizedY = tileY / Math.Max(1, worldHeight - 1);
-        bool isSouth = normalizedY > 0.5f;
+        var normalizedY = tileY / Math.Max(1, worldHeight - 1);
+        var isSouth = normalizedY > 0.5f;
         if (!isSouth) return CurrentSeason;
         return CurrentSeason switch
         {
@@ -161,9 +175,9 @@ public sealed class ClimateSystem
 
     public float GetTileTemperature(Tile tile, float tileY, int worldHeight)
     {
-        float latMod = GetLatitudeModifier(tileY, worldHeight);
-        float orbitalEffect = TemperatureModifier * 20f;
-        float latEffect = (latMod - 0.6f) * 25f;
+        var latMod = GetLatitudeModifier(tileY, worldHeight);
+        var orbitalEffect = TemperatureModifier * 20f;
+        var latEffect = (latMod - 0.6f) * 25f;
         return tile.Temperature + orbitalEffect + latEffect;
     }
     private static (float grass, float energy) SeasonMods(Season season)
@@ -176,7 +190,7 @@ public sealed class ClimateSystem
             Season.Winter => (0.3f, 1.2f),
             _ => (1f, 1f)
         };
-        string key = season.ToString().ToLowerInvariant();
+        var key = season.ToString().ToLowerInvariant();
         if (ClimateConfig.Data.Seasons.TryGetValue(key, out var mod))
             return (mod.GrassRegenModifier, mod.EnergyModifier);
         return def;

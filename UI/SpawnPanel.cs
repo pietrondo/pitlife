@@ -130,7 +130,7 @@ public sealed class SpawnPanel
         if (!IsOpen || _speciesButtons.Count == 0) return;
         if (!_panelBounds.Contains(mouse.Position) && !_speciesScrollArea.Contains(mouse.Position))
             return;
-        int delta = mouse.ScrollWheelValue - previousMouse.ScrollWheelValue;
+        var delta = mouse.ScrollWheelValue - previousMouse.ScrollWheelValue;
         if (delta == 0) return;
         ScrollOffset = Math.Clamp(ScrollOffset - delta / 120 * (ButtonHeight + ButtonSpacing),
             0, MaxScroll);
@@ -139,20 +139,20 @@ public sealed class SpawnPanel
 
     private void UpdateLayout()
     {
-        int toggleY = Margin + 10;
+        var toggleY = Margin + 10;
         _toggleBounds = new Rectangle(Margin, toggleY, ToggleButtonSize, ToggleButtonSize);
         if (IsOpen)
         {
-            int panelY = toggleY + ToggleButtonSize + Margin;
+            var panelY = toggleY + ToggleButtonSize + Margin;
             _panelBounds = new Rectangle(Margin, panelY, PanelWidth, ComputePanelHeight());
             LayoutCategoryButtons();
-            int speciesStartY = _panelBounds.Y + HeaderHeight +
+            var speciesStartY = _panelBounds.Y + HeaderHeight +
                 _categoryButtons.Count * (ButtonHeight + ButtonSpacing + SectionSpacing);
-            int maxSpeciesHeight = _viewportHeight - speciesStartY - Margin - 40;
+            var maxSpeciesHeight = _viewportHeight - speciesStartY - Margin - 40;
             if (maxSpeciesHeight < 40) maxSpeciesHeight = 40;
             _speciesScrollArea = new Rectangle(_panelBounds.X + 8, speciesStartY,
                 PanelWidth - 16, maxSpeciesHeight);
-            int searchY = speciesStartY - SearchBoxHeight - 4;
+            var searchY = speciesStartY - SearchBoxHeight - 4;
             if (searchY < _panelBounds.Y + HeaderHeight + 10)
                 searchY = _panelBounds.Y + HeaderHeight + 10;
             _searchInput.Bounds = new Rectangle(_panelBounds.X + 10, searchY,
@@ -207,7 +207,7 @@ public sealed class SpawnPanel
     {
         foreach (var btn in _categoryButtons)
         {
-            bool isSelected = btn.Tag as string == _state.SelectedCategory;
+            var isSelected = btn.Tag as string == _state.SelectedCategory;
             btn.Draw(sb, pixel, font, mouse, isSelected);
         }
     }
@@ -230,7 +230,7 @@ public sealed class SpawnPanel
             {
                 if (sBtn.Bounds.Bottom < _speciesScrollArea.Top || sBtn.Bounds.Top > _speciesScrollArea.Bottom)
                     continue;
-                bool isSel = sBtn.Tag as string == _state.SelectedSpeciesKey;
+                var isSel = sBtn.Tag as string == _state.SelectedSpeciesKey;
                 sBtn.Draw(sb, pixel, font, mouse, isSel);
             }
 
@@ -247,13 +247,13 @@ public sealed class SpawnPanel
     {
         if (_state.SelectedSpeciesKey != null)
         {
-            string selectedName = I18n.Species(_state.SelectedSpeciesKey!);
-            string hint = I18n.T("spawn.selected") + ": " + selectedName;
+            var selectedName = I18n.Species(_state.SelectedSpeciesKey!);
+            var hint = I18n.T("spawn.selected") + ": " + selectedName;
             sb.DrawString(font, hint,
                 new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 36),
                 UiTheme.MossSignal);
 
-            string clickHint = I18n.T("spawn.hint");
+            var clickHint = I18n.T("spawn.hint");
             sb.DrawString(font, clickHint,
                 new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 22),
                 UiTheme.WarmParchment);
@@ -263,20 +263,20 @@ public sealed class SpawnPanel
     private void DrawScrollBar(SpriteBatch sb, Texture2D pixel)
     {
         if (MaxScroll <= 0) return;
-        int barX = _speciesScrollArea.Right - ScrollBarWidth;
-        int barH = _speciesScrollArea.Height;
+        var barX = _speciesScrollArea.Right - ScrollBarWidth;
+        var barH = _speciesScrollArea.Height;
         UiPrimitives.Fill(sb, pixel, new Rectangle(barX, _speciesScrollArea.Y, ScrollBarWidth, barH),
             new Color(20, 20, 20, 180));
-        float thumbRatio = (float)barH / (barH + MaxScroll);
-        int thumbH = Math.Max(16, (int)(barH * thumbRatio));
-        int thumbY = _speciesScrollArea.Y + (int)((float)ScrollOffset / MaxScroll * (barH - thumbH));
+        var thumbRatio = (float)barH / (barH + MaxScroll);
+        var thumbH = Math.Max(16, (int)(barH * thumbRatio));
+        var thumbY = _speciesScrollArea.Y + (int)((float)ScrollOffset / MaxScroll * (barH - thumbH));
         UiPrimitives.Fill(sb, pixel, new Rectangle(barX, thumbY, ScrollBarWidth, thumbH),
             new Color(107, 81, 55, 200));
     }
 
     private void DrawToggleButton(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
     {
-        bool isHover = _toggleBounds.Contains(mouse.Position);
+        var isHover = _toggleBounds.Contains(mouse.Position);
         Color bg = IsOpen ? new Color(78, 156, 181, 230) :
             (isHover ? new Color(11, 23, 18, 240) : new Color(11, 23, 18, 200));
         UiPrimitives.Fill(sb, pixel, _toggleBounds, bg);
@@ -284,7 +284,7 @@ public sealed class SpawnPanel
 
         if (_iconTexture != null)
         {
-            int pad = 6;
+            var pad = 6;
             var iconRect = new Rectangle(_toggleBounds.X + pad, _toggleBounds.Y + pad,
                 _toggleBounds.Width - pad * 2, _toggleBounds.Height - pad * 2);
             sb.Draw(_iconTexture, iconRect, Color.White);
@@ -309,11 +309,11 @@ public sealed class SpawnPanel
 
     private void DrawCataclysmButtons(SpriteBatch sb, Texture2D pixel, SpriteFont font, MouseState mouse)
     {
-        int y = _panelBounds.Y + 34;
+        var y = _panelBounds.Y + 34;
         foreach (var btn in _cataButtons)
         {
             btn.Bounds = new Rectangle(_panelBounds.X + 10, y, PanelWidth - 20, 22);
-            bool sel = SelectedCataclysm == (string)btn.Tag!;
+            var sel = SelectedCataclysm == (string)btn.Tag!;
             btn.Draw(sb, pixel, font, mouse, sel);
             y += 26;
         }
@@ -339,7 +339,7 @@ public sealed class SpawnPanel
     private void RebuildCategoryButtons()
     {
         _categoryButtons.Clear();
-        int y = 0 + HeaderHeight;
+        var y = 0 + HeaderHeight;
         foreach (var category in SpawnPanelState.CategoryOrder)
         {
             _categoryButtons.Add(new UiButton(I18n.T($"spawn.{category.ToLowerInvariant()}"))
@@ -353,7 +353,7 @@ public sealed class SpawnPanel
 
     private void LayoutCategoryButtons()
     {
-        int y = _panelBounds.Y + HeaderHeight;
+        var y = _panelBounds.Y + HeaderHeight;
         foreach (var btn in _categoryButtons)
         {
             btn.Bounds = new Rectangle(_panelBounds.X + 10, y, PanelWidth - 20, ButtonHeight);
@@ -367,12 +367,12 @@ public sealed class SpawnPanel
         if (_state.SelectedCategory == null) return;
         if (!_speciesByCategory.TryGetValue(_state.SelectedCategory, out var species)) return;
 
-        string filter = _searchInput.Text.Trim();
+        var filter = _searchInput.Text.Trim();
         foreach (var s in species)
         {
-            string displayName = I18n.Species(s);
+            var displayName = I18n.Species(s);
             var def = SpeciesRegistry.Get(s);
-            string prefix = "";
+            var prefix = "";
             if (def != null && def.IsAquatic) prefix = "~ ";
             else if (s is "Eagle" or "Owl") prefix = "^ ";
             if (filter.Length > 0 && !displayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
@@ -391,27 +391,27 @@ public sealed class SpawnPanel
     private void LayoutSpeciesButtons()
     {
         if (_speciesButtons.Count == 0) return;
-        int speciesStartY = _panelBounds.Y + HeaderHeight +
+        var speciesStartY = _panelBounds.Y + HeaderHeight +
             _categoryButtons.Count * (ButtonHeight + ButtonSpacing + SectionSpacing);
-        int speciesAreaHeight = _speciesScrollArea.Height;
-        int y = speciesStartY - ScrollOffset;
+        var speciesAreaHeight = _speciesScrollArea.Height;
+        var y = speciesStartY - ScrollOffset;
         foreach (var button in _speciesButtons)
         {
             button.Bounds = new Rectangle(_panelBounds.X + 20, y, PanelWidth - 30 - ScrollBarWidth, ButtonHeight);
             y += ButtonHeight + ButtonSpacing;
         }
-        int totalHeight = _speciesButtons.Count * (ButtonHeight + ButtonSpacing) - ButtonSpacing;
+        var totalHeight = _speciesButtons.Count * (ButtonHeight + ButtonSpacing) - ButtonSpacing;
         MaxScroll = Math.Max(0, totalHeight - speciesAreaHeight);
         ScrollOffset = Math.Clamp(ScrollOffset, 0, MaxScroll);
     }
 
     private int ComputePanelHeight()
     {
-        int h = HeaderHeight + 10;
+        var h = HeaderHeight + 10;
         foreach (var _ in _categoryButtons)
             h += ButtonHeight + ButtonSpacing + SectionSpacing;
         h += SearchBoxHeight + 4;
-        int speciesAreaHeight = 0;
+        var speciesAreaHeight = 0;
         if (SelectedCategory != null && _speciesButtons.Count > 0)
             speciesAreaHeight = Math.Min(_speciesButtons.Count * (ButtonHeight + ButtonSpacing) + 8,
                 _viewportHeight - Margin * 2 - ToggleButtonSize - HeaderHeight - 120);

@@ -11,9 +11,9 @@ public class SpeciesCatalogRuntimeTests
     [Fact]
     public void Apply_UpdatesSimulationAssetsLocalizationAndSpawnCategories()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         var runtime = new SpeciesCatalogRuntime();
-        int changeNotifications = 0;
+        var changeNotifications = 0;
         runtime.CatalogChanged += () => changeNotifications++;
         try
         {
@@ -42,7 +42,7 @@ public class SpeciesCatalogRuntimeTests
     [Fact]
     public void Apply_InvalidCatalogDoesNotMutateRuntime()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         var runtime = new SpeciesCatalogRuntime();
         SpeciesCatalogEntry entry = ValidEntry();
         entry.TexturePath = "missing.png";

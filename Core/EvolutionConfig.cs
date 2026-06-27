@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text.Json;
 
@@ -12,10 +11,10 @@ public static class EvolutionConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "evolution.json");
+            var path = Path.Combine("Content", "config", "evolution.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<EvolutionConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,

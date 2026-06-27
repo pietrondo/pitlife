@@ -1,5 +1,4 @@
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -44,7 +43,7 @@ public class LineageTests
         var parent = LineageRecord.Founder(1);
         var child1 = LineageRecord.CreateAsexualChild(parent).WithIndividualId(2);
         var child2 = LineageRecord.CreateAsexualChild(parent).WithIndividualId(3);
-        float rel = LineageRecord.CalculateRelatedness(child1, child2);
+        var rel = LineageRecord.CalculateRelatedness(child1, child2);
         Assert.True(rel > 0f);
         Assert.True(rel <= 1f);
     }
@@ -54,7 +53,7 @@ public class LineageTests
     {
         var a = LineageRecord.Founder(1).WithIndividualId(1);
         var b = LineageRecord.Founder(2).WithIndividualId(2);
-        float rel = LineageRecord.CalculateRelatedness(a, b);
+        var rel = LineageRecord.CalculateRelatedness(a, b);
         Assert.Equal(0f, rel);
     }
 
@@ -73,7 +72,8 @@ public class LineageTests
     {
         var ancestors = new System.Collections.Generic.Dictionary<ulong, byte>
         {
-            [10] = 1, [20] = 2
+            [10] = 1,
+            [20] = 2
         };
         var restored = LineageRecord.Restore(1, 10, 20, ancestors);
         Assert.Equal(1ul, restored.IndividualId);
@@ -87,7 +87,7 @@ public class LineageTests
         var parent = LineageRecord.Founder(1);
         var sib1 = LineageRecord.CreateAsexualChild(parent).WithIndividualId(2);
         var sib2 = LineageRecord.CreateAsexualChild(parent).WithIndividualId(3);
-        float inb = LineageRecord.CalculateOffspringInbreeding(sib1, sib2);
+        var inb = LineageRecord.CalculateOffspringInbreeding(sib1, sib2);
         Assert.True(inb >= 0f && inb <= 1f);
     }
 }

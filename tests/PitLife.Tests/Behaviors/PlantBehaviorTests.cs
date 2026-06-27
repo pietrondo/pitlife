@@ -26,11 +26,10 @@ public class PlantBehaviorTests
 
         float initialEnergy = plant.Energy;
         float dt = 1.0f; // 1 second
-        var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(dt));
 
         // Act
         var behavior = new PlantBehavior();
-        behavior.Update(plant, world, eco, gameTime);
+        behavior.Update(plant, world, eco, dt);
 
         // Assert
         Assert.True(plant.Energy > initialEnergy, "Plant should gain energy from sunlight over time.");
@@ -51,11 +50,10 @@ public class PlantBehaviorTests
         var plant = new Plant(new Vector2(32, 32), Genome.Random(new Random(1)), "Clover");
         plant.Energy = plant.MaxEnergy - 0.1f; // Almost max
 
-        var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(10.0f)); // Big time step
 
         // Act
         var behavior = new PlantBehavior();
-        behavior.Update(plant, world, eco, gameTime);
+        behavior.Update(plant, world, eco, 10.0f);
 
         // Assert
         Assert.Equal(plant.MaxEnergy, plant.Energy, 3);
@@ -75,12 +73,11 @@ public class PlantBehaviorTests
         var tile = world.GetTileAtPosition(plant.Position.X, plant.Position.Y);
         tile.Biome = BiomeType.Forest;
 
-        var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0f));
 
         // Act
         eco.AddCreature(plant); // Important: add to eco so TrySpreadPlant works
         var behavior = new PlantBehavior();
-        behavior.Update(plant, world, eco, gameTime);
+        behavior.Update(plant, world, eco, 1.0f);
 
         // Assert
         Assert.True(plant.Energy >= plant.ReproductionThreshold, "Plant energy should exceed reproduction threshold.");
@@ -102,11 +99,10 @@ public class PlantBehaviorTests
         var plant = new Plant(new Vector2(32, 32), Genome.Random(new Random(1)), "Clover");
         plant.GrowFor(301f); // Older than 300f
 
-        var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(1.0f));
 
         // Act
         var behavior = new PlantBehavior();
-        behavior.Update(plant, world, eco, gameTime);
+        behavior.Update(plant, world, eco, 1.0f);
 
         // Assert
         Assert.False(plant.IsAlive, "Plant should die of old age (> 300f).");

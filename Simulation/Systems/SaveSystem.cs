@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
@@ -120,7 +118,7 @@ public static class SaveSystem
             });
         }
 
-        string json = JsonSerializer.Serialize(data, Options);
+        var json = JsonSerializer.Serialize(data, Options);
         File.WriteAllText(filePath, json);
     }
 
@@ -128,7 +126,7 @@ public static class SaveSystem
     {
         if (!File.Exists(filePath)) return null;
 
-        string json = File.ReadAllText(filePath);
+        var json = File.ReadAllText(filePath);
 
         // Try current format first (has SchemaVersion)
         try

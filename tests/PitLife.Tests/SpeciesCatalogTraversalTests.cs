@@ -1,7 +1,4 @@
-using System;
-using System.IO;
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 

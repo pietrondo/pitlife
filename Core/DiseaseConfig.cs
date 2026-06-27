@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -14,10 +13,10 @@ public static class DiseaseConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "diseases.json");
+            var path = Path.Combine("Content", "config", "diseases.json");
             if (!File.Exists(path)) return FallbackDiseases;
 
-            string json = File.ReadAllText(path);
+            var json = File.ReadAllText(path);
             var doc = JsonSerializer.Deserialize<DiseaseConfigDoc>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -33,10 +32,10 @@ public static class DiseaseConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "diseases.json");
+            var path = Path.Combine("Content", "config", "diseases.json");
             if (!File.Exists(path)) return new OutbreakDefaults();
 
-            string json = File.ReadAllText(path);
+            var json = File.ReadAllText(path);
             var doc = JsonSerializer.Deserialize<DiseaseConfigDoc>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,

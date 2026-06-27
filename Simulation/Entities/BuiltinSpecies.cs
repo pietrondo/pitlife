@@ -347,7 +347,7 @@ internal static class BuiltinSpecies
             isAquatic: false,
             socialBehavior: SocialBehavior.None,
             validBiomes: biomes ?? Land,
-            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out float age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
+            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out var age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
             plantReproduction: reproduction,
             pollination: pollination,
             minTemperature: minTemperature,
@@ -366,7 +366,7 @@ internal static class BuiltinSpecies
             isAquatic: true,
             socialBehavior: SocialBehavior.None,
             validBiomes: ShallowOrDeep,
-            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out float age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
+            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out var age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
             plantReproduction: reproduction,
             pollination: pollination,
             minTemperature: minTemperature,
@@ -390,7 +390,7 @@ internal static class BuiltinSpecies
             socialBehavior: social,
             validBiomes: biomes,
             defaultSize: size,
-            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out float age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
+            maturityAge: PitLife.Core.MaturationConfig.Data.Ages.TryGetValue(name, out var age) ? age : PitLife.Core.MaturationConfig.Data.DefaultAge,
             hibernates: hibernates));
     }
 }

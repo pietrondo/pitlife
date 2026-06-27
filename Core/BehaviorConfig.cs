@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -13,10 +12,10 @@ public static class BehaviorConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "behaviors.json");
+            var path = Path.Combine("Content", "config", "behaviors.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<BehaviorConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -33,7 +32,7 @@ public class BehaviorConfigData
     public int Version { get; set; } = 1;
     public MovementConfig Movement { get; set; } = new();
     public ThirstConfig Thirst { get; set; } = new();
-    public FeedingConfig Feeding { get; set; } = new();
+    public BehaviorFeedingConfig Feeding { get; set; } = new();
     public Dictionary<string, FlockingConfig> Flocking { get; set; } = new()
     {
         ["herd"] = new() { Cohesion = 1.5f, Separation = 2.0f, Alignment = 0.5f, SeparationDistance = 30f },
@@ -61,7 +60,7 @@ public class ThirstConfig
     public float SeekThreshold { get; set; } = 30f;
 }
 
-public class FeedingConfig
+public class BehaviorFeedingConfig
 {
     public float CarnivoreHungerThreshold { get; set; } = 0.8f;
     public float HerbivoreHungerThreshold { get; set; } = 0.6f;

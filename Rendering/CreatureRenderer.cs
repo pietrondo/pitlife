@@ -161,7 +161,7 @@ public class CreatureRenderer : IDisposable
         Rectangle visible = camera.VisibleArea;
         var creatures = _ecosystem.Creatures;
 
-        for (int i = 0; i < creatures.Count; i++)
+        for (var i = 0; i < creatures.Count; i++)
         {
             Creature? c = null;
             try
@@ -181,8 +181,8 @@ public class CreatureRenderer : IDisposable
     {
         if (c == null || !c.IsAlive) return;
 
-        float px = c.Position.X;
-        float py = c.Position.Y;
+        var px = c.Position.X;
+        var py = c.Position.Y;
 
         if (float.IsNaN(px) || float.IsNaN(py)) return;
 
@@ -190,8 +190,8 @@ public class CreatureRenderer : IDisposable
             py < visible.Y - 64 || py > visible.Y + visible.Height + 64)
             return;
 
-        float size = CalculateSize(c);
-        int s = Math.Max(6, (int)size);
+        var size = CalculateSize(c);
+        var s = Math.Max(6, (int)size);
         Rectangle dest = new((int)(px - s / 2), (int)(py - s / 2), s, s);
 
         Texture2D? tex = GetCreatureTexture(c);
@@ -212,7 +212,7 @@ public class CreatureRenderer : IDisposable
     {
         if (dayNightOverlay.HasValue && dayNightOverlay.Value.A > 0)
         {
-            float alpha = dayNightOverlay.Value.A / 255f;
+            var alpha = dayNightOverlay.Value.A / 255f;
             return Color.Lerp(original, new Color(dayNightOverlay.Value.R, dayNightOverlay.Value.G, dayNightOverlay.Value.B, (byte)255), alpha);
         }
         return original;
@@ -220,7 +220,7 @@ public class CreatureRenderer : IDisposable
 
     private float CalculateSize(Creature c)
     {
-        float size = c.CreatureType == CreatureType.Plant
+        var size = c.CreatureType == CreatureType.Plant
             ? 18f * c.Genome.Size
             : 28f * c.Genome.Size;
         if (c.IsBaby) size *= 0.6f;
@@ -266,8 +266,8 @@ public class CreatureRenderer : IDisposable
         if (dir.LengthSquared() > 0.01f)
         {
             dir.Normalize();
-            float eyeOffset = size * 0.3f;
-            int eyeSize = Math.Max(2, s / 4);
+            var eyeOffset = size * 0.3f;
+            var eyeSize = Math.Max(2, s / 4);
             sb.Draw(_pixelTexture, new Rectangle(
                 (int)(px + dir.X * eyeOffset - dir.Y * eyeOffset / 2 - eyeSize / 2),
                 (int)(py + dir.Y * eyeOffset + dir.X * eyeOffset / 2 - eyeSize / 2),
@@ -287,8 +287,8 @@ public class CreatureRenderer : IDisposable
             if (maybeGenderColor.HasValue)
             {
                 Color genderColor = ApplyOverlay(maybeGenderColor.Value, dayNightOverlay);
-                int dot = Math.Max(2, s / 6);
-                int yOff = s / 2 + 2;
+                var dot = Math.Max(2, s / 6);
+                var yOff = s / 2 + 2;
                 sb.Draw(_pixelTexture, new Rectangle((int)px - dot / 2, (int)py + yOff, dot, dot), genderColor);
             }
         }
