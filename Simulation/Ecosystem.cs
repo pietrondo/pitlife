@@ -252,7 +252,7 @@ public class Ecosystem
             {
                 try
                 {
-                    c.Update(World, this, new GameTime(gameTime.TotalGameTime, TimeSpan.FromSeconds(dt)));
+                    c.Update(World, this, dt);
                 }
                 catch (Exception ex)
                 {

@@ -57,9 +57,8 @@ public class AdaptationTests
         var adaptedCreature = new TestCreature(new Vector2(32, 32), adaptedGenome);
 
         // Update once to apply environmental multipliers
-        var gameTime = new GameTime(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
-        unadaptedCreature.Update(world, ecosystem, gameTime);
-        adaptedCreature.Update(world, ecosystem, gameTime);
+                unadaptedCreature.Update(world, ecosystem, 1.0f);
+        adaptedCreature.Update(world, ecosystem, 1.0f);
 
         // Assert adapted has higher speed than unadapted
         Assert.True(adaptedCreature.Speed > unadaptedCreature.Speed);
