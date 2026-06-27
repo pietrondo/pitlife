@@ -178,7 +178,7 @@ public class TrophicDynamicsTests
         var exception = Record.Exception(() => dynamics.Update(eco, 1f));
         Assert.Null(exception); // Should not throw divide by zero
 
-        // When carnivores == 0, ratio = LotkaVolterraDefaultRatio (10).
+        // When carnivores == 0, ratio = LotkaVolterraDefaultRatio (10). 
         // 10 > PreyBoomRatioThreshold (5), so it's a Prey Boom.
         Assert.Equal("Prey Boom", dynamics.CurrentPhaseLabel);
     }
@@ -188,23 +188,23 @@ public class TrophicDynamicsTests
     {
         // 10 carnivores, 10 herbivores (ratio 1 < 2 -> Predator pressure)
         // 20 plants
-        var eco = CreateEcosystemWithPopulations(10, 10, 20);
+        var eco = CreateEcosystemWithPopulations(10, 10, 20); 
         eco.Trophic.Update(eco, 1f); // Applies Predator Pressure penalty
 
         var herbivore = CreateHerbivore();
         herbivore.Energy = 100f;
-
+        
         SetCount(eco, "PopulationPressure", 1);
-
+        
         float energyBefore = herbivore.Energy;
         herbivore.ApplyClimateAndPopulationPressure(eco);
         float energyAfter = herbivore.Energy;
-
+        
         Assert.True(energyBefore > energyAfter);
-
+        
         // 3 carnivores, 10 herbivores -> Balanced (plants=20)
         var ecoBalanced = CreateEcosystemWithPopulations(10, 3, 20);
-        ecoBalanced.Trophic.Update(ecoBalanced, 1f);
+        ecoBalanced.Trophic.Update(ecoBalanced, 1f); 
 
         var herbivoreBalanced = CreateHerbivore();
         herbivoreBalanced.Energy = 100f;
