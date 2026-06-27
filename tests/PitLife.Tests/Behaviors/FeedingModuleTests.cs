@@ -254,18 +254,7 @@ public class FeedingModuleTests
 
         // Clear grid and set up new state to attack strong prey
         eco.Creatures.Remove(weakPrey);
-        var field = eco.GetType().GetField("_spatialGrid", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var grid = (SpatialGrid)field?.GetValue(eco)!;
-
-        var bucketsField = grid.GetType().GetField("_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var locationsField = grid.GetType().GetField("_locations", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-        var buckets = bucketsField?.GetValue(grid);
-        buckets?.GetType().GetMethod("Clear")?.Invoke(buckets, null);
-
-        var locations = locationsField?.GetValue(grid);
-        locations?.GetType().GetMethod("Clear")?.Invoke(locations, null);
-        grid.Update(carn);
+        eco.Spatial.Rebuild(eco.Creatures);
 
         eco.AddCreature(strongPrey);
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
