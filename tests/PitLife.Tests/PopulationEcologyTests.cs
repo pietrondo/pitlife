@@ -77,6 +77,9 @@ public class PopulationEcologyTests
     public void SpeciesCount_TracksDiversity()
     {
         var ecosystem = new Ecosystem(32, 24, 42);
+        for (int x = 0; x < ecosystem.World.Width; x++)
+            for (int y = 0; y < ecosystem.World.Height; y++)
+                ecosystem.World.Tiles[x, y] = new Tile(BiomeType.Grassland);
         ecosystem.Initialize(5, 3, 2, 10);
         ecosystem.UpdateStats();
 
@@ -89,6 +92,9 @@ public class PopulationEcologyTests
     public void Extinction_DetectedWhenSpeciesDisappears()
     {
         var ecosystem = new Ecosystem(16, 12, 42);
+        for (int x = 0; x < ecosystem.World.Width; x++)
+            for (int y = 0; y < ecosystem.World.Height; y++)
+                ecosystem.World.Tiles[x, y] = new Tile(BiomeType.Grassland);
         ecosystem.Initialize(1, 1, 0, 2);
         ecosystem.UpdateStats();
 

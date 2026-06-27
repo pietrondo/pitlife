@@ -53,6 +53,10 @@ public class SubspeciesTests
     public void Metrics_TracksSubspecies()
     {
         var ecosystem = new Ecosystem(16, 12, 42);
+        for (int x = 0; x < ecosystem.World.Width; x++)
+            for (int y = 0; y < ecosystem.World.Height; y++)
+                ecosystem.World.Tiles[x, y] = new Tile(BiomeType.Grassland);
+
         var rng = new System.Random(42);
 
         var r1 = new Herbivore(new Vector2(100, 100), Genome.Random(rng), "Rabbit");
@@ -83,6 +87,10 @@ public class SubspeciesTests
     public void Subspecies_NotCountedWhenEmpty()
     {
         var ecosystem = new Ecosystem(16, 12, 42);
+        for (int x = 0; x < ecosystem.World.Width; x++)
+            for (int y = 0; y < ecosystem.World.Height; y++)
+                ecosystem.World.Tiles[x, y] = new Tile(BiomeType.Grassland);
+
         var rng = new System.Random(42);
 
         var r1 = new Herbivore(new Vector2(100, 100), Genome.Random(rng), "Rabbit");
