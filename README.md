@@ -116,8 +116,9 @@
 | **F4** | Spawn creature |
 | **F6** | Editor specie |
 | **F7** | Cataclisma casuale globale |
-| **F8** | Pannello cataclismi |
+| **C** | Pannello cataclismi |
 | **F9** | Dashboard clima |
+| **G** | SpeciesCyclopedia |
 | **ESC** | Annulla selezione / menu principale |
 
 ### Spawn creature
@@ -126,7 +127,7 @@
 3. Clicca sulla mappa per spawnare (3 individui in gruppo)
 
 ### Cataclismi
-1. **F8** o toolbar **Cataclismi** → seleziona tipo
+1. **C** o toolbar **Cataclismi** → seleziona tipo
 2. Clicca sulla mappa per piazzarlo
 3. Il terreno cambia visibilmente e recupera gradualmente
 4. **F7** per cataclisma casuale globale
