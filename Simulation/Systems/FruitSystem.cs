@@ -41,7 +41,7 @@ public sealed class FruitSystem
 {
 
 
-    private Fruit[] _fruits = [];
+    private Fruit[] _fruits = new Fruit[FruitConfig.Data.MaxFruits];
     private int _fruitCount;
     private float _spawnTimer;
 
