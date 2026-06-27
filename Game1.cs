@@ -130,6 +130,7 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
+        PitLife.Core.FeedingConfig.Load();
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         _font = Content.Load<SpriteFont>("Font");
         _uiPixel = new Texture2D(GraphicsDevice, 1, 1);

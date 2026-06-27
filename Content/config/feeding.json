@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hungerThresholdHerbivore": 0.6,
+  "hungerThresholdCarnivore": 0.8,
+  "attackEnergyGain": 1.5,
+  "toxicityReduction": 0.5,
+  "preyEscapeThreshold": 0.3,
+  "scavengeRange": 80,
+  "herbivorePlantEnergy": 8,
+  "carnivoreAttackCost": 3,
+  "omnivoreAttackCost": 4,
+  "plantDigestionRate": 4,
+  "maxFruitEatRange": 60
+}
