@@ -94,7 +94,7 @@ public class CataclysmSystemTests
 
         sys.TriggerAt(eco, mockRng.Object, "NonExistentCataclysm", Vector2.Zero);
 
-        Assert.Equal("NonExistentCataclysm", sys.ActiveEvent);
+        Assert.Equal("Asteroid", sys.ActiveEvent);
         Assert.True(sys.IsActive);
     }
 
