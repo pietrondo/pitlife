@@ -392,6 +392,18 @@ public abstract class Creature
         float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
         if (tempDiff > 15f && CreatureType != CreatureType.Plant)
             CurrentEnergyMultiplier += tempDiff * 0.02f;
+
+        if (CreatureType != CreatureType.Plant)
+        {
+            var def = SpeciesRegistry.Get(Species);
+            if (def != null)
+            {
+                if (!def.IsValidBiome(tile.Biome))
+                    CurrentEnergyMultiplier += 4.0f;
+                if (!def.IsValidTemperature(tileTemp))
+                    CurrentEnergyMultiplier += 2.0f;
+            }
+        }
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Unknown)
