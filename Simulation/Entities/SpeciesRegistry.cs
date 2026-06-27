@@ -97,7 +97,7 @@ public static class SpeciesRegistry
 {
     private static readonly object Sync = new();
     private static readonly Dictionary<string, SpeciesDefinition> _bySpecies = new(StringComparer.Ordinal);
-    private static readonly Dictionary<CreatureType, List<string>> _byKind = new();
+    private static readonly Dictionary<CreatureType, HashSet<string>> _byKind = new();
 
     static SpeciesRegistry()
     {
@@ -124,18 +124,18 @@ public static class SpeciesRegistry
         lock (Sync)
         {
             _bySpecies[def.Species] = def;
-            if (!_byKind.TryGetValue(def.Kind, out var list))
+            if (!_byKind.TryGetValue(def.Kind, out var set))
             {
-                list = new List<string>();
-                _byKind[def.Kind] = list;
+                set = new HashSet<string>();
+                _byKind[def.Kind] = set;
             }
-            if (!list.Contains(def.Species))
-                list.Add(def.Species);
+            set.Add(def.Species);
         }
     }
 
     public static SpeciesDefinition? Get(string species)
     {
+        if (species is null) return null;
         lock (Sync)
             return _bySpecies.TryGetValue(species, out var def) ? def : null;
     }
@@ -158,7 +158,7 @@ public static class SpeciesRegistry
     public static IEnumerable<string> OfType(CreatureType kind)
     {
         lock (Sync)
-            return _byKind.TryGetValue(kind, out var list) ? list.ToArray() : Array.Empty<string>();
+            return _byKind.TryGetValue(kind, out var set) ? set.ToArray() : Array.Empty<string>();
     }
 
     public static bool IsPackAnimal(string species)
@@ -192,7 +192,7 @@ public static class SpeciesRegistry
             if (!_bySpecies.Remove(species, out SpeciesDefinition? definition))
                 return false;
 
-            if (_byKind.TryGetValue(definition.Kind, out List<string>? speciesOfKind))
+            if (_byKind.TryGetValue(definition.Kind, out HashSet<string>? speciesOfKind))
                 speciesOfKind.Remove(species);
             return true;
         }
