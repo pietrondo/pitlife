@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "maxFruits": 500,
+  "spawnTimerBase": 3.0,
+  "spawnTimerVariance": 5.0,
+  "spawnAttempts": 10,
+  "findPlantMaxTries": 50,
+  "spawnOffsetMax": 40.0,
+  "energyValueBase": 5.0,
+  "energyValueVariance": 10.0,
+  "lifetimeBase": 20.0,
+  "lifetimeVariance": 30.0,
+  "poisonousToxicityBase": 0.6,
+  "poisonousToxicityVariance": 0.3
+}

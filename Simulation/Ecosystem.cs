@@ -252,7 +252,7 @@ public class Ecosystem
             {
                 try
                 {
-                    c.Update(World, this, new GameTime(gameTime.TotalGameTime, TimeSpan.FromSeconds(dt)));
+                    c.Update(World, this, dt);
                 }
                 catch (Exception ex)
                 {
@@ -328,7 +328,6 @@ public class Ecosystem
         HerbivoreCount = herbivores;
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
-        Metrics.Update(this);
 
         foreach (var species in _knownSpecies.ToArray())
         {
