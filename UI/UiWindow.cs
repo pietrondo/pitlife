@@ -65,9 +65,11 @@ public sealed class UiWindow
 
         if (IsDraggable)
         {
+            var isHovered = titleBar.Contains(mousePosition);
             var collapseIcon = IsCollapsed ? "[+]" : "[-]";
             Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
-            spriteBatch.DrawString(font, collapseIcon, new Vector2(titleBar.X + 8, titleBar.Center.Y - iconSize.Y / 2f), UiTheme.MutedStone, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            Color iconColor = isHovered ? UiTheme.WarmParchment : UiTheme.MutedStone;
+            spriteBatch.DrawString(font, collapseIcon, new Vector2(titleBar.X + 8, titleBar.Center.Y - iconSize.Y / 2f), iconColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
         if (ShowCloseButton)

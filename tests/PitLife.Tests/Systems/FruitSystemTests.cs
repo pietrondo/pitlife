@@ -14,6 +14,7 @@ public class FruitSystemTests
     {
         var eco = new Ecosystem(16, 12, 42);
         var fruitSys = new FruitSystem();
+        fruitSys.Initialize(eco.World);
 
         var plant = new Plant(new Vector2(100, 100), Genome.Random(eco.Random), "BerryBush");
         eco.AddCreature(plant);
@@ -33,6 +34,7 @@ public class FruitSystemTests
     {
         var eco = new Ecosystem(16, 12, 42);
         var fruitSys = new FruitSystem();
+        fruitSys.Initialize(eco.World);
 
         var plant = new Plant(new Vector2(100, 100), Genome.Random(eco.Random), "BerryBush");
         eco.AddCreature(plant);
@@ -51,6 +53,7 @@ public class FruitSystemTests
     {
         var eco = new Ecosystem(16, 12, 42);
         var fruitSys = new FruitSystem();
+        fruitSys.Initialize(eco.World);
 
         var plant = new Plant(new Vector2(100, 100), Genome.Random(eco.Random), "BerryBush");
         eco.AddCreature(plant);
@@ -88,6 +91,7 @@ public class FruitSystemTests
     {
         var eco = new Ecosystem(16, 12, 42);
         var fruitSys = new FruitSystem();
+        fruitSys.Initialize(eco.World);
 
         var plant = new Plant(new Vector2(100, 100), Genome.Random(eco.Random), "BerryBush");
         eco.AddCreature(plant);
@@ -110,6 +114,7 @@ public class FruitSystemTests
     {
         var eco = new Ecosystem(16, 12, 42);
         var fruitSys = new FruitSystem();
+        fruitSys.Initialize(eco.World);
 
         var plant = new Plant(new Vector2(100, 100), Genome.Random(eco.Random), "BerryBush");
         eco.AddCreature(plant);
