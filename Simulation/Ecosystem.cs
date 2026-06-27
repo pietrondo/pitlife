@@ -23,6 +23,7 @@ public class Ecosystem
     public int CarnivoreCount { get; private set; }
     public int OmnivoreCount { get; private set; }
     public EcosystemMetrics Metrics { get; } = new();
+    public List<ISimulationSystem> Systems { get; } = new();
     public float PopulationPressure { get; private set; } = 1f;
     public ClimateSystem Climate { get; } = new();
     public DiseaseSystem Disease { get; } = new();
@@ -83,19 +84,23 @@ public class Ecosystem
         Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
     }
 
-    private void InitSystems()
+private void InitSystems()
     {
-        // EarlyUpdate
-        Climate.Initialize(World);
-        Atmosphere.Initialize(World);
-        Trophic.Initialize(World);
-        // Update
-        Disease.Initialize(World);
-        Cataclysms.Initialize(World);
-        if (Flow != null) Flow.Initialize(World);
-        Fruits.Initialize(World);
-        // LateUpdate
-        Metrics.Initialize(World);
+        Systems.Clear();
+        Systems.Add(Climate);
+        Systems.Add(Atmosphere);
+        Systems.Add(Trophic);
+        Systems.Add(Disease);
+        Systems.Add(Cataclysms);
+        if (Flow != null) Systems.Add(Flow);
+        Systems.Add(Fruits);
+        Systems.Add(Metrics);
+        Systems.Add(Phylogeny);
+
+        foreach (var sys in Systems)
+        {
+            sys.Initialize(World);
+        }
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -266,17 +271,9 @@ public class Ecosystem
 
         FlushPending();
         ProcessDeaths(dt);
-        // EarlyUpdate
-        Climate.Tick(this, gameTime);
-        Atmosphere.Tick(this, gameTime);
-        Trophic.Tick(this, gameTime);
-        // Update
-        Disease.Tick(this, gameTime);
-        Cataclysms.Tick(this, gameTime);
-        if (Flow != null) Flow.Tick(this, gameTime);
-        Fruits.Tick(this, gameTime);
-        // LateUpdate
-        Metrics.Tick(this, gameTime);
+        foreach (var sys in Systems) if (sys.Phase == UpdatePhase.EarlyUpdate) sys.Tick(this, gameTime);
+        foreach (var sys in Systems) if (sys.Phase == UpdatePhase.Update) sys.Tick(this, gameTime);
+        foreach (var sys in Systems) if (sys.Phase == UpdatePhase.LateUpdate) sys.Tick(this, gameTime);
         float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
@@ -328,6 +325,8 @@ public class Ecosystem
         HerbivoreCount = herbivores;
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
+
+        Metrics.Update(this);
 
         foreach (var species in _knownSpecies.ToArray())
         {
@@ -457,17 +456,9 @@ public class Ecosystem
             OmnivoreCount = 0;
             _spatialGrid.Rebuild(Array.Empty<Creature>());
             _nextIndividualId = 1;
-            // EarlyUpdate
-            Climate.Reset();
-            Atmosphere.Reset();
-            Trophic.Reset();
-            // Update
-            Disease.Reset();
-            Cataclysms.Reset();
-            if (Flow != null) Flow.Reset();
-            Fruits.Reset();
-            // LateUpdate
-            Metrics.Reset();
+            foreach (var sys in Systems) if (sys.Phase == UpdatePhase.EarlyUpdate) sys.Reset();
+            foreach (var sys in Systems) if (sys.Phase == UpdatePhase.Update) sys.Reset();
+            foreach (var sys in Systems) if (sys.Phase == UpdatePhase.LateUpdate) sys.Reset();
         }
     }
 }
