@@ -168,7 +168,8 @@ public sealed class CataclysmSystem
 
     public void TriggerAt(Ecosystem ecosystem, Random rng, string type, Microsoft.Xna.Framework.Vector2 position)
     {
-        var ev = CataclysmConfig.Data.PlayerEvents.Find(e => e.Name == type) ?? CataclysmConfig.Data.PlayerEvents[0];
+        var ev = CataclysmConfig.Data.PlayerEvents.Find(e => e.Name == type);
+        if (ev == null) return;
 
         ActiveEvent = ev.Name;
         IsActive = true;

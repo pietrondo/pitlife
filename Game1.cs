@@ -894,6 +894,8 @@ public class Game1 : Game
 
     private void DrawFruits(SpriteBatch sb, Rectangle visibleArea)
     {
+        // Optimization: Pre-calculate camera bounds with a small 2px margin to perfectly
+        // match the 2x2 drawn rectangle and prevent edge popping.
         var left = visibleArea.X - 2;
         var top = visibleArea.Y - 2;
         var right = visibleArea.Right + 2;
@@ -905,6 +907,9 @@ public class Game1 : Game
             var px = (int)fruit.Position.X;
             var py = (int)fruit.Position.Y;
 
+            // Optimization: Pure mathematical culling prevents off-screen rendering.
+            // Skipping the SpriteBatch.Draw call for off-screen items directly reduces
+            // Draw Calls submitted to the GPU, preventing fill-rate bottlenecks when MaxFruits is high.
             if (px < left || px > right || py < top || py > bottom) continue;
 
             var color = fruit.GetColor();
