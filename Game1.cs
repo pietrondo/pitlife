@@ -115,7 +115,7 @@ public class Game1 : Game
         _controller = new SimulationController(_ecosystem, _dayNight);
         _waterEffect = new WaterEffect();
         _inGameUi.World = _ecosystem.World;
-        _inGameUi.Climate = _ecosystem.Climate;
+        _inGameUi.Climate = _ecosystem.Pipeline.GetSystem<ClimateSystem>()!;
         _inGameUi.ToolbarButtonClicked += () =>
         {
             if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
@@ -315,7 +315,7 @@ public class Game1 : Game
         _displayOmnivores = _controller.OmnivoreCount;
         _displayTime = _controller.TotalTime;
 
-        _weather.Update(_ecosystem.Climate, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
+        _weather.Update(_ecosystem.Pipeline.GetSystem<ClimateSystem>()!, _camera, dt, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight);
         _waterEffect.Update(dt);
 
         _inGameUi.RecordPopSnapshot(_displayPlants, _displayHerbivores, _displayCarnivores, _displayOmnivores,
@@ -446,7 +446,7 @@ public class Game1 : Game
 
         // Manual Cataclysm
         if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
-            _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
+            _ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.TriggerManual(_ecosystem, _ecosystem.Random);
 
         // Species Editor
         if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
@@ -535,7 +535,7 @@ public class Game1 : Game
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _cataclysmPanel.SelectedType!, catPos);
+            _ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.TriggerAt(_ecosystem, _ecosystem.Random, _cataclysmPanel.SelectedType!, catPos);
             _worldRenderer.Invalidate();
             _cataclysmPanel.SelectedType = null;
             _prevPanelCata = null;
@@ -546,7 +546,7 @@ public class Game1 : Game
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
+            _ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.TriggerAt(_ecosystem, _ecosystem.Random, _inGameUi.SelectedCataclysm, catPos);
             _worldRenderer.Invalidate();
             _inGameUi.SelectedCataclysm = null;
         }
@@ -580,7 +580,7 @@ public class Game1 : Game
             mouse.LeftButton == ButtonState.Pressed && _prevMouse.LeftButton == ButtonState.Released)
         {
             var catPos = _camera.ScreenToWorld(mouse.X, mouse.Y);
-            _ecosystem.Cataclysms.TriggerAt(_ecosystem, _ecosystem.Random, _spawnPanel.SelectedCataclysm, catPos);
+            _ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.TriggerAt(_ecosystem, _ecosystem.Random, _spawnPanel.SelectedCataclysm, catPos);
             _worldRenderer.Invalidate();
             _spawnPanel.SelectedCataclysm = null;
             _prevSpawnCata = null;
@@ -637,7 +637,7 @@ public class Game1 : Game
         var seed = seedOverride ?? new Random().Next();
         var wgOpts = worldGenOptions ?? Simulation.WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
         _ecosystem = new Ecosystem(wgOpts, seed);
-        _ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
+        _ecosystem.Pipeline.GetSystem<ClimateSystem>()!.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
         _ecosystem.Initialize(60, 20, 15, 150);
         _worldRenderer?.Dispose();
         _creatureRenderer?.Dispose();
@@ -824,7 +824,7 @@ public class Game1 : Game
             _paused,
             _controller.CurrentSpeed,
             GraphicsDevice.Viewport.Height,
-            _ecosystem.Metrics);
+            _ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!);
 
         _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
         _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
@@ -846,7 +846,7 @@ public class Game1 : Game
 
     private void DrawWorld(GameTime gameTime)
     {
-        var shake = _ecosystem.Cataclysms.ScreenShake;
+        var shake = _ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.ScreenShake;
         Vector2 savedPos = _camera.Position;
         if (shake != Vector2.Zero)
             _camera.Position = new Vector2(savedPos.X + shake.X, savedPos.Y + shake.Y);
@@ -857,7 +857,7 @@ public class Game1 : Game
 
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix,
             blendState: BlendState.Additive);
-        Color seasonTint = _ecosystem.Climate.CurrentSeason switch
+        Color seasonTint = _ecosystem.Pipeline.GetSystem<ClimateSystem>()!.CurrentSeason switch
         {
             Season.Spring => new Color(40, 120, 40, 6),
             Season.Summer => new Color(120, 100, 20, 8),
@@ -865,13 +865,13 @@ public class Game1 : Game
             Season.Winter => new Color(60, 80, 160, 10),
             _ => Color.Transparent
         };
-        var tempAlpha = Math.Clamp((_ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
+        var tempAlpha = Math.Clamp((_ecosystem.Pipeline.GetSystem<ClimateSystem>()!.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
         Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
         _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), seasonTint);
         _spriteBatch.Draw(_uiPixel, new Rectangle(0, 0, _ecosystem.World.PixelWidth, _ecosystem.World.PixelHeight), tempBlend);
         _spriteBatch.End();
 
-        var isSnow = _ecosystem.Climate.CurrentSeason == Season.Winter || _ecosystem.Climate.TemperatureModifier < -0.05f;
+        var isSnow = _ecosystem.Pipeline.GetSystem<ClimateSystem>()!.CurrentSeason == Season.Winter || _ecosystem.Pipeline.GetSystem<ClimateSystem>()!.TemperatureModifier < -0.05f;
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix);
         _weather.Draw(_spriteBatch, _uiPixel, isSnow);
         _waterEffect.Draw(_spriteBatch, _uiPixel, _ecosystem.World, _camera);
@@ -884,7 +884,7 @@ public class Game1 : Game
             var center = _selectedCreature.Position;
             _spriteBatch.DrawString(_font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
-        _ecosystem.Cataclysms.Draw(_spriteBatch, _uiPixel);
+        _ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.Draw(_spriteBatch, _uiPixel);
         DrawFruits(_spriteBatch);
         _spriteBatch.End();
 
@@ -893,7 +893,7 @@ public class Game1 : Game
 
     private void DrawFruits(SpriteBatch sb)
     {
-        foreach (var fruit in _ecosystem.Fruits.Fruits)
+        foreach (var fruit in _ecosystem.Pipeline.GetSystem<FruitSystem>()!.Fruits)
         {
             if (!fruit.IsAlive) continue;
             var color = fruit.GetColor();
@@ -911,8 +911,8 @@ public class Game1 : Game
             new Vector2(10, 32), new Color(160, 160, 160));
         var phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
         sb.DrawString(font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
-        var seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
-        sb.DrawString(font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
+        var seasonLabel = I18n.T($"season.{_ecosystem.Pipeline.GetSystem<ClimateSystem>()!.CurrentSeason}");
+        sb.DrawString(font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Pipeline.GetSystem<ClimateSystem>()!.CurrentSeason));
         var seedLabel = $"Seed: {_ecosystem.Seed}";
         sb.DrawString(font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
     }
@@ -974,21 +974,21 @@ public class Game1 : Game
 
     private void DrawDebugOverlay(SpriteBatch sb, SpriteFont font)
     {
-        var m = _ecosystem.Metrics;
+        var m = _ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!;
         m.FPS = _currentFPS;
         var y = GraphicsDevice.Viewport.Height - 100;
         var x = 8;
         var lineH = 14;
 
-        if (_ecosystem.Disease.HasOutbreak)
+        if (_ecosystem.Pipeline.GetSystem<DiseaseSystem>()!.HasOutbreak)
         {
-            sb.DrawString(font, $"Disease: {_ecosystem.Disease.ActiveDiseaseName}",
+            sb.DrawString(font, $"Disease: {_ecosystem.Pipeline.GetSystem<DiseaseSystem>()!.ActiveDiseaseName}",
                 new Vector2(x, y), new Color(220, 60, 60));
             y += lineH;
         }
-        if (_ecosystem.Cataclysms.IsActive)
+        if (_ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.IsActive)
         {
-            sb.DrawString(font, $"{_ecosystem.Cataclysms.ActiveEvent} ({_ecosystem.Cataclysms.Timer:F0}s)",
+            sb.DrawString(font, $"{_ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.ActiveEvent} ({_ecosystem.Pipeline.GetSystem<CataclysmSystem>()!.Timer:F0}s)",
                 new Vector2(x, y), new Color(255, 140, 0));
             y += lineH;
         }
@@ -1001,7 +1001,7 @@ public class Game1 : Game
         sb.DrawString(font, $"Sp:{m.SpeciesCount} Het:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2} Sub:{m.TotalSubspecies} Trophic:L1={m.TrophicLevel1}/L2={m.TrophicLevel2}/L3+={m.TrophicLevel3Plus}",
             new Vector2(x, y), UiTheme.MutedStone);
         y += lineH;
-        sb.DrawString(font, $"O2:{_ecosystem.Atmosphere.Oxygen:F0}% CO2:{_ecosystem.Atmosphere.CO2:F0}%",
+        sb.DrawString(font, $"O2:{_ecosystem.Pipeline.GetSystem<AtmosphereSystem>()!.Oxygen:F0}% CO2:{_ecosystem.Pipeline.GetSystem<AtmosphereSystem>()!.CO2:F0}%",
             new Vector2(x, y), UiTheme.MutedStone);
         if (m.LastDeathSpecies.Length > 0)
         {

@@ -37,8 +37,11 @@ public struct Fruit
     }
 }
 
-public sealed class FruitSystem
+public sealed class FruitSystem : ISimulationSystem
 {
+
+    public SimulationPhase Phase => SimulationPhase.Update;
+
 
 
     private Fruit[] _fruits = [];

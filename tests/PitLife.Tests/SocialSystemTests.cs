@@ -131,7 +131,7 @@ public class SocialSystemTests
         eco.AddCreature(m);
         eco.AddCreature(f);
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
-        var mate = eco.FindNearestMate(m);
+        var mate = eco.Spatial.FindNearestMate(m);
         Assert.Same(f, mate);
     }
 
@@ -148,7 +148,7 @@ public class SocialSystemTests
         eco.AddCreature(m);
         eco.AddCreature(f);
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
-        Assert.Null(eco.FindNearestMate(m));
+        Assert.Null(eco.Spatial.FindNearestMate(m));
     }
 
     [Fact]

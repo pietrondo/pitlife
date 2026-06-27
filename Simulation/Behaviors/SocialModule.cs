@@ -13,12 +13,12 @@ internal sealed class SocialModule : IBehaviorModule
 
     public void DefendInfants(Creature self, Ecosystem ecosystem, float dt)
     {
-        var infants = ecosystem.FindNeighbors(self, 40f,
+        var infants = ecosystem.Spatial.FindNeighbors(self, 40f,
             c => c.IsBaby && c.Parent == self && c.IsAlive);
         if (infants.Count == 0) return;
 
         var infant = infants[0];
-        var predator = ecosystem.FindNearestPredator(infant);
+        var predator = ecosystem.Spatial.FindNearestPredator(infant);
         if (predator == null || infant.DistanceTo(predator) >= 40f) return;
 
         self.MoveToward(predator.Position, dt, null);
@@ -50,7 +50,7 @@ internal sealed class SocialModule : IBehaviorModule
             case SocialBehavior.Pack:
                 {
                     var flockMoved = ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.2f, separationWeight: 1.0f, alignmentWeight: 1.5f, separationDist: 25f);
-                    var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, n => n.Species == self.Species);
+                    var neighbors = ecosystem.Spatial.FindNeighbors(self, self.VisionPixels * 0.3f, n => n.Species == self.Species);
                     if (neighbors.Count > 0)
                     {
                         self.Energy = Math.Min(self.MaxEnergy, self.Energy + 5f * dt);
@@ -86,7 +86,7 @@ internal sealed class SocialModule : IBehaviorModule
         float radius = -1f)
     {
         float actualRadius = radius < 0f ? self.VisionPixels : radius;
-        var neighbors = ecosystem.FindNeighbors(self, actualRadius, n => n.Species == self.Species);
+        var neighbors = ecosystem.Spatial.FindNeighbors(self, actualRadius, n => n.Species == self.Species);
         if (neighbors.Count == 0)
             return false;
 
@@ -147,7 +147,7 @@ internal sealed class SocialModule : IBehaviorModule
 
     private static bool ApplyPairBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        var partner = ecosystem.FindNearestSameSpecies(self);
+        var partner = ecosystem.Spatial.FindNearestSameSpecies(self);
         if (partner == null || self.DistanceTo(partner) >= self.VisionPixels)
             return false;
 
@@ -174,7 +174,7 @@ internal sealed class SocialModule : IBehaviorModule
 
     private static bool ApplySolitaryBehavior(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        var neighbor = ecosystem.FindNearestSameSpecies(self);
+        var neighbor = ecosystem.Spatial.FindNearestSameSpecies(self);
         if (neighbor == null || self.DistanceTo(neighbor) >= self.VisionPixels * 0.5f)
             return false;
 

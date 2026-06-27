@@ -22,17 +22,13 @@ public class Ecosystem
     public int HerbivoreCount { get; private set; }
     public int CarnivoreCount { get; private set; }
     public int OmnivoreCount { get; private set; }
-    public EcosystemMetrics Metrics { get; } = new();
     public float PopulationPressure { get; private set; } = 1f;
-    public ClimateSystem Climate { get; } = new();
-    public DiseaseSystem Disease { get; } = new();
     public PhylogeneticGraph Phylogeny { get; } = new();
-    public AtmosphereSystem Atmosphere { get; } = new();
-    public CataclysmSystem Cataclysms { get; } = new();
-    public TrophicDynamics Trophic { get; } = new();
-    public FruitSystem Fruits { get; } = new();
     public CreaturePool Pool { get; } = new();
-    public FlowSimulation? Flow { get; private set; }
+    public SimulationPipeline Pipeline { get; } = new();
+
+
+
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
@@ -40,7 +36,7 @@ public class Ecosystem
     private readonly List<Creature> _pendingAdd = new();
     private readonly List<Creature> _pendingRemove = new();
     private readonly object _lock = new();
-    private readonly SpatialGrid _spatialGrid;
+    public SpatialIndex Spatial { get; }
     private CreatureSpawner _spawner = null!;
     private ulong _nextIndividualId = 1;
 
@@ -64,9 +60,8 @@ public class Ecosystem
         Seed = seed;
         World = new World(worldWidth, worldHeight, seed);
         Random = new Random(seed);
-        _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        Spatial = new SpatialIndex(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
-        Flow = new FlowSimulation(World);
         InitSystems();
         Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
     }
@@ -76,27 +71,27 @@ public class Ecosystem
         Seed = seed;
         World = new World(options, seed);
         Random = new Random(seed);
-        _spatialGrid = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        Spatial = new SpatialIndex(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
-        Flow = new FlowSimulation(World);
         InitSystems();
         Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
     }
 
+
     private void InitSystems()
     {
-        // EarlyUpdate
-        Climate.Initialize(World);
-        Atmosphere.Initialize(World);
-        Trophic.Initialize(World);
-        // Update
-        Disease.Initialize(World);
-        Cataclysms.Initialize(World);
-        if (Flow != null) Flow.Initialize(World);
-        Fruits.Initialize(World);
-        // LateUpdate
-        Metrics.Initialize(World);
+        Pipeline.AddSystem(new ClimateSystem());
+        Pipeline.AddSystem(new AtmosphereSystem());
+        Pipeline.AddSystem(new TrophicDynamics());
+        Pipeline.AddSystem(new DiseaseSystem());
+        Pipeline.AddSystem(new CataclysmSystem());
+        Pipeline.AddSystem(new FlowSimulation(World));
+        Pipeline.AddSystem(new FruitSystem());
+        Pipeline.AddSystem(new EcosystemMetrics());
+
+        Pipeline.Initialize(World);
     }
+
 
     public void Initialize(int h, int c, int o, int p)
     {
@@ -158,7 +153,7 @@ public class Ecosystem
     public void QueueRemove(Creature c)
     {
         lock (_lock) { _pendingRemove.Add(c); }
-        Metrics.RecordDeath(c.Species, c.DeathCause);
+        Pipeline.GetSystem<EcosystemMetrics>()!.RecordDeath(c.Species, c.DeathCause);
         Logger.Event("DEATH", $"{c.Species} age={c.Age:F1}s energy={c.Energy:F1} cause={c.DeathCause}");
     }
 
@@ -176,7 +171,7 @@ public class Ecosystem
         if (_pendingRemove.Count == 0) return;
         var remove = new HashSet<Creature>(_pendingRemove);
         foreach (var creature in remove)
-            _spatialGrid.Remove(creature);
+            Spatial.Remove(creature);
         Creatures.RemoveAll(c => remove.Contains(c));
         _pendingRemove.Clear();
     }
@@ -188,7 +183,7 @@ public class Ecosystem
         {
             if (Creatures.Count >= MaxCreatures) break;
             Creatures.Add(c);
-            _spatialGrid.Update(c);
+            Spatial.Update(c);
         }
         _pendingAdd.Clear();
     }
@@ -217,7 +212,7 @@ public class Ecosystem
             float y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
             var tile = World.GetTileAtPosition(x, y);
             if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidClimate(tile.Biome,
-                    Climate.GetTileTemperature(tile, y / World.TileSize, World.Height))))
+                    Pipeline.GetSystem<ClimateSystem>()!.GetTileTemperature(tile, y / World.TileSize, World.Height))))
                 return new Vector2(x, y);
         }
 
@@ -229,7 +224,7 @@ public class Ecosystem
             int tileY = index / World.Width;
             var tile = World.GetTile(tileX, tileY);
             if (tile.IsPassableFor(isAquatic) && (def == null || def.IsValidClimate(tile.Biome,
-                    Climate.GetTileTemperature(tile, tileY, World.Height))))
+                    Pipeline.GetSystem<ClimateSystem>()!.GetTileTemperature(tile, tileY, World.Height))))
                 return new Vector2((tileX + 0.5f) * World.TileSize, (tileY + 0.5f) * World.TileSize);
         }
 
@@ -240,7 +235,7 @@ public class Ecosystem
     {
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds * SimulationSpeed;
         TotalTime += dt;
-        _spatialGrid.Rebuild(Creatures);
+        Spatial.Rebuild(Creatures);
 
         int count = Creatures.Count;
         for (int i = count - 1; i >= 0; i--)
@@ -259,25 +254,17 @@ public class Ecosystem
                     Logger.Error($"Creature update failed for {c.Species}: {ex.Message}");
                     c.Die();
                 }
-                _spatialGrid.Update(c);
-                c.ApplyWindDrift(Climate.WindDirection, Climate.WindSpeed, dt, World);
+                Spatial.Update(c);
+                c.ApplyWindDrift(Pipeline.GetSystem<ClimateSystem>()!.WindDirection, Pipeline.GetSystem<ClimateSystem>()!.WindSpeed, dt, World);
             }
         }
 
         FlushPending();
+
         ProcessDeaths(dt);
-        // EarlyUpdate
-        Climate.Tick(this, gameTime);
-        Atmosphere.Tick(this, gameTime);
-        Trophic.Tick(this, gameTime);
-        // Update
-        Disease.Tick(this, gameTime);
-        Cataclysms.Tick(this, gameTime);
-        if (Flow != null) Flow.Tick(this, gameTime);
-        Fruits.Tick(this, gameTime);
-        // LateUpdate
-        Metrics.Tick(this, gameTime);
-        float grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
+        Pipeline.Tick(this, gameTime);
+        float grassFactor = Pipeline.GetSystem<ClimateSystem>()!.GrassRegenModifier * Pipeline.GetSystem<CataclysmSystem>()!.GrassMultiplier;
+
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
         UpdateStats();
@@ -299,7 +286,7 @@ public class Ecosystem
                     if (tile.GrassAmount < tile.MaxGrass)
                         tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
                     tile.SoilNutrients = Math.Min(2f, tile.SoilNutrients + 0.1f);
-                    _spatialGrid.Remove(c);
+                    Spatial.Remove(c);
                     Pool.Return(c);
                     Creatures.RemoveAt(i);
                 }
@@ -329,15 +316,17 @@ public class Ecosystem
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
 
+        Pipeline.GetSystem<EcosystemMetrics>()!.Update(this);
+
         foreach (var species in _knownSpecies.ToArray())
         {
-            if (!Metrics.SpeciesPopulations.ContainsKey(species) && !string.IsNullOrEmpty(species))
+            if (!Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesPopulations.ContainsKey(species) && !string.IsNullOrEmpty(species))
             {
                 Logger.Event("EXTINCT", $"Species '{species}' has gone extinct at T={TotalTime:F1}s");
                 _knownSpecies.Remove(species);
             }
         }
-        foreach (var species in Metrics.SpeciesPopulations.Keys)
+        foreach (var species in Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesPopulations.Keys)
             _knownSpecies.Add(species);
 
         float softCap = MaxCreatures * 0.7f;
@@ -353,34 +342,6 @@ public class Ecosystem
         }
     }
 
-    public Plant? FindNearestPlant(Herbivore seeker) => FindNearest<Plant>(seeker);
-    public Plant? FindNearestPlantFor(Creature seeker) => FindNearest<Plant>(seeker);
-
-    public Creature? FindNearestPrey(Creature seeker)
-    {
-        return _spatialGrid.FindNearest(seeker, c =>
-            c.CreatureType != CreatureType.Carnivore &&
-            c.CreatureType != seeker.CreatureType &&
-            (c.CreatureType != CreatureType.Plant || seeker is not Herbivore and not Omnivore));
-    }
-
-    public Creature? FindNearestSameSpecies(Creature seeker)
-    {
-        return _spatialGrid.FindNearest(seeker, c => c != seeker && c.Species == seeker.Species);
-    }
-
-    public Creature? FindNearestMate(Creature seeker)
-    {
-        if (!seeker.IsAdult || seeker.Gender is not (Gender.Male or Gender.Female))
-            return null;
-        return _spatialGrid.FindNearest(seeker, seeker.CanMateWith);
-    }
-
-    public Creature? FindNearestPredator(Creature seeker)
-    {
-        return _spatialGrid.FindNearest(seeker, c => c.CreatureType == CreatureType.Carnivore);
-    }
-
     public void TrySpreadPlant(Plant plant)
     {
         if (plant == null || !plant.IsAlive) return;
@@ -389,7 +350,7 @@ public class Ecosystem
         if (plant.Energy < plant.ReproductionThreshold) return;
 
         float angle = (float)(Random.NextDouble() * Math.PI * 2);
-        float windBias = Climate.WindDirection;
+        float windBias = Pipeline.GetSystem<ClimateSystem>()!.WindDirection;
         if (plant.Genome.ForestAdaptation > 0.3f)
             angle = (angle * 0.3f + windBias * 0.7f + (float)Math.PI * 0.5f) % ((float)Math.PI * 2);
         float dist = 30f + (float)Random.NextDouble() * 40f;
@@ -405,11 +366,11 @@ public class Ecosystem
         if (def != null)
         {
             int tileY = (int)(newPos.Y / World.TileSize);
-            if (!def.IsValidClimate(tile.Biome, Climate.GetTileTemperature(tile, tileY, World.Height)))
+            if (!def.IsValidClimate(tile.Biome, Pipeline.GetSystem<ClimateSystem>()!.GetTileTemperature(tile, tileY, World.Height)))
                 return;
         }
 
-        var sameSpeciesNearby = FindNeighbors(plant, 80f, c => c is Plant p && p.Species == plant.Species);
+        var sameSpeciesNearby = Spatial.FindNeighbors(plant, 80f, c => c is Plant p && p.Species == plant.Species);
         if (sameSpeciesNearby.Count >= 4)
             return;
 
@@ -433,16 +394,6 @@ public class Ecosystem
         }
     }
 
-    private T? FindNearest<T>(Creature seeker) where T : Creature
-    {
-        return _spatialGrid.FindNearest(seeker, c => c is T) as T;
-    }
-
-    public List<Creature> FindNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
-    {
-        return _spatialGrid.GetNeighbors(seeker, radius, predicate);
-    }
-
     public void Clear()
     {
         lock (_lock)
@@ -455,19 +406,11 @@ public class Ecosystem
             HerbivoreCount = 0;
             CarnivoreCount = 0;
             OmnivoreCount = 0;
-            _spatialGrid.Rebuild(Array.Empty<Creature>());
+            Spatial.Rebuild(Array.Empty<Creature>());
+
             _nextIndividualId = 1;
-            // EarlyUpdate
-            Climate.Reset();
-            Atmosphere.Reset();
-            Trophic.Reset();
-            // Update
-            Disease.Reset();
-            Cataclysms.Reset();
-            if (Flow != null) Flow.Reset();
-            Fruits.Reset();
-            // LateUpdate
-            Metrics.Reset();
+            Pipeline.Reset();
         }
     }
+
 }

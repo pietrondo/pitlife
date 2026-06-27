@@ -5,8 +5,11 @@ using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-public sealed class EcosystemMetrics
+public sealed class EcosystemMetrics : ISimulationSystem
 {
+
+    public SimulationPhase Phase => SimulationPhase.LateUpdate;
+
     public float TotalTime { get; private set; }
     public float FPS { get; set; }
     public int TotalCreatures { get; private set; }

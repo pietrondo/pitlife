@@ -29,13 +29,13 @@ public class PopulationEcologyTests
     {
         var ecosystem = new Ecosystem(32, 24, 99);
         ecosystem.Initialize(2, 2, 0, 4);
-        Assert.Equal(0, ecosystem.Metrics.TotalBirths);
-        Assert.Equal(0, ecosystem.Metrics.TotalDeaths);
+        Assert.Equal(0, ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.TotalBirths);
+        Assert.Equal(0, ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.TotalDeaths);
 
         var gameTime = new GameTime(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         ecosystem.Tick(gameTime);
 
-        Assert.True(ecosystem.Metrics.TotalDeaths + ecosystem.Metrics.TotalBirths >= 0);
+        Assert.True(ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.TotalDeaths + ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.TotalBirths >= 0);
     }
 
     [Fact]
@@ -81,9 +81,9 @@ public class PopulationEcologyTests
         ecosystem.Initialize(5, 3, 2, 10);
         ecosystem.UpdateStats();
 
-        Assert.True(ecosystem.Metrics.SpeciesCount >= 1,
-            $"Expected at least 1 species, got {ecosystem.Metrics.SpeciesCount}");
-        Assert.NotEmpty(ecosystem.Metrics.SpeciesPopulations);
+        Assert.True(ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesCount >= 1,
+            $"Expected at least 1 species, got {ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesCount}");
+        Assert.NotEmpty(ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesPopulations);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class PopulationEcologyTests
         ecosystem.Initialize(1, 1, 0, 2);
         ecosystem.UpdateStats();
 
-        int initialSpecies = ecosystem.Metrics.SpeciesCount;
+        int initialSpecies = ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesCount;
         Assert.True(initialSpecies > 0);
 
         for (int i = 0; i < 300; i++)

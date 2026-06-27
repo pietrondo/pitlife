@@ -7,7 +7,7 @@ internal sealed class ThreatModule : IBehaviorModule
 {
     public bool Update(Creature self, World world, Ecosystem ecosystem, float dt)
     {
-        Creature? threat = ecosystem.FindNearestPredator(self);
+        Creature? threat = ecosystem.Spatial.FindNearestPredator(self);
         if (threat != null && self.DistanceTo(threat) < self.VisionPixels * VisionScale(self))
         {
             self.MoveAwayFrom(threat.Position, dt, world);

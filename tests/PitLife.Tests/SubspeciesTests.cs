@@ -74,10 +74,10 @@ public class SubspeciesTests
         ecosystem.FlushPending();
         ecosystem.UpdateStats();
 
-        Assert.Equal(2, ecosystem.Metrics.TotalSubspecies);
-        Assert.Contains("Rabbit/arcticus", ecosystem.Metrics.SubspeciesCounts.Keys);
-        Assert.Contains("Rabbit/vulgaris", ecosystem.Metrics.SubspeciesCounts.Keys);
-        Assert.Equal(2, ecosystem.Metrics.SubspeciesCounts["Rabbit/arcticus"]);
+        Assert.Equal(2, ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.TotalSubspecies);
+        Assert.Contains("Rabbit/arcticus", ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SubspeciesCounts.Keys);
+        Assert.Contains("Rabbit/vulgaris", ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SubspeciesCounts.Keys);
+        Assert.Equal(2, ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SubspeciesCounts["Rabbit/arcticus"]);
     }
 
     [Fact]
@@ -93,6 +93,6 @@ public class SubspeciesTests
         ecosystem.FlushPending();
         ecosystem.UpdateStats();
 
-        Assert.Equal(0, ecosystem.Metrics.TotalSubspecies);
+        Assert.Equal(0, ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.TotalSubspecies);
     }
 }

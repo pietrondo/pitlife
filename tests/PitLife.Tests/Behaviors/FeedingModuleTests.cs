@@ -111,11 +111,11 @@ public class FeedingModuleTests
         herb.Energy = herb.MaxEnergy * 0.5f;
 
         // Spawn fruit by accessing the _fruits array via reflection
-        var field = eco.Fruits.GetType().GetField("_fruits", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var fruitsArray = (Fruit[])field?.GetValue(eco.Fruits)!;
+        var field = eco.Pipeline.GetSystem<FruitSystem>()!.GetType().GetField("_fruits", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var fruitsArray = (Fruit[])field?.GetValue(eco.Pipeline.GetSystem<FruitSystem>()!)!;
         fruitsArray[0] = new Fruit(new Vector2(10, 10), 50f, 100f, "Apple", poisonous: false, toxicity: 0f);
-        var countField = eco.Fruits.GetType().GetField("_fruitCount", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        countField?.SetValue(eco.Fruits, 1);
+        var countField = eco.Pipeline.GetSystem<FruitSystem>()!.GetType().GetField("_fruitCount", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        countField?.SetValue(eco.Pipeline.GetSystem<FruitSystem>()!, 1);
 
         var module = new FeedingModule();
         float energyBefore = herb.Energy;
@@ -140,11 +140,11 @@ public class FeedingModuleTests
         eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
         toxicHerb.Energy = toxicHerb.MaxEnergy * 0.5f;
 
-        var field = eco.Fruits.GetType().GetField("_fruits", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var fruitsArray = (Fruit[])field?.GetValue(eco.Fruits)!;
+        var field = eco.Pipeline.GetSystem<FruitSystem>()!.GetType().GetField("_fruits", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var fruitsArray = (Fruit[])field?.GetValue(eco.Pipeline.GetSystem<FruitSystem>()!)!;
         fruitsArray[0] = new Fruit(new Vector2(10, 10), 50f, 100f, "ToxicApple", poisonous: true, toxicity: 1f);
-        var countField = eco.Fruits.GetType().GetField("_fruitCount", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        countField?.SetValue(eco.Fruits, 1);
+        var countField = eco.Pipeline.GetSystem<FruitSystem>()!.GetType().GetField("_fruitCount", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        countField?.SetValue(eco.Pipeline.GetSystem<FruitSystem>()!, 1);
 
         var module = new FeedingModule();
         float energyBefore = toxicHerb.Energy;
@@ -254,16 +254,17 @@ public class FeedingModuleTests
 
         // Clear grid and set up new state to attack strong prey
         eco.Creatures.Remove(weakPrey);
-        var field = eco.GetType().GetField("_spatialGrid", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var grid = (SpatialGrid)field?.GetValue(eco)!;
+        var grid = eco.Spatial;
+        var innerGridField = grid.GetType().GetField("_grid", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var innerGrid = innerGridField?.GetValue(grid)!;
 
-        var bucketsField = grid.GetType().GetField("_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        var locationsField = grid.GetType().GetField("_locations", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var bucketsField = innerGrid.GetType().GetField("_buckets", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var locationsField = innerGrid.GetType().GetField("_locations", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-        var buckets = bucketsField?.GetValue(grid);
+        var buckets = bucketsField?.GetValue(innerGrid);
         buckets?.GetType().GetMethod("Clear")?.Invoke(buckets, null);
 
-        var locations = locationsField?.GetValue(grid);
+        var locations = locationsField?.GetValue(innerGrid);
         locations?.GetType().GetMethod("Clear")?.Invoke(locations, null);
         grid.Update(carn);
 

@@ -63,8 +63,8 @@ public class DiseaseSystemTests
         ecosystem.Initialize(2, 2, 0, 4);
 
         var dt = 1f / 60f;
-        ecosystem.Disease.Update(ecosystem, dt, ecosystem.Random);
+        ecosystem.Pipeline.GetSystem<DiseaseSystem>()!.Update(ecosystem, dt, ecosystem.Random);
 
-        Assert.False(ecosystem.Disease.HasOutbreak);
+        Assert.False(ecosystem.Pipeline.GetSystem<DiseaseSystem>()!.HasOutbreak);
     }
 }

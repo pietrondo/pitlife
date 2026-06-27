@@ -189,7 +189,7 @@ public class TrophicDynamicsTests
         // 10 carnivores, 10 herbivores (ratio 1 < 2 -> Predator pressure)
         // 20 plants
         var eco = CreateEcosystemWithPopulations(10, 10, 20); 
-        eco.Trophic.Update(eco, 1f); // Applies Predator Pressure penalty
+        eco.Pipeline.GetSystem<TrophicDynamics>()!.Update(eco, 1f); // Applies Predator Pressure penalty
 
         var herbivore = CreateHerbivore();
         herbivore.Energy = 100f;
@@ -204,7 +204,7 @@ public class TrophicDynamicsTests
         
         // 3 carnivores, 10 herbivores -> Balanced (plants=20)
         var ecoBalanced = CreateEcosystemWithPopulations(10, 3, 20);
-        ecoBalanced.Trophic.Update(ecoBalanced, 1f); 
+        ecoBalanced.Pipeline.GetSystem<TrophicDynamics>()!.Update(ecoBalanced, 1f);
 
         var herbivoreBalanced = CreateHerbivore();
         herbivoreBalanced.Energy = 100f;

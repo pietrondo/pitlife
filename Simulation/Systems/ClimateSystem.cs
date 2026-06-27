@@ -4,8 +4,11 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class ClimateSystem
+public sealed class ClimateSystem : ISimulationSystem
 {
+
+    public SimulationPhase Phase => SimulationPhase.EarlyUpdate;
+
 
     public const float PlanetRadiusKm = 6371f;
     public const float DefaultOrbitalAU = 1f;

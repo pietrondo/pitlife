@@ -98,7 +98,7 @@ public class DiagnosticsTests
         eco.Initialize(0, 0, 0, 50);
         for (int i = 0; i < 100; i++)
             eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
-        Assert.True(eco.Atmosphere.Oxygen > 40, $"O2={eco.Atmosphere.Oxygen:F1}");
+        Assert.True(eco.Pipeline.GetSystem<AtmosphereSystem>()!.Oxygen > 40, $"O2={eco.Pipeline.GetSystem<AtmosphereSystem>()!.Oxygen:F1}");
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public class DiagnosticsTests
     {
         var eco = new Ecosystem(16, 12, 42);
         eco.Initialize(0, 0, 0, 5);
-        eco.Cataclysms.TriggerAt(eco, eco.Random, "Asteroid", new Vector2(200, 150));
-        Assert.True(eco.Cataclysms.IsActive);
+        eco.Pipeline.GetSystem<CataclysmSystem>()!.TriggerAt(eco, eco.Random, "Asteroid", new Vector2(200, 150));
+        Assert.True(eco.Pipeline.GetSystem<CataclysmSystem>()!.IsActive);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public class DiagnosticsTests
     {
         var eco = new Ecosystem(16, 12, 42);
         eco.Initialize(3, 2, 1, 10);
-        Assert.False(eco.Disease.HasOutbreak);
+        Assert.False(eco.Pipeline.GetSystem<DiseaseSystem>()!.HasOutbreak);
     }
 
     [Fact]

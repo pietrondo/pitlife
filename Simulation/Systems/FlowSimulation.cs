@@ -4,8 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PitLife.Simulation;
 
-public sealed class FlowSimulation :  IDisposable
+public sealed class FlowSimulation : ISimulationSystem, IDisposable
 {
+
+    public SimulationPhase Phase => SimulationPhase.Update;
+
     private readonly World _world;
     private float[,] _water, _lava;
     private Vector2[,] _flowDir;

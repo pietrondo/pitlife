@@ -5,8 +5,11 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class DiseaseSystem
+public sealed class DiseaseSystem : ISimulationSystem
 {
+
+    public SimulationPhase Phase => SimulationPhase.Update;
+
     public readonly struct DiseaseDef
     {
         public string Name { get; init; }
@@ -129,7 +132,7 @@ public sealed class DiseaseSystem
         float transmissionChance = _activeDisease.TransmissionRate * dt;
         if (rng.NextDouble() >= transmissionChance) return;
 
-        var neighbors = ecosystem.FindNeighbors(carrier, 30f,
+        var neighbors = ecosystem.Spatial.FindNeighbors(carrier, 30f,
             n => n.IsAlive && !n.IsInfected && n.CreatureType != CreatureType.Plant
                  && n.Species == carrier.Species);
 

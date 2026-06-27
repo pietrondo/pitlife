@@ -58,7 +58,7 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static bool TryEatNearbyFruit(Creature self, Ecosystem ecosystem)
     {
-        var fruit = ecosystem.Fruits.TryEatFruit(self.Position, 12f);
+        var fruit = ecosystem.Pipeline.GetSystem<FruitSystem>()!.TryEatFruit(self.Position, 12f);
         if (!fruit.HasValue) return false;
 
         if (fruit.Value.Poisonous && self.Genome.PlantRecognition < 0.5f)
@@ -107,7 +107,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (self is not Carnivore carn)
             return false;
 
-        Creature? prey = ecosystem.FindNearestPrey(self);
+        Creature? prey = ecosystem.Spatial.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= self.VisionPixels)
             return TryScavengeCarcass(self, ecosystem, dt);
 
@@ -132,7 +132,7 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         if (TryHuntAsOmnivore(self, ecosystem, dt, world)) return true;
 
-        Plant? food = ecosystem.FindNearestPlantFor(self);
+        Plant? food = ecosystem.Spatial.FindNearestPlantFor(self);
         if (food == null)
             return false;
 
@@ -151,7 +151,7 @@ internal sealed class FeedingModule : IBehaviorModule
         var seekPrey = self.Energy < self.MaxEnergy * 0.4f && ecosystem.Random.NextDouble() < 0.4;
         if (!seekPrey) return false;
 
-        Creature? prey = ecosystem.FindNearestPrey(self);
+        Creature? prey = ecosystem.Spatial.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= self.VisionPixels) return false;
 
         if (self.DistanceTo(prey) >= 10f)
@@ -192,7 +192,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (self is not Carnivore carn)
             return TryScavengeCarcass(self, ecosystem, dt);
 
-        Creature? prey = ecosystem.FindNearestPrey(self);
+        Creature? prey = ecosystem.Spatial.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= 10f)
             return TryScavengeCarcass(self, ecosystem, dt);
 
@@ -205,7 +205,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (TryAttackNearbyPrey(self, ecosystem, dt))
             return true;
 
-        Plant? food = ecosystem.FindNearestPlantFor(self);
+        Plant? food = ecosystem.Spatial.FindNearestPlantFor(self);
         if (food == null || self.DistanceTo(food) >= 12f)
             return TryScavengeCarcass(self, ecosystem, dt);
 
@@ -244,13 +244,13 @@ internal sealed class FeedingModule : IBehaviorModule
     private static Plant? FindFoodPlant(Creature self, Ecosystem ecosystem)
     {
         return self is Herbivore h
-            ? ecosystem.FindNearestPlant(h)
-            : ecosystem.FindNearestPlantFor(self);
+            ? ecosystem.Spatial.FindNearestPlant(h)
+            : ecosystem.Spatial.FindNearestPlantFor(self);
     }
 
     private static bool TryAttackNearbyPrey(Creature self, Ecosystem ecosystem, float dt)
     {
-        Creature? prey = ecosystem.FindNearestPrey(self);
+        Creature? prey = ecosystem.Spatial.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= 10f)
             return false;
 

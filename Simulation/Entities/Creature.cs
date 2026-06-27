@@ -30,7 +30,7 @@ public abstract class Creature
         var def = SpeciesRegistry.Get(Species);
         if (def == null || !def.Hibernates) return;
         var tile = ecosystem.World.GetTileAtPosition(Position.X, Position.Y);
-        float temp = ecosystem.Climate.GetTileTemperature(tile, Position.Y / ecosystem.World.TileSize, ecosystem.World.Height);
+        float temp = ecosystem.Pipeline.GetSystem<ClimateSystem>()!.GetTileTemperature(tile, Position.Y / ecosystem.World.TileSize, ecosystem.World.Height);
         if (temp < BalanceConfig.Data.Hibernation.EnterTemperature && !Hibernating)
         {
             Hibernating = true;
@@ -250,7 +250,7 @@ public abstract class Creature
         if (timeSinceLastReproduction < ReproductionCooldown) return;
 
         int sameSpeciesCount = 0;
-        ecosystem.Metrics.SpeciesPopulations.TryGetValue(Species, out sameSpeciesCount);
+        ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.SpeciesPopulations.TryGetValue(Species, out sameSpeciesCount);
         int totalAnimals = ecosystem.HerbivoreCount + ecosystem.CarnivoreCount + ecosystem.OmnivoreCount;
         if (totalAnimals > 10 && sameSpeciesCount > totalAnimals / 3 && ecosystem.Random.NextDouble() > 0.3f)
             return;
@@ -258,19 +258,19 @@ public abstract class Creature
         // Lotka-Volterra: adjust reproduction probability based on trophic balance
         float trophicBirthBonus = CreatureType switch
         {
-            CreatureType.Herbivore => ecosystem.Trophic.HerbivoreBirthBonus,
-            CreatureType.Carnivore => ecosystem.Trophic.CarnivoreBirthBonus,
+            CreatureType.Herbivore => ecosystem.Pipeline.GetSystem<TrophicDynamics>()!.HerbivoreBirthBonus,
+            CreatureType.Carnivore => ecosystem.Pipeline.GetSystem<TrophicDynamics>()!.CarnivoreBirthBonus,
             _ => 1f
         };
         if (trophicBirthBonus < 1f && ecosystem.Random.NextDouble() > trophicBirthBonus)
             return;
 
-        var mate = ecosystem.FindNearestMate(this);
+        var mate = ecosystem.Spatial.FindNearestMate(this);
         if (mate == null || DistanceTo(mate) >= VisionPixels * 0.5f) return;
 
         if (Gender == Gender.Male)
         {
-            var rivals = ecosystem.FindNeighbors(this, VisionPixels * 0.3f,
+            var rivals = ecosystem.Spatial.FindNeighbors(this, VisionPixels * 0.3f,
                 c => c != this && c.Species == Species && c.Gender == Gender.Male && c.IsAdult);
             foreach (var rival in rivals)
             {
@@ -290,7 +290,7 @@ public abstract class Creature
             if (child != null)
             {
                 ecosystem.AddCreature(child);
-                ecosystem.Metrics.RecordBirth();
+                ecosystem.Pipeline.GetSystem<EcosystemMetrics>()!.RecordBirth();
             }
         }
         LastReproductionTime = ecosystem.TotalTime;
@@ -307,17 +307,17 @@ public abstract class Creature
     internal void ApplyClimateAndPopulationPressure(Ecosystem ecosystem)
     {
         if (CreatureType == CreatureType.Plant) return;
-        float seasonalFactor = ecosystem.Climate.EnergyModifier;
+        float seasonalFactor = ecosystem.Pipeline.GetSystem<ClimateSystem>()!.EnergyModifier;
         float pressureFactor = ecosystem.PopulationPressure;
-        float o2Factor = 2f - ecosystem.Atmosphere.OxygenModifier;
+        float o2Factor = 2f - ecosystem.Pipeline.GetSystem<AtmosphereSystem>()!.OxygenModifier;
         float altitude = ecosystem.World.GetElevation(Position.X, Position.Y);
         float altitudeFactor = altitude > 0.6f ? (altitude - 0.6f) * 3f : 0f;
 
         // Lotka-Volterra trophic dynamics: adjust death rate based on predator-prey balance
         float trophicDeathMultiplier = CreatureType switch
         {
-            CreatureType.Herbivore => ecosystem.Trophic.HerbivoreDeathPenalty,
-            CreatureType.Carnivore => ecosystem.Trophic.CarnivoreDeathPenalty,
+            CreatureType.Herbivore => ecosystem.Pipeline.GetSystem<TrophicDynamics>()!.HerbivoreDeathPenalty,
+            CreatureType.Carnivore => ecosystem.Pipeline.GetSystem<TrophicDynamics>()!.CarnivoreDeathPenalty,
             _ => 1f
         };
 
@@ -344,7 +344,7 @@ public abstract class Creature
         UpdateTerrestrialMultipliers(tile);
 
         int tileY = (int)(Position.Y / ecosystem.World.TileSize);
-        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
+        float tileTemp = ecosystem.Pipeline.GetSystem<ClimateSystem>()!.GetTileTemperature(tile, tileY, ecosystem.World.Height);
         float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
         if (tempDiff > 15f && CreatureType != CreatureType.Plant)
             CurrentEnergyMultiplier += tempDiff * 0.02f;
@@ -589,7 +589,7 @@ public abstract class Creature
 
     public Creature? FindNearestSameSpecies(Ecosystem ecosystem)
     {
-        return ecosystem.FindNearestSameSpecies(this);
+        return ecosystem.Spatial.FindNearestSameSpecies(this);
     }
 
     public bool IsInRange(Creature other, float range)
