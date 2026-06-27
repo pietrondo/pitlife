@@ -5,6 +5,9 @@ using PitLife.Simulation;
 
 namespace PitLife.Rendering;
 
+/// <summary>
+/// Represents the PixelWorldRenderer.
+/// </summary>
 public sealed class PixelWorldRenderer : IDisposable
 {
     private readonly World _world;
@@ -12,11 +15,19 @@ public sealed class PixelWorldRenderer : IDisposable
     private bool _needsRedraw = true;
     private int _renderScale = 8;
 
+    /// <summary>
+    /// Initializes a new instance of the PixelWorldRenderer.
+    /// </summary>
+    /// <param name="world">The world parameter.</param>
     public PixelWorldRenderer(World world)
     {
         _world = world;
     }
 
+    /// <summary>
+    /// Executes the LoadContent.
+    /// </summary>
+    /// <param name="gd">The gd parameter.</param>
     public void LoadContent(GraphicsDevice gd)
     {
         int texWidth = _world.Width * _renderScale;
@@ -26,8 +37,16 @@ public sealed class PixelWorldRenderer : IDisposable
         _needsRedraw = true;
     }
 
+    /// <summary>
+    /// Executes the Invalidate.
+    /// </summary>
     public void Invalidate() => _needsRedraw = true;
 
+    /// <summary>
+    /// Executes the Draw.
+    /// </summary>
+    /// <param name="sb">The sb parameter.</param>
+    /// <param name="camera">The camera parameter.</param>
     public void Draw(SpriteBatch sb, Camera camera)
     {
         if (_worldTexture == null) return;
@@ -194,6 +213,9 @@ public sealed class PixelWorldRenderer : IDisposable
         _ => Color.Magenta
     };
 
+    /// <summary>
+    /// Executes the Dispose.
+    /// </summary>
     public void Dispose()
     {
         _worldTexture?.Dispose();
@@ -201,13 +223,31 @@ public sealed class PixelWorldRenderer : IDisposable
     }
 
     // Static accessors for testing
+    /// <summary>
+    /// Executes the GetBiomeBaseColors.
+    /// </summary>
+    /// <returns>Returns the Color[] result.</returns>
     public static Color[] GetBiomeBaseColors() => new[] { GetBiomeRenderColor((BiomeType)0), GetBiomeRenderColor((BiomeType)1), GetBiomeRenderColor((BiomeType)2), GetBiomeRenderColor((BiomeType)3), GetBiomeRenderColor((BiomeType)4), GetBiomeRenderColor((BiomeType)5), GetBiomeRenderColor((BiomeType)6), GetBiomeRenderColor((BiomeType)7), GetBiomeRenderColor((BiomeType)8), GetBiomeRenderColor((BiomeType)9), GetBiomeRenderColor((BiomeType)10), GetBiomeRenderColor((BiomeType)11), GetBiomeRenderColor((BiomeType)12), GetBiomeRenderColor((BiomeType)13), GetBiomeRenderColor((BiomeType)14) };
+    /// <summary>
+    /// Executes the GetBiomeDetailColors.
+    /// </summary>
+    /// <returns>Returns the Color[] result.</returns>
     public static Color[] GetBiomeDetailColors() => GetBiomeBaseColors();
+    /// <summary>
+    /// Executes the GetBiomeHighlightColors.
+    /// </summary>
+    /// <returns>Returns the Color[] result.</returns>
     public static Color[] GetBiomeHighlightColors() => GetBiomeBaseColors();
+    /// <summary>
+    /// Gets or sets the RenderScale.
+    /// </summary>
     public static int RenderScale => 8;
 }
 
 // Simplex noise implementation (FastNoiseLite-style)
+/// <summary>
+/// Represents the FastNoiseLite.
+/// </summary>
 public sealed class FastNoiseLite
 {
     private readonly int _seed;
@@ -216,11 +256,29 @@ public sealed class FastNoiseLite
 
     public enum NoiseType { OpenSimplex2, Perlin, Value }
 
+    /// <summary>
+    /// Initializes a new instance of the FastNoiseLite.
+    /// </summary>
+    /// <param name="seed">The seed parameter.</param>
     public FastNoiseLite(int seed) => _seed = seed;
 
+    /// <summary>
+    /// Executes the SetFrequency.
+    /// </summary>
+    /// <param name="freq">The freq parameter.</param>
     public void SetFrequency(float freq) => _frequency = freq;
+    /// <summary>
+    /// Executes the SetNoiseType.
+    /// </summary>
+    /// <param name="type">The type parameter.</param>
     public void SetNoiseType(NoiseType type) => _type = type;
 
+    /// <summary>
+    /// Executes the GetNoise.
+    /// </summary>
+    /// <param name="x">The x parameter.</param>
+    /// <param name="y">The y parameter.</param>
+    /// <returns>Returns the float result.</returns>
     public float GetNoise(float x, float y)
     {
         return _type switch
