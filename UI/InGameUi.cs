@@ -141,28 +141,7 @@ public sealed class InGameUi
         RefreshText();
         LayoutToolbar(viewportHeight);
 
-        if (Pressed(keyboard, previousKeyboard, Keys.F2))
-        {
-            _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-        if (Pressed(keyboard, previousKeyboard, Keys.F3))
-        {
-            _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-        if (Pressed(keyboard, previousKeyboard, Keys.F5))
-            _windowManager.TileWindows(viewportWidth, viewportHeight);
-        if (Pressed(keyboard, previousKeyboard, Keys.F8))
-        {
-            _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
-        if (Pressed(keyboard, previousKeyboard, Keys.F9))
-        {
-            _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
-            ToolbarButtonClicked?.Invoke();
-        }
+        HandleKeyboardShortcuts(keyboard, previousKeyboard, viewportWidth, viewportHeight);
 
         bool toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
@@ -214,6 +193,32 @@ public sealed class InGameUi
 
         bool overToolbar = _toolbarRect.Contains(mouse.Position);
         return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
+    }
+
+    private void HandleKeyboardShortcuts(KeyboardState keyboard, KeyboardState previousKeyboard, int viewportWidth, int viewportHeight)
+    {
+        if (Pressed(keyboard, previousKeyboard, Keys.F2))
+        {
+            _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F3))
+        {
+            _windowManager.Toggle(CreatureWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F5))
+            _windowManager.TileWindows(viewportWidth, viewportHeight);
+        if (Pressed(keyboard, previousKeyboard, Keys.F8))
+        {
+            _windowManager.Toggle(CataclysmWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
+        if (Pressed(keyboard, previousKeyboard, Keys.F9))
+        {
+            _windowManager.Toggle(ClimateWindowId, viewportWidth, viewportHeight);
+            ToolbarButtonClicked?.Invoke();
+        }
     }
 
     public void Draw(
