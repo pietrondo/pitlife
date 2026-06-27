@@ -66,6 +66,7 @@ internal sealed class SpatialGrid
     public List<Creature> GetNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
     {
         var results = new List<Creature>();
+
         float radiusSquared = radius * radius;
         var position = seeker.Position;
 
