@@ -328,7 +328,6 @@ public class Ecosystem
         HerbivoreCount = herbivores;
         CarnivoreCount = carnivores;
         OmnivoreCount = omnivores;
-        Metrics.Update(this);
 
         foreach (var species in _knownSpecies.ToArray())
         {

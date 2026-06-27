@@ -11,7 +11,7 @@ namespace PitLife.Rendering;
 /// <summary>
 /// Represents the CreatureRenderer.
 /// </summary>
-public class CreatureRenderer
+public class CreatureRenderer : IDisposable
 {
     private readonly Ecosystem _ecosystem;
     private Texture2D? _pixelTexture;
@@ -28,6 +28,25 @@ public class CreatureRenderer
     /// </summary>
     /// <param name="ecosystem">The ecosystem parameter.</param>
     public CreatureRenderer(Ecosystem ecosystem) => _ecosystem = ecosystem;
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        _pixelTexture?.Dispose();
+        _plantTexture?.Dispose();
+        _herbivoreTexture?.Dispose();
+        _carnivoreTexture?.Dispose();
+        _omnivoreTexture?.Dispose();
+        foreach (var tex in _speciesTextures.Values)
+            tex.Dispose();
+        foreach (var (male, female) in _genderedSpeciesTextures.Values)
+        {
+            male.Dispose();
+            female.Dispose();
+        }
+    }
 
     /// <summary>
     /// Executes the LoadContent.

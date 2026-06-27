@@ -1,22 +1,3 @@
-## BOLT'S JOURNAL
-
-## 2024-05-18 - WorldRenderer Culling and Draw Calls Optimization
-**Learning:** `WorldRenderer.Draw` method creates new `Rectangle` structs inside the loop and loops over the grid, drawing multiple layers per tile (base texture, and up to 4 edges). It could be optimized to minimize state changes and reduce struct allocations in loop.
-**Action:** Replace `new Rectangle` inside loops with inline structs or precalculate. Group texture draws to minimize texture swaps and reduce draw calls.
-## 2024-05-18 - Avoid instantiating Rectangles on each Draw in loop
-**Learning:** `new Rectangle` doesn't allocate on heap (it's a struct), however `WorldRenderer.Draw` method creates new `Rectangle` objects constantly inside `sb.Draw` calls and the loop loops over a calculated bounding box. It could be cleaner with math. Also, `CreatureRenderer.Draw` doesn't fully take advantage of culling by pure mathematical grid indexing, though it uses `camera.VisibleArea`. Let's focus on `WorldRenderer.Draw` loop since that draws every tile, while `PixelWorldRenderer` caches the world. Looking closely, `PixelWorldRenderer` draws a huge chunk at once, while `WorldRenderer` iterates over individual tiles, drawing 1-5 things per tile!
-
-Wait, Game1.cs uses `_worldRenderer = new PixelWorldRenderer(_ecosystem.World);`
-And `_spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix); _worldRenderer.Draw(_spriteBatch, _camera);`
-Wait... `Game1.cs` only uses `PixelWorldRenderer`. `WorldRenderer` is unused or maybe an old version? Let's verify.
-**Learning:** `Game1.cs` only instantiates and uses `PixelWorldRenderer` for the world! `PixelWorldRenderer` renders the whole map into a giant `Texture2D` (`_worldTexture`) and then draws it using 9 loops (`dx` from -1 to 1, `dy` from -1 to 1) for tiling/wrapping, drawing the FULL texture 9 times every frame regardless of camera zoom or bounds! This is a massive draw call/fillrate issue! The texture size is `_world.Width * _renderScale` x `_world.Height * _renderScale` (e.g. 400x8 = 3200 width, 300x8 = 2400 height!). Drawing this 9 times means submitting 3200x2400 textures 9 times per frame!
-**Action:** Optimize `PixelWorldRenderer.Draw` to only draw the copies of `_worldTexture` that actually intersect with `camera.VisibleArea`.
-**Learning:** `PixelWorldRenderer` creates a single massive `Texture2D` containing the whole world scaled by `_renderScale` (which is 8). The map wraps around infinitely. Currently `PixelWorldRenderer.Draw` calls `sb.Draw` 9 times (3x3 grid) to allow infinite scrolling. It just blindly draws the whole texture 9 times, even though only 1-4 of them could possibly be visible on the screen! This is terrible for fill rate.
-**Action:** Optimize `PixelWorldRenderer.Draw` to only draw the copies of `_worldTexture` that actually intersect with `camera.VisibleArea`. Since we know `pw = _world.PixelWidth` and `ph = _world.PixelHeight`, and `camera.VisibleArea` gives us the `Rectangle` of what's currently visible. We can do simple AABB intersection `camera.VisibleArea.Intersects(...)` or calculate precisely which `dx` and `dy` indices we need to draw.
-**Learning:** `Camera.cs` uses `ClampPosition` that wraps around using `% WorldWidth`. The `VisibleArea` calculation creates a rectangle that matches exactly what is shown on screen.
-In `PixelWorldRenderer.Draw`, `pw` and `ph` represent the total scaled pixel width and height of the world map. Currently it loops 3x3 times, drawing the world from `dx=-1` to `dx=1` and `dy=-1` to `dy=1`. This is 9 `sb.Draw` calls.
-If we check whether `camera.VisibleArea.Intersects(...)` before drawing, we can cull up to 8 of those 9 draw calls, leaving only 1 to 4 draw calls at map wrap boundaries!
-This perfectly fits Bolt's philosophy: "Measure first, optimize second. If it's off-screen, it doesn't exist. Rely on pure mathematical grid coordinates for culling... minimizes Draw Calls."
-## 2024-05-18 - Culling PixelWorldRenderer
-**Learning:** Hardcoded loops from -1 to 1 for full texture draws cause immense fill rate issues when most wraps are off-screen. Mathematical boundaries calculated via `camera.VisibleArea` and texture dimensions (`MathF.Floor((float)visible.Left / pw)`) effectively cull grid chunks perfectly.
-**Action:** Always prefer mathematical intersections and exact boundary start/end limits for tile or wrapped grid rendering over fixed loops and naive off-screen drawing.
+## 2024-05-19 - Memory Optimization in Render Loops
+**Learning:** `SpriteBatch.DrawString` in MonoGame has an overload taking `StringBuilder` to avoid string allocations, but custom localization wrappers like `I18n.Format` use `params object[]` and `string.Format`, forcing boxing and string allocations.
+**Action:** When performing zero-allocation optimizations, bypass or refactor custom wrappers like `I18n.Format` that implicitly allocate, and use pre-allocated StringBuilders passed directly to MonoGame's rendering API.
