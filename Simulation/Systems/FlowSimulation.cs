@@ -49,45 +49,63 @@ public sealed class FlowSimulation :  IDisposable
         _timeAccum = 0f;
 
         int w = _world.Width, h = _world.Height;
-        var nw = new float[w, h];
-        var nl = new float[w, h];
 
-        for (int y = 2; y < h - 2; y += 2)
-            for (int x = 2; x < w - 2; x += 2)
-            {
-                float myElev = _world.ElevationField[y * w + x];
-                float w0 = _water[x, y], l0 = _lava[x, y];
-                nw[x, y] = w0; nl[x, y] = l0;
-                Vector2 bestDir = Vector2.Zero;
-                float bestDiff = 0;
+        var nw = System.Buffers.ArrayPool<float>.Shared.Rent(w * h);
+        var nl = System.Buffers.ArrayPool<float>.Shared.Rent(w * h);
 
-                for (int dy = -1; dy <= 1; dy++)
-                    for (int dx = -1; dx <= 1; dx++)
-                    {
-                        if (dx == 0 && dy == 0) continue;
-                        float ne = _world.ElevationField[(y + dy) * w + (x + dx)];
-                        float diff = myElev - ne;
-                        if (diff <= 0) continue;
-                        if (diff > bestDiff) { bestDiff = diff; bestDir = new Vector2(dx, dy); }
-                        float rate = diff * 0.1f;
-                        float wf = Math.Min(w0 * rate, w0 * 0.25f);
-                        nw[x, y] -= wf; nw[x + dx, y + dy] += wf;
-                        float lf = Math.Min(l0 * rate * 0.3f, l0 * 0.1f);
-                        nl[x, y] -= lf; nl[x + dx, y + dy] += lf;
-                    }
+        try
+        {
+            Array.Clear(nw, 0, w * h);
+            Array.Clear(nl, 0, w * h);
 
-                _flowDir[x, y] = bestDir;
+            for (int y = 2; y < h - 2; y += 2)
+                for (int x = 2; x < w - 2; x += 2)
+                {
+                    float myElev = _world.ElevationField[y * w + x];
+                    float w0 = _water[x, y], l0 = _lava[x, y];
+                    nw[y * w + x] = w0; nl[y * w + x] = l0;
+                    Vector2 bestDir = Vector2.Zero;
+                    float bestDiff = 0;
 
-                float temp = TileTemperature(x, y, _world.Tiles[x, y].Biome);
-                nw[x, y] = Math.Max(0, nw[x, y] - w0 * 0.01f * (1f + temp / 40f));
+                    for (int dy = -1; dy <= 1; dy++)
+                        for (int dx = -1; dx <= 1; dx++)
+                        {
+                            if (dx == 0 && dy == 0) continue;
+                            float ne = _world.ElevationField[(y + dy) * w + (x + dx)];
+                            float diff = myElev - ne;
+                            if (diff <= 0) continue;
+                            if (diff > bestDiff) { bestDiff = diff; bestDir = new Vector2(dx, dy); }
+                            float rate = diff * 0.1f;
+                            float wf = Math.Min(w0 * rate, w0 * 0.25f);
+                            nw[y * w + x] -= wf; nw[(y + dy) * w + (x + dx)] += wf;
+                            float lf = Math.Min(l0 * rate * 0.3f, l0 * 0.1f);
+                            nl[y * w + x] -= lf; nl[(y + dy) * w + (x + dx)] += lf;
+                        }
 
-                if (_world.Tiles[x, y].Biome == BiomeType.Volcano)
-                    nl[x, y] = Math.Min(1f, nl[x, y] + 0.1f);
-                if (_world.RiverMask[y * w + x])
-                    nw[x, y] = Math.Min(1f, nw[x, y] + 0.05f);
-            }
+                    _flowDir[x, y] = bestDir;
 
-        _water = nw; _lava = nl;
+                    float temp = TileTemperature(x, y, _world.Tiles[x, y].Biome);
+                    nw[y * w + x] = Math.Max(0, nw[y * w + x] - w0 * 0.01f * (1f + temp / 40f));
+
+                    if (_world.Tiles[x, y].Biome == BiomeType.Volcano)
+                        nl[y * w + x] = Math.Min(1f, nl[y * w + x] + 0.1f);
+                    if (_world.RiverMask[y * w + x])
+                        nw[y * w + x] = Math.Min(1f, nw[y * w + x] + 0.05f);
+                }
+
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                {
+                    _water[x, y] = nw[y * w + x];
+                    _lava[x, y] = nl[y * w + x];
+                }
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<float>.Shared.Return(nw);
+            System.Buffers.ArrayPool<float>.Shared.Return(nl);
+        }
+
         _dirty = true;
     }
 

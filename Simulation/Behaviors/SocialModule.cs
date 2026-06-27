@@ -13,8 +13,8 @@ internal sealed class SocialModule : IBehaviorModule
 
     public void DefendInfants(Creature self, Ecosystem ecosystem, float dt)
     {
-        var infants = ecosystem.FindNeighbors(self, 40f,
-            c => c.IsBaby && c.Parent == self && c.IsAlive);
+        bool IsInfant(Creature c) => c.IsBaby && c.Parent == self && c.IsAlive;
+        var infants = ecosystem.FindNeighbors(self, 40f, IsInfant);
         if (infants.Count == 0) return;
 
         var infant = infants[0];
@@ -45,7 +45,8 @@ internal sealed class SocialModule : IBehaviorModule
             case SocialBehavior.Pack:
                 {
                     var flockMoved = ApplyFlocking(self, ecosystem, dt, world, cohesionWeight: 1.2f, separationWeight: 1.0f, alignmentWeight: 1.5f, separationDist: 25f);
-                    var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, n => n.Species == self.Species);
+                    bool IsSame(Creature n) => n.Species == self.Species;
+                    var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels * 0.3f, IsSame);
                     if (neighbors.Count > 0)
                     {
                         self.Energy = Math.Min(self.MaxEnergy, self.Energy + 5f * dt);
@@ -79,7 +80,8 @@ internal sealed class SocialModule : IBehaviorModule
         float alignmentWeight,
         float separationDist)
     {
-        var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels, n => n.Species == self.Species);
+        bool IsSame(Creature n) => n.Species == self.Species;
+        var neighbors = ecosystem.FindNeighbors(self, self.VisionPixels, IsSame);
         if (neighbors.Count == 0)
             return false;
 
