@@ -17,6 +17,9 @@ public sealed class SpeciesEditorService
         string repositoryRoot,
         string catalogPath)
     {
+        ArgumentNullException.ThrowIfNull(runtime);
+        ArgumentNullException.ThrowIfNull(repositoryRoot);
+        ArgumentNullException.ThrowIfNull(catalogPath);
         _runtime = runtime;
         _repositoryRoot = repositoryRoot;
         _catalogPath = catalogPath;
@@ -31,11 +34,13 @@ public sealed class SpeciesEditorService
 
     public IReadOnlyList<SpeciesCatalogValidationError> Add(SpeciesCatalogEntry entry)
     {
+        ArgumentNullException.ThrowIfNull(entry);
         return SaveEntry(entry, replaceExisting: false);
     }
 
     public IReadOnlyList<SpeciesCatalogValidationError> Upsert(SpeciesCatalogEntry entry)
     {
+        ArgumentNullException.ThrowIfNull(entry);
         return SaveEntry(entry, replaceExisting: true);
     }
 

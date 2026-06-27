@@ -12,6 +12,20 @@ Rules:
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 
 
+## Delegation to Jules CLI
+
+Jules (`npm install -g @google/jules`) is Google's autonomous AI coding agent.
+Use `.opencode/skills/jules/SKILL.md` for the full workflow. Key points:
+
+- Delegate well-scoped tasks: `jules remote new --repo pietrondo/pitlife --session "<prompt>"`
+- Retrieve: `jules remote pull --session <id>` — always review the diff before merging.
+- **Windows (pwsh) race condition:** launching multiple `jules remote new` in parallel
+  crashes the CLI (gzip extraction collision in %TEMP%\jules_tmp). Always run them
+  **sequentially** (one at a time), or clear the cache between attempts:
+  `Remove-Item -Recurse -Force "$env:TEMP\jules_tmp" -ErrorAction SilentlyContinue`
+- Track delegated work in bd (issues have session IDs in the description).
+
+
 ## Development Rules
 
 1. **Ask, don't assume.** If something is unclear, ask before writing a single line. Never make silent assumptions about intent, architecture, or requirements. When running unattended, pick the most reasonable interpretation, proceed, and record the assumption rather than blocking.

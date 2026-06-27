@@ -12,6 +12,7 @@ public sealed class PixelWorldRenderer : IDisposable
 {
     private readonly World _world;
     private Texture2D? _worldTexture;
+    private Color[]? _textureData;
     private bool _needsRedraw = true;
     private int _renderScale = 8;
 
@@ -34,6 +35,13 @@ public sealed class PixelWorldRenderer : IDisposable
         int texHeight = _world.Height * _renderScale;
         _worldTexture?.Dispose();
         _worldTexture = new Texture2D(gd, texWidth, texHeight);
+
+        int requiredSize = texWidth * texHeight;
+        if (_textureData == null || _textureData.Length != requiredSize)
+        {
+            _textureData = new Color[requiredSize];
+        }
+
         _needsRedraw = true;
     }
 
@@ -78,11 +86,11 @@ public sealed class PixelWorldRenderer : IDisposable
 
     private void RedrawWorldTexture(GraphicsDevice gd)
     {
-        if (_worldTexture == null) return;
+        if (_worldTexture == null || _textureData == null) return;
 
         int width = _worldTexture.Width;
         int height = _worldTexture.Height;
-        Color[] data = new Color[width * height];
+        Color[] data = _textureData;
 
         for (int y = 0; y < height; y++)
         {
@@ -220,6 +228,7 @@ public sealed class PixelWorldRenderer : IDisposable
     {
         _worldTexture?.Dispose();
         _worldTexture = null;
+        _textureData = null;
     }
 
     // Static accessors for testing

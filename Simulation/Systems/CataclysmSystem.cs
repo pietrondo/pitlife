@@ -72,11 +72,11 @@ public sealed class CataclysmSystem
 
         _cooldownTimer = 180f + (float)rng.NextDouble() * 420f;
 
-        if (rng.NextDouble() < 0.3f)
+        if (rng.NextDouble() < CataclysmConfig.Data.Chances.RandomTriggerChance)
         {
             TriggerRandom(ecosystem, rng);
         }
-        else if (rng.NextDouble() < 0.05f && ecosystem.TotalTime > 120f)
+        else if (rng.NextDouble() < CataclysmConfig.Data.Chances.MassExtinctionChance && ecosystem.TotalTime > CataclysmConfig.Data.Chances.MassExtinctionMinTime)
         {
             TriggerMassExtinction(ecosystem, rng);
         }
@@ -84,37 +84,20 @@ public sealed class CataclysmSystem
 
     private void TriggerMassExtinction(Ecosystem ecosystem, Random rng)
     {
-        int type = rng.Next(3);
-        switch (type)
-        {
-            case 0:
-                ActiveEvent = "Asteroid Impact";
-                GrassMultiplier = 0f;
-                Timer = 60f;
-                break;
-            case 1:
-                ActiveEvent = "Ice Age";
-                GrassMultiplier = 0.1f;
-                Timer = 120f;
-                break;
-            case 2:
-                ActiveEvent = "Supervolcano";
-                GrassMultiplier = 0.05f;
-                Timer = 90f;
-                break;
-        }
+        var extinctions = CataclysmConfig.Data.MassExtinctions;
+        if (extinctions.Count == 0) return;
+        var ev = extinctions[rng.Next(extinctions.Count)];
+
+        ActiveEvent = ev.Name;
+        GrassMultiplier = ev.GrassMultiplier;
+        Timer = ev.Duration;
         IsActive = true;
-        int radius = ApplyTerrainChange(ecosystem);
+
+        int radius = ApplyTerrainChange(ecosystem, ev.Radius);
         if (radius > 0)
         {
             ImpactRadius = radius * ecosystem.World.TileSize;
-            ImpactColor = ActiveEvent switch
-            {
-                "Asteroid Impact" => new Color(255, 100, 30, (int)200),
-                "Supervolcano" => new Color(255, 50, 10, (int)200),
-                "Ice Age" => new Color(100, 200, 255, (int)150),
-                _ => Color.Transparent
-            };
+            ImpactColor = ev.Color.ToColor();
             AnimTimer = 0;
             AnimDuration = 2f;
         }
@@ -122,14 +105,9 @@ public sealed class CataclysmSystem
         TryChainReaction(ecosystem, rng, ActiveEvent, ImpactPosition);
     }
 
-    private int ApplyTerrainChange(Ecosystem ecosystem)
+    private int ApplyTerrainChange(Ecosystem ecosystem, int defaultRadius = 0)
     {
-        int radius = ActiveEvent switch
-        {
-            "Asteroid Impact" => 8,
-            "Supervolcano" => 5,
-            _ => 0
-        };
+        int radius = defaultRadius;
         if (radius <= 0) return 0;
         int w = ecosystem.World.Width, h = ecosystem.World.Height;
         int cx = ecosystem.Random.Next(Math.Min(radius, w - radius), Math.Max(radius + 1, w - radius));
@@ -153,60 +131,61 @@ public sealed class CataclysmSystem
 
     private void TryChainReaction(Ecosystem ecosystem, Random rng, string type, Vector2 position)
     {
+        var chains = CataclysmConfig.Data.ChainReactions;
+
         // Earthquake on water → Tsunami
         if (type == "Earthquake")
         {
             int tx = (int)(position.X / ecosystem.World.TileSize);
             int ty = (int)(position.Y / ecosystem.World.TileSize);
             bool nearWater = false;
-            for (int dy = -3; dy <= 3 && !nearWater; dy++)
-                for (int dx = -3; dx <= 3 && !nearWater; dx++)
+            for (int dy = -chains.EarthquakeTsunamiRadius; dy <= chains.EarthquakeTsunamiRadius && !nearWater; dy++)
+                for (int dx = -chains.EarthquakeTsunamiRadius; dx <= chains.EarthquakeTsunamiRadius && !nearWater; dx++)
                 {
                     var t = ecosystem.World.GetTile(tx + dx, ty + dy);
                     if (t.Biome == BiomeType.DeepOcean || t.Biome == BiomeType.ShallowWater)
                         nearWater = true;
                 }
-            if (nearWater && rng.NextDouble() < 0.4f)
+            if (nearWater && rng.NextDouble() < chains.EarthquakeTsunamiChance)
             {
                 Logger.Event("CATACLYSM", $"Chain: Earthquake → Tsunami at ({tx},{ty})");
                 ImpactColor = new Color(30, 100, 200, 180);
                 ActiveEvent = "Tsunami";
-                GrassMultiplier = 2.5f;
+                GrassMultiplier = chains.TsunamiGrassMultiplier;
                 IsActive = true;
-                Timer = 25f;
+                Timer = chains.TsunamiDuration;
             }
         }
 
         // Supervolcano → volcanic winter
-        if (type == "Supervolcano" && rng.NextDouble() < 0.5f)
+        if (type == "Supervolcano" && rng.NextDouble() < chains.SupervolcanoWinterChance)
         {
             Logger.Event("CATACLYSM", $"Chain: Supervolcano → Volcanic Winter");
-            GrassMultiplier *= 0.2f;
-            Timer = Math.Max(Timer, 60f);
+            GrassMultiplier *= chains.SupervolcanoWinterGrassMultiplier;
+            Timer = Math.Max(Timer, chains.WinterMinDuration);
         }
     }
 
     public void TriggerAt(Ecosystem ecosystem, Random rng, string type, Microsoft.Xna.Framework.Vector2 position)
     {
-        ActiveEvent = type;
+        var ev = CataclysmConfig.Data.PlayerEvents.Find(e => e.Name == type) ?? CataclysmConfig.Data.PlayerEvents[0];
+
+        ActiveEvent = ev.Name;
         IsActive = true;
-        Timer = 40f;
-        GrassMultiplier = type switch { "Drought" => 0.1f, "Flood" => 2.5f, _ => 0.2f };
+        Timer = ev.Duration;
+        GrassMultiplier = ev.GrassMultiplier;
+
         int tx = (int)(position.X / ecosystem.World.TileSize);
         int ty = (int)(position.Y / ecosystem.World.TileSize);
-        int radius = type switch { "Asteroid" => 6, "Supervolcano" => 5, "Earthquake" => 8, _ => 3 };
+        int radius = ev.Radius;
+
         ImpactPosition = position;
         ImpactRadius = radius * ecosystem.World.TileSize;
-        ImpactColor = type switch
-        {
-            "Asteroid" => new Color(255, 100, 30, (int)200),
-            "Supervolcano" => new Color(255, 50, 10, (int)200),
-            "Earthquake" => new Color(180, 140, 100, (int)150),
-            "IceAge" => new Color(100, 200, 255, (int)150),
-            "Drought" => new Color(255, 180, 40, (int)150),
-            "Flood" => new Color(40, 140, 255, (int)150),
-            _ => Color.Transparent
-        };
+        ImpactColor = ev.Color.ToColor();
+
+        Enum.TryParse<BiomeType>(ev.InnerBiome, out var innerBiome);
+        Enum.TryParse<BiomeType>(ev.OuterBiome, out var outerBiome);
+
         for (int dy = -radius; dy <= radius; dy++)
             for (int dx = -radius; dx <= radius; dx++)
             {
@@ -218,25 +197,13 @@ public sealed class CataclysmSystem
 
                 // Visible terrain changes (set Biome first - it resets grass)
                 float dist = MathF.Sqrt(dx * dx + dy * dy);
-                if (dist < radius * 0.4f)
+                if (dist < radius * 0.4f && ev.InnerBiome != "None")
                 {
-                    tile.Biome = type switch
-                    {
-                        "Asteroid" or "Supervolcano" => BiomeType.Volcano,
-                        "Earthquake" => BiomeType.Cave,
-                        "IceAge" => BiomeType.Snow,
-                        "Flood" => BiomeType.ShallowWater,
-                        _ => BiomeType.Desert
-                    };
+                    tile.Biome = innerBiome;
                 }
-                else if (dist < radius * 0.8f)
+                else if (dist < radius * 0.8f && ev.OuterBiome != "None")
                 {
-                    if (type is "Asteroid" or "Supervolcano" or "Drought")
-                        tile.Biome = BiomeType.Desert;
-                    else if (type == "Earthquake")
-                        tile.Biome = BiomeType.Mountain;
-                    else if (type == "IceAge")
-                        tile.Biome = BiomeType.Tundra;
+                    tile.Biome = outerBiome;
                 }
 
                 bool biomeChanged = tile.Biome != previousBiome;
@@ -247,8 +214,8 @@ public sealed class CataclysmSystem
                 }
 
                 // Then override grass/soil
-                tile.GrassAmount = type == "Flood" ? tile.MaxGrass : 0f;
-                tile.SoilNutrients = type == "Flood" ? 2f : 0.1f;
+                tile.GrassAmount = ev.GrassAmount;
+                tile.SoilNutrients = ev.SoilNutrients;
             }
         Logger.Event("CATACLYSM", $"Player {type} at ({tx},{ty}) r={radius}");
         TryChainReaction(ecosystem, rng, type, position);

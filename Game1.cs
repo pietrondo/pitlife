@@ -143,7 +143,7 @@ public class Game1 : Game
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, AssetRegistry.SpeciesTextures);
         _creatureRenderer.LoadGenderedFromRegistry(GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
 
-        _logo = LoadTexture("Content/assets/logo.png");
+        _logo = LoadTexture("Content/logo.png");
         _contentLoaded = true;
     }
 
@@ -187,36 +187,7 @@ public class Game1 : Game
 
         if (UpdateMainMenu(gameTime, dt, kbd, mouse, gamepadBack)) return;
 
-        if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
-            _showDebugOverlay = !_showDebugOverlay;
-        if (kbd.IsKeyDown(Keys.F5) && _prevKbd.IsKeyUp(Keys.F5))
-            _cyclopedia.Toggle(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-        if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
-            _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
-        if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
-        {
-            _speciesEditor.Toggle();
-            if (_cyclopedia.IsOpen)
-            {
-                if (escapePressed)
-                    _cyclopedia.Close();
-                else
-                    _cyclopedia.Update(mouse, _prevMouse, kbd, _prevKbd,
-                        GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-
-                _prevKbd = kbd;
-                _prevMouse = mouse;
-                base.Update(gameTime);
-                return;
-            }
-
-            if (_speciesEditor.IsOpen)
-            {
-                _inGameUi.CloseAllWindows();
-                if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
-                if (_spawnPanel.IsOpen) _spawnPanel.Close();
-            }
-        }
+        if (HandleKeyboardInput(gameTime, dt, kbd, mouse, escapePressed)) return;
 
         if (_speciesEditor.IsOpen)
         {
@@ -292,12 +263,6 @@ public class Game1 : Game
         _spawnPanel.SetViewportHeight(GraphicsDevice.Viewport.Height);
         var cataWasOpen = _cataclysmPanel.IsOpen;
         var spawnWasOpen = _spawnPanel.IsOpen;
-        if (kbd.IsKeyDown(Keys.F8) && !_prevKbd.IsKeyDown(Keys.F8))
-            _cataclysmPanel.Toggle();
-        if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
-        {
-            _spawnPanel.Toggle();
-        }
         var spawnPanelConsumed = _spawnPanel.Update(mouse, _prevMouse, kbd, _prevKbd);
         var cataConsumed = _cataclysmPanel.Update(mouse, _prevMouse);
         spawnPanelConsumed = spawnPanelConsumed || _spawnPanel.HandleCataclysmClick(mouse, _prevMouse);
@@ -340,26 +305,6 @@ public class Game1 : Game
         if (_cataclysmPanel.SelectedType == null && !_cataclysmPanel.IsOpen) _prevPanelCata = null;
         if (_spawnPanel.SelectedCataclysm == null) _prevSpawnCata = null;
 
-        // ESC: close panel if open, otherwise cancel active mode
-        if (kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape))
-        {
-            if (_cataclysmPanel.IsOpen)
-                _cataclysmPanel.Toggle();
-            else if (_spawnPanel.IsOpen)
-                _spawnPanel.Toggle();
-            if (_cataclysmPanel.SelectedType != null || _spawnPanel.SelectedCataclysm != null || _spawnPanel.SelectedSpeciesKey != null)
-            {
-                _spawnPanel.SelectedCataclysm = null;
-                _spawnPanel.DeselectSpecies();
-                _cataclysmPanel.SelectedType = null;
-                _prevPanelCata = null;
-                _prevSpawnCata = null;
-                _prevSpawnSpecies = null;
-                _cataSelectedFrame = 0;
-            }
-        }
-
-        HandleInputShortcuts(dt, kbd);
         _prevKbd = kbd;
 
         _controller.Advance(dt);
@@ -387,7 +332,7 @@ public class Game1 : Game
     {
         if (_screen != GameScreen.MainMenu) return false;
 
-        if (!_mainMenu.IsWorldGenPanelOpen)
+        if (!_mainMenu.IsWorldGenPanelOpen && !_paused)
         {
             _ecosystem.SimulationSpeed = 0.35f;
             _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(dt), TimeSpan.FromSeconds(dt)));
@@ -489,8 +434,74 @@ public class Game1 : Game
         return true;
     }
 
-    private void HandleInputShortcuts(float dt, KeyboardState kbd)
+    private bool HandleKeyboardInput(GameTime gameTime, float dt, KeyboardState kbd, MouseState mouse, bool escapePressed)
     {
+        // Debug
+        if (kbd.IsKeyDown(Keys.F1) && _prevKbd.IsKeyUp(Keys.F1))
+            _showDebugOverlay = !_showDebugOverlay;
+
+        // Species Cyclopedia
+        if (kbd.IsKeyDown(Keys.G) && _prevKbd.IsKeyUp(Keys.G))
+            _cyclopedia.Toggle(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+        // Manual Cataclysm
+        if (kbd.IsKeyDown(Keys.F7) && _prevKbd.IsKeyUp(Keys.F7))
+            _ecosystem.Cataclysms.TriggerManual(_ecosystem, _ecosystem.Random);
+
+        // Species Editor
+        if (kbd.IsKeyDown(Keys.F6) && _prevKbd.IsKeyUp(Keys.F6))
+        {
+            _speciesEditor.Toggle();
+            if (_cyclopedia.IsOpen)
+            {
+                if (escapePressed)
+                    _cyclopedia.Close();
+                else
+                    _cyclopedia.Update(mouse, _prevMouse, kbd, _prevKbd,
+                        GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+                _prevKbd = kbd;
+                _prevMouse = mouse;
+                base.Update(gameTime);
+                return true;
+            }
+
+            if (_speciesEditor.IsOpen)
+            {
+                _inGameUi.CloseAllWindows();
+                if (_cataclysmPanel.IsOpen) _cataclysmPanel.Close();
+                if (_spawnPanel.IsOpen) _spawnPanel.Close();
+            }
+        }
+
+        // Cataclysm Panel
+        if (kbd.IsKeyDown(Keys.C) && !_prevKbd.IsKeyDown(Keys.C))
+            _cataclysmPanel.Toggle();
+
+        // Spawn Panel
+        if (kbd.IsKeyDown(Keys.F4) && !_prevKbd.IsKeyDown(Keys.F4))
+            _spawnPanel.Toggle();
+
+        // ESC: close panel if open, otherwise cancel active mode
+        if (kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape))
+        {
+            if (_cataclysmPanel.IsOpen)
+                _cataclysmPanel.Toggle();
+            else if (_spawnPanel.IsOpen)
+                _spawnPanel.Toggle();
+            if (_cataclysmPanel.SelectedType != null || _spawnPanel.SelectedCataclysm != null || _spawnPanel.SelectedSpeciesKey != null)
+            {
+                _spawnPanel.SelectedCataclysm = null;
+                _spawnPanel.DeselectSpecies();
+                _cataclysmPanel.SelectedType = null;
+                _prevPanelCata = null;
+                _prevSpawnCata = null;
+                _prevSpawnSpecies = null;
+                _cataSelectedFrame = 0;
+            }
+        }
+
+        // Camera & Time Controls
         _camera.HandleInput(dt);
         if (kbd.IsKeyDown(Keys.Up) && _prevKbd.IsKeyUp(Keys.Up))
             _controller.SetSpeed(Math.Min(3, _controller.SpeedLevel + 1));
@@ -500,6 +511,7 @@ public class Game1 : Game
         if (kbd.IsKeyDown(Keys.D2) && !_prevKbd.IsKeyDown(Keys.D2)) _controller.SetSpeed(2);
         if (kbd.IsKeyDown(Keys.D3) && !_prevKbd.IsKeyDown(Keys.D3)) _controller.SetSpeed(3);
         if (kbd.IsKeyDown(Keys.Space) && !_prevKbd.IsKeyDown(Keys.Space)) _controller.TogglePause();
+
         if (_inGameUi.SpeedUpRequested)
         {
             _controller.SetSpeed(Math.Min(3, _controller.SpeedLevel + 1));
@@ -510,6 +522,8 @@ public class Game1 : Game
             _controller.SetSpeed(Math.Max(0, _controller.SpeedLevel - 1));
             _inGameUi.SpeedDownRequested = false;
         }
+
+        return false;
     }
 
     private void HandleMouseClicks(MouseState mouse, bool pointerOverUi, bool spawnPanelConsumed, bool cataConsumed)
@@ -625,6 +639,8 @@ public class Game1 : Game
         _ecosystem = new Ecosystem(wgOpts, seed);
         _ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
         _ecosystem.Initialize(60, 20, 15, 150);
+        _worldRenderer?.Dispose();
+        _creatureRenderer?.Dispose();
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
@@ -689,6 +705,8 @@ public class Game1 : Game
         _ecosystem.FlushPending();
         _ecosystem.UpdateStats();
 
+        _worldRenderer?.Dispose();
+        _creatureRenderer?.Dispose();
         _worldRenderer = new PixelWorldRenderer(_ecosystem.World);
         _creatureRenderer = new CreatureRenderer(_ecosystem);
         _minimap = new Minimap(_ecosystem, _camera);
