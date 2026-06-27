@@ -40,12 +40,30 @@ public static class Logger
         catch (Exception ex) { Console.Error.WriteLine($"Log rotation failed: {ex.Message}"); }
     }
 
-    public static void Info(string message) => Write("INFO", message);
-    public static void Debug(string message) => Write("DEBUG", message);
-    public static void Warn(string message) => Write("WARN", message);
-    public static void Error(string message) => Write("ERROR", message);
+    public static void Info(string message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        Write("INFO", message);
+    }
+    public static void Debug(string message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        Write("DEBUG", message);
+    }
+    public static void Warn(string message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        Write("WARN", message);
+    }
+    public static void Error(string message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        Write("ERROR", message);
+    }
     public static void Event(string category, string message)
     {
+        ArgumentNullException.ThrowIfNull(category);
+        ArgumentNullException.ThrowIfNull(message);
         Write($"EVT.{category}", message);
         lock (Lock)
         {
