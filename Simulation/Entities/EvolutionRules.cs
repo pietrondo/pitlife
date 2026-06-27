@@ -7,9 +7,9 @@ public static class EvolutionRules
 {
     public static string DetermineEvolvedSpecies(CreatureType kind, Genome genome, string currentSpecies, Random rng)
     {
-        bool isLandMammal = IsLandMammal(currentSpecies);
+        var isLandMammal = IsLandMammal(currentSpecies);
 
-        string? evolved = kind switch
+        var evolved = kind switch
         {
             CreatureType.Herbivore => DetermineHerbivoreEvolution(genome, isLandMammal, rng),
             CreatureType.Carnivore => DetermineCarnivoreEvolution(genome, isLandMammal, rng),

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text.Json;
 
@@ -12,10 +11,10 @@ public static class SocialConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "social.json");
+            var path = Path.Combine("Content", "config", "social.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<SocialConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,

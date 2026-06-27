@@ -1,8 +1,5 @@
-using System;
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
-using System.Linq;
 
 namespace PitLife.Tests.Behaviors;
 
@@ -24,8 +21,8 @@ public class PlantBehaviorTests
         var tile = world.GetTileAtPosition(plant.Position.X, plant.Position.Y);
         tile.Biome = BiomeType.Grassland; // Ensure it has some vegetation
 
-        float initialEnergy = plant.Energy;
-        float dt = 1.0f; // 1 second
+        var initialEnergy = plant.Energy;
+        var dt = 1.0f; // 1 second
         var gameTime = new GameTime(TimeSpan.Zero, TimeSpan.FromSeconds(dt));
 
         // Act
@@ -36,8 +33,8 @@ public class PlantBehaviorTests
         Assert.True(plant.Energy > initialEnergy, "Plant should gain energy from sunlight over time.");
 
         // Verify exact calculation if possible
-        float sunlight = tile.Vegetation * 0.5f + 0.5f;
-        float expectedEnergyGain = plant.GrowthRate * sunlight * dt;
+        var sunlight = tile.Vegetation * 0.5f + 0.5f;
+        var expectedEnergyGain = plant.GrowthRate * sunlight * dt;
         Assert.Equal(initialEnergy + expectedEnergyGain, plant.Energy, 3);
     }
 

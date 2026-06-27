@@ -9,9 +9,9 @@ public class SpeciesCatalogTests
     [Fact]
     public void Store_RejectsPathTraversal()
     {
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
         var document = new SpeciesCatalogDocument { Species = [ValidAnimal()] };
-        string path = Path.GetFullPath("../../../../../../../../../../../../tmp/test.json");
+        var path = Path.GetFullPath("../../../../../../../../../../../../tmp/test.json");
         if (Environment.OSVersion.Platform == PlatformID.Unix) path = "/tmp/test.json";
 
         Assert.Throws<UnauthorizedAccessException>(() => SpeciesCatalogStore.Save(path, document, directory));
@@ -20,9 +20,9 @@ public class SpeciesCatalogTests
     [Fact]
     public void Store_RoundTripsVersionedCatalog()
     {
-        string root = FindRepositoryRoot();
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
-        string path = Path.Combine(directory, "species.json");
+        var root = FindRepositoryRoot();
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, "species.json");
         try
         {
             var document = new SpeciesCatalogDocument { Species = [ValidAnimal()] };
@@ -46,7 +46,7 @@ public class SpeciesCatalogTests
     [Fact]
     public void Validator_RejectsDuplicateAndBuiltinKeys()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         SpeciesCatalogEntry duplicate = ValidAnimal();
         var document = new SpeciesCatalogDocument { Species = [ValidAnimal(), duplicate] };
 
@@ -60,7 +60,7 @@ public class SpeciesCatalogTests
     [Fact]
     public void Validator_RejectsUnsafeAssetPathAndInvalidPlantReproduction()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         var entry = new SpeciesCatalogEntry
         {
             Key = "TestFern",
@@ -86,7 +86,7 @@ public class SpeciesCatalogTests
     [Fact]
     public void Validator_AcceptsSeedPlantWithPollination()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         var entry = new SpeciesCatalogEntry
         {
             Key = "TestLavender",
@@ -109,8 +109,8 @@ public class SpeciesCatalogTests
     [Fact]
     public void Store_RejectsUnknownJsonFields()
     {
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
-        string path = Path.Combine(directory, "species.json");
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, "species.json");
         Directory.CreateDirectory(directory);
         try
         {
@@ -126,8 +126,8 @@ public class SpeciesCatalogTests
     [Fact]
     public void Store_RejectsNullRequiredCollections()
     {
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
-        string path = Path.Combine(directory, "species.json");
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-catalog-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, "species.json");
         Directory.CreateDirectory(directory);
         try
         {

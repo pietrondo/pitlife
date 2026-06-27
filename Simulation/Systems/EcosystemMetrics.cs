@@ -89,7 +89,7 @@ public sealed class EcosystemMetrics
         foreach (var (species, count) in bySpecies)
         {
             if (!SpeciesFirstAppearance.ContainsKey(species)) SpeciesFirstAppearance[species] = TotalTime;
-            SpeciesMaxPopulation.TryGetValue(species, out int prevMax);
+            SpeciesMaxPopulation.TryGetValue(species, out var prevMax);
             if (count > prevMax) SpeciesMaxPopulation[species] = count;
         }
 

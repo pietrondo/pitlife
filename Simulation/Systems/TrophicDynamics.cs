@@ -41,9 +41,9 @@ public sealed class TrophicDynamics
 
     public void Update(Ecosystem eco, float dt)
     {
-        int herbivores = eco.HerbivoreCount;
-        int carnivores = eco.CarnivoreCount;
-        int plants = eco.PlantCount;
+        var herbivores = eco.HerbivoreCount;
+        var carnivores = eco.CarnivoreCount;
+        var plants = eco.PlantCount;
 
         // Sample population for historical tracking
         _timeSinceLastSample += dt;
@@ -59,7 +59,7 @@ public sealed class TrophicDynamics
         // Lotka-Volterra: compute predator-prey ratio
         // When predators >> prey: prey drops, then predators starve
         // When prey >> predators: prey booms, then predators follow
-        float ratio = carnivores > 0 ? (float)herbivores / carnivores : BalanceConfig.Data.Trophic.LotkaVolterraDefaultRatio;
+        var ratio = carnivores > 0 ? (float)herbivores / carnivores : BalanceConfig.Data.Trophic.LotkaVolterraDefaultRatio;
 
         // Prey (herbivore) dynamics
         // Prey reproduce more when predators are scarce (high ratio)

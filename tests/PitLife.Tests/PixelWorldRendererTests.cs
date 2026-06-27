@@ -29,7 +29,7 @@ public class PixelWorldRendererTests
         Assert.Equal(15, detailColors.Length);
         Assert.Equal(15, highlightColors.Length);
 
-        for (int i = 0; i < 15; i++)
+        for (var i = 0; i < 15; i++)
         {
             Assert.False(baseColors[i].R == 0 && baseColors[i].G == 0 && baseColors[i].B == 0,
                 $"Biome {i} has black base color");
@@ -47,7 +47,7 @@ public class PixelWorldRendererTests
         Assert.Equal(pixelColors.Length, minimapColors.Length);
 
         // Verify colors match (or are very close)
-        for (int i = 0; i < pixelColors.Length; i++)
+        for (var i = 0; i < pixelColors.Length; i++)
         {
             var pc = pixelColors[i];
             var mc = minimapColors[i];
@@ -72,9 +72,9 @@ public class PixelWorldRendererTests
         var world = new World(64, 48, 42);
         var biomes = new HashSet<BiomeType>();
 
-        for (int y = 0; y < world.Height; y++)
+        for (var y = 0; y < world.Height; y++)
         {
-            for (int x = 0; x < world.Width; x++)
+            for (var x = 0; x < world.Width; x++)
             {
                 biomes.Add(world.GetTile(x, y).Biome);
             }

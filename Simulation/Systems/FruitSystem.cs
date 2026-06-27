@@ -30,7 +30,7 @@ public struct Fruit
     public Color GetColor()
     {
         if (!IsAlive) return Color.Transparent;
-        float ageRatio = 1f - (Lifetime / MaxLifetime);
+        var ageRatio = 1f - (Lifetime / MaxLifetime);
         if (Poisonous)
             return Color.Lerp(Color.DarkViolet, Color.Purple, ageRatio);
         return Color.Lerp(Color.Red, new Color(139, 69, 19), ageRatio);
@@ -66,7 +66,7 @@ public sealed class FruitSystem
     public void Update(Ecosystem eco, float dt)
     {
         // Decay existing fruits
-        for (int i = _fruitCount - 1; i >= 0; i--)
+        for (var i = _fruitCount - 1; i >= 0; i--)
         {
             if (_fruits[i].IsAlive)
             {
@@ -94,8 +94,8 @@ public sealed class FruitSystem
     {
         if (eco.Creatures.Count == 0) return;
 
-        int attempts = FruitConfig.Data.SpawnAttempts;
-        for (int a = 0; a < attempts; a++)
+        var attempts = FruitConfig.Data.SpawnAttempts;
+        for (var a = 0; a < attempts; a++)
         {
             if (_fruitCount >= FruitConfig.Data.MaxFruits) break;
 
@@ -107,17 +107,17 @@ public sealed class FruitSystem
             if (def == null || def.PlantReproduction != PlantReproductionMode.Seeds) continue;
 
             // Spawn fruit near the plant
-            float offsetX = (float)(eco.Random.NextDouble() - 0.5) * FruitConfig.Data.SpawnOffsetMax;
-            float offsetY = (float)(eco.Random.NextDouble() - 0.5) * FruitConfig.Data.SpawnOffsetMax;
+            var offsetX = (float)(eco.Random.NextDouble() - 0.5) * FruitConfig.Data.SpawnOffsetMax;
+            var offsetY = (float)(eco.Random.NextDouble() - 0.5) * FruitConfig.Data.SpawnOffsetMax;
             var pos = new Vector2(
                 Math.Clamp(plant.Position.X + offsetX, 0, eco.World.PixelWidth - 1),
                 Math.Clamp(plant.Position.Y + offsetY, 0, eco.World.PixelHeight - 1));
 
-            float energyValue = FruitConfig.Data.EnergyValueBase + (float)eco.Random.NextDouble() * FruitConfig.Data.EnergyValueVariance;
-            float lifetime = FruitConfig.Data.LifetimeBase + (float)eco.Random.NextDouble() * FruitConfig.Data.LifetimeVariance;
+            var energyValue = FruitConfig.Data.EnergyValueBase + (float)eco.Random.NextDouble() * FruitConfig.Data.EnergyValueVariance;
+            var lifetime = FruitConfig.Data.LifetimeBase + (float)eco.Random.NextDouble() * FruitConfig.Data.LifetimeVariance;
 
-            bool poisonous = plant.Species is "Belladonna" or "VenusFlyTrap" or "PitcherPlant";
-            float toxicity = poisonous ? FruitConfig.Data.PoisonousToxicityBase + (float)eco.Random.NextDouble() * FruitConfig.Data.PoisonousToxicityVariance : 0f;
+            var poisonous = plant.Species is "Belladonna" or "VenusFlyTrap" or "PitcherPlant";
+            var toxicity = poisonous ? FruitConfig.Data.PoisonousToxicityBase + (float)eco.Random.NextDouble() * FruitConfig.Data.PoisonousToxicityVariance : 0f;
 
             _fruits[_fruitCount++] = new Fruit(pos, energyValue, lifetime, plant.Species, poisonous, toxicity);
         }
@@ -125,7 +125,7 @@ public sealed class FruitSystem
 
     public Fruit? TryEatFruit(Vector2 position, float eatDistance)
     {
-        for (int i = 0; i < _fruitCount; i++)
+        for (var i = 0; i < _fruitCount; i++)
         {
             if (!_fruits[i].IsAlive) continue;
             if (Vector2.Distance(position, _fruits[i].Position) <= eatDistance)
@@ -142,8 +142,8 @@ public sealed class FruitSystem
     }
     private Creature? TryFindRandomFruitPlant(Ecosystem eco)
     {
-        int idx = eco.Random.Next(eco.Creatures.Count);
-        int tries = 0;
+        var idx = eco.Random.Next(eco.Creatures.Count);
+        var tries = 0;
         while (tries < FruitConfig.Data.FindPlantMaxTries)
         {
             var candidate = eco.Creatures[(idx + tries) % eco.Creatures.Count];

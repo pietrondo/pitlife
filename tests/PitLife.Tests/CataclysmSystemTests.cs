@@ -1,7 +1,5 @@
-using System;
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -33,7 +31,7 @@ public class CataclysmSystemTests
 
         sys.TriggerAt(eco, eco.Random, "Earthquake", Vector2.Zero);
         Assert.True(sys.IsActive);
-        float initialTimer = sys.Timer;
+        var initialTimer = sys.Timer;
 
         sys.Update(eco, 10f, eco.Random);
         Assert.True(sys.IsActive);

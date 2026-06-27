@@ -1,9 +1,5 @@
-using System;
-using System.IO;
-using System.Text.Json;
 using Microsoft.Xna.Framework;
 using PitLife.Simulation;
-using Xunit;
 using Moq;
 
 namespace PitLife.Tests;
@@ -13,8 +9,8 @@ public class SaveSystemTests
     [Fact]
     public void SaveAndLoad_RestoresEcosystemCorrectly()
     {
-        string filePath = "test_savegame.json";
-        
+        var filePath = "test_savegame.json";
+
         var original = new Ecosystem(32, 24, 42);
         original.Initialize(2, 1, 1, 3);
         original.TotalTime = 123.45f;
@@ -86,7 +82,7 @@ public class SaveSystemTests
             Assert.Equal(original.TotalTime, restored.TotalTime);
             Assert.Equal(original.Creatures.Count, restored.Creatures.Count);
 
-            for (int i = 0; i < original.Creatures.Count; i++)
+            for (var i = 0; i < original.Creatures.Count; i++)
             {
                 var origC = original.Creatures[i];
                 var restC = restored.Creatures[i];
@@ -122,7 +118,7 @@ public class SaveSystemTests
     [Fact]
     public void Save_WritesCurrentSchemaVersion()
     {
-        string filePath = "test_versioned_save.json";
+        var filePath = "test_versioned_save.json";
         var ecosystem = new Ecosystem(16, 12, 7);
         ecosystem.Initialize(1, 1, 0, 2);
 
@@ -131,7 +127,7 @@ public class SaveSystemTests
             SaveSystem.Save(filePath, ecosystem);
             Assert.True(File.Exists(filePath));
 
-            string json = File.ReadAllText(filePath);
+            var json = File.ReadAllText(filePath);
             Assert.Contains("\"SchemaVersion\":", json);
             Assert.Contains($"\"SchemaVersion\": {SaveSystem.CurrentSchemaVersion}", json);
 
@@ -149,14 +145,14 @@ public class SaveSystemTests
     [Fact]
     public void Load_MigratesV0SaveWithoutSchemaVersion()
     {
-        string filePath = "test_v0_save.json";
+        var filePath = "test_v0_save.json";
         var ecosystem = new Ecosystem(16, 12, 42);
         ecosystem.Initialize(2, 1, 0, 4);
 
         try
         {
             // Manually write a V0-format save (no SchemaVersion)
-            string v0Json = @"{
+            var v0Json = @"{
   ""Seed"": 42,
   ""WorldWidth"": 16,
   ""WorldHeight"": 12,
@@ -184,7 +180,7 @@ public class SaveSystemTests
     [Fact]
     public void Load_RejectsCorruptJson()
     {
-        string filePath = "test_corrupt_save.json";
+        var filePath = "test_corrupt_save.json";
         File.WriteAllText(filePath, "not valid json {{{");
 
         try
@@ -202,8 +198,8 @@ public class SaveSystemTests
     [Fact]
     public void Load_ThrowsOnInvalidSeed()
     {
-        string filePath = "test_invalid_save.json";
-        string json = @"{
+        var filePath = "test_invalid_save.json";
+        var json = @"{
   ""SchemaVersion"": 1,
   ""Seed"": -1,
   ""WorldWidth"": 16,
@@ -227,8 +223,8 @@ public class SaveSystemTests
     [Fact]
     public void Load_ThrowsOnInvalidWorldDimensions()
     {
-        string filePath = "test_invalid_dim_save.json";
-        string json = @"{
+        var filePath = "test_invalid_dim_save.json";
+        var json = @"{
   ""SchemaVersion"": 1,
   ""Seed"": 1,
   ""WorldWidth"": 2,
@@ -253,8 +249,8 @@ public class SaveSystemTests
     [Fact]
     public void Load_ThrowsOnNegativeTotalTime()
     {
-        string filePath = "test_negative_time_save.json";
-        string json = @"{
+        var filePath = "test_negative_time_save.json";
+        var json = @"{
   ""SchemaVersion"": 1,
   ""Seed"": 1,
   ""WorldWidth"": 10,
@@ -278,8 +274,8 @@ public class SaveSystemTests
     [Fact]
     public void Load_ThrowsOnInvalidCreatureEnergy()
     {
-        string filePath = "test_invalid_creature_save.json";
-        string json = @"{
+        var filePath = "test_invalid_creature_save.json";
+        var json = @"{
   ""SchemaVersion"": 1,
   ""Seed"": 1,
   ""WorldWidth"": 10,
@@ -320,7 +316,7 @@ public class SaveSystemTests
     [Fact]
     public void SaveLoadRoundTrip_PreservesAllData()
     {
-        string filePath = "test_roundtrip.json";
+        var filePath = "test_roundtrip.json";
         var original = new Ecosystem(24, 18, 123);
         original.Initialize(3, 2, 1, 5);
 
@@ -344,8 +340,10 @@ public class SaveSystemTests
                 Assert.NotNull(def);
                 var genome = new Genome
                 {
-                    Speed = cData.Genome.Speed, Size = cData.Genome.Size,
-                    Metabolism = cData.Genome.Metabolism, VisionRange = cData.Genome.VisionRange,
+                    Speed = cData.Genome.Speed,
+                    Size = cData.Genome.Size,
+                    Metabolism = cData.Genome.Metabolism,
+                    VisionRange = cData.Genome.VisionRange,
                     Color = new Color(cData.Genome.ColorR, cData.Genome.ColorG, cData.Genome.ColorB),
                     MutationRate = cData.Genome.MutationRate,
                     DesertAdaptation = cData.Genome.DesertAdaptation,
@@ -367,7 +365,7 @@ public class SaveSystemTests
             restored.FlushPending();
             restored.UpdateStats();
 
-            string filePath2 = "test_roundtrip2.json";
+            var filePath2 = "test_roundtrip2.json";
             SaveSystem.Save(filePath2, restored);
             var json2 = File.ReadAllText(filePath2);
 
@@ -384,8 +382,8 @@ public class SaveSystemTests
     [Fact]
     public void Load_MissingOptionalFields_UsesDefaults()
     {
-        string filePath = "test_partial_save.json";
-        string json = @"{
+        var filePath = "test_partial_save.json";
+        var json = @"{
   ""SchemaVersion"": 1,
   ""Seed"": 99,
   ""WorldWidth"": 16,
@@ -409,14 +407,14 @@ public class SaveSystemTests
             var loaded = SaveSystem.Load(filePath);
             Assert.NotNull(loaded);
             Assert.Single(loaded.Creatures);
-            
+
             var c = loaded.Creatures[0];
             Assert.Equal("Clover", c.Species);
             Assert.Equal(5, c.PositionX);
             Assert.Equal(5, c.PositionY);
             Assert.Equal(10, c.Energy);
             Assert.Equal(1, c.Age);
-            
+
             // Check default fields that were missing
             Assert.Equal(Gender.None, c.Gender); // Default enum value
             Assert.Equal(0, c.FacingX); // Default
@@ -436,7 +434,7 @@ public class SaveSystemTests
     [Fact]
     public void SaveLoad_EmptyWorld_WorksCorrectly()
     {
-        string filePath = "test_empty_save.json";
+        var filePath = "test_empty_save.json";
         var ecosystem = new Ecosystem(20, 15, 12345);
         // Ecosystem created but NOT initialized, so it has no creatures.
 
@@ -462,9 +460,9 @@ public class SaveSystemTests
     [Fact]
     public void Save_SerializesEcosystemState()
     {
-        string filePath = "test_serialize_save.json";
+        var filePath = "test_serialize_save.json";
         var mockEcosystem = new Mock<Ecosystem>(10, 10, 42) { CallBase = true };
-        
+
         var genome = new Genome { Size = 1.0f };
         var creature = new Plant(new Vector2(5, 5), genome, "Clover");
         mockEcosystem.Object.AddCreature(creature);
@@ -474,8 +472,8 @@ public class SaveSystemTests
         {
             SaveSystem.Save(filePath, mockEcosystem.Object);
             Assert.True(File.Exists(filePath));
-            
-            string json = File.ReadAllText(filePath);
+
+            var json = File.ReadAllText(filePath);
             Assert.Contains("\"Seed\": 42", json);
             Assert.Contains("\"WorldWidth\": 10", json);
             Assert.Contains("\"WorldHeight\": 10", json);
@@ -491,8 +489,8 @@ public class SaveSystemTests
     [Fact]
     public void Load_DeserializesEcosystemState()
     {
-        string filePath = "test_deserialize_save.json";
-        string json = @"{
+        var filePath = "test_deserialize_save.json";
+        var json = @"{
   ""SchemaVersion"": 1,
   ""Seed"": 77,
   ""WorldWidth"": 8,
@@ -519,7 +517,7 @@ public class SaveSystemTests
             Assert.Equal(8, loaded.WorldWidth);
             Assert.Equal(8, loaded.WorldHeight);
             Assert.Equal(5.5f, loaded.TotalTime);
-            
+
             Assert.Single(loaded.Creatures);
             var c = loaded.Creatures[0];
             Assert.Equal("Clover", c.Species);

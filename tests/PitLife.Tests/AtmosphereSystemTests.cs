@@ -1,5 +1,4 @@
 using PitLife.Simulation;
-using Xunit;
 
 namespace PitLife.Tests;
 
@@ -17,7 +16,7 @@ public class AtmosphereSystemTests
     public void OxygenIncreases_WithPlants()
     {
         var atmos = new AtmosphereSystem();
-        float before = atmos.Oxygen;
+        var before = atmos.Oxygen;
         atmos.Update(100, 0, 10f);
         Assert.True(atmos.Oxygen > before);
     }
@@ -26,7 +25,7 @@ public class AtmosphereSystemTests
     public void OxygenDecreases_WithAnimals()
     {
         var atmos = new AtmosphereSystem();
-        float before = atmos.Oxygen;
+        var before = atmos.Oxygen;
         atmos.Update(0, 100, 10f);
         Assert.True(atmos.Oxygen < before);
     }
@@ -35,7 +34,7 @@ public class AtmosphereSystemTests
     public void CO2Increases_WithAnimals()
     {
         var atmos = new AtmosphereSystem();
-        float before = atmos.CO2;
+        var before = atmos.CO2;
         atmos.Update(0, 50, 10f);
         Assert.True(atmos.CO2 > before);
     }
@@ -44,7 +43,7 @@ public class AtmosphereSystemTests
     public void CO2Decays_WithoutAnimals()
     {
         var atmos = new AtmosphereSystem();
-        float before = atmos.CO2;
+        var before = atmos.CO2;
         atmos.Update(0, 0, 10f);
         Assert.True(atmos.CO2 < before);
     }

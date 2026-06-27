@@ -8,8 +8,8 @@ public readonly record struct GeneticAllele(float Value, float Dominance)
 {
     public GeneticAllele Mutate(float rate, float minimum, float maximum, float step, Random random)
     {
-        float value = Value;
-        float dominance = Dominance;
+        var value = Value;
+        var dominance = Dominance;
         if (random.NextDouble() < rate)
             value = MathHelper.Clamp(value + (float)(random.NextDouble() - 0.5) * step, minimum, maximum);
         if (random.NextDouble() < rate * 0.25f)
@@ -24,7 +24,7 @@ public readonly record struct DiploidLocus(GeneticAllele AlleleA, GeneticAllele 
     {
         get
         {
-            float totalDominance = AlleleA.Dominance + AlleleB.Dominance;
+            var totalDominance = AlleleA.Dominance + AlleleB.Dominance;
             return totalDominance <= 0.0001f
                 ? (AlleleA.Value + AlleleB.Value) * 0.5f
                 : (AlleleA.Value * AlleleA.Dominance + AlleleB.Value * AlleleB.Dominance) /
@@ -111,8 +111,8 @@ public struct GeneticProfile
 
     public static GeneticProfile FromPhenotype(Genome genome)
     {
-        ulong markerA = HashPhenotype(genome);
-        ulong markerB = BitOperations.RotateLeft(markerA ^ 0x9E3779B97F4A7C15UL, 29);
+        var markerA = HashPhenotype(genome);
+        var markerB = BitOperations.RotateLeft(markerA ^ 0x9E3779B97F4A7C15UL, 29);
         return new GeneticProfile
         {
             IsInitialized = true,
@@ -138,7 +138,7 @@ public struct GeneticProfile
         GeneticProfile second,
         Random random)
     {
-        float inheritedMutationRate = MathHelper.Clamp(
+        var inheritedMutationRate = MathHelper.Clamp(
             (first.MutationRate.ExpressedValue + second.MutationRate.ExpressedValue) * 0.5f,
             0.01f,
             0.2f);
@@ -195,8 +195,8 @@ public struct GeneticProfile
 
     private static ulong CreateGamete(GeneticProfile profile, Random random)
     {
-        int crossover = random.Next(1, 64);
-        ulong lowerMask = (1UL << crossover) - 1UL;
+        var crossover = random.Next(1, 64);
+        var lowerMask = (1UL << crossover) - 1UL;
         return random.Next(2) == 0
             ? (profile.MarkerHaplotypeA & lowerMask) | (profile.MarkerHaplotypeB & ~lowerMask)
             : (profile.MarkerHaplotypeB & lowerMask) | (profile.MarkerHaplotypeA & ~lowerMask);
@@ -218,7 +218,7 @@ public struct GeneticProfile
 
     private static ulong HashPhenotype(Genome genome)
     {
-        ulong hash = 1469598103934665603UL;
+        var hash = 1469598103934665603UL;
         Add(ref hash, genome.Speed);
         Add(ref hash, genome.Size);
         Add(ref hash, genome.Metabolism);

@@ -66,17 +66,17 @@ internal sealed class SpatialGrid
     public List<Creature> GetNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
     {
         var results = new List<Creature>();
-        float radiusSquared = radius * radius;
+        var radiusSquared = radius * radius;
         var position = seeker.Position;
 
-        int minCellX = Math.Clamp((int)((position.X - radius) / _cellSize), 0, _columns - 1);
-        int maxCellX = Math.Clamp((int)((position.X + radius) / _cellSize), 0, _columns - 1);
-        int minCellY = Math.Clamp((int)((position.Y - radius) / _cellSize), 0, _rows - 1);
-        int maxCellY = Math.Clamp((int)((position.Y + radius) / _cellSize), 0, _rows - 1);
+        var minCellX = Math.Clamp((int)((position.X - radius) / _cellSize), 0, _columns - 1);
+        var maxCellX = Math.Clamp((int)((position.X + radius) / _cellSize), 0, _columns - 1);
+        var minCellY = Math.Clamp((int)((position.Y - radius) / _cellSize), 0, _rows - 1);
+        var maxCellY = Math.Clamp((int)((position.Y + radius) / _cellSize), 0, _rows - 1);
 
-        for (int y = minCellY; y <= maxCellY; y++)
+        for (var y = minCellY; y <= maxCellY; y++)
         {
-            for (int x = minCellX; x <= maxCellX; x++)
+            for (var x = minCellX; x <= maxCellX; x++)
             {
                 if (!_buckets.TryGetValue((x, y), out var bucket))
                     continue;
@@ -100,14 +100,14 @@ internal sealed class SpatialGrid
     public Creature? FindNearest(Creature seeker, Func<Creature, bool> predicate)
     {
         var center = GetCell(seeker.Position);
-        int maxRing = Math.Max(
+        var maxRing = Math.Max(
             Math.Max(center.X, _columns - 1 - center.X),
             Math.Max(center.Y, _rows - 1 - center.Y));
 
         Creature? best = null;
-        float bestDistanceSquared = float.MaxValue;
+        var bestDistanceSquared = float.MaxValue;
 
-        for (int ring = 0; ring <= maxRing; ring++)
+        for (var ring = 0; ring <= maxRing; ring++)
         {
             VisitRing(center, ring, seeker, predicate, ref best, ref bestDistanceSquared);
 
@@ -132,18 +132,18 @@ internal sealed class SpatialGrid
             return;
         }
 
-        int minX = center.X - ring;
-        int maxX = center.X + ring;
-        int minY = center.Y - ring;
-        int maxY = center.Y + ring;
+        var minX = center.X - ring;
+        var maxX = center.X + ring;
+        var minY = center.Y - ring;
+        var maxY = center.Y + ring;
 
-        for (int x = minX; x <= maxX; x++)
+        for (var x = minX; x <= maxX; x++)
         {
             VisitCell(x, minY, seeker, predicate, ref best, ref bestDistanceSquared);
             VisitCell(x, maxY, seeker, predicate, ref best, ref bestDistanceSquared);
         }
 
-        for (int y = minY + 1; y < maxY; y++)
+        for (var y = minY + 1; y < maxY; y++)
         {
             VisitCell(minX, y, seeker, predicate, ref best, ref bestDistanceSquared);
             VisitCell(maxX, y, seeker, predicate, ref best, ref bestDistanceSquared);
@@ -166,7 +166,7 @@ internal sealed class SpatialGrid
             if (candidate == seeker || !candidate.IsAlive || !predicate(candidate))
                 continue;
 
-            float distanceSquared = Vector2.DistanceSquared(seeker.Position, candidate.Position);
+            var distanceSquared = Vector2.DistanceSquared(seeker.Position, candidate.Position);
             if (distanceSquared < bestDistanceSquared)
             {
                 bestDistanceSquared = distanceSquared;
@@ -177,11 +177,11 @@ internal sealed class SpatialGrid
 
     private float DistanceToUnvisitedAreaSquared(Vector2 position, (int X, int Y) center, int ring)
     {
-        float minDistance = float.MaxValue;
-        int minX = Math.Max(0, center.X - ring) * _cellSize;
-        int maxX = Math.Min(_columns, center.X + ring + 1) * _cellSize;
-        int minY = Math.Max(0, center.Y - ring) * _cellSize;
-        int maxY = Math.Min(_rows, center.Y + ring + 1) * _cellSize;
+        var minDistance = float.MaxValue;
+        var minX = Math.Max(0, center.X - ring) * _cellSize;
+        var maxX = Math.Min(_columns, center.X + ring + 1) * _cellSize;
+        var minY = Math.Max(0, center.Y - ring) * _cellSize;
+        var maxY = Math.Min(_rows, center.Y + ring + 1) * _cellSize;
 
         if (minX > 0) minDistance = Math.Min(minDistance, position.X - minX);
         if (maxX < _columns * _cellSize) minDistance = Math.Min(minDistance, maxX - position.X);
@@ -193,8 +193,8 @@ internal sealed class SpatialGrid
 
     private (int X, int Y) GetCell(Vector2 position)
     {
-        int x = Math.Clamp((int)(position.X / _cellSize), 0, _columns - 1);
-        int y = Math.Clamp((int)(position.Y / _cellSize), 0, _rows - 1);
+        var x = Math.Clamp((int)(position.X / _cellSize), 0, _columns - 1);
+        var y = Math.Clamp((int)(position.Y / _cellSize), 0, _rows - 1);
         return (x, y);
     }
 

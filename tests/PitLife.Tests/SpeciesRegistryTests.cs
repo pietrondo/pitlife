@@ -78,7 +78,7 @@ public class SpeciesRegistryTests
     [Fact]
     public void Plants_DeclareConsistentReproductionModes()
     {
-        foreach (string species in SpeciesRegistry.OfType(CreatureType.Plant))
+        foreach (var species in SpeciesRegistry.OfType(CreatureType.Plant))
         {
             SpeciesDefinition definition = SpeciesRegistry.Get(species)!;
             Assert.NotNull(definition.PlantReproduction);
@@ -100,7 +100,7 @@ public class SpeciesRegistryTests
     {
         foreach (CreatureType kind in new[] { CreatureType.Herbivore, CreatureType.Carnivore, CreatureType.Omnivore })
         {
-            foreach (string species in SpeciesRegistry.OfType(kind))
+            foreach (var species in SpeciesRegistry.OfType(kind))
             {
                 SpeciesDefinition definition = SpeciesRegistry.Get(species)!;
                 Assert.Null(definition.PlantReproduction);

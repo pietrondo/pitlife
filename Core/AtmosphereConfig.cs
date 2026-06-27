@@ -1,7 +1,5 @@
-using System;
 using System.IO;
 using System.Text.Json;
-using Microsoft.Xna.Framework;
 
 namespace PitLife.Core;
 
@@ -13,10 +11,10 @@ public static class AtmosphereConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "atmosphere.json");
+            var path = Path.Combine("Content", "config", "atmosphere.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<AtmosphereConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

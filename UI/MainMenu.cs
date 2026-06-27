@@ -96,7 +96,7 @@ public sealed class MainMenu
 
     private static int ParseIntSafe(string text, int fallback)
     {
-        return int.TryParse(text, out int val) ? val : fallback;
+        return int.TryParse(text, out var val) ? val : fallback;
     }
 
     public MenuAction Update(
@@ -114,7 +114,7 @@ public sealed class MainMenu
         if (!IsInputReady(mouse, keyboard)) return MenuAction.None;
         if (HandleEscapeKey(keyboard, previousKeyboard)) return MenuAction.None;
 
-        int prevFocused = _focusedIndex;
+        var prevFocused = _focusedIndex;
         HandleKeyboardNavigation(keyboard, previousKeyboard);
         HandleSeedInput(keyboard, previousKeyboard, mouse, previousMouse, prevFocused);
         UpdateHoverStates(mouse);
@@ -126,7 +126,7 @@ public sealed class MainMenu
             return MenuAction.None;
         }
 
-        int activated = GetClickedButton(mouse, previousMouse);
+        var activated = GetClickedButton(mouse, previousMouse);
         if (IsActivatePressed(keyboard, previousKeyboard))
             activated = _focusedIndex;
 
@@ -169,7 +169,7 @@ public sealed class MainMenu
 
     private void HandleKeyboardNavigation(KeyboardState keyboard, KeyboardState previousKeyboard)
     {
-        int totalElements = _showOptions ? 3 : 8;
+        var totalElements = _showOptions ? 3 : 8;
 
         // Keyboard navigation
         if (Pressed(keyboard, previousKeyboard, Keys.Up))
@@ -217,7 +217,7 @@ public sealed class MainMenu
     private void UpdateHoverStates(MouseState mouse)
     {
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
-        for (int i = 0; i < buttons.Length; i++)
+        for (var i = 0; i < buttons.Length; i++)
         {
             if (buttons[i].IsHovered(mouse))
             {
@@ -228,9 +228,9 @@ public sealed class MainMenu
 
     private int GetClickedButton(MouseState mouse, MouseState previousMouse)
     {
-        int activated = -1;
+        var activated = -1;
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
-        for (int i = 0; i < buttons.Length; i++)
+        for (var i = 0; i < buttons.Length; i++)
         {
             if (buttons[i].WasClicked(mouse, previousMouse))
             {
@@ -242,7 +242,7 @@ public sealed class MainMenu
 
     private bool IsActivatePressed(KeyboardState keyboard, KeyboardState previousKeyboard)
     {
-        bool activatePressed = Pressed(keyboard, previousKeyboard, Keys.Enter);
+        var activatePressed = Pressed(keyboard, previousKeyboard, Keys.Enter);
         if (!(_seedInput.IsFocused && !_showOptions))
         {
             activatePressed = activatePressed || Pressed(keyboard, previousKeyboard, Keys.Space);
@@ -316,8 +316,8 @@ public sealed class MainMenu
         Layout(viewportWidth, viewportHeight);
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(0, 0, viewportWidth, viewportHeight), UiTheme.MenuScrim);
 
-        int logoSize = viewportHeight < 650 ? 96 : 144;
-        int logoY = viewportHeight < 650 ? 16 : 28;
+        var logoSize = viewportHeight < 650 ? 96 : 144;
+        var logoY = viewportHeight < 650 ? 16 : 28;
         if (logo != null)
         {
             var logoBounds = new Rectangle(viewportWidth / 2 - logoSize / 2, logoY, logoSize, logoSize);
@@ -329,19 +329,19 @@ public sealed class MainMenu
 
         if (_showWorldGenPanel)
         {
-            int wgCenterX = viewportWidth / 2;
+            var wgCenterX = viewportWidth / 2;
 
             _presetButton.Draw(spriteBatch, pixel, font, mouse, false);
             _mapSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
             _planetButton.Draw(spriteBatch, pixel, font, mouse, false);
 
-            int labelX = _continentInput.Bounds.X - 8;
-            string contLabel = I18n.T("menu.continents") + ":";
+            var labelX = _continentInput.Bounds.X - 8;
+            var contLabel = I18n.T("menu.continents") + ":";
             Vector2 contLabelSize = font.MeasureString(contLabel);
             spriteBatch.DrawString(font, contLabel, new Vector2(labelX - contLabelSize.X, _continentInput.Bounds.Y + 8), Color.White);
             _continentInput.Draw(spriteBatch, pixel, font, mouse);
 
-            string seaLabel = I18n.T("menu.seaLevel") + ":";
+            var seaLabel = I18n.T("menu.seaLevel") + ":";
             Vector2 seaLabelSize = font.MeasureString(seaLabel);
             spriteBatch.DrawString(font, seaLabel, new Vector2(labelX - seaLabelSize.X, _seaLevelInput.Bounds.Y + 8), Color.White);
             _seaLevelInput.Draw(spriteBatch, pixel, font, mouse);
@@ -349,17 +349,17 @@ public sealed class MainMenu
             _islandSizeButton.Draw(spriteBatch, pixel, font, mouse, false);
 
             _worldGenButtons[0].Draw(spriteBatch, pixel, font, mouse, true);
-            string wgHint = I18n.T("menu.worldGenHint");
+            var wgHint = I18n.T("menu.worldGenHint");
             Vector2 wgHintSize = font.MeasureString(wgHint);
             spriteBatch.DrawString(font, wgHint, new Vector2(viewportWidth / 2f - wgHintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
             return;
         }
 
         UiButton[] buttons = _showOptions ? _optionButtons : _mainButtons;
-        for (int i = 0; i < buttons.Length; i++)
+        for (var i = 0; i < buttons.Length; i++)
         {
-            bool isFocused = _showOptions 
-                ? (i == _focusedIndex) 
+            var isFocused = _showOptions
+                ? (i == _focusedIndex)
                 : (i < 2 ? i == _focusedIndex : i + 1 == _focusedIndex);
             buttons[i].Draw(spriteBatch, pixel, font, mouse, isFocused);
         }
@@ -370,7 +370,7 @@ public sealed class MainMenu
             _seedInput.Draw(spriteBatch, pixel, font, mouse);
         }
 
-        string hint = I18n.T(_showOptions ? "menu.optionsHint" : "menu.hint");
+        var hint = I18n.T(_showOptions ? "menu.optionsHint" : "menu.hint");
         Vector2 hintSize = font.MeasureString(hint);
         spriteBatch.DrawString(font, hint, new Vector2(viewportWidth / 2f - hintSize.X / 2f, viewportHeight - 28), UiTheme.MutedStone);
     }
@@ -451,11 +451,11 @@ public sealed class MainMenu
 
     private Rectangle CalculateWindowBounds(int viewportWidth, int viewportHeight)
     {
-        int panelWidth = Math.Min(400, viewportWidth - 32);
-        int panelHeight = _showWorldGenPanel ? 580 : (_showOptions ? 260 : 436);
-        int logoSize = viewportHeight < 650 ? 96 : 144;
-        int logoY = viewportHeight < 650 ? 16 : 28;
-        int panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
+        var panelWidth = Math.Min(400, viewportWidth - 32);
+        var panelHeight = _showWorldGenPanel ? 580 : (_showOptions ? 260 : 436);
+        var logoSize = viewportHeight < 650 ? 96 : 144;
+        var logoY = viewportHeight < 650 ? 16 : 28;
+        var panelY = Math.Max(logoY + logoSize + 12, (viewportHeight - panelHeight) / 2 + 48);
         panelY = Math.Min(panelY, viewportHeight - panelHeight - 48);
         return new Rectangle(viewportWidth / 2 - panelWidth / 2, panelY, panelWidth, panelHeight);
     }
@@ -470,7 +470,7 @@ public sealed class MainMenu
         _window.Bounds = CalculateWindowBounds(viewportWidth, viewportHeight);
         _window.Title = GetWindowTitle();
 
-        int panelWidth = _window.Bounds.Width;
+        var panelWidth = _window.Bounds.Width;
 
         if (_showWorldGenPanel)
         {
@@ -478,9 +478,9 @@ public sealed class MainMenu
             return;
         }
 
-        int buttonHeight = 52;
-        int gap = 12;
-        int startY = _window.Bounds.Y + 60;
+        var buttonHeight = 52;
+        var gap = 12;
+        var startY = _window.Bounds.Y + 60;
 
         if (_showOptions)
         {
@@ -494,11 +494,11 @@ public sealed class MainMenu
 
     private void LayoutWorldGenPanel(int viewportWidth, int panelWidth)
     {
-        int wgButtonWidth = panelWidth - 48;
-        int wgButtonHeight = 46;
-        int wgGap = 8;
-        int wgStartY = _window.Bounds.Y + 56;
-        int wgCenterX = viewportWidth / 2;
+        var wgButtonWidth = panelWidth - 48;
+        var wgButtonHeight = 46;
+        var wgGap = 8;
+        var wgStartY = _window.Bounds.Y + 56;
+        var wgCenterX = viewportWidth / 2;
 
         LayoutWorldGenTopButtons(wgCenterX, wgButtonWidth, wgButtonHeight, wgGap, wgStartY);
         LayoutWorldGenInputs(wgCenterX, wgButtonWidth, wgButtonHeight, wgGap, wgStartY);
@@ -514,9 +514,9 @@ public sealed class MainMenu
 
     private void LayoutWorldGenInputs(int wgCenterX, int wgButtonWidth, int wgButtonHeight, int wgGap, int wgStartY)
     {
-        int wgInputWidth = 80;
-        int wgInputHeight = 40;
-        int labelWidth = (wgButtonWidth - wgInputWidth - 8) / 2 + wgInputWidth + 8;
+        var wgInputWidth = 80;
+        var wgInputHeight = 40;
+        var labelWidth = (wgButtonWidth - wgInputWidth - 8) / 2 + wgInputWidth + 8;
 
         _continentInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 3 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
         _seaLevelInput.Bounds = new Rectangle(wgCenterX + labelWidth / 2 - wgInputWidth, wgStartY + 4 * (wgButtonHeight + wgGap) + 2, wgInputWidth, wgInputHeight);
@@ -526,14 +526,14 @@ public sealed class MainMenu
     {
         _islandSizeButton.Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, wgStartY + 5 * (wgButtonHeight + wgGap), wgButtonWidth, wgButtonHeight);
 
-        int genY = wgStartY + 6 * (wgButtonHeight + wgGap) + wgGap;
+        var genY = wgStartY + 6 * (wgButtonHeight + wgGap) + wgGap;
         _worldGenButtons[0].Bounds = new Rectangle(wgCenterX - wgButtonWidth / 2, genY, wgButtonWidth, wgButtonHeight);
     }
 
     private void LayoutOptionsPanel(int viewportWidth, int panelWidth, int startY, int buttonHeight, int gap)
     {
-        int buttonWidth = panelWidth - 48;
-        for (int i = 0; i < _optionButtons.Length; i++)
+        var buttonWidth = panelWidth - 48;
+        for (var i = 0; i < _optionButtons.Length; i++)
         {
             _optionButtons[i].Bounds = new Rectangle(
                 viewportWidth / 2 - buttonWidth / 2,
@@ -545,14 +545,14 @@ public sealed class MainMenu
 
     private void LayoutMainPanel(int viewportWidth, int panelWidth, int startY, int buttonHeight, int gap)
     {
-        int buttonWidth = panelWidth - 48;
-        int halfWidth = (buttonWidth - gap) / 2;
-        int centerX = viewportWidth / 2;
+        var buttonWidth = panelWidth - 48;
+        var halfWidth = (buttonWidth - gap) / 2;
+        var centerX = viewportWidth / 2;
 
-        int inputY = startY + 2 * (buttonHeight + gap);
-        int saveLoadY = inputY + 40 + gap;
-        int optionsHelpY = saveLoadY + buttonHeight + gap;
-        int exitY = optionsHelpY + buttonHeight + gap;
+        var inputY = startY + 2 * (buttonHeight + gap);
+        var saveLoadY = inputY + 40 + gap;
+        var optionsHelpY = saveLoadY + buttonHeight + gap;
+        var exitY = optionsHelpY + buttonHeight + gap;
 
         LayoutPrimaryButtons(centerX, buttonWidth, startY, buttonHeight, gap);
         LayoutSeedInput(centerX, buttonWidth, inputY);
@@ -576,7 +576,7 @@ public sealed class MainMenu
 
     private void LayoutSecondaryButtons(int halfWidth, int saveLoadY, int optionsHelpY, int buttonHeight, int gap)
     {
-        int startX = _window.Bounds.X + 24;
+        var startX = _window.Bounds.X + 24;
 
         // Save & Load
         _mainButtons[2].Bounds = new Rectangle(startX, saveLoadY, halfWidth, buttonHeight);

@@ -45,13 +45,13 @@ public sealed class UiWindow
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 8, Bounds.Y + 8, Bounds.Width, Bounds.Height), UiTheme.Shadow);
         // Draw window surface
         UiPrimitives.Fill(spriteBatch, pixel, Bounds, UiTheme.ForestNight);
-        
+
         // Draw border: active/focused windows get a bright Moss Signal border, inactive ones get a Bark Edge border
         UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, isActive ? UiTheme.MossSignal : UiTheme.BarkEdge);
 
         Rectangle titleBar = TitleBarBounds;
         UiPrimitives.Fill(spriteBatch, pixel, titleBar, UiTheme.DeepGrove);
-        
+
         // Only draw the separator line between title and content if the window is NOT collapsed
         if (!IsCollapsed)
         {
@@ -65,7 +65,7 @@ public sealed class UiWindow
 
         if (IsDraggable)
         {
-            string collapseIcon = IsCollapsed ? "[+]" : "[-]";
+            var collapseIcon = IsCollapsed ? "[+]" : "[-]";
             Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
             spriteBatch.DrawString(font, collapseIcon, new Vector2(titleBar.X + 8, titleBar.Center.Y - iconSize.Y / 2f), UiTheme.MutedStone, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
@@ -73,7 +73,7 @@ public sealed class UiWindow
         if (ShowCloseButton)
         {
             Rectangle close = CloseButtonBounds;
-            bool isHovered = close.Contains(mousePosition);
+            var isHovered = close.Contains(mousePosition);
             // Highlight close button when hovered
             Color closeColor = isHovered ? Color.Lerp(UiTheme.DangerClay, Color.White, 0.25f) : UiTheme.DangerClay;
 

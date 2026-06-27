@@ -43,7 +43,7 @@ internal static class SpeciesJsonLoader
 
     public static void Load(string path)
     {
-        string json = File.ReadAllText(path);
+        var json = File.ReadAllText(path);
         var doc = JsonSerializer.Deserialize<JsonSpeciesDocument>(json, Options)
                   ?? throw new InvalidDataException("Failed to parse species.json");
 
@@ -57,7 +57,7 @@ internal static class SpeciesJsonLoader
     {
         var kind = Enum.Parse<CreatureType>(e.Kind, ignoreCase: true);
         var biomes = ResolveBiomes(e, kind);
-        float maturityAge = e.MaturityAge ?? GetDefaultMaturityAge(e.Name);
+        var maturityAge = e.MaturityAge ?? GetDefaultMaturityAge(e.Name);
         Type creatureType = GetCreatureType(kind);
 
         if (kind == CreatureType.Plant)

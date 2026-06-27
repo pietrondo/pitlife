@@ -1,4 +1,3 @@
-using System.Linq;
 using PitLife.Simulation;
 
 namespace PitLife.Tests;
@@ -20,8 +19,8 @@ public class WorldGeneratorTests
     {
         var w1 = new World(64, 48, 42);
         var w2 = new World(64, 48, 42);
-        for (int y = 0; y < w1.Height; y++)
-            for (int x = 0; x < w1.Width; x++)
+        for (var y = 0; y < w1.Height; y++)
+            for (var x = 0; x < w1.Width; x++)
                 Assert.Equal(w1.Tiles[x, y].Biome, w2.Tiles[x, y].Biome);
     }
 
@@ -30,9 +29,9 @@ public class WorldGeneratorTests
     {
         var w1 = new World(64, 48, 1);
         var w2 = new World(64, 48, 999);
-        int diffs = 0;
-        for (int y = 0; y < w1.Height; y++)
-            for (int x = 0; x < w1.Width; x++)
+        var diffs = 0;
+        for (var y = 0; y < w1.Height; y++)
+            for (var x = 0; x < w1.Width; x++)
                 if (w1.Tiles[x, y].Biome != w2.Tiles[x, y].Biome) diffs++;
         Assert.True(diffs > 100, $"Different seeds should give mostly different maps, got {diffs} diffs");
     }
@@ -41,8 +40,8 @@ public class WorldGeneratorTests
     public void Generator_ProducesRivers()
     {
         var world = new World(128, 96, 42);
-        int riverCells = 0;
-        for (int i = 0; i < world.Width * world.Height; i++)
+        var riverCells = 0;
+        for (var i = 0; i < world.Width * world.Height; i++)
             if (world.RiverMask[i]) riverCells++;
         Assert.True(riverCells > 0, "Should produce at least some river cells");
     }

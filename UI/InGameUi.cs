@@ -3,7 +3,6 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using PitLife.Core;
 using PitLife.Localization;
 using PitLife.Simulation;
 
@@ -120,7 +119,7 @@ public sealed class InGameUi
             Array.Copy(_popHistory, 1, _popHistory, 0, _popHistory.Length - 1);
             _popHistory[_popHistory.Length - 1] = new PopSnapshot(plants, herbivores, carnivores, omnivores);
         }
-        float temp = Climate?.TemperatureModifier * 20f + 20f ?? 20f;
+        var temp = Climate?.TemperatureModifier * 20f + 20f ?? 20f;
         if (_tempHistoryCount < _tempHistory.Length)
             _tempHistory[_tempHistoryCount++] = temp;
         else
@@ -164,7 +163,7 @@ public sealed class InGameUi
             ToolbarButtonClicked?.Invoke();
         }
 
-        bool toolbarConsumed = false;
+        var toolbarConsumed = false;
         if (_statisticsButton.WasClicked(mouse, previousMouse))
         {
             _windowManager.Toggle(StatisticsWindowId, viewportWidth, viewportHeight);
@@ -212,7 +211,7 @@ public sealed class InGameUi
 
         HandleCataclysmClick(mouse, previousMouse);
 
-        bool overToolbar = _toolbarRect.Contains(mouse.Position);
+        var overToolbar = _toolbarRect.Contains(mouse.Position);
         return toolbarConsumed || overToolbar || _windowManager.Update(mouse, previousMouse, viewportWidth, viewportHeight);
     }
 
@@ -258,7 +257,7 @@ public sealed class InGameUi
             if (!window.IsOpen)
                 continue;
 
-            bool isActive = _windowManager.IsActive(window);
+            var isActive = _windowManager.IsActive(window);
             window.Draw(spriteBatch, pixel, font, isActive, mouse.Position);
 
             if (window.IsCollapsed)
@@ -266,9 +265,9 @@ public sealed class InGameUi
 
             if (window.Id == StatisticsWindowId)
             {
-                int needed = DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
+                var needed = DrawStatistics(spriteBatch, pixel, font, window.ContentBounds,
                     plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
-                int totalH = needed + 72;
+                var totalH = needed + 72;
                 if (totalH != window.Bounds.Height)
                     window.Bounds = new Rectangle(window.Bounds.X, window.Bounds.Y, window.Bounds.Width, totalH);
             }
@@ -306,8 +305,8 @@ public sealed class InGameUi
         float speed,
         EcosystemMetrics? metrics)
     {
-        int total = plants + herbivores + carnivores + omnivores;
-        int y = content.Y;
+        var total = plants + herbivores + carnivores + omnivores;
+        var y = content.Y;
         DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
         y += 18;
         DrawLine(spriteBatch, font, content.X, y,
@@ -331,7 +330,7 @@ public sealed class InGameUi
             spriteBatch.DrawString(font, I18n.T("stats.speciesList"),
                 new Vector2(content.X, y), UiTheme.MossSignal);
             y += 14;
-            int shown = 0;
+            var shown = 0;
             foreach (var kvp in metrics.SpeciesPopulations)
             {
                 if (shown >= 14) break;
@@ -347,13 +346,13 @@ public sealed class InGameUi
         return y - content.Y + 8;
     }
 
-    
+
 
     private void DrawInlineBar(SpriteBatch sb, Texture2D pixel, SpriteFont font,
         int x, int y, string label, int value, int total, Color color)
     {
-        int barW = (int)(120f * (total > 0 ? value / (float)total : 0));
-        int barH = 10;
+        var barW = (int)(120f * (total > 0 ? value / (float)total : 0));
+        var barH = 10;
         sb.DrawString(font, label, new Vector2(x, y - 2), color);
         var bg = new Rectangle(x + 14, y + 1, 122, barH);
         UiPrimitives.Fill(sb, pixel, bg, UiTheme.DeepGrove);
@@ -385,7 +384,7 @@ public sealed class InGameUi
         DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("creature.energy", creature.Energy, creature.MaxEnergy), UiTheme.WarmParchment);
         DrawProgress(spriteBatch, pixel, new Rectangle(content.X, content.Y + 48, content.Width, 14), creature.Energy / creature.MaxEnergy);
         DrawLine(spriteBatch, font, content.X, content.Y + 78, I18n.Format("creature.age", creature.Age), UiTheme.WarmParchment);
-        string statusText = creature.Gender == Gender.None
+        var statusText = creature.Gender == Gender.None
             ? I18n.T(creature.IsAdult ? "ui.status.adult" : "ui.status.baby")
             : $"{I18n.T(creature.Gender == Gender.Male ? "ui.gender.male" : "ui.gender.female")}  |  {I18n.T(creature.IsAdult ? "ui.status.adult" : "ui.status.baby")}";
         DrawLine(spriteBatch, font, content.X, content.Y + 100, statusText, UiTheme.MutedStone);
@@ -397,8 +396,8 @@ public sealed class InGameUi
 
         DrawLine(spriteBatch, font, content.X, content.Y + 236, I18n.T("creature.adaptations"), UiTheme.MossSignal);
 
-        int col1X = content.X;
-        int col2X = content.X + content.Width / 2;
+        var col1X = content.X;
+        var col2X = content.X + content.Width / 2;
 
         DrawLine(spriteBatch, font, col1X, content.Y + 258, I18n.Format("creature.adaptDesert", creature.Genome.DesertAdaptation), UiTheme.WarmParchment);
         DrawLine(spriteBatch, font, col2X, content.Y + 258, I18n.Format("creature.adaptCold", creature.Genome.ColdAdaptation), UiTheme.WarmParchment);
@@ -411,7 +410,7 @@ public sealed class InGameUi
         // Lineage tree
         DrawLine(spriteBatch, font, content.X, content.Y + 340, "Lineage", UiTheme.MossSignal);
         var lineage = creature.Lineage;
-        int genDepth = 0;
+        var genDepth = 0;
         foreach (var kv in lineage.AncestorDepths)
             genDepth = Math.Max(genDepth, kv.Value);
         _creatureLineageSb.Clear();
@@ -435,7 +434,7 @@ public sealed class InGameUi
     private static void DrawProgress(SpriteBatch spriteBatch, Texture2D pixel, Rectangle bounds, float value)
     {
         UiPrimitives.Fill(spriteBatch, pixel, bounds, UiTheme.DeepGrove);
-        int width = (int)((bounds.Width - 4) * MathHelper.Clamp(value, 0f, 1f));
+        var width = (int)((bounds.Width - 4) * MathHelper.Clamp(value, 0f, 1f));
         if (width > 0)
             UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(bounds.X + 2, bounds.Y + 2, width, bounds.Height - 4), UiTheme.MossSignal);
         UiPrimitives.Border(spriteBatch, pixel, bounds, 2, UiTheme.BarkEdge);
@@ -455,11 +454,11 @@ public sealed class InGameUi
 
     private void LayoutToolbar(int viewportHeight)
     {
-        int y = viewportHeight - 56;
+        var y = viewportHeight - 56;
         _toolbarRect = new Rectangle(8, viewportHeight - 60, 720, 52);
 
-        int x = 12;
-        int gap = 6;
+        var x = 12;
+        var gap = 6;
         _statisticsButton.Bounds = new Rectangle(x, y, 120, 44); x += 120 + gap;
         _creatureButton.Bounds = new Rectangle(x, y, 110, 44); x += 110 + gap;
         _arrangeButton.Bounds = new Rectangle(x, y, 90, 44); x += 90 + gap;
@@ -506,17 +505,17 @@ public sealed class InGameUi
         }
 
         Point p = SelectedTile.Value;
-        int x = MathHelper.Clamp(p.X, 0, World.Width - 1);
-        int y = MathHelper.Clamp(p.Y, 0, World.Height - 1);
+        var x = MathHelper.Clamp(p.X, 0, World.Width - 1);
+        var y = MathHelper.Clamp(p.Y, 0, World.Height - 1);
 
         Tile tile = World.Tiles[x, y];
-        float elevation = World.ElevationField[y * World.Width + x];
-        float elevationM = (elevation - 0.15f) / 0.85f * 4000f;
-        bool isRiver = World.RiverMask[y * World.Width + x];
+        var elevation = World.ElevationField[y * World.Width + x];
+        var elevationM = (elevation - 0.15f) / 0.85f * 4000f;
+        var isRiver = World.RiverMask[y * World.Width + x];
 
-        string passStr = I18n.T(tile.IsPassable ? "common.yes" : "common.no");
-        string riverStr = I18n.T(isRiver ? "common.yes" : "common.no");
-        string biomeName = I18n.T($"biome.{tile.Biome}");
+        var passStr = I18n.T(tile.IsPassable ? "common.yes" : "common.no");
+        var riverStr = I18n.T(isRiver ? "common.yes" : "common.no");
+        var biomeName = I18n.T($"biome.{tile.Biome}");
 
         DrawLine(spriteBatch, font, content.X, content.Y, I18n.Format("terrain.heading", x, y), UiTheme.MossSignal);
         DrawLine(spriteBatch, font, content.X, content.Y + 28, I18n.Format("terrain.biome", biomeName), UiTheme.WarmParchment);
@@ -537,24 +536,24 @@ public sealed class InGameUi
 
     private void DrawCataclysmWindow(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content)
     {
-        int y = content.Y;
+        var y = content.Y;
         var mouse = Microsoft.Xna.Framework.Input.Mouse.GetState();
 
-        for (int i = 0; i < _cataclysmButtons.Length; i++)
+        for (var i = 0; i < _cataclysmButtons.Length; i++)
         {
             var btn = _cataclysmButtons[i];
             btn.Bounds = new Rectangle(content.X, y, content.Width, 22);
-            bool sel = SelectedCataclysm == (string)btn.Tag!;
+            var sel = SelectedCataclysm == (string)btn.Tag!;
             btn.Draw(sb, pixel, font, mouse, sel);
             y += 26;
         }
         if (!string.IsNullOrEmpty(SelectedCataclysm))
-            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(content.X, content.Bottom - 20), new Color(255,200,100));
+            sb.DrawString(font, I18n.T("cata.placeHint"), new Vector2(content.X, content.Bottom - 20), new Color(255, 200, 100));
     }
 
     public bool HandleCataclysmClick(MouseState mouse, MouseState prevMouse)
     {
-        for (int i = 0; i < _cataclysmButtons.Length; i++)
+        for (var i = 0; i < _cataclysmButtons.Length; i++)
         {
             if (_cataclysmButtons[i].WasClicked(mouse, prevMouse))
             {
@@ -577,7 +576,7 @@ public sealed class InGameUi
             return;
         }
 
-        int y = content.Y;
+        var y = content.Y;
 
         DrawClimateGlobalData(sb, pixel, font, content, climate, ref y);
         DrawClimateLocalData(sb, font, content, climate, ref y);
@@ -588,7 +587,7 @@ public sealed class InGameUi
     private void DrawClimateGlobalData(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content, Simulation.ClimateSystem climate, ref int y)
     {
         // Global data
-        string seasonKey = climate.CurrentSeason switch
+        var seasonKey = climate.CurrentSeason switch
         {
             Simulation.Season.Spring => "season.Spring",
             Simulation.Season.Summer => "season.Summer",
@@ -605,7 +604,7 @@ public sealed class InGameUi
 
         _tempSb.Clear();
         _tempSb.Append((int)(20f + climate.TemperatureModifier * 20f)).Append("°C");
-        float tempNorm = Math.Clamp((climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
+        var tempNorm = Math.Clamp((climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
         DrawLine(sb, font, content.X, y, I18n.Format("climate.temperature", _tempSb.ToString()),
             Color.Lerp(new Color(100, 150, 255), new Color(255, 120, 40), tempNorm));
         y += 18;
@@ -629,18 +628,21 @@ public sealed class InGameUi
     {
         // Local tile data
         Point h = HoverTile ?? SelectedTile ?? new Point(World!.Width / 2, World!.Height / 2);
-        int lx = Math.Clamp(h.X, 0, World!.Width - 1);
-        int ly = Math.Clamp(h.Y, 0, World!.Height - 1);
+        var lx = Math.Clamp(h.X, 0, World!.Width - 1);
+        var ly = Math.Clamp(h.Y, 0, World!.Height - 1);
         Simulation.Tile localTile = World!.GetTile(lx, ly);
-        float localTemp = climate.GetTileTemperature(localTile, ly, World!.Height);
+        var localTemp = climate.GetTileTemperature(localTile, ly, World!.Height);
         Simulation.Season localSeason = climate.GetLocalSeason(ly, World!.Height);
-        string localSeasonKey = localSeason switch
+        var localSeasonKey = localSeason switch
         {
-            Simulation.Season.Spring => "season.Spring", Simulation.Season.Summer => "season.Summer",
-            Simulation.Season.Autumn => "season.Autumn", Simulation.Season.Winter => "season.Winter", _ => "season.Spring"
+            Simulation.Season.Spring => "season.Spring",
+            Simulation.Season.Summer => "season.Summer",
+            Simulation.Season.Autumn => "season.Autumn",
+            Simulation.Season.Winter => "season.Winter",
+            _ => "season.Spring"
         };
-        string localSeasonName = I18n.T(localSeasonKey);
-        string biomeName = I18n.T($"biome.{localTile.Biome}");
+        var localSeasonName = I18n.T(localSeasonKey);
+        var biomeName = I18n.T($"biome.{localTile.Biome}");
         DrawLine(sb, font, content.X, y,
             I18n.Format("climate.local", lx, ly, biomeName, (int)localTemp), UiTheme.WarmParchment);
         y += 18;
@@ -681,7 +683,7 @@ public sealed class InGameUi
         y += 6;
         DrawLine(sb, font, content.X, y, I18n.T("climate.populations"), UiTheme.MossSignal);
         y += 20;
-        int totalPop = plantCount + herbivoreCount + carnivoreCount + omnivoreCount;
+        var totalPop = plantCount + herbivoreCount + carnivoreCount + omnivoreCount;
         DrawInlineBar(sb, pixel, font, content.X, y, "P", plantCount, totalPop, UiTheme.MossSignal);
         y += 16;
         DrawInlineBar(sb, pixel, font, content.X, y, "H", herbivoreCount, totalPop, UiTheme.LakeBlue);
@@ -709,10 +711,10 @@ public sealed class InGameUi
         DrawLine(sb, font, content.X, y, I18n.T("climate.events"), UiTheme.MossSignal);
         y += 20;
         var recent = Core.Logger.RecentEvents;
-        int maxShow = Math.Min(5, recent.Count);
-        for (int i = recent.Count - maxShow; i < recent.Count; i++)
+        var maxShow = Math.Min(5, recent.Count);
+        for (var i = recent.Count - maxShow; i < recent.Count; i++)
         {
-            string ev = TranslateEvent(recent[i]);
+            var ev = TranslateEvent(recent[i]);
             if (ev.Length > 44) ev = ev.Substring(0, 44);
             DrawLine(sb, font, content.X, y, ev, new Color(180, 160, 140));
             y += 16;
@@ -722,26 +724,26 @@ public sealed class InGameUi
     private static void DrawSparkline(SpriteBatch sb, Texture2D pixel, int baseX, int baseY, int width,
         PopSnapshot[] history, int count, int field, Color color)
     {
-        int w = width - 8;
-        int h = 10;
-        float xStep = count > 1 ? (float)w / (count - 1) : 0;
+        var w = width - 8;
+        var h = 10;
+        var xStep = count > 1 ? (float)w / (count - 1) : 0;
 
-        int maxVal = 1;
-        for (int i = 0; i < count; i++)
+        var maxVal = 1;
+        for (var i = 0; i < count; i++)
         {
-            int v = field switch { 0 => history[i].Plants, 1 => history[i].Herbivores, 2 => history[i].Carnivores, _ => history[i].Omnivores };
+            var v = field switch { 0 => history[i].Plants, 1 => history[i].Herbivores, 2 => history[i].Carnivores, _ => history[i].Omnivores };
             if (v > maxVal) maxVal = v;
         }
         if (maxVal < 1) maxVal = 1;
 
-        for (int i = 1; i < count; i++)
+        for (var i = 1; i < count; i++)
         {
-            int v0 = field switch { 0 => history[i - 1].Plants, 1 => history[i - 1].Herbivores, 2 => history[i - 1].Carnivores, _ => history[i - 1].Omnivores };
-            int v1 = field switch { 0 => history[i].Plants, 1 => history[i].Herbivores, 2 => history[i].Carnivores, _ => history[i].Omnivores };
-            int x0 = baseX + (int)((i - 1) * xStep);
-            int y0 = baseY + h - (int)(v0 * h / (float)maxVal);
-            int x1 = baseX + (int)(i * xStep);
-            int y1 = baseY + h - (int)(v1 * h / (float)maxVal);
+            var v0 = field switch { 0 => history[i - 1].Plants, 1 => history[i - 1].Herbivores, 2 => history[i - 1].Carnivores, _ => history[i - 1].Omnivores };
+            var v1 = field switch { 0 => history[i].Plants, 1 => history[i].Herbivores, 2 => history[i].Carnivores, _ => history[i].Omnivores };
+            var x0 = baseX + (int)((i - 1) * xStep);
+            var y0 = baseY + h - (int)(v0 * h / (float)maxVal);
+            var x1 = baseX + (int)(i * xStep);
+            var y1 = baseY + h - (int)(v1 * h / (float)maxVal);
             DrawLineSegment(sb, pixel, new Point(x0, y0), new Point(x1, y1), color);
         }
     }
@@ -752,12 +754,12 @@ public sealed class InGameUi
         int x1 = p1.X, y1 = p1.Y;
         int dx = Math.Abs(x1 - x0), dy = Math.Abs(y1 - y0);
         int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
-        int err = dx - dy;
+        var err = dx - dy;
         while (true)
         {
             sb.Draw(pixel, new Rectangle(x0, y0, 1, 1), color);
             if (x0 == x1 && y0 == y1) break;
-            int e2 = 2 * err;
+            var e2 = 2 * err;
             if (e2 > -dy) { err -= dy; x0 += sx; }
             if (e2 < dx) { err += dx; y0 += sy; }
         }
@@ -767,11 +769,11 @@ public sealed class InGameUi
         float[] history, int count)
     {
         int w = width - 8, h = 12;
-        float xStep = count > 1 ? (float)w / (count - 1) : 0;
+        var xStep = count > 1 ? (float)w / (count - 1) : 0;
         float min = float.MaxValue, max = float.MinValue;
-        for (int i = 0; i < count; i++) { if (history[i] < min) min = history[i]; if (history[i] > max) max = history[i]; }
-        float range = max - min; if (range < 1f) range = 1f;
-        for (int i = 1; i < count; i++)
+        for (var i = 0; i < count; i++) { if (history[i] < min) min = history[i]; if (history[i] > max) max = history[i]; }
+        var range = max - min; if (range < 1f) range = 1f;
+        for (var i = 1; i < count; i++)
         {
             float v0 = (history[i - 1] - min) / range, v1 = (history[i] - min) / range;
             Color c0 = Color.Lerp(new Color(80, 120, 220), new Color(230, 80, 40), v0);
@@ -806,12 +808,12 @@ public sealed class InGameUi
                .Replace("died at age ", I18n.T("evt.msg.died"))
                .Replace("(dist=", "(" + I18n.T("evt.msg.dist") + "=");
 
-        foreach (string sp in Simulation.SpeciesRegistry.All)
+        foreach (var sp in Simulation.SpeciesRegistry.All)
         {
-            string tr = Localization.I18n.Species(sp);
+            var tr = Localization.I18n.Species(sp);
             if (tr != sp && ev.Contains(sp))
             {
-                int idx = ev.IndexOf(sp);
+                var idx = ev.IndexOf(sp);
                 if (idx > 0 && !char.IsLetterOrDigit(ev[idx - 1]))
                     ev = ev.Replace(sp, tr);
             }

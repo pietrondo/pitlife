@@ -13,7 +13,7 @@ public sealed class CreaturePool
         var def = SpeciesRegistry.Get(species);
         if (def == null) return null;
 
-        string key = $"{def.CreatureType.Name}:{species}";
+        var key = $"{def.CreatureType.Name}:{species}";
         if (_pools.TryGetValue(key, out var stack) && stack.Count > 0)
         {
             var c = stack.Pop();
@@ -30,7 +30,7 @@ public sealed class CreaturePool
         var def = SpeciesRegistry.Get(creature.Species);
         if (def == null) return;
 
-        string key = $"{def.CreatureType.Name}:{creature.Species}";
+        var key = $"{def.CreatureType.Name}:{creature.Species}";
         if (!_pools.TryGetValue(key, out var stack))
         {
             stack = new Stack<Creature>();

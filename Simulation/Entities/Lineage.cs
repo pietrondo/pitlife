@@ -55,9 +55,9 @@ public sealed class LineageRecord
         Dictionary<ulong, byte> firstAncestors = WithSelf(first);
         Dictionary<ulong, byte> secondAncestors = WithSelf(second);
         double coefficient = 0;
-        foreach ((ulong ancestor, byte firstDepth) in firstAncestors)
+        foreach ((var ancestor, var firstDepth) in firstAncestors)
         {
-            if (ancestor == 0 || !secondAncestors.TryGetValue(ancestor, out byte secondDepth))
+            if (ancestor == 0 || !secondAncestors.TryGetValue(ancestor, out var secondDepth))
                 continue;
             coefficient += Math.Pow(0.5, firstDepth + secondDepth + 1);
         }
@@ -71,7 +71,7 @@ public sealed class LineageRecord
         IEnumerable<KeyValuePair<ulong, byte>> ancestors)
     {
         var depths = new Dictionary<ulong, byte>();
-        foreach ((ulong ancestor, byte depth) in ancestors)
+        foreach ((var ancestor, var depth) in ancestors)
         {
             if (ancestor != 0 && depth <= MaximumTrackedGenerations)
                 AddMinimumDepth(depths, ancestor, depth);
@@ -85,9 +85,9 @@ public sealed class LineageRecord
     {
         if (parent.IndividualId != 0)
             AddMinimumDepth(destination, parent.IndividualId, 1);
-        foreach ((ulong ancestor, byte depth) in parent._ancestorDepths)
+        foreach ((var ancestor, var depth) in parent._ancestorDepths)
         {
-            int childDepth = depth + 1;
+            var childDepth = depth + 1;
             if (childDepth <= MaximumTrackedGenerations)
                 AddMinimumDepth(destination, ancestor, (byte)childDepth);
         }
@@ -103,7 +103,7 @@ public sealed class LineageRecord
 
     private static void AddMinimumDepth(Dictionary<ulong, byte> depths, ulong id, byte depth)
     {
-        if (!depths.TryGetValue(id, out byte existing) || depth < existing)
+        if (!depths.TryGetValue(id, out var existing) || depth < existing)
             depths[id] = depth;
     }
 }

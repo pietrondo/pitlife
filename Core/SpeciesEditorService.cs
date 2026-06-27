@@ -62,7 +62,7 @@ public sealed class SpeciesEditorService
             ];
         }
 
-        int existingIndex = document.Species.FindIndex(candidate =>
+        var existingIndex = document.Species.FindIndex(candidate =>
             string.Equals(candidate.Key, entry.Key, StringComparison.Ordinal));
         if (existingIndex >= 0 && replaceExisting)
             document.Species[existingIndex] = entry;

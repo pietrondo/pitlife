@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PitLife.Simulation;
 
-public sealed class FlowSimulation :  IDisposable
+public sealed class FlowSimulation : IDisposable
 {
     private readonly World _world;
     private float[,] _water, _lava;
@@ -24,8 +24,8 @@ public sealed class FlowSimulation :  IDisposable
         _lava = new float[w, h];
         _flowDir = new Vector2[w, h];
 
-        for (int y = 0; y < h; y++)
-            for (int x = 0; x < w; x++)
+        for (var y = 0; y < h; y++)
+            for (var x = 0; x < w; x++)
             {
                 var b = world.Tiles[x, y].Biome;
                 if (b == BiomeType.DeepOcean) _water[x, y] = 1f;
@@ -52,33 +52,33 @@ public sealed class FlowSimulation :  IDisposable
         var nw = new float[w, h];
         var nl = new float[w, h];
 
-        for (int y = 2; y < h - 2; y += 2)
-            for (int x = 2; x < w - 2; x += 2)
+        for (var y = 2; y < h - 2; y += 2)
+            for (var x = 2; x < w - 2; x += 2)
             {
-                float myElev = _world.ElevationField[y * w + x];
+                var myElev = _world.ElevationField[y * w + x];
                 float w0 = _water[x, y], l0 = _lava[x, y];
                 nw[x, y] = w0; nl[x, y] = l0;
                 Vector2 bestDir = Vector2.Zero;
                 float bestDiff = 0;
 
-                for (int dy = -1; dy <= 1; dy++)
-                    for (int dx = -1; dx <= 1; dx++)
+                for (var dy = -1; dy <= 1; dy++)
+                    for (var dx = -1; dx <= 1; dx++)
                     {
                         if (dx == 0 && dy == 0) continue;
-                        float ne = _world.ElevationField[(y + dy) * w + (x + dx)];
-                        float diff = myElev - ne;
+                        var ne = _world.ElevationField[(y + dy) * w + (x + dx)];
+                        var diff = myElev - ne;
                         if (diff <= 0) continue;
                         if (diff > bestDiff) { bestDiff = diff; bestDir = new Vector2(dx, dy); }
-                        float rate = diff * 0.1f;
-                        float wf = Math.Min(w0 * rate, w0 * 0.25f);
+                        var rate = diff * 0.1f;
+                        var wf = Math.Min(w0 * rate, w0 * 0.25f);
                         nw[x, y] -= wf; nw[x + dx, y + dy] += wf;
-                        float lf = Math.Min(l0 * rate * 0.3f, l0 * 0.1f);
+                        var lf = Math.Min(l0 * rate * 0.3f, l0 * 0.1f);
                         nl[x, y] -= lf; nl[x + dx, y + dy] += lf;
                     }
 
                 _flowDir[x, y] = bestDir;
 
-                float temp = TileTemperature(x, y, _world.Tiles[x, y].Biome);
+                var temp = TileTemperature(x, y, _world.Tiles[x, y].Biome);
                 nw[x, y] = Math.Max(0, nw[x, y] - w0 * 0.01f * (1f + temp / 40f));
 
                 if (_world.Tiles[x, y].Biome == BiomeType.Volcano)
@@ -93,7 +93,7 @@ public sealed class FlowSimulation :  IDisposable
 
     private static float TileTemperature(int x, int y, BiomeType biome)
     {
-        float latFactor = Math.Abs(y / 100f - 0.5f) * 2f;
+        var latFactor = Math.Abs(y / 100f - 0.5f) * 2f;
         return biome switch
         {
             BiomeType.Desert => 38f - latFactor * 15f,
@@ -109,8 +109,8 @@ public sealed class FlowSimulation :  IDisposable
     public void DrawOverlay(SpriteBatch sb, int tileSize)
     {
         _animTime += 0.016f;
-        int tw = _world.Width * _overlayScale;
-        int th = _world.Height * _overlayScale;
+        var tw = _world.Width * _overlayScale;
+        var th = _world.Height * _overlayScale;
 
         if (_overlay == null || _overlay.Width != tw || _overlay.Height != th)
         {
@@ -122,23 +122,23 @@ public sealed class FlowSimulation :  IDisposable
 
         if (_dirty && _pixels != null)
         {
-            for (int y = 0; y < th; y++)
-                for (int x = 0; x < tw; x++)
+            for (var y = 0; y < th; y++)
+                for (var x = 0; x < tw; x++)
                 {
                     int tx = x / _overlayScale, ty = y / _overlayScale;
                     if (tx >= _world.Width || ty >= _world.Height) continue;
 
-                    float w = _water[tx, ty];
-                    float l = _lava[tx, ty];
+                    var w = _water[tx, ty];
+                    var l = _lava[tx, ty];
 
-                    byte r = (byte)(l * 200);
+                    var r = (byte)(l * 200);
                     byte g = 0;
-                    byte b = (byte)(w * 160);
-                    byte a = (byte)((w * 100 + l * 180));
+                    var b = (byte)(w * 160);
+                    var a = (byte)((w * 100 + l * 180));
 
                     if (w > 0.1f && _world.RiverMask[ty * _world.Width + tx])
                     {
-                        float phase = (x + y + _animTime * 40f) % (_overlayScale * 2f);
+                        var phase = (x + y + _animTime * 40f) % (_overlayScale * 2f);
                         if (phase < _overlayScale)
                         { a = (byte)Math.Min(255, a + 70); b = (byte)Math.Min(255, b + 40); }
                     }

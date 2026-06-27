@@ -8,9 +8,9 @@ public class SpeciesEditorServiceTests
     [Fact]
     public void Add_PersistsAndAppliesValidSpecies()
     {
-        string root = FindRepositoryRoot();
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-editor-{Guid.NewGuid():N}");
-        string path = Path.Combine(directory, "species.json");
+        var root = FindRepositoryRoot();
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-editor-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, "species.json");
         var runtime = new SpeciesCatalogRuntime();
         try
         {
@@ -34,15 +34,15 @@ public class SpeciesEditorServiceTests
     [Fact]
     public void Add_DuplicateDoesNotReplacePersistedCatalog()
     {
-        string root = FindRepositoryRoot();
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-editor-{Guid.NewGuid():N}");
-        string path = Path.Combine(directory, "species.json");
+        var root = FindRepositoryRoot();
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-editor-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, "species.json");
         var runtime = new SpeciesCatalogRuntime();
         try
         {
             var editor = new SpeciesEditorService(runtime, root, path);
             Assert.Empty(editor.Add(ValidEntry()));
-            string original = File.ReadAllText(path);
+            var original = File.ReadAllText(path);
 
             IReadOnlyList<SpeciesCatalogValidationError> errors = editor.Add(ValidEntry());
 
@@ -61,9 +61,9 @@ public class SpeciesEditorServiceTests
     [Fact]
     public void Upsert_ModifiesExistingSpeciesWithoutDuplicatingIt()
     {
-        string root = FindRepositoryRoot();
-        string directory = Path.Combine(Path.GetTempPath(), $"pitlife-editor-{Guid.NewGuid():N}");
-        string path = Path.Combine(directory, "species.json");
+        var root = FindRepositoryRoot();
+        var directory = Path.Combine(Path.GetTempPath(), $"pitlife-editor-{Guid.NewGuid():N}");
+        var path = Path.Combine(directory, "species.json");
         var runtime = new SpeciesCatalogRuntime();
         try
         {

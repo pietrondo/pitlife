@@ -46,13 +46,13 @@ public class Minimap
     /// </summary>
     public void RebuildTerrainBuffer()
     {
-        int worldW = _ecosystem.World.PixelWidth;
-        int worldH = _ecosystem.World.PixelHeight;
+        var worldW = _ecosystem.World.PixelWidth;
+        var worldH = _ecosystem.World.PixelHeight;
         _terrainBuffer = new Color[worldW * worldH];
 
-        for (int y = 0; y < worldH; y++)
+        for (var y = 0; y < worldH; y++)
         {
-            for (int x = 0; x < worldW; x++)
+            for (var x = 0; x < worldW; x++)
             {
                 var tile = _ecosystem.World.GetTileAtPosition(x, y);
                 _terrainBuffer[y * worldW + x] = GetBiomeColor(tile.Biome);
@@ -70,8 +70,8 @@ public class Minimap
     {
         if (_pixelTexture == null || _terrainBuffer == null) return;
 
-        int x = viewportWidth - Size - Margin;
-        int y = viewportHeight - Size - Margin - 52;
+        var x = viewportWidth - Size - Margin;
+        var y = viewportHeight - Size - Margin - 52;
 
         var borderRect = new Rectangle(x - 2, y - 2, Size + 4, Size + 4);
         UiPrimitivesHelper.Fill(sb, _pixelTexture, borderRect, new Color(11, 23, 18, 235));
@@ -90,8 +90,8 @@ public class Minimap
     /// <returns>Returns the Rectangle result.</returns>
     public Rectangle GetBounds(int viewportWidth, int viewportHeight)
     {
-        int x = viewportWidth - Size - Margin;
-        int y = viewportHeight - Size - Margin - 52;
+        var x = viewportWidth - Size - Margin;
+        var y = viewportHeight - Size - Margin - 52;
         return new Rectangle(x, y, Size, Size);
     }
 
@@ -128,33 +128,33 @@ public class Minimap
     private void MoveCameraToMinimap(Point mousePos, Rectangle bounds)
     {
         float worldW = _ecosystem.World.PixelWidth;
-        float scaleX = Size / worldW;
+        var scaleX = Size / worldW;
         float localX = mousePos.X - bounds.X;
-        float worldX = localX / scaleX;
+        var worldX = localX / scaleX;
         _camera.Position = new Vector2(worldX, _camera.Position.Y);
 
         float worldH = _ecosystem.World.PixelHeight;
-        float scaleY = Size / worldH;
+        var scaleY = Size / worldH;
         float localY = mousePos.Y - bounds.Y;
-        float worldY = localY / scaleY;
+        var worldY = localY / scaleY;
         _camera.Position = new Vector2(_camera.Position.X, worldY);
     }
 
     private void DrawTerrain(SpriteBatch sb, int x, int y)
     {
         if (_terrainBuffer == null) return;
-        int worldW = _ecosystem.World.PixelWidth;
-        int worldH = _ecosystem.World.PixelHeight;
-        float scaleX = Size / (float)worldW;
-        float scaleY = Size / (float)worldH;
+        var worldW = _ecosystem.World.PixelWidth;
+        var worldH = _ecosystem.World.PixelHeight;
+        var scaleX = Size / (float)worldW;
+        var scaleY = Size / (float)worldH;
 
-        for (int py = 0; py < Size; py++)
+        for (var py = 0; py < Size; py++)
         {
-            int srcY = (int)(py / scaleY);
+            var srcY = (int)(py / scaleY);
             if (srcY >= worldH) break;
-            for (int px = 0; px < Size; px++)
+            for (var px = 0; px < Size; px++)
             {
-                int srcX = (int)(px / scaleX);
+                var srcX = (int)(px / scaleX);
                 if (srcX >= worldW) break;
                 sb.Draw(_pixelTexture, new Rectangle(x + px, y + py, 1, 1), _terrainBuffer[srcY * worldW + srcX]);
             }
@@ -163,16 +163,16 @@ public class Minimap
 
     private void DrawCreatures(SpriteBatch sb, int x, int y)
     {
-        int worldW = _ecosystem.World.PixelWidth;
-        int worldH = _ecosystem.World.PixelHeight;
-        float scaleX = Size / (float)worldW;
-        float scaleY = Size / (float)worldH;
+        var worldW = _ecosystem.World.PixelWidth;
+        var worldH = _ecosystem.World.PixelHeight;
+        var scaleX = Size / (float)worldW;
+        var scaleY = Size / (float)worldH;
 
         foreach (var creature in _ecosystem.Creatures)
         {
             if (creature == null || !creature.IsAlive) continue;
-            int px = x + (int)(creature.Position.X * scaleX);
-            int py = y + (int)(creature.Position.Y * scaleY);
+            var px = x + (int)(creature.Position.X * scaleX);
+            var py = y + (int)(creature.Position.Y * scaleY);
             Color color = GetCreatureColor(creature.CreatureType);
             sb.Draw(_pixelTexture, new Rectangle(px - 1, py - 1, 2, 2), color);
         }
@@ -181,18 +181,18 @@ public class Minimap
     private void DrawViewportRect(SpriteBatch sb, int x, int y)
     {
         if (_pixelTexture == null) return;
-        int worldW = _ecosystem.World.PixelWidth;
-        int worldH = _ecosystem.World.PixelHeight;
-        float scaleX = Size / (float)worldW;
-        float scaleY = Size / (float)worldH;
+        var worldW = _ecosystem.World.PixelWidth;
+        var worldH = _ecosystem.World.PixelHeight;
+        var scaleX = Size / (float)worldW;
+        var scaleY = Size / (float)worldH;
 
-        float halfW = _camera.ViewportWidth / (2f * _camera.Zoom);
-        float halfH = _camera.ViewportHeight / (2f * _camera.Zoom);
+        var halfW = _camera.ViewportWidth / (2f * _camera.Zoom);
+        var halfH = _camera.ViewportHeight / (2f * _camera.Zoom);
 
-        int rx = x + (int)((_camera.Position.X - halfW) * scaleX);
-        int ry = y + (int)((_camera.Position.Y - halfH) * scaleY);
-        int rw = Math.Max(4, (int)(halfW * 2 * scaleX));
-        int rh = Math.Max(4, (int)(halfH * 2 * scaleY));
+        var rx = x + (int)((_camera.Position.X - halfW) * scaleX);
+        var ry = y + (int)((_camera.Position.Y - halfH) * scaleY);
+        var rw = Math.Max(4, (int)(halfW * 2 * scaleX));
+        var rh = Math.Max(4, (int)(halfH * 2 * scaleY));
 
         var rect = new Rectangle(rx, ry, rw, rh);
         UiPrimitivesHelper.Border(sb, _pixelTexture, rect, 1, new Color(255, 255, 255, 180));

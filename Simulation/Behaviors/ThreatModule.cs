@@ -1,6 +1,3 @@
-using System;
-using Microsoft.Xna.Framework;
-
 namespace PitLife.Simulation;
 
 internal sealed class ThreatModule : IBehaviorModule

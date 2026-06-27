@@ -38,15 +38,15 @@ public class AssetRegistryTests
     [Fact]
     public void GenderedSpecies_AreDistinctValidPngPairs()
     {
-        string root = FindRepositoryRoot();
+        var root = FindRepositoryRoot();
         string[] expectedSpecies = ["Deer", "Goat", "Lion", "Sheep"];
         Assert.Equal(expectedSpecies,
             AssetRegistry.GenderedSpeciesTextures.Select(asset => asset.Species).Order().ToArray());
 
         foreach (GenderedSpeciesAsset asset in AssetRegistry.GenderedSpeciesTextures)
         {
-            byte[] male = ReadAndValidatePng(Path.Combine(root, asset.MalePath));
-            byte[] female = ReadAndValidatePng(Path.Combine(root, asset.FemalePath));
+            var male = ReadAndValidatePng(Path.Combine(root, asset.MalePath));
+            var female = ReadAndValidatePng(Path.Combine(root, asset.FemalePath));
 
             Assert.False(male.SequenceEqual(female),
                 $"Male and female sprites must differ for {asset.Species}");
@@ -69,7 +69,7 @@ public class AssetRegistryTests
         SpeciesAsset asset = Assert.Single(
             AssetRegistry.SpeciesTextures,
             candidate => candidate.Species == species);
-        byte[] bytes = ReadAndValidatePng(Path.Combine(FindRepositoryRoot(), asset.Path));
+        var bytes = ReadAndValidatePng(Path.Combine(FindRepositoryRoot(), asset.Path));
 
         Assert.Equal(64, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16, 4)));
         Assert.Equal(64, BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20, 4)));
@@ -86,11 +86,11 @@ public class AssetRegistryTests
     private static byte[] ReadAndValidatePng(string path)
     {
         Assert.True(File.Exists(path), $"Missing gendered sprite: {path}");
-        byte[] bytes = File.ReadAllBytes(path);
+        var bytes = File.ReadAllBytes(path);
         Assert.True(bytes.AsSpan(0, 8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }),
             $"Invalid PNG signature: {path}");
-        int width = BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16, 4));
-        int height = BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20, 4));
+        var width = BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(16, 4));
+        var height = BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(20, 4));
         Assert.Equal(width, height);
         Assert.InRange(width, 32, 128);
         Assert.Equal(6, bytes[25]);

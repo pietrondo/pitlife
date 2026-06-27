@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
@@ -32,8 +31,8 @@ public sealed class CreatureSpawner
         if (def == null) return false;
         if (_ecosystem.IsFull) return false;
         var tile = _ecosystem.World.GetTileAtPosition(position.X, position.Y);
-        int tileY = (int)(position.Y / _ecosystem.World.TileSize);
-        float effectiveTemp = _ecosystem.Climate.GetTileTemperature(tile, tileY, _ecosystem.World.Height);
+        var tileY = (int)(position.Y / _ecosystem.World.TileSize);
+        var effectiveTemp = _ecosystem.Climate.GetTileTemperature(tile, tileY, _ecosystem.World.Height);
         return def.Kind == CreatureType.Plant ? def.IsValidClimate(tile.Biome, effectiveTemp) : true;
     }
 
@@ -41,8 +40,8 @@ public sealed class CreatureSpawner
     {
         if (_ecosystem.IsFull) return false;
         var tile = _ecosystem.World.GetTileAtPosition(position.X, position.Y);
-        int tileY = (int)(position.Y / _ecosystem.World.TileSize);
-        float effectiveTemp = _ecosystem.Climate.GetTileTemperature(tile, tileY, _ecosystem.World.Height);
+        var tileY = (int)(position.Y / _ecosystem.World.TileSize);
+        var effectiveTemp = _ecosystem.Climate.GetTileTemperature(tile, tileY, _ecosystem.World.Height);
         if (def.Kind == CreatureType.Plant && !def.IsValidClimate(tile.Biome, effectiveTemp))
             return false;
 

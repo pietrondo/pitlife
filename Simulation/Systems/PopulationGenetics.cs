@@ -27,20 +27,20 @@ public static class PopulationGenetics
         GeneticProfile[] profiles = population
             .Select(creature => creature.Genome.EnsureGeneticProfile())
             .ToArray();
-        float individualHeterozygosity = profiles.Average(profile => profile.Heterozygosity);
-        float expectedHeterozygosity = 0f;
-        int polymorphicMarkers = 0;
-        int alleleCount = profiles.Length * 2;
-        for (int marker = 0; marker < 64; marker++)
+        var individualHeterozygosity = profiles.Average(profile => profile.Heterozygosity);
+        var expectedHeterozygosity = 0f;
+        var polymorphicMarkers = 0;
+        var alleleCount = profiles.Length * 2;
+        for (var marker = 0; marker < 64; marker++)
         {
-            ulong bit = 1UL << marker;
-            int ones = 0;
+            var bit = 1UL << marker;
+            var ones = 0;
             foreach (GeneticProfile profile in profiles)
             {
                 if ((profile.MarkerHaplotypeA & bit) != 0) ones++;
                 if ((profile.MarkerHaplotypeB & bit) != 0) ones++;
             }
-            float frequency = ones / (float)alleleCount;
+            var frequency = ones / (float)alleleCount;
             expectedHeterozygosity += 2f * frequency * (1f - frequency);
             if (ones > 0 && ones < alleleCount)
                 polymorphicMarkers++;

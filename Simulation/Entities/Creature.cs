@@ -30,7 +30,7 @@ public abstract class Creature
         var def = SpeciesRegistry.Get(Species);
         if (def == null || !def.Hibernates) return;
         var tile = ecosystem.World.GetTileAtPosition(Position.X, Position.Y);
-        float temp = ecosystem.Climate.GetTileTemperature(tile, Position.Y / ecosystem.World.TileSize, ecosystem.World.Height);
+        var temp = ecosystem.Climate.GetTileTemperature(tile, Position.Y / ecosystem.World.TileSize, ecosystem.World.Height);
         if (temp < BalanceConfig.Data.Hibernation.EnterTemperature && !Hibernating)
         {
             Hibernating = true;
@@ -77,7 +77,7 @@ public abstract class Creature
 
     public void DecayMemories(Random rng)
     {
-        float decayRate = BalanceConfig.Data.Creature.MemoryDecayRateBase * (1f - Genome.MemorySpan * BalanceConfig.Data.Creature.MemoryDecayMemorySpanFactor);
+        var decayRate = BalanceConfig.Data.Creature.MemoryDecayRateBase * (1f - Genome.MemorySpan * BalanceConfig.Data.Creature.MemoryDecayMemorySpanFactor);
         if (rng.NextDouble() < decayRate && RememberedFood.Count > 0)
             RememberedFood.RemoveAt(rng.Next(RememberedFood.Count));
         if (rng.NextDouble() < decayRate && RememberedDanger.Count > 0)
@@ -183,7 +183,7 @@ public abstract class Creature
     public virtual void Update(World world, Ecosystem ecosystem, GameTime gameTime)
     {
         if (!IsAlive) return;
-        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (dt <= 0 || dt > 1f) return;
         Age += dt;
 
@@ -192,7 +192,7 @@ public abstract class Creature
         UpdateEnvironmentalMultipliers(world, ecosystem);
         Position = ClampToWorld(Position, world);
 
-        bool active = IsActive(ecosystem.CurrentDayPhase) || CreatureType == CreatureType.Plant;
+        var active = IsActive(ecosystem.CurrentDayPhase) || CreatureType == CreatureType.Plant;
         IsSleeping = !active && CreatureType != CreatureType.Plant;
 
         if (Hibernating)
@@ -214,7 +214,7 @@ public abstract class Creature
         ApplyClimateAndPopulationPressure(ecosystem);
         ConsumeEnergy(dt);
 
-        float thirstRate = BalanceConfig.Data.Thirst.BaseRate + CurrentEnergyMultiplier * BalanceConfig.Data.Thirst.EnergyMultiplierRate;
+        var thirstRate = BalanceConfig.Data.Thirst.BaseRate + CurrentEnergyMultiplier * BalanceConfig.Data.Thirst.EnergyMultiplierRate;
         if (CreatureType == CreatureType.Plant) thirstRate = 0f;
         Thirst = Math.Min(MaxThirst, Thirst + thirstRate * dt);
         if (Thirst >= MaxThirst * BalanceConfig.Data.Thirst.PenaltyThresholdRatio)
@@ -232,7 +232,7 @@ public abstract class Creature
     public void ApplyWindDrift(float windDir, float windSpeed, float dt, World world)
     {
         if (CreatureType == CreatureType.Plant) return;
-        float drift = windSpeed * BalanceConfig.Data.Wind.DriftSpeedLand * dt;
+        var drift = windSpeed * BalanceConfig.Data.Wind.DriftSpeedLand * dt;
         if (IsAquatic) drift *= BalanceConfig.Data.Wind.DriftSpeedAquaticMultiplier;
         Vector2 push = new Vector2(MathF.Cos(windDir) * drift, MathF.Sin(windDir) * drift);
         Vector2 newPos = ClampToWorld(Position + push, world);
@@ -246,17 +246,17 @@ public abstract class Creature
         if (Energy < ReproductionThreshold) return;
         if (CreatureType == CreatureType.Plant) return;
 
-        float timeSinceLastReproduction = ecosystem.TotalTime - LastReproductionTime;
+        var timeSinceLastReproduction = ecosystem.TotalTime - LastReproductionTime;
         if (timeSinceLastReproduction < ReproductionCooldown) return;
 
-        int sameSpeciesCount = 0;
+        var sameSpeciesCount = 0;
         ecosystem.Metrics.SpeciesPopulations.TryGetValue(Species, out sameSpeciesCount);
-        int totalAnimals = ecosystem.HerbivoreCount + ecosystem.CarnivoreCount + ecosystem.OmnivoreCount;
+        var totalAnimals = ecosystem.HerbivoreCount + ecosystem.CarnivoreCount + ecosystem.OmnivoreCount;
         if (totalAnimals > 10 && sameSpeciesCount > totalAnimals / 3 && ecosystem.Random.NextDouble() > 0.3f)
             return;
 
         // Lotka-Volterra: adjust reproduction probability based on trophic balance
-        float trophicBirthBonus = CreatureType switch
+        var trophicBirthBonus = CreatureType switch
         {
             CreatureType.Herbivore => ecosystem.Trophic.HerbivoreBirthBonus,
             CreatureType.Carnivore => ecosystem.Trophic.CarnivoreBirthBonus,
@@ -283,8 +283,8 @@ public abstract class Creature
             ecosystem.TotalTime - mate.LastReproductionTime < mate.ReproductionCooldown)
             return;
 
-        int litter = Math.Min(LitterSize, mate.LitterSize);
-        for (int i = 0; i < litter && IsAlive && mate.IsAlive; i++)
+        var litter = Math.Min(LitterSize, mate.LitterSize);
+        for (var i = 0; i < litter && IsAlive && mate.IsAlive; i++)
         {
             var child = ReproduceWith(mate, ecosystem.Random);
             if (child != null)
@@ -307,21 +307,21 @@ public abstract class Creature
     internal void ApplyClimateAndPopulationPressure(Ecosystem ecosystem)
     {
         if (CreatureType == CreatureType.Plant) return;
-        float seasonalFactor = ecosystem.Climate.EnergyModifier;
-        float pressureFactor = ecosystem.PopulationPressure;
-        float o2Factor = 2f - ecosystem.Atmosphere.OxygenModifier;
-        float altitude = ecosystem.World.GetElevation(Position.X, Position.Y);
-        float altitudeFactor = altitude > 0.6f ? (altitude - 0.6f) * 3f : 0f;
+        var seasonalFactor = ecosystem.Climate.EnergyModifier;
+        var pressureFactor = ecosystem.PopulationPressure;
+        var o2Factor = 2f - ecosystem.Atmosphere.OxygenModifier;
+        var altitude = ecosystem.World.GetElevation(Position.X, Position.Y);
+        var altitudeFactor = altitude > 0.6f ? (altitude - 0.6f) * 3f : 0f;
 
         // Lotka-Volterra trophic dynamics: adjust death rate based on predator-prey balance
-        float trophicDeathMultiplier = CreatureType switch
+        var trophicDeathMultiplier = CreatureType switch
         {
             CreatureType.Herbivore => ecosystem.Trophic.HerbivoreDeathPenalty,
             CreatureType.Carnivore => ecosystem.Trophic.CarnivoreDeathPenalty,
             _ => 1f
         };
 
-        float combinedFactor = seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f + altitudeFactor;
+        var combinedFactor = seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f + altitudeFactor;
         Energy -= EnergyConsumption * combinedFactor * trophicDeathMultiplier * (1f / 60f);
     }
 
@@ -337,7 +337,7 @@ public abstract class Creature
 
         if (IsAquatic)
         {
-            bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
+            var inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
             if (inWater)
             {
                 CurrentSpeedMultiplier = 1.0f;
@@ -387,9 +387,9 @@ public abstract class Creature
                 break;
         }
 
-        int tileY = (int)(Position.Y / ecosystem.World.TileSize);
-        float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
-        float tempDiff = Math.Abs(tileTemp - TemperaturePreference);
+        var tileY = (int)(Position.Y / ecosystem.World.TileSize);
+        var tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
+        var tempDiff = Math.Abs(tileTemp - TemperaturePreference);
         if (tempDiff > 15f && CreatureType != CreatureType.Plant)
             CurrentEnergyMultiplier += tempDiff * 0.02f;
 
@@ -420,7 +420,7 @@ public abstract class Creature
 
         if (Waypoint == null || Vector2.Distance(Position, Waypoint.Value) < WaypointReachedDistance)
         {
-            float distFromHome = Vector2.Distance(Position, HomePosition);
+            var distFromHome = Vector2.Distance(Position, HomePosition);
             if (distFromHome > radius * 3f)
             {
                 Waypoint = HomePosition;
@@ -459,13 +459,13 @@ public abstract class Creature
 
     protected Vector2 PickWaypoint(World world, Random random, float radius)
     {
-        float minDist = radius * 0.35f;
+        var minDist = radius * 0.35f;
         Vector2 target;
-        int attempts = 0;
+        var attempts = 0;
         do
         {
-            float rx = (float)(random.NextDouble() - 0.5) * radius * 2;
-            float ry = (float)(random.NextDouble() - 0.5) * radius * 2;
+            var rx = (float)(random.NextDouble() - 0.5) * radius * 2;
+            var ry = (float)(random.NextDouble() - 0.5) * radius * 2;
             target = Position + new Vector2(rx, ry);
             target.X = Math.Clamp(target.X, 1, world.PixelWidth - 1);
             target.Y = Math.Clamp(target.Y, 1, world.PixelHeight - 1);
@@ -477,10 +477,10 @@ public abstract class Creature
     public void MoveToward(Vector2 target, float dt, World? world = null)
     {
         Vector2 dir = target - Position;
-        float dist = dir.Length();
+        var dist = dir.Length();
         if (dist < 1f) return;
         if (dist > 0.001f) dir /= dist;
-        float moveAmount = Speed * dt;
+        var moveAmount = Speed * dt;
         Vector2 newPos = ClampToWorld(Position + dir * Math.Min(moveAmount, dist), world);
         if (world != null && !world.GetTileAtPosition(newPos.X, newPos.Y).IsPassableFor(IsAquatic))
             return;
@@ -491,7 +491,7 @@ public abstract class Creature
     public bool MoveAwayFrom(Vector2 threat, float dt, World? world = null)
     {
         Vector2 dir = Position - threat;
-        float dist = dir.Length();
+        var dist = dir.Length();
         if (dist < 1f) return false;
         dir /= dist;
         Vector2 newPos = ClampToWorld(Position + dir * Speed * dt, world);

@@ -13,10 +13,10 @@ public static class MaturationConfig
     {
         try
         {
-            string path = Path.Combine("Content", "config", "maturation.json");
+            var path = Path.Combine("Content", "config", "maturation.json");
             if (File.Exists(path))
             {
-                string json = File.ReadAllText(path);
+                var json = File.ReadAllText(path);
                 var parsed = JsonSerializer.Deserialize<MaturationConfigData>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
