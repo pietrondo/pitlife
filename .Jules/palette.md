@@ -7,3 +7,7 @@
 ## 2026-06-27 - Title Bar Collapse Indicator Hover State
 **Learning:** Hidden interactions in UI elements (like double-clicking a title bar to collapse the window) need explicit visual affordances to be discoverable. Adding hover states to existing indicator icons bridges the gap between static text and interactive elements.
 **Action:** Always add subtle color transitions or hover states to visual indicators linked to hidden interactions.
+
+## 2024-06-28 - Missing Shortcut Hints
+**Learning:** Some primary UI buttons lacked shortcut hints, forcing users to guess keyboard controls for navigation (like ESC) and time manipulation (like UP/DWN for speed controls).
+**Action:** Consistently use the `ShortcutHint` property on `UiButton` for all actions that have a keyboard equivalent to improve discoverability.
