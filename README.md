@@ -67,7 +67,7 @@
 - **Fuga per bassa energia**: istinto di sopravvivenza dinamico
 
 ### UI
-- **Tema foresta**: palette verde/marrone con finestre draggable
+- **Tema foresta**: palette verde/marrone con finestre draggable e hover state per gli indicatori di collasso
 - **Minimap**: angolo in basso a destra con biomi e creature
 - **Toolbar**: statistiche, creature, velocità, cataclismi, clima, menu
 - **Dashboard clima**: dati orbitali, temperatura per-tile, emisferi
@@ -78,6 +78,8 @@
 
 ### Performance e Architettura
 - **Multi-thread**: world generation parallela, object pooling
+- **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, e ricerca spaziale)
+- **Architettura**: pipeline di simulazione modulare basata su `ISimulationSystem` estratta dal core
 - **Rendering**: grid culling rigoroso in `PixelWorldRenderer`
 - **Data-driven**: tutte le logiche (specie, bilanciamento, clima, malattie, comportamenti) in JSON esterno
 - **Benchmark**: suite BenchmarkDotNet per regressioni di performance
