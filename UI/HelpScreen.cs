@@ -9,7 +9,7 @@ namespace PitLife.UI;
 public sealed class HelpScreen
 {
     private readonly UiWindow _window = new(I18n.T("help.title"));
-    private readonly UiButton _backButton = new(I18n.T("common.back"));
+    private readonly UiButton _backButton = new(I18n.T("common.back")) { ShortcutHint = "ESC" };
 
     private bool _inputReady = true;
 
