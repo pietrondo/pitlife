@@ -7,8 +7,6 @@ namespace PitLife.Rendering;
 /// </summary>
 public class DayNightCycle
 {
-    public const float DayLength = 120f;
-
     /// <summary>
     /// Gets or sets the TimeOfDay.
     /// </summary>
@@ -24,7 +22,7 @@ public class DayNightCycle
     /// <param name="totalTime">The totalTime parameter.</param>
     public void Update(float totalTime)
     {
-        TimeOfDay = totalTime % DayLength;
+        TimeOfDay = totalTime % Core.SimulationConfig.Data.DayNight.DayLength;
         Phase = GetPhase(TimeOfDay);
     }
 
@@ -35,15 +33,14 @@ public class DayNightCycle
     /// <returns>Returns the DayPhase result.</returns>
     public static DayPhase GetPhase(float timeOfDay)
     {
-        var t = timeOfDay / DayLength;
-        return t switch
-        {
-            < 0.10f => DayPhase.Dawn,
-            < 0.45f => DayPhase.Day,
-            < 0.55f => DayPhase.Dusk,
-            < 0.90f => DayPhase.Night,
-            _ => DayPhase.Dawn
-        };
+        var config = Core.SimulationConfig.Data.DayNight;
+        var t = timeOfDay / config.DayLength;
+
+        if (t < config.DawnEnd) return DayPhase.Dawn;
+        if (t < config.DayEnd) return DayPhase.Day;
+        if (t < config.DuskEnd) return DayPhase.Dusk;
+        if (t < config.NightEnd) return DayPhase.Night;
+        return DayPhase.Dawn;
     }
 
     /// <summary>
@@ -52,20 +49,28 @@ public class DayNightCycle
     /// <returns>Returns the Color result.</returns>
     public Color GetOverlayColor()
     {
-        var t = TimeOfDay / DayLength;
-        return t switch
-        {
-            < 0.10f => LerpColor(NightColor, DawnColor, t / 0.10f),
-            < 0.45f => Color.Transparent,
-            < 0.55f => LerpColor(Color.Transparent, DuskColor, (t - 0.45f) / 0.10f),
-            < 0.90f => LerpColor(DuskColor, NightColor, (t - 0.55f) / 0.35f),
-            _ => LerpColor(NightColor, DawnColor, (t - 0.90f) / 0.10f)
-        };
-    }
+        var config = Core.SimulationConfig.Data.DayNight;
+        var t = TimeOfDay / config.DayLength;
 
-    private static readonly Color NightColor = new(20, 30, 80, 100);
-    private static readonly Color DawnColor = new(255, 180, 100, 50);
-    private static readonly Color DuskColor = new(255, 120, 60, 70);
+        if (t < config.DawnEnd)
+        {
+            return LerpColor(config.NightColorValue, config.DawnColorValue, t / config.DawnEnd);
+        }
+        if (t < config.DayEnd)
+        {
+            return Color.Transparent;
+        }
+        if (t < config.DuskEnd)
+        {
+            return LerpColor(Color.Transparent, config.DuskColorValue, (t - config.DayEnd) / (config.DuskEnd - config.DayEnd));
+        }
+        if (t < config.NightEnd)
+        {
+            return LerpColor(config.DuskColorValue, config.NightColorValue, (t - config.DuskEnd) / (config.NightEnd - config.DuskEnd));
+        }
+
+        return LerpColor(config.NightColorValue, config.DawnColorValue, (t - config.NightEnd) / (1f - config.NightEnd));
+    }
 
     private static Color LerpColor(Color a, Color b, float t)
     {
