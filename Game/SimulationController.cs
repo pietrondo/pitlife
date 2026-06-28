@@ -10,9 +10,6 @@ public sealed class SimulationController
     private readonly Ecosystem _ecosystem;
     private readonly DayNightCycle _dayNight;
 
-    private static readonly float[] SpeedLevels = [0f, 1f, 2f, 4f];
-    private const float TickInterval = 1f / 10f;
-
     private float _timeAccumulator;
     private bool _paused;
     private int _speedLevel = 1;
@@ -25,7 +22,7 @@ public sealed class SimulationController
 
     public bool IsPaused => _paused;
     public int SpeedLevel => _speedLevel;
-    public float CurrentSpeed => SpeedLevels[_speedLevel];
+    public float CurrentSpeed => Core.SimulationConfig.Data.SpeedLevels[_speedLevel];
     public float TotalTime => _ecosystem.TotalTime;
     public int PlantCount => _ecosystem.PlantCount;
     public int HerbivoreCount => _ecosystem.HerbivoreCount;
@@ -43,10 +40,11 @@ public sealed class SimulationController
 
         _ecosystem.SimulationSpeed = CurrentSpeed;
         _timeAccumulator += dt;
-        while (_timeAccumulator >= TickInterval)
+        var tickInterval = Core.SimulationConfig.Data.TickInterval;
+        while (_timeAccumulator >= tickInterval)
         {
-            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(TickInterval), TimeSpan.FromSeconds(TickInterval)));
-            _timeAccumulator -= TickInterval;
+            _ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(tickInterval), TimeSpan.FromSeconds(tickInterval)));
+            _timeAccumulator -= tickInterval;
         }
         _dayNight.Update(_ecosystem.TotalTime);
         _ecosystem.CurrentDayPhase = _dayNight.Phase;
@@ -54,7 +52,7 @@ public sealed class SimulationController
 
     public void SetSpeed(int level)
     {
-        if (level < 0 || level >= SpeedLevels.Length) return;
+        if (level < 0 || level >= Core.SimulationConfig.Data.SpeedLevels.Length) return;
         _speedLevel = level;
         _paused = level == 0;
     }
