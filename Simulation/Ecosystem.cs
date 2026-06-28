@@ -299,6 +299,7 @@ public class Ecosystem
 
     public void UpdateStats()
     {
+        Metrics.Update(this);
         int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
         foreach (var c in Creatures)
         {
