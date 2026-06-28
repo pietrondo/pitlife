@@ -171,7 +171,8 @@ public abstract class Creature
         }
 
         float tempEnergy = Energy; EnvironmentState.ApplyClimateAndPopulationPressure(ref tempEnergy, EnergyConsumption, CreatureType, Position, ecosystem); Energy = tempEnergy;
-        ConsumeEnergy(dt);
+        float scarcity = CreatureType == CreatureType.Plant ? 1f : GrassScarcityPenalty(world);
+        ConsumeEnergy(dt * scarcity);
 
         float thirstRate = BalanceConfig.Data.Thirst.BaseRate + Motor.CurrentEnergyMultiplier * BalanceConfig.Data.Thirst.EnergyMultiplierRate;
         if (CreatureType == CreatureType.Plant) thirstRate = 0f;
@@ -208,6 +209,10 @@ public abstract class Creature
         ecosystem.Metrics.SpeciesPopulations.TryGetValue(Species, out sameSpeciesCount);
         int totalAnimals = ecosystem.HerbivoreCount + ecosystem.CarnivoreCount + ecosystem.OmnivoreCount;
         if (totalAnimals > 10 && sameSpeciesCount > totalAnimals / 3 && ecosystem.Random.NextDouble() > 0.3f)
+            return;
+
+        float scarcity = GrassScarcityPenalty(ecosystem.World);
+        if (scarcity > 1.5f && ecosystem.Random.NextDouble() > 0.3f)
             return;
 
         // Lotka-Volterra: adjust reproduction probability based on trophic balance
@@ -256,7 +261,15 @@ public abstract class Creature
 
     protected virtual void ConsumeEnergy(float dt)
     {
-        Energy -= EnergyConsumption * Motor.CurrentEnergyMultiplier * dt;
+        float cost = EnergyConsumption * Motor.CurrentEnergyMultiplier;
+        Energy -= cost * dt;
+    }
+
+    public float GrassScarcityPenalty(World world)
+    {
+        var tile = world.GetTileAtPosition(Position.X, Position.Y);
+        float grassRatio = tile.GrassAmount / Math.Max(tile.MaxGrass, 0.001f);
+        return grassRatio < 0.2f ? 1f + (0.2f - grassRatio) * 5f : 1f;
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Unknown)
