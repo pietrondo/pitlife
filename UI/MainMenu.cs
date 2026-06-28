@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Localization;
@@ -22,6 +23,7 @@ public enum MenuAction
 
 public sealed class MainMenu
 {
+    private readonly StringBuilder _sb = new StringBuilder(64);
     private readonly UiWindow _window = new(I18n.T("menu.mainTitle"));
     private readonly UiButton[] _mainButtons =
     [
@@ -346,14 +348,14 @@ public sealed class MainMenu
         _planetButton.Draw(spriteBatch, pixel, font, mouse, false);
 
         int labelX = _continentInput.Bounds.X - 8;
-        string contLabel = I18n.T("menu.continents") + ":";
-        Vector2 contLabelSize = font.MeasureString(contLabel);
-        spriteBatch.DrawString(font, contLabel, new Vector2(labelX - contLabelSize.X, _continentInput.Bounds.Y + 8), Color.White);
+        _sb.Clear().Append(I18n.T("menu.continents")).Append(':');
+        Vector2 contLabelSize = font.MeasureString(_sb);
+        spriteBatch.DrawString(font, _sb, new Vector2(labelX - contLabelSize.X, _continentInput.Bounds.Y + 8), Color.White);
         _continentInput.Draw(spriteBatch, pixel, font, mouse);
 
-        string seaLabel = I18n.T("menu.seaLevel") + ":";
-        Vector2 seaLabelSize = font.MeasureString(seaLabel);
-        spriteBatch.DrawString(font, seaLabel, new Vector2(labelX - seaLabelSize.X, _seaLevelInput.Bounds.Y + 8), Color.White);
+        _sb.Clear().Append(I18n.T("menu.seaLevel")).Append(':');
+        Vector2 seaLabelSize = font.MeasureString(_sb);
+        spriteBatch.DrawString(font, _sb, new Vector2(labelX - seaLabelSize.X, _seaLevelInput.Bounds.Y + 8), Color.White);
         _seaLevelInput.Draw(spriteBatch, pixel, font, mouse);
 
         _islandSizeButton.Draw(spriteBatch, pixel, font, mouse, false);

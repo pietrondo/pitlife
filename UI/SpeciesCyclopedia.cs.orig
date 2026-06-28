@@ -277,14 +277,14 @@ public sealed class SpeciesCyclopedia
 
             DrawText(sb, font, cx + 8, cy + 6, name, selected ? UiTheme.MossSignal : UiTheme.WarmParchment);
 
-            _sb.Clear().Append(def.Kind.ToString());
+            _sb.Clear().Append(def.Kind);
             if (def.Kind != CreatureType.Plant)
             {
-                _sb.Append($" | Size: {def.DefaultSize:F1}");
+                _sb.Append(" | Size: ").AppendFormat("{0:F1}", def.DefaultSize);
             }
             DrawText(sb, font, cx + 8, cy + 26, _sb, UiTheme.MutedStone);
 
-            var social = def.Kind != CreatureType.Plant ? def.SocialBehavior.ToString() : string.Empty;
+            var social = def.Kind != CreatureType.Plant ? def.SocialBehavior.ToString() : "";
             DrawText(sb, font, cx + 8, cy + 46, social, UiTheme.LakeBlue);
 
             _sb.Clear();

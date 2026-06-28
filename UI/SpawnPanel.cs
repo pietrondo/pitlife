@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Localization;
+using System.Text;
 using PitLife.Core;
 using PitLife.Simulation;
 
@@ -11,6 +12,7 @@ namespace PitLife.UI;
 
 public sealed class SpawnPanel
 {
+    private readonly StringBuilder _sb = new StringBuilder(64);
     public bool IsOpen => _state.IsOpen;
     public string? SelectedSpeciesKey => _state.SelectedSpeciesKey;
     public string? SelectedCategory => _state.SelectedCategory;
@@ -248,8 +250,8 @@ public sealed class SpawnPanel
         if (_state.SelectedSpeciesKey != null)
         {
             var selectedName = I18n.Species(_state.SelectedSpeciesKey!);
-            var hint = I18n.T("spawn.selected") + ": " + selectedName;
-            sb.DrawString(font, hint,
+            _sb.Clear().Append(I18n.T("spawn.selected")).Append(": ").Append(selectedName);
+            sb.DrawString(font, _sb,
                 new Vector2(_panelBounds.X + 10, _panelBounds.Bottom - 36),
                 UiTheme.MossSignal);
 
