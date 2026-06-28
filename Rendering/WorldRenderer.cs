@@ -181,6 +181,7 @@ public class WorldRenderer
         var ex = Math.Min(_world.Width, (v.X + v.Width) / ts + 2);
         var ey = Math.Min(_world.Height, (v.Y + v.Height) / ts + 2);
 
+        // Pass 1: Draw base biome textures
         for (var y = sy; y < ey; y++)
         {
             for (var x = sx; x < ex; x++)
@@ -194,6 +195,16 @@ public class WorldRenderer
                     sb.Draw(tex, r, Color.White);
                 else
                     sb.Draw(_pixel, r, BiomeColors[(int)b]);
+            }
+        }
+
+        // Pass 2: Draw borders using only the pixel texture to prevent texture swaps
+        for (var y = sy; y < ey; y++)
+        {
+            for (var x = sx; x < ex; x++)
+            {
+                var t = _world.Tiles[x, y];
+                BiomeType b = t.Biome;
 
                 var (top, bot, l, r_) = GetNB(x, y);
 
