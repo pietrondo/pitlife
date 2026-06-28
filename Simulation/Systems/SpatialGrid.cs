@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-internal sealed class SpatialGrid
+public sealed class SpatialGrid
 {
     private readonly int _cellSize;
     private readonly int _columns;
@@ -62,6 +62,28 @@ internal sealed class SpatialGrid
 
         RemoveFromBucket(creature, cell);
     }
+
+    public Plant? FindNearestPlant(Herbivore seeker) => FindNearest(seeker, c => c is Plant) as Plant;
+    public Plant? FindNearestPlantFor(Creature seeker) => FindNearest(seeker, c => c is Plant) as Plant;
+
+    public Creature? FindNearestPrey(Creature seeker) =>
+        FindNearest(seeker, c =>
+            c.CreatureType != CreatureType.Carnivore &&
+            c.CreatureType != seeker.CreatureType &&
+            (c.CreatureType != CreatureType.Plant || seeker is not Herbivore and not Omnivore));
+
+    public Creature? FindNearestSameSpecies(Creature seeker) =>
+        FindNearest(seeker, c => c != seeker && c.Species == seeker.Species);
+
+    public Creature? FindNearestMate(Creature seeker)
+    {
+        if (!seeker.IsAdult || seeker.Gender is not (Gender.Male or Gender.Female))
+            return null;
+        return FindNearest(seeker, seeker.CanMateWith);
+    }
+
+    public Creature? FindNearestPredator(Creature seeker) =>
+        FindNearest(seeker, c => c.CreatureType == CreatureType.Carnivore);
 
     public List<Creature> GetNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
     {

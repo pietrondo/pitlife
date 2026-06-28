@@ -26,7 +26,7 @@ public class Ecosystem
     public PhylogeneticGraph Phylogeny { get; } = new();
     public CreaturePool Pool { get; } = new();
     public SimulationPipeline Pipeline { get; } = new();
-    public SpatialIndex Spatial { get; }
+    public SpatialGrid Spatial { get; }
     public EcosystemMetrics Metrics => Pipeline.Get<EcosystemMetrics>()!;
     public ClimateSystem Climate => Pipeline.Get<ClimateSystem>()!;
     public DiseaseSystem Disease => Pipeline.Get<DiseaseSystem>()!;
@@ -65,7 +65,7 @@ public class Ecosystem
         Seed = seed;
         World = new World(worldWidth, worldHeight, seed);
         Random = new Random(seed);
-        Spatial = new SpatialIndex(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        Spatial = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
         InitSystems();
         Logger.Event("ECO", $"Ecosystem created: {worldWidth}x{worldHeight}, seed={seed}");
@@ -76,7 +76,7 @@ public class Ecosystem
         Seed = seed;
         World = new World(options, seed);
         Random = new Random(seed);
-        Spatial = new SpatialIndex(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
+        Spatial = new SpatialGrid(World.PixelWidth, World.PixelHeight, World.TileSize * 2);
         _spawner = new CreatureSpawner(this);
         InitSystems();
         Logger.Event("ECO", $"Ecosystem created: {options.MapWidth}x{options.MapHeight}, seed={seed}, preset={options.Preset}");
@@ -404,7 +404,7 @@ public class Ecosystem
 
     public List<Creature> FindNeighbors(Creature seeker, float radius, Func<Creature, bool> predicate)
     {
-        return Spatial.FindNeighbors(seeker, radius, predicate);
+        return Spatial.GetNeighbors(seeker, radius, predicate);
     }
 
     public void Clear()

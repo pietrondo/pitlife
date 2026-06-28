@@ -59,31 +59,4 @@ public static class FoodWeb
         };
     }
 
-    public static string Describe(DietType diet) => diet switch
-    {
-        DietType.Herbivore => "Plants",
-        DietType.Carnivore => "Meat (herbivores/omnivores)",
-        DietType.Omnivore => "Plants and meat",
-        DietType.Insectivore => "Small creatures",
-        DietType.Piscivore => "Aquatic prey",
-        _ => "Unknown"
-    };
-
-    public static List<string> BuildTrophicChain(CreatureType top, int depth = 3)
-    {
-        var chain = new List<string> { top.ToString() };
-        var current = top;
-        for (var i = 0; i < depth && current != CreatureType.Plant; i++)
-        {
-            current = current switch
-            {
-                CreatureType.Carnivore => CreatureType.Herbivore,
-                CreatureType.Omnivore => CreatureType.Herbivore,
-                CreatureType.Herbivore => CreatureType.Plant,
-                _ => CreatureType.Plant
-            };
-            chain.Add(current.ToString());
-        }
-        return chain;
-    }
 }

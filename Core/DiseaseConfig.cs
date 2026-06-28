@@ -6,46 +6,35 @@ namespace PitLife.Core;
 
 public static class DiseaseConfig
 {
-    public static IReadOnlyList<DiseaseDefEntry> Diseases { get; } = LoadDiseases();
-    public static OutbreakDefaults Outbreak { get; } = LoadOutbreak();
+    private static DiseaseConfigDoc? _doc;
 
-    private static IReadOnlyList<DiseaseDefEntry> LoadDiseases()
+    private static DiseaseConfigDoc Doc
     {
-        try
+        get
         {
-            var path = Path.Combine("Content", "config", "diseases.json");
-            if (!File.Exists(path)) return FallbackDiseases;
-
-            var json = File.ReadAllText(path);
-            var doc = JsonSerializer.Deserialize<DiseaseConfigDoc>(json, new JsonSerializerOptions
+            if (_doc != null) return _doc;
+            try
             {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            });
-            return doc?.Diseases ?? FallbackDiseases;
+                var path = Path.Combine("Content", "config", "diseases.json");
+                if (File.Exists(path))
+                {
+                    var json = File.ReadAllText(path);
+                    _doc = JsonSerializer.Deserialize<DiseaseConfigDoc>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        AllowTrailingCommas = true,
+                        ReadCommentHandling = JsonCommentHandling.Skip
+                    });
+                }
+            }
+            catch { }
+            _doc ??= new DiseaseConfigDoc(0, null, null);
+            return _doc;
         }
-        catch { return FallbackDiseases; }
     }
 
-    private static OutbreakDefaults LoadOutbreak()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "diseases.json");
-            if (!File.Exists(path)) return new OutbreakDefaults();
-
-            var json = File.ReadAllText(path);
-            var doc = JsonSerializer.Deserialize<DiseaseConfigDoc>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            });
-            return doc?.Outbreak ?? new OutbreakDefaults();
-        }
-        catch { return new OutbreakDefaults(); }
-    }
+    public static IReadOnlyList<DiseaseDefEntry> Diseases => Doc.Diseases ?? FallbackDiseases;
+    public static OutbreakDefaults Outbreak => Doc.Outbreak ?? new OutbreakDefaults();
 
     private static readonly IReadOnlyList<DiseaseDefEntry> FallbackDiseases = new[]
     {

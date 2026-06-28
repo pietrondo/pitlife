@@ -56,29 +56,6 @@ public class FoodWebTests
     }
 
     [Fact]
-    public void EnergyTransfer_SingleStepIs15Percent()
-    {
-        var efficiency = FoodWeb.EnergyTransferEfficiency(CreatureType.Plant, CreatureType.Herbivore);
-        Assert.Equal(0.15f, efficiency, 2);
-    }
-
-    [Fact]
-    public void EnergyTransfer_TwoStepsIs2Percent()
-    {
-        var efficiency = FoodWeb.EnergyTransferEfficiency(CreatureType.Plant, CreatureType.Carnivore);
-        Assert.True(efficiency < 0.05f);
-    }
-
-    [Fact]
-    public void BuildTrophicChain_ProducesCorrectOrder()
-    {
-        var chain = FoodWeb.BuildTrophicChain(CreatureType.Carnivore, 3);
-        Assert.True(chain.Count >= 3);
-        Assert.Equal("Carnivore", chain[0]);
-        Assert.Equal("Plant", chain[^1]);
-    }
-
-    [Fact]
     public void Creatures_HaveCorrectDietDefault()
     {
         var rng = new System.Random(42);

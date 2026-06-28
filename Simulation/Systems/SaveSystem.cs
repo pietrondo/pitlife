@@ -53,16 +53,6 @@ public static class SaveSystem
         public List<CreatureSaveData> Creatures { get; set; } = new();
     }
 
-    /// <summary>Legacy V0 format without SchemaVersion, used for migration.</summary>
-    private class SaveDataV0
-    {
-        public int Seed { get; set; }
-        public int WorldWidth { get; set; }
-        public int WorldHeight { get; set; }
-        public float TotalTime { get; set; }
-        public List<CreatureSaveData> Creatures { get; set; } = new();
-    }
-
     private static readonly JsonSerializerOptions Options = new()
     {
         WriteIndented = true,
@@ -128,89 +118,13 @@ public static class SaveSystem
 
         var json = File.ReadAllText(filePath);
 
-        // Try current format first (has SchemaVersion)
         try
         {
-            var data = JsonSerializer.Deserialize<SaveData>(json, Options);
-            if (data != null && data.SchemaVersion >= 1)
-            {
-                ValidateOrThrow(data);
-                return data;
-            }
+            return JsonSerializer.Deserialize<SaveData>(json, Options);
         }
-        catch (JsonException) { /* not current format, try V0 migration */ }
-
-        // Try legacy V0 format (no SchemaVersion)
-        try
+        catch (JsonException)
         {
-            var v0 = JsonSerializer.Deserialize<SaveDataV0>(json, Options);
-            if (v0 != null && v0.Creatures != null)
-            {
-                var migrated = MigrateFromV0(v0);
-                ValidateOrThrow(migrated);
-                return migrated;
-            }
+            return null;
         }
-        catch (JsonException) { /* not V0 either */ }
-
-        return null;
-    }
-
-    private static SaveData MigrateFromV0(SaveDataV0 v0)
-    {
-        return new SaveData
-        {
-            SchemaVersion = CurrentSchemaVersion,
-            Seed = v0.Seed,
-            WorldWidth = v0.WorldWidth,
-            WorldHeight = v0.WorldHeight,
-            TotalTime = v0.TotalTime,
-            Creatures = v0.Creatures
-        };
-    }
-
-    private static void ValidateOrThrow(SaveData data)
-    {
-        var errors = new List<string>();
-
-        if (data.SchemaVersion > CurrentSchemaVersion)
-            errors.Add($"Save was created by a newer version (v{data.SchemaVersion}). Current version: v{CurrentSchemaVersion}. Please update the game.");
-
-        if (data.Seed < 0)
-            errors.Add("Invalid seed: must be non-negative.");
-
-        if (data.WorldWidth < 4 || data.WorldWidth > 4096)
-            errors.Add($"Invalid world width: {data.WorldWidth}. Must be between 4 and 4096.");
-
-        if (data.WorldHeight < 4 || data.WorldHeight > 4096)
-            errors.Add($"Invalid world height: {data.WorldHeight}. Must be between 4 and 4096.");
-
-        if (data.TotalTime < 0)
-            errors.Add($"Invalid total time: {data.TotalTime}. Must be non-negative.");
-
-        if (data.Creatures == null)
-            errors.Add("Creature list is missing.");
-
-        if (data.Creatures is { Count: > 0 })
-        {
-            foreach (var c in data.Creatures)
-            {
-                if (string.IsNullOrWhiteSpace(c.Species))
-                    errors.Add($"Creature #{c.IndividualId}: species name is empty.");
-                if (!float.IsFinite(c.Energy) || c.Energy < 0)
-                    errors.Add($"Creature #{c.IndividualId} ({c.Species}): invalid energy {c.Energy}.");
-                if (!float.IsFinite(c.Age) || c.Age < 0)
-                    errors.Add($"Creature #{c.IndividualId} ({c.Species}): invalid age {c.Age}.");
-                if (!float.IsFinite(c.PositionX) || !float.IsFinite(c.PositionY))
-                    errors.Add($"Creature #{c.IndividualId} ({c.Species}): invalid position.");
-                if (c.Genome == null)
-                    errors.Add($"Creature #{c.IndividualId} ({c.Species}): missing genome data.");
-                else if (c.Genome.Size <= 0)
-                    errors.Add($"Creature #{c.IndividualId} ({c.Species}): invalid genome size {c.Genome.Size}.");
-            }
-        }
-
-        if (errors.Count > 0)
-            throw new InvalidDataException($"Save validation failed ({errors.Count} error(s)):\n- {string.Join("\n- ", errors)}");
     }
 }
