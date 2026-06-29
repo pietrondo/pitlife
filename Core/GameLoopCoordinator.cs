@@ -586,7 +586,7 @@ public class GameLoopCoordinator
             var center = _game._selectedCreature.Position;
             _game._spriteBatch.DrawString(_game._font, "X", center - new Vector2(8, 14), Color.Yellow);
         }
-        _game._ecosystem.Cataclysms.Draw(_game._spriteBatch, _game._uiPixel);
+        _game._ecosystem.Cataclysms.Draw(_game._spriteBatch, _game._uiPixel, _game._camera.VisibleArea);
         DrawFruits(_game._spriteBatch, _game._camera.VisibleArea);
         _game._spriteBatch.End();
 
