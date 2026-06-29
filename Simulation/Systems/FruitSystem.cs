@@ -37,9 +37,8 @@ public struct Fruit
     }
 }
 
-public sealed class FruitSystem : ISimulationSystem
+public sealed class FruitSystem
 {
-    public UpdatePhase Phase => UpdatePhase.Update;
 
 
     private Fruit[] _fruits = new Fruit[FruitConfig.Data.MaxFruits];

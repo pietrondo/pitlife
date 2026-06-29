@@ -4,9 +4,8 @@ using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-internal sealed class RiverSystem : ISimulationSystem
+internal sealed class RiverSystem
 {
-    public UpdatePhase Phase => UpdatePhase.Update;
     private readonly World _world;
 
     public RiverSystem(World world)

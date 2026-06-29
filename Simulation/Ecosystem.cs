@@ -25,16 +25,15 @@ public class Ecosystem
     public float PopulationPressure { get; private set; } = 1f;
     public PhylogeneticGraph Phylogeny { get; } = new();
     public CreaturePool Pool { get; } = new();
-    public SimulationPipeline Pipeline { get; } = new();
     public SpatialGrid Spatial { get; }
-    public EcosystemMetrics Metrics => Pipeline.Get<EcosystemMetrics>()!;
-    public ClimateSystem Climate => Pipeline.Get<ClimateSystem>()!;
-    public DiseaseSystem Disease => Pipeline.Get<DiseaseSystem>()!;
-    public AtmosphereSystem Atmosphere => Pipeline.Get<AtmosphereSystem>()!;
-    public CataclysmSystem Cataclysms => Pipeline.Get<CataclysmSystem>()!;
-    public TrophicDynamics Trophic => Pipeline.Get<TrophicDynamics>()!;
-    public FruitSystem Fruits => Pipeline.Get<FruitSystem>()!;
-    public FlowSimulation? Flow => Pipeline.Get<FlowSimulation>();
+    public EcosystemMetrics Metrics { get; } = new();
+    public ClimateSystem Climate { get; } = new();
+    public DiseaseSystem Disease { get; } = new();
+    public AtmosphereSystem Atmosphere { get; } = new();
+    public CataclysmSystem Cataclysms { get; } = new();
+    public TrophicDynamics Trophic { get; } = new();
+    public FruitSystem Fruits { get; } = new();
+    public FlowSimulation Flow { get; private set; } = null!;
     public DayPhase CurrentDayPhase { get; set; } = DayPhase.Day;
     private HashSet<string> _knownSpecies = new(StringComparer.Ordinal);
     public float TotalTime { get; set; }
@@ -84,15 +83,15 @@ public class Ecosystem
 
     private void InitSystems()
     {
-        Pipeline.Add(new ClimateSystem());
-        Pipeline.Add(new AtmosphereSystem());
-        Pipeline.Add(new TrophicDynamics());
-        Pipeline.Add(new DiseaseSystem());
-        Pipeline.Add(new CataclysmSystem());
-        Pipeline.Add(new FlowSimulation(World));
-        Pipeline.Add(new FruitSystem());
-        Pipeline.Add(new EcosystemMetrics());
-        Pipeline.Initialize(World);
+        Flow = new FlowSimulation(World);
+        Climate.Initialize(World);
+        Atmosphere.Initialize(World);
+        Trophic.Initialize(World);
+        Disease.Initialize(World);
+        Cataclysms.Initialize(World);
+        Flow.Initialize(World);
+        Fruits.Initialize(World);
+        Metrics.Initialize(World);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -263,7 +262,18 @@ public class Ecosystem
 
         FlushPending();
         ProcessDeaths(dt);
-        Pipeline.Tick(this, gameTime);
+
+        Climate.Tick(this, gameTime);
+        Atmosphere.Tick(this, gameTime);
+        Trophic.Tick(this, gameTime);
+
+        Cataclysms.Tick(this, gameTime);
+        Flow.Tick(this, gameTime);
+        Fruits.Tick(this, gameTime);
+        Disease.Tick(this, gameTime);
+
+        Metrics.Tick(this, gameTime);
+
         var grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
@@ -421,7 +431,14 @@ public class Ecosystem
             OmnivoreCount = 0;
             Spatial.Rebuild(Array.Empty<Creature>());
             _nextIndividualId = 1;
-            Pipeline.Reset();
+            Climate.Reset();
+            Atmosphere.Reset();
+            Trophic.Reset();
+            Disease.Reset();
+            Cataclysms.Reset();
+            Flow.Reset();
+            Fruits.Reset();
+            Metrics.Reset();
         }
     }
 }
