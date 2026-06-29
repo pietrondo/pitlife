@@ -51,6 +51,11 @@ public class SimulationOrchestrator
         _game._ecosystem = new Ecosystem(wgOpts, seed);
         _game._ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
         _game._ecosystem.Initialize(60, 20, 15, 150);
+        InitializeRenderers();
+    }
+
+    private void InitializeRenderers()
+    {
         _game._worldRenderer?.Dispose();
         _game._creatureRenderer?.Dispose();
         _game._worldRenderer = new PixelWorldRenderer(_game._ecosystem.World);
@@ -117,21 +122,7 @@ public class SimulationOrchestrator
         _game._ecosystem.FlushPending();
         _game._ecosystem.UpdateStats();
 
-        _game._worldRenderer?.Dispose();
-        _game._creatureRenderer?.Dispose();
-        _game._worldRenderer = new PixelWorldRenderer(_game._ecosystem.World);
-        _game._creatureRenderer = new CreatureRenderer(_game._ecosystem);
-        _game._minimap = new Minimap(_game._ecosystem, _game._camera);
-        _game._controller = new SimulationController(_game._ecosystem, _game._dayNight);
-        _game._waterEffect = new WaterEffect();
-        ResetWorldSessionState();
-
-        _game._worldRenderer.LoadContent(_game.GraphicsDevice);
-        _game._creatureRenderer.LoadContent(_game.GraphicsDevice);
-        _game._minimap.LoadContent(_game.GraphicsDevice);
-        _game._creatureRenderer.LoadFromRegistry(_game.GraphicsDevice, AssetRegistry.Fallbacks);
-        _game._creatureRenderer.LoadFromRegistry(_game.GraphicsDevice, AssetRegistry.SpeciesTextures);
-        _game._creatureRenderer.LoadGenderedFromRegistry(_game.GraphicsDevice, AssetRegistry.GenderedSpeciesTextures);
+        InitializeRenderers();
     }
 
     public void ResetWorldSessionState()
