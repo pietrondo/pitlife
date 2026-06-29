@@ -1,0 +1,118 @@
+using System;
+using System.Text;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PitLife.Localization;
+using PitLife.Simulation;
+
+namespace PitLife.UI.Windows;
+
+public class StatisticsWindow : UiWindow
+{
+    private readonly StringBuilder _speciesSb = new(64);
+    private readonly StringBuilder _valueSb = new(16);
+
+    public StatisticsWindow(string title, string id) : base(title, id)
+    {
+    }
+
+    public void DrawContent(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        int plants,
+        int herbivores,
+        int carnivores,
+        int omnivores,
+        float time,
+        bool paused,
+        float speed,
+        EcosystemMetrics? metrics)
+    {
+        var content = ContentBounds;
+        var needed = DrawStatistics(spriteBatch, pixel, font, content,
+            plants, herbivores, carnivores, omnivores, time, paused, speed, metrics);
+        var totalH = needed + 72;
+        if (totalH != Bounds.Height)
+        {
+            Bounds = new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, totalH);
+        }
+    }
+
+    private int DrawStatistics(
+        SpriteBatch spriteBatch,
+        Texture2D pixel,
+        SpriteFont font,
+        Rectangle content,
+        int plants,
+        int herbivores,
+        int carnivores,
+        int omnivores,
+        float time,
+        bool paused,
+        float speed,
+        EcosystemMetrics? metrics)
+    {
+        var total = plants + herbivores + carnivores + omnivores;
+        var y = content.Y;
+        DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
+        y += 18;
+        DrawLine(spriteBatch, font, content.X, y,
+            paused ? I18n.T("stats.paused") : I18n.Format("stats.speed", speed),
+            paused ? UiTheme.DangerClay : UiTheme.MossSignal);
+        y += 18;
+        DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.total", total), UiTheme.WarmParchment);
+        y += 22;
+
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "P", plants, total, UiTheme.MossSignal);
+        y += 16;
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "H", herbivores, total, UiTheme.LakeBlue);
+        y += 16;
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "C", carnivores, total, UiTheme.DangerClay);
+        y += 16;
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "O", omnivores, total, UiTheme.WarmParchment);
+
+        if (metrics != null && metrics.SpeciesPopulations.Count > 0)
+        {
+            y += 22;
+            spriteBatch.DrawString(font, I18n.T("stats.speciesList"),
+                new Vector2(content.X, y), UiTheme.MossSignal);
+            y += 14;
+            var shown = 0;
+            foreach (var kvp in metrics.SpeciesPopulations)
+            {
+                if (shown >= 14) break;
+                Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
+                _speciesSb.Clear();
+                _speciesSb.Append(kvp.Value).Append(' ').Append(I18n.Species(kvp.Key));
+                spriteBatch.DrawString(font, _speciesSb, new Vector2(content.X, y), col);
+                y += 13;
+                shown++;
+            }
+        }
+
+        return y - content.Y + 8;
+    }
+
+    private void DrawInlineBar(SpriteBatch sb, Texture2D pixel, SpriteFont font,
+        int x, int y, string label, int value, int total, Color color)
+    {
+        var barW = (int)(120f * (total > 0 ? value / (float)total : 0));
+        var barH = 10;
+        sb.DrawString(font, label, new Vector2(x, y - 2), color);
+        var bg = new Rectangle(x + 14, y + 1, 122, barH);
+        UiPrimitives.Fill(sb, pixel, bg, UiTheme.DeepGrove);
+        if (barW > 0)
+            UiPrimitives.Fill(sb, pixel, new Rectangle(bg.X, bg.Y, barW, barH), color);
+        UiPrimitives.Border(sb, pixel, bg, 1, UiTheme.BarkEdge);
+
+        _valueSb.Clear();
+        _valueSb.Append(value);
+        sb.DrawString(font, _valueSb, new Vector2(bg.Right + 4, y - 2), UiTheme.WarmParchment);
+    }
+
+    private void DrawLine(SpriteBatch spriteBatch, SpriteFont font, int x, int y, string text, Color color)
+    {
+        spriteBatch.DrawString(font, text, new Vector2(x, y), color);
+    }
+}

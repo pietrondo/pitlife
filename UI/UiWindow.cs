@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace PitLife.UI;
 
-public sealed class UiWindow
+public class UiWindow
 {
     public string Id { get; }
     public string Title { get; set; }

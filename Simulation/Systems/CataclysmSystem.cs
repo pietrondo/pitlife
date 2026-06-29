@@ -256,9 +256,12 @@ public sealed class CataclysmSystem
     }
 
 
-    public void Draw(SpriteBatch sb, Texture2D pixel)
+    public void Draw(SpriteBatch sb, Texture2D pixel, Rectangle visibleArea)
     {
         if (!IsActive || ImpactRadius <= 0) return;
+
+        var bounds = new Rectangle((int)(ImpactPosition.X - ImpactRadius), (int)(ImpactPosition.Y - ImpactRadius), (int)(ImpactRadius * 2), (int)(ImpactRadius * 2));
+        if (!visibleArea.Intersects(bounds)) return;
 
         var progress = AnimTimer / AnimDuration; // 0..1
         Vector2 pos = ImpactPosition;
@@ -268,29 +271,29 @@ public sealed class CataclysmSystem
         {
             case "Asteroid":
             case "Asteroid Impact":
-                DrawAsteroidEvent(sb, pixel, pos, maxR, progress);
+                DrawAsteroidEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "Supervolcano":
-                DrawSupervolcanoEvent(sb, pixel, pos, maxR, progress);
+                DrawSupervolcanoEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "Firestorm":
-                DrawFirestormEvent(sb, pixel, pos, maxR, progress);
+                DrawFirestormEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "IceAge":
             case "Ice Age":
-                DrawIceAgeEvent(sb, pixel, pos, maxR, progress);
+                DrawIceAgeEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "Earthquake":
-                DrawEarthquakeEvent(sb, pixel, pos, maxR, progress);
+                DrawEarthquakeEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "Drought":
-                DrawDroughtEvent(sb, pixel, pos, maxR, progress);
+                DrawDroughtEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "Flood":
-                DrawFloodEvent(sb, pixel, pos, maxR, progress);
+                DrawFloodEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
             case "Bloom":
-                DrawBloomEvent(sb, pixel, pos, maxR, progress);
+                DrawBloomEvent(sb, pixel, pos, maxR, progress, visibleArea);
                 break;
         }
 
@@ -298,10 +301,10 @@ public sealed class CataclysmSystem
         var genR = maxR * 0.5f * (1f + progress);
         var genA = (byte)((1f - progress) * 60);
         if (genA > 0)
-            DrawRing(sb, pixel, pos, genR, new Color(ImpactColor.R, ImpactColor.G, ImpactColor.B, genA), 2);
+            DrawRing(sb, pixel, pos, genR, new Color(ImpactColor.R, ImpactColor.G, ImpactColor.B, genA), 2, visibleArea);
     }
 
-    private void DrawAsteroidEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawAsteroidEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Falling meteor (first 0.3s)
         if (progress < 0.3f)
@@ -309,7 +312,7 @@ public sealed class CataclysmSystem
             var t = progress / 0.3f;
             var meteorY = -100 + (pos.Y + 100) * (t * t); // accelerate down
             var mColor = new Color(255, 200, 50);
-            DrawFireball(sb, pixel, new Vector2(pos.X, meteorY), 6 + (1 - t) * 12, mColor, 255);
+            DrawFireball(sb, pixel, new Vector2(pos.X, meteorY), 6 + (1 - t) * 12, mColor, 255, visibleArea);
 
             // Smoke trail
             for (var i = 1; i <= 4; i++)
@@ -317,7 +320,7 @@ public sealed class CataclysmSystem
                 var trailY = meteorY + i * 20;
                 var alpha = (byte)((1f - i * 0.25f) * 180);
                 var trailColor = new Color(100, 80, 40, (int)alpha);
-                DrawFireball(sb, pixel, new Vector2(pos.X, trailY), 4 + i, trailColor, alpha);
+                DrawFireball(sb, pixel, new Vector2(pos.X, trailY), 4 + i, trailColor, alpha, visibleArea);
             }
         }
 
@@ -331,13 +334,13 @@ public sealed class CataclysmSystem
             var rT = (explodeT + r * 0.3f) % 1.0f;
             var rr = maxR * rT;
             var alpha = (byte)((1f - rT) * 128);
-            DrawRing(sb, pixel, pos, rr, new Color(255, 180, 40, (int)alpha), 3);
+            DrawRing(sb, pixel, pos, rr, new Color(255, 180, 40, (int)alpha), 3, visibleArea);
         }
         // Fire particles at impact
-        DrawFireCluster(sb, pixel, pos, maxR * 0.6f, explodeT, progress);
+        DrawFireCluster(sb, pixel, pos, maxR * 0.6f, explodeT, progress, visibleArea);
     }
 
-    private void DrawSupervolcanoEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawSupervolcanoEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Rising magma column from ground
         var intensity = Math.Min(1f, progress * 2f) * Math.Max(0f, 1f - progress * 1.5f);
@@ -347,7 +350,7 @@ public sealed class CataclysmSystem
         {
             var sx = pos.X + (stripe - 1) * maxR * 0.2f;
             var sy = pos.Y - colH * (0.5f + stripe * 0.2f);
-            DrawFireball(sb, pixel, new Vector2(sx, sy), 3 + stripe * 2, new Color(255, 60, 10), (byte)(intensity * 180));
+            DrawFireball(sb, pixel, new Vector2(sx, sy), 3 + stripe * 2, new Color(255, 60, 10), (byte)(intensity * 180), visibleArea);
         }
         // Rising lava blobs
         for (var i = 0; i < 6; i++)
@@ -356,26 +359,26 @@ public sealed class CataclysmSystem
             var rise = (progress + i * 0.1f) % 1f;
             var bx = pos.X + angle * maxR * 0.4f;
             var by = pos.Y - rise * colH;
-            DrawFireball(sb, pixel, new Vector2(bx, by), 2 + i % 3, new Color(255, 140, 20), (byte)(intensity * 200));
+            DrawFireball(sb, pixel, new Vector2(bx, by), 2 + i % 3, new Color(255, 140, 20), (byte)(intensity * 200), visibleArea);
         }
         // Lava pool at base
-        DrawRing(sb, pixel, pos, maxR * progress * 0.7f, new Color(255, 40, 10, (int)(intensity * 150)), 5);
-        DrawFireCluster(sb, pixel, pos, maxR * 0.4f * progress, progress, progress);
+        DrawRing(sb, pixel, pos, maxR * progress * 0.7f, new Color(255, 40, 10, (int)(intensity * 150)), 5, visibleArea);
+        DrawFireCluster(sb, pixel, pos, maxR * 0.4f * progress, progress, progress, visibleArea);
     }
 
-    private void DrawFirestormEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawFirestormEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
-        DrawFireCluster(sb, pixel, pos, maxR, progress, progress);
+        DrawFireCluster(sb, pixel, pos, maxR, progress, progress, visibleArea);
         for (var i = 0; i < 5; i++)
         {
             var angle = i * 1.256f + progress * 3f;
             var fx = pos.X + MathF.Cos(angle) * maxR * (0.5f + progress * 0.5f);
             var fy = pos.Y + MathF.Sin(angle) * maxR * (0.5f + progress * 0.5f);
-            DrawFireball(sb, pixel, new Vector2(fx, fy), 3 + progress * 4, new Color(255, 160, 30), 180);
+            DrawFireball(sb, pixel, new Vector2(fx, fy), 3 + progress * 4, new Color(255, 160, 30), 180, visibleArea);
         }
     }
 
-    private void DrawIceAgeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawIceAgeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Frost spread
         var frostR = maxR * progress;
@@ -383,18 +386,18 @@ public sealed class CataclysmSystem
         for (var r = 0; r < 3; r++)
         {
             var cr = frostR * (1f - r * 0.3f);
-            DrawRing(sb, pixel, pos, cr, frostColors[r], (int)(2 + r * 2));
+            DrawRing(sb, pixel, pos, cr, frostColors[r], (int)(2 + r * 2), visibleArea);
         }
         // Snowflakes
         for (var i = 0; i < 8; i++)
         {
             var sx = pos.X + MathF.Cos(i * 0.8f + progress * 5f) * frostR * 0.8f;
             var sy = pos.Y + MathF.Sin(i * 0.8f + progress * 2f) * frostR * 0.8f;
-            DrawFireball(sb, pixel, new Vector2(sx, sy), 2, new Color(255, 255, 255, (int)150), 150);
+            DrawFireball(sb, pixel, new Vector2(sx, sy), 2, new Color(255, 255, 255, (int)150), 150, visibleArea);
         }
     }
 
-    private void DrawEarthquakeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawEarthquakeEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Crack lines radiating from center
         var crackR = maxR * progress;
@@ -403,31 +406,31 @@ public sealed class CataclysmSystem
             var angle = i * 1.047f + progress * 0.5f;
             var endX = pos.X + MathF.Cos(angle) * crackR;
             var endY = pos.Y + MathF.Sin(angle) * crackR;
-            DrawLine(sb, pixel, pos, new Vector2(endX, endY), new Color(100, 80, 60, (int)120), 2);
+            DrawLine(sb, pixel, pos, new Vector2(endX, endY), new Color(100, 80, 60, (int)120), 2, visibleArea);
         }
     }
 
-    private void DrawDroughtEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawDroughtEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Heat shimmer rings
         for (var r = 0; r < 4; r++)
         {
             var rr = maxR * (1f - (progress + r * 0.2f) % 1f);
-            DrawRing(sb, pixel, pos, rr, new Color(255, 200, 80, (int)(progress * 80)), 2);
+            DrawRing(sb, pixel, pos, rr, new Color(255, 200, 80, (int)(progress * 80)), 2, visibleArea);
         }
     }
 
-    private void DrawFloodEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawFloodEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Water waves
         for (var r = 0; r < 4; r++)
         {
             var rr = maxR * (progress + r * 0.25f) % maxR;
-            DrawRing(sb, pixel, pos, rr, new Color(60, 160, 240, (int)((1f - rr / maxR) * 120)), 3);
+            DrawRing(sb, pixel, pos, rr, new Color(60, 160, 240, (int)((1f - rr / maxR) * 120)), 3, visibleArea);
         }
     }
 
-    private void DrawBloomEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress)
+    private void DrawBloomEvent(SpriteBatch sb, Texture2D pixel, Vector2 pos, float maxR, float progress, Rectangle visibleArea)
     {
         // Flower/grass particles
         for (var i = 0; i < 10; i++)
@@ -435,25 +438,37 @@ public sealed class CataclysmSystem
             var angle = i * 0.628f + progress * 2f;
             var fx = pos.X + MathF.Cos(angle) * maxR * progress;
             var fy = pos.Y + MathF.Sin(angle) * maxR * progress;
-            DrawFireball(sb, pixel, new Vector2(fx, fy), 3, new Color(100, 220, 80, (int)120), 120);
+            DrawFireball(sb, pixel, new Vector2(fx, fy), 3, new Color(100, 220, 80, (int)120), 120, visibleArea);
         }
     }
 
-    private static void DrawFireball(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, byte alpha)
+    private static void DrawFireball(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, byte alpha, Rectangle visibleArea)
     {
         var color = new Color(c.R, c.G, c.B, alpha);
-        for (var dy = -(int)r; dy <= (int)r; dy++)
-            for (var dx = -(int)r; dx <= (int)r; dx++)
+        int rInt = (int)r;
+        int minX = Math.Max(-rInt, visibleArea.X - (int)pos.X);
+        int maxX = Math.Min(rInt, visibleArea.Right - (int)pos.X);
+        int minY = Math.Max(-rInt, visibleArea.Y - (int)pos.Y);
+        int maxY = Math.Min(rInt, visibleArea.Bottom - (int)pos.Y);
+
+        for (var dy = minY; dy <= maxY; dy++)
+            for (var dx = minX; dx <= maxX; dx++)
             {
                 if (dx * dx + dy * dy <= r * r)
                     sb.Draw(p, new Rectangle((int)pos.X + dx, (int)pos.Y + dy, 1, 1), color);
             }
     }
 
-    private static void DrawRing(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, int thickness)
+    private static void DrawRing(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, int thickness, Rectangle visibleArea)
     {
-        for (var dy = -(int)r - thickness; dy <= (int)r + thickness; dy++)
-            for (var dx = -(int)r - thickness; dx <= (int)r + thickness; dx++)
+        int rInt = (int)r + thickness;
+        int minX = Math.Max(-rInt, visibleArea.X - (int)pos.X);
+        int maxX = Math.Min(rInt, visibleArea.Right - (int)pos.X);
+        int minY = Math.Max(-rInt, visibleArea.Y - (int)pos.Y);
+        int maxY = Math.Min(rInt, visibleArea.Bottom - (int)pos.Y);
+
+        for (var dy = minY; dy <= maxY; dy++)
+            for (var dx = minX; dx <= maxX; dx++)
             {
                 var d = MathF.Sqrt(dx * dx + dy * dy);
                 if (d >= r - thickness && d <= r)
@@ -461,7 +476,7 @@ public sealed class CataclysmSystem
             }
     }
 
-    private void DrawFireCluster(SpriteBatch sb, Texture2D p, Vector2 pos, float radius, float t, float progress)
+    private void DrawFireCluster(SpriteBatch sb, Texture2D p, Vector2 pos, float radius, float t, float progress, Rectangle visibleArea)
     {
         var seed = (int)(t * 100);
         var rng = new Random(seed);
@@ -474,12 +489,19 @@ public sealed class CataclysmSystem
             var size = 1 + rng.Next(3);
             var alpha = (byte)(160 + rng.Next(95));
             var fc = new Color(255, 100 + rng.Next(155), 10 + rng.Next(30));
-            DrawFireball(sb, p, new Vector2(fx, fy), size, fc, alpha);
+            DrawFireball(sb, p, new Vector2(fx, fy), size, fc, alpha, visibleArea);
         }
     }
 
-    private static void DrawLine(SpriteBatch sb, Texture2D p, Vector2 from, Vector2 to, Color c, int thickness)
+    private static void DrawLine(SpriteBatch sb, Texture2D p, Vector2 from, Vector2 to, Color c, int thickness, Rectangle visibleArea)
     {
+        var b = new Rectangle(
+            (int)Math.Min(from.X, to.X) - thickness,
+            (int)Math.Min(from.Y, to.Y) - thickness,
+            (int)Math.Abs(from.X - to.X) + thickness * 2,
+            (int)Math.Abs(from.Y - to.Y) + thickness * 2);
+        if (!visibleArea.Intersects(b)) return;
+
         var dx = to.X - from.X;
         var dy = to.Y - from.Y;
         var len = MathF.Sqrt(dx * dx + dy * dy);
@@ -489,7 +511,8 @@ public sealed class CataclysmSystem
         {
             var px = (int)(from.X + nx * i);
             var py = (int)(from.Y + ny * i);
-            sb.Draw(p, new Rectangle(px, py, 1, thickness), c);
+            if (visibleArea.Contains(px, py))
+                sb.Draw(p, new Rectangle(px, py, 1, thickness), c);
         }
     }
 }
