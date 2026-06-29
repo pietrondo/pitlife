@@ -7,13 +7,13 @@ namespace PitLife.Simulation;
 public sealed class ClimateSystem
 {
 
-    public const float PlanetRadiusKm = 6371f;
-    public const float DefaultOrbitalAU = 1f;
-    public const float DefaultEccentricity = 0.12f;
-    public const float OrbitalPeriod = 120f;
-    public const float YearLength = OrbitalPeriod;
-    public const float SeasonLength = OrbitalPeriod / 4f;
-    public const float BaseSurfaceTempK = 288f;
+    public static float PlanetRadiusKm => ClimateConfig.Data.Orbital.PlanetRadiusKm;
+    public static float DefaultOrbitalAU => ClimateConfig.Data.Orbital.DefaultOrbitalAU;
+    public static float DefaultEccentricity => ClimateConfig.Data.Orbital.DefaultEccentricity;
+    public static float OrbitalPeriod => ClimateConfig.Data.Orbital.OrbitalPeriod;
+    public static float YearLength => ClimateConfig.Data.Orbital.OrbitalPeriod;
+    public static float SeasonLength => ClimateConfig.Data.Orbital.OrbitalPeriod / 4f;
+    public static float BaseSurfaceTempK => ClimateConfig.Data.Orbital.BaseSurfaceTempK;
 
     public Season CurrentSeason { get; private set; } = Season.Summer;
     public float SeasonProgress { get; private set; }
