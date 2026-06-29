@@ -11,6 +11,10 @@ public class ClimateWindow : UiWindow
 {
     private readonly StringBuilder _tempSb = new(32);
     private readonly StringBuilder _valueSb = new(16);
+    private readonly System.Collections.Generic.List<string> _cachedTranslatedEvents = [];
+    private string? _lastFirstEvent;
+    private string? _lastLastEvent;
+    private int _lastEventCount;
 
     public ClimateWindow(string title, string id) : base(title, id)
     {
@@ -70,7 +74,18 @@ public class ClimateWindow : UiWindow
         _tempSb.Append((int)(20f + climate.TemperatureModifier * 20f)).Append("°C");
         var tempNorm = Math.Clamp((climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
         _valueSb.Clear();
-        _valueSb.Append(I18n.T("climate.temperature").Replace("{0}", _tempSb.ToString()));
+        var tempStr = I18n.T("climate.temperature");
+        var idx = tempStr.IndexOf("{0}");
+        if (idx >= 0)
+        {
+            _valueSb.Append(tempStr.AsSpan(0, idx));
+            _valueSb.Append(_tempSb);
+            _valueSb.Append(tempStr.AsSpan(idx + 3));
+        }
+        else
+        {
+            _valueSb.Append(tempStr);
+        }
         DrawLine(sb, font, content.X, y, _valueSb,
             Color.Lerp(new Color(100, 150, 255), new Color(255, 120, 40), tempNorm));
         y += 18;
@@ -88,6 +103,152 @@ public class ClimateWindow : UiWindow
         DrawOrbitalData(sb, font, content, climate, ref y);
         DrawWindData(sb, font, content, climate, ref y);
         DrawExtremeEventData(sb, font, content, climate, ref y);
+    }
+
+    private static void AppendFormattedLocal(StringBuilder sb, string format, int lx, int ly, string biomeName, int localTemp)
+    {
+        int p = 0;
+        while (p < format.Length)
+        {
+            int next = format.IndexOf('{', p);
+            if (next < 0) { sb.Append(format.AsSpan(p)); break; }
+            sb.Append(format.AsSpan(p, next - p));
+            int end = format.IndexOf('}', next);
+            if (end > next)
+            {
+                var token = format.AsSpan(next + 1, end - next - 1);
+                var colon = token.IndexOf(':');
+                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
+                if (int.TryParse(indexSpan, out int index))
+                {
+                    if (index == 0) sb.Append(lx);
+                    else if (index == 1) sb.Append(ly);
+                    else if (index == 2) sb.Append(biomeName);
+                    else if (index == 3) sb.Append(localTemp);
+                }
+                p = end + 1;
+            }
+            else
+            {
+                sb.Append('{');
+                p = next + 1;
+            }
+        }
+    }
+
+    private static void AppendFormattedSeason(StringBuilder sb, string format, string localSeasonName)
+    {
+        int p = 0;
+        while (p < format.Length)
+        {
+            int next = format.IndexOf('{', p);
+            if (next < 0) { sb.Append(format.AsSpan(p)); break; }
+            sb.Append(format.AsSpan(p, next - p));
+            int end = format.IndexOf('}', next);
+            if (end > next)
+            {
+                var token = format.AsSpan(next + 1, end - next - 1);
+                var colon = token.IndexOf(':');
+                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
+                if (int.TryParse(indexSpan, out int index))
+                {
+                    if (index == 0) sb.Append(localSeasonName);
+                }
+                p = end + 1;
+            }
+            else
+            {
+                sb.Append('{');
+                p = next + 1;
+            }
+        }
+    }
+
+    private static void AppendFormattedOrbit(StringBuilder sb, string format, float dist, float angle, float speed)
+    {
+        int p = 0;
+        while (p < format.Length)
+        {
+            int next = format.IndexOf('{', p);
+            if (next < 0) { sb.Append(format.AsSpan(p)); break; }
+            sb.Append(format.AsSpan(p, next - p));
+            int end = format.IndexOf('}', next);
+            if (end > next)
+            {
+                var token = format.AsSpan(next + 1, end - next - 1);
+                var colon = token.IndexOf(':');
+                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
+                if (int.TryParse(indexSpan, out int index))
+                {
+                    if (index == 0) sb.Append($"{dist:F3}");
+                    else if (index == 1) sb.Append($"{angle:F0}");
+                    else if (index == 2) sb.Append($"{speed:F1}");
+                }
+                p = end + 1;
+            }
+            else
+            {
+                sb.Append('{');
+                p = next + 1;
+            }
+        }
+    }
+
+    private static void AppendFormattedWind(StringBuilder sb, string format, float speed, float dir)
+    {
+        int p = 0;
+        while (p < format.Length)
+        {
+            int next = format.IndexOf('{', p);
+            if (next < 0) { sb.Append(format.AsSpan(p)); break; }
+            sb.Append(format.AsSpan(p, next - p));
+            int end = format.IndexOf('}', next);
+            if (end > next)
+            {
+                var token = format.AsSpan(next + 1, end - next - 1);
+                var colon = token.IndexOf(':');
+                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
+                if (int.TryParse(indexSpan, out int index))
+                {
+                    if (index == 0) sb.Append($"{speed:F1}");
+                    else if (index == 1) sb.Append($"{dir:F0}");
+                }
+                p = end + 1;
+            }
+            else
+            {
+                sb.Append('{');
+                p = next + 1;
+            }
+        }
+    }
+
+    private static void AppendFormattedExtreme(StringBuilder sb, string format, string extremeName)
+    {
+        int p = 0;
+        while (p < format.Length)
+        {
+            int next = format.IndexOf('{', p);
+            if (next < 0) { sb.Append(format.AsSpan(p)); break; }
+            sb.Append(format.AsSpan(p, next - p));
+            int end = format.IndexOf('}', next);
+            if (end > next)
+            {
+                var token = format.AsSpan(next + 1, end - next - 1);
+                var colon = token.IndexOf(':');
+                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
+                if (int.TryParse(indexSpan, out int index))
+                {
+                    if (index == 0) sb.Append(extremeName);
+                }
+                p = end + 1;
+            }
+            else
+            {
+                sb.Append('{');
+                p = next + 1;
+            }
+        }
     }
 
     private void DrawLocalTileData(SpriteBatch sb, SpriteFont font, Rectangle content, ClimateSystem climate, World world, Point? hoverTile, Point? selectedTile, ref int y)
@@ -108,26 +269,34 @@ public class ClimateWindow : UiWindow
         };
         var localSeasonName = I18n.T(localSeasonKey);
         var biomeName = I18n.T($"biome.{localTile.Biome}");
+        _tempSb.Clear();
+        AppendFormattedLocal(_tempSb, I18n.T("climate.local"), lx, ly, biomeName, (int)localTemp);
         DrawLine(sb, font, content.X, y,
-            I18n.Format("climate.local", lx, ly, biomeName, (int)localTemp), UiTheme.WarmParchment);
+            _tempSb, UiTheme.WarmParchment);
         y += 18;
+        _tempSb.Clear();
+        AppendFormattedSeason(_tempSb, I18n.T("climate.localseason"), localSeasonName);
         DrawLine(sb, font, content.X, y,
-            I18n.Format("climate.localseason", localSeasonName), UiTheme.MossSignal);
+            _tempSb, UiTheme.MossSignal);
         y += 22;
     }
 
     private void DrawOrbitalData(SpriteBatch sb, SpriteFont font, Rectangle content, ClimateSystem climate, ref int y)
     {
+        _tempSb.Clear();
+        AppendFormattedOrbit(_tempSb, I18n.T("climate.orbit"), climate.SunDistanceAU, climate.OrbitalAngle * 180f / MathF.PI, climate.OrbitalSpeedKmS);
         DrawLine(sb, font, content.X, y,
-            I18n.Format("climate.orbit", climate.SunDistanceAU, climate.OrbitalAngle * 180f / MathF.PI, climate.OrbitalSpeedKmS),
+            _tempSb,
             UiTheme.WarmParchment);
         y += 18;
     }
 
     private void DrawWindData(SpriteBatch sb, SpriteFont font, Rectangle content, ClimateSystem climate, ref int y)
     {
+        _tempSb.Clear();
+        AppendFormattedWind(_tempSb, I18n.T("climate.wind"), climate.WindSpeed, climate.WindDirection * 180f / MathF.PI);
         DrawLine(sb, font, content.X, y,
-            I18n.Format("climate.wind", climate.WindSpeed, climate.WindDirection * 180f / MathF.PI),
+            _tempSb,
             UiTheme.WarmParchment);
         y += 18;
     }
@@ -136,8 +305,10 @@ public class ClimateWindow : UiWindow
     {
         if (climate.IsExtremeEvent)
         {
+            _tempSb.Clear();
+            AppendFormattedExtreme(_tempSb, I18n.T("climate.extreme"), climate.ExtremeEventName);
             DrawLine(sb, font, content.X, y,
-                I18n.Format("climate.extreme", climate.ExtremeEventName),
+                _tempSb,
                 climate.ExtremeEventName == "Heatwave" ? new Color(255, 140, 40) : new Color(120, 180, 255));
             y += 18;
         }
@@ -176,11 +347,37 @@ public class ClimateWindow : UiWindow
         DrawLine(sb, font, content.X, y, I18n.T("climate.events"), UiTheme.MossSignal);
         y += 20;
         var recent = Core.Logger.RecentEvents;
-        var maxShow = Math.Min(5, recent.Count);
-        for (var i = recent.Count - maxShow; i < recent.Count; i++)
+
+        bool changed = recent.Count != _lastEventCount;
+        if (recent.Count > 0 && !changed)
         {
-            var ev = TranslateEvent(recent[i]);
-            if (ev.Length > 44) ev = ev.Substring(0, 44);
+            if (recent[0] != _lastFirstEvent || recent[^1] != _lastLastEvent)
+            {
+                changed = true;
+            }
+        }
+
+        if (changed || (_cachedTranslatedEvents.Count == 0 && recent.Count > 0))
+        {
+            _lastEventCount = recent.Count;
+            if (recent.Count > 0)
+            {
+                _lastFirstEvent = recent[0];
+                _lastLastEvent = recent[^1];
+            }
+
+            _cachedTranslatedEvents.Clear();
+            var maxShow = Math.Min(5, recent.Count);
+            for (var i = recent.Count - maxShow; i < recent.Count; i++)
+            {
+                var ev = TranslateEvent(recent[i]);
+                if (ev.Length > 44) ev = ev.Substring(0, 44);
+                _cachedTranslatedEvents.Add(ev);
+            }
+        }
+
+        foreach (var ev in _cachedTranslatedEvents)
+        {
             DrawLine(sb, font, content.X, y, ev, new Color(180, 160, 140));
             y += 16;
         }
