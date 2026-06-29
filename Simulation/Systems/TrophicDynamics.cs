@@ -4,9 +4,8 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class TrophicDynamics : ISimulationSystem
+public sealed class TrophicDynamics
 {
-    public UpdatePhase Phase => UpdatePhase.EarlyUpdate;
 
     // Prey (herbivore) population growth rates
     public float HerbivoreBirthBonus { get; private set; } = 1f;

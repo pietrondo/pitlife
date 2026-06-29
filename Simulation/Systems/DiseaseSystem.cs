@@ -5,9 +5,8 @@ using PitLife.Core;
 
 namespace PitLife.Simulation;
 
-public sealed class DiseaseSystem : ISimulationSystem
+public sealed class DiseaseSystem
 {
-    public UpdatePhase Phase => UpdatePhase.Update;
     public readonly struct DiseaseDef
     {
         public string Name { get; init; }
