@@ -241,9 +241,7 @@ public class Ecosystem
         var count = Creatures.Count;
         for (var i = count - 1; i >= 0; i--)
         {
-            if (i >= Creatures.Count) continue;
             var c = Creatures[i];
-            if (c == null) continue;
             if (c.IsAlive)
             {
                 try
@@ -285,9 +283,7 @@ public class Ecosystem
         var decomposeChance = 1.0 - Math.Exp(-0.02 * dt);
         for (var i = Creatures.Count - 1; i >= 0; i--)
         {
-            if (i >= Creatures.Count) continue;
             var c = Creatures[i];
-            if (c == null) continue;
             if (!c.IsAlive)
             {
                 if (Random.NextDouble() < decomposeChance)
