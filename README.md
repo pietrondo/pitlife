@@ -24,6 +24,7 @@
 
 ### Simulazione
 - **15 biomi**: DeepOcean, ShallowWater, Beach, Desert, Savanna, Grassland, Forest, DenseForest, Swamp, Tundra, Mountain, Snow, CoralReef, Cave, Volcano
+- **Grafica**: sprite dedicati in pixel art 64x64 per le principali specie marine, terrestri e aviarie
 - **122+ specie** tra piante, erbivori, carnivori, onnivori, insetti e preistorici
 - **Ciclo giorno/notte** con 4 fasi e overlay visivo
 - **Stagioni orbitali**: orbita ellittica (e=0.12), perielio/afelio, gradiente latitudinale
@@ -54,6 +55,7 @@
 - **Simbiosi**: mutualismo implicito (api-fiori, pesci pulitori)
 - **Migrazioni**: home range, movimento stagionale
 - **Dinamiche trofiche**: cicli Lotka-Volterra
+- **Scarsità d'erba**: penalità dinamica su costo energetico e riproduzione per stabilizzare gli ecosistemi
 - **Frutti**: meccanica di spawn, maturazione e consumo
 
 ### Comportamento
@@ -80,7 +82,7 @@
 - **Multi-thread**: world generation parallela, object pooling
 - **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, e ricerca spaziale)
 - **Architettura**: pipeline di simulazione modulare basata su `ISimulationSystem` estratta dal core
-- **Rendering**: grid culling rigoroso in `PixelWorldRenderer`
+- **Rendering**: grid culling rigoroso e tile rendering a due passaggi in `PixelWorldRenderer` per minimizzare i texture swap
 - **Data-driven**: tutte le logiche (specie, bilanciamento, clima, malattie, comportamenti) in JSON esterno
 - **Benchmark**: suite BenchmarkDotNet per regressioni di performance
 - **255+ test**: unit test, property-based test, benchmark

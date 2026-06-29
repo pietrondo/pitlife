@@ -27,7 +27,10 @@ public static class DiseaseConfig
                     });
                 }
             }
-            catch { }
+            catch (System.Exception ex)
+            {
+                PitLife.Core.Logger.Error(ex.ToString());
+            }
             _doc ??= new DiseaseConfigDoc(0, null, null);
             return _doc;
         }
@@ -43,7 +46,7 @@ public static class DiseaseConfig
         new DiseaseDefEntry { Name = "Parasite", TransmissionRate = 0.1f, Lethality = 0.05f, RecoveryTime = 60f, EnergyDrain = 1f }
     };
 
-    private sealed record DiseaseConfigDoc(int Version, List<DiseaseDefEntry> Diseases, OutbreakDefaults? Outbreak);
+    private sealed record DiseaseConfigDoc(int Version, List<DiseaseDefEntry>? Diseases, OutbreakDefaults? Outbreak);
 
     public sealed record DiseaseDefEntry
     {

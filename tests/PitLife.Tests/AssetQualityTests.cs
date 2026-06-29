@@ -10,7 +10,7 @@ public class AssetQualityTests
     private static readonly IReadOnlyDictionary<string, int> ExpectedStandardSizes =
         new Dictionary<string, int>(StringComparer.Ordinal)
         {
-            ["Content/assets/creatures/mammals/herbivores/lagomorphs/rabbit.png"] = 32,
+            ["Content/assets/creatures/mammals/herbivores/lagomorphs/rabbit.png"] = 64,
             ["Content/assets/creatures/mammals/herbivores/ungulates/deer.png"] = 64,
             ["Content/assets/creatures/mammals/herbivores/ungulates/goat.png"] = 64,
             ["Content/assets/creatures/mammals/herbivores/ungulates/herbivore.png"] = 64,
