@@ -7,6 +7,19 @@ namespace PitLife.Simulation;
 
 public abstract class Creature
 {
+    private const float REPRODUCE_ENERGY_COST_RATIO = 0.3f;
+    private const float CHILD_OFFSET_RADIUS = 30f;
+    private const float CHILD_INITIAL_ENERGY_RATIO = 0.5f;
+
+    private const float GENETIC_DRIFT_CHANCE = 0.0001f;
+
+    private const float SCARCITY_GRASS_THRESHOLD = 0.2f;
+    private const float SCARCITY_PENALTY_FACTOR = 5f;
+
+    private const float COLD_PREF_TEMP = 10f;
+    private const float HOT_PREF_TEMP = 35f;
+    private const float NEUTRAL_PREF_TEMP = 22f;
+
     public Vector2 Position { get; set; }
     public Genome Genome { get; protected set; }
     public float Energy { get; set; }
@@ -41,7 +54,7 @@ public abstract class Creature
     public float EnergyConsumption => Genome.Metabolism * BalanceConfig.Data.Creature.EnergyConsumptionBaseMultiplier * Genome.Size;
     public float Defense => Genome.Size * BalanceConfig.Data.Creature.DefenseSizeMultiplier + Genome.Metabolism * BalanceConfig.Data.Creature.DefenseMetabolismMultiplier;
     public float AttackPower => Motor.GetSpeed(Genome, GeneticFitness, IsBaby) * BalanceConfig.Data.Creature.AttackSpeedMultiplier + Genome.Size * BalanceConfig.Data.Creature.AttackSizeMultiplier;
-    public float TemperaturePreference => Genome.ColdAdaptation > 0.5f ? 10f : Genome.DesertAdaptation > 0.5f ? 35f : 22f;
+    public float TemperaturePreference => Genome.ColdAdaptation > 0.5f ? COLD_PREF_TEMP : Genome.DesertAdaptation > 0.5f ? HOT_PREF_TEMP : NEUTRAL_PREF_TEMP;
     public float MaturityAge => SpeciesRegistry.Get(Species)?.MaturityAge ?? 30f;
     public LifeStage LifeStage => Age >= MaturityAge ? LifeStage.Adult : LifeStage.Infant;
     public bool IsAdult => LifeStage == LifeStage.Adult;
@@ -269,7 +282,7 @@ public abstract class Creature
     {
         var tile = world.GetTileAtPosition(Position.X, Position.Y);
         float grassRatio = tile.GrassAmount / Math.Max(tile.MaxGrass, 0.001f);
-        return grassRatio < 0.2f ? 1f + (0.2f - grassRatio) * 5f : 1f;
+        return grassRatio < SCARCITY_GRASS_THRESHOLD ? 1f + (SCARCITY_GRASS_THRESHOLD - grassRatio) * SCARCITY_PENALTY_FACTOR : 1f;
     }
 
     public virtual void Die(DeathCause cause = DeathCause.Unknown)
@@ -285,7 +298,7 @@ public abstract class Creature
         if (CreatureType != CreatureType.Plant)
             Memory.DecayMemories(random, Genome);
 
-        if (random.NextDouble() < 0.0001f)
+        if (random.NextDouble() < GENETIC_DRIFT_CHANCE)
         {
             Genome.ApplyGeneticDrift(random);
         }
@@ -321,16 +334,16 @@ public abstract class Creature
         if (!CanMateWith(partner)) return null;
         if (Energy < ReproductionThreshold || partner.Energy < partner.ReproductionThreshold)
             return null;
-        Energy -= MaxEnergy * 0.3f;
-        partner.Energy -= partner.MaxEnergy * 0.3f;
+        Energy -= MaxEnergy * REPRODUCE_ENERGY_COST_RATIO;
+        partner.Energy -= partner.MaxEnergy * REPRODUCE_ENERGY_COST_RATIO;
         Genome childGenome = Genome.Reproduce(Genome, partner.Genome, rng);
-        Vector2 offset = new((float)(rng.NextDouble() - 0.5) * 30, (float)(rng.NextDouble() - 0.5) * 30);
+        Vector2 offset = new((float)(rng.NextDouble() - 0.5) * CHILD_OFFSET_RADIUS, (float)(rng.NextDouble() - 0.5) * CHILD_OFFSET_RADIUS);
         var child = CreateChild(Motor.ClampToWorld(Position + offset), childGenome, rng);
         if (child != null)
         {
             child.Lineage = LineageRecord.CreateChild(Lineage, partner.Lineage);
             child.InbreedingCoefficient = LineageRecord.CalculateOffspringInbreeding(Lineage, partner.Lineage);
-            child.Energy = child.MaxEnergy * 0.5f;
+            child.Energy = child.MaxEnergy * CHILD_INITIAL_ENERGY_RATIO;
             child.Parent = Gender == Gender.Female ? this : partner;
             if (child.CreatureType != CreatureType.Plant)
             {
