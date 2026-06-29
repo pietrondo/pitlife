@@ -26,10 +26,10 @@ public sealed class UiButton
         mouse.LeftButton == ButtonState.Released &&
         previousMouse.LeftButton == ButtonState.Pressed;
 
-    public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool isFocused)
+    public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, MouseState mouse, bool isFocused, Color? activeFillColor = null)
     {
         var hovered = IsHovered(mouse);
-        Color fill = IsDisabled ? UiTheme.DeepGrove : (hovered || isFocused ? UiTheme.ForestNight : UiTheme.DeepGrove);
+        Color fill = IsDisabled ? UiTheme.DeepGrove : (hovered || isFocused ? UiTheme.ForestNight : (activeFillColor ?? UiTheme.DeepGrove));
         Color border = IsDisabled ? UiTheme.BarkEdge : (IsDestructive ? UiTheme.DangerClay : UiTheme.BarkEdge);
 
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 4, Bounds.Y + 4, Bounds.Width, Bounds.Height), UiTheme.Shadow);

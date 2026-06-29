@@ -4,9 +4,8 @@ using Microsoft.Xna.Framework;
 
 namespace PitLife.Simulation;
 
-public sealed class PhylogeneticGraph : ISimulationSystem
+public sealed class PhylogeneticGraph
 {
-    public UpdatePhase Phase => UpdatePhase.LateUpdate;
     private readonly Dictionary<string, PhylogeneticNode> _nodes = new(StringComparer.Ordinal);
     public IReadOnlyDictionary<string, PhylogeneticNode> Nodes => _nodes;
 
@@ -117,10 +116,6 @@ public sealed class PhylogeneticGraph : ISimulationSystem
 
         return errors;
     }
-
-    public void Initialize(World world) { }
-    public void Tick(Ecosystem eco, GameTime gameTime) { }
-    public void Reset() { }
 }
 
 public sealed class PhylogeneticNode

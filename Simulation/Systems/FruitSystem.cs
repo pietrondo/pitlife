@@ -84,7 +84,7 @@ public sealed class FruitSystem : ISimulationSystem
 
         // Spawn new fruits from plants
         _spawnTimer -= dt;
-        if (_spawnTimer <= 0 && _fruitCount < FruitConfig.Data.MaxFruits)
+        if (_spawnTimer <= 0 && _fruitCount < _fruits.Length)
         {
             _spawnTimer = FruitConfig.Data.SpawnTimerBase + (float)eco.Random.NextDouble() * FruitConfig.Data.SpawnTimerVariance;
             SpawnFruits(eco);
@@ -98,7 +98,7 @@ public sealed class FruitSystem : ISimulationSystem
         var attempts = FruitConfig.Data.SpawnAttempts;
         for (var a = 0; a < attempts; a++)
         {
-            if (_fruitCount >= FruitConfig.Data.MaxFruits) break;
+            if (_fruitCount >= _fruits.Length) break;
 
             // Pick a random alive plant
             Creature? plant = TryFindRandomFruitPlant(eco);

@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Microsoft.Xna.Framework;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -8,12 +9,13 @@ public readonly record struct GeneticAllele(float Value, float Dominance)
 {
     public GeneticAllele Mutate(float rate, float minimum, float maximum, float step, Random random)
     {
+        var cfg = GeneticsConfig.Data.Alleles;
         var value = Value;
         var dominance = Dominance;
         if (random.NextDouble() < rate)
             value = MathHelper.Clamp(value + (float)(random.NextDouble() - 0.5) * step, minimum, maximum);
-        if (random.NextDouble() < rate * 0.25f)
-            dominance = MathHelper.Clamp(dominance + (float)(random.NextDouble() - 0.5) * 0.2f, 0.05f, 1f);
+        if (random.NextDouble() < rate * cfg.MutationChanceMultiplier)
+            dominance = MathHelper.Clamp(dominance + (float)(random.NextDouble() - 0.5) * cfg.DominanceMutationStep, cfg.DominanceMin, cfg.DominanceMax);
         return new GeneticAllele(value, dominance);
     }
 }
@@ -62,7 +64,11 @@ public readonly record struct DiploidLocus(GeneticAllele AlleleA, GeneticAllele 
     private static float RandomRange(float minimum, float maximum, Random random) =>
         minimum + (float)random.NextDouble() * (maximum - minimum);
 
-    private static float RandomDominance(Random random) => 0.2f + (float)random.NextDouble() * 0.8f;
+    private static float RandomDominance(Random random)
+    {
+        var cfg = GeneticsConfig.Data.Alleles;
+        return cfg.RandomDominanceMin + (float)random.NextDouble() * cfg.RandomDominanceSpread;
+    }
 }
 
 public struct GeneticProfile
@@ -89,21 +95,22 @@ public struct GeneticProfile
 
     public static GeneticProfile Random(Random random)
     {
+        var t = GeneticsConfig.Data.Traits;
         return new GeneticProfile
         {
             IsInitialized = true,
-            Speed = DiploidLocus.Random(0.5f, 2f, random),
-            Size = DiploidLocus.Random(0.5f, 2f, random),
-            Metabolism = DiploidLocus.Random(0.5f, 2f, random),
-            VisionRange = DiploidLocus.Random(1f, 10f, random),
-            MutationRate = DiploidLocus.Homozygous(0.05f),
-            DesertAdaptation = DiploidLocus.Random(0f, 1f, random),
-            ColdAdaptation = DiploidLocus.Random(0f, 1f, random),
-            ForestAdaptation = DiploidLocus.Random(0f, 1f, random),
-            WaterAdaptation = DiploidLocus.Random(0f, 1f, random),
-            ColorR = DiploidLocus.Random(40f, 255f, random),
-            ColorG = DiploidLocus.Random(40f, 255f, random),
-            ColorB = DiploidLocus.Random(40f, 255f, random),
+            Speed = DiploidLocus.Random(t.Speed.Min, t.Speed.Max, random),
+            Size = DiploidLocus.Random(t.Size.Min, t.Size.Max, random),
+            Metabolism = DiploidLocus.Random(t.Metabolism.Min, t.Metabolism.Max, random),
+            VisionRange = DiploidLocus.Random(t.VisionRange.Min, t.VisionRange.Max, random),
+            MutationRate = DiploidLocus.Homozygous(t.MutationRate.Default),
+            DesertAdaptation = DiploidLocus.Random(t.Adaptation.Min, t.Adaptation.Max, random),
+            ColdAdaptation = DiploidLocus.Random(t.Adaptation.Min, t.Adaptation.Max, random),
+            ForestAdaptation = DiploidLocus.Random(t.Adaptation.Min, t.Adaptation.Max, random),
+            WaterAdaptation = DiploidLocus.Random(t.Adaptation.Min, t.Adaptation.Max, random),
+            ColorR = DiploidLocus.Random(t.Color.Min, t.Color.Max, random),
+            ColorG = DiploidLocus.Random(t.Color.Min, t.Color.Max, random),
+            ColorB = DiploidLocus.Random(t.Color.Min, t.Color.Max, random),
             MarkerHaplotypeA = NextUInt64(random),
             MarkerHaplotypeB = NextUInt64(random)
         };
@@ -138,37 +145,38 @@ public struct GeneticProfile
         GeneticProfile second,
         Random random)
     {
+        var t = GeneticsConfig.Data.Traits;
         var inheritedMutationRate = MathHelper.Clamp(
             (first.MutationRate.ExpressedValue + second.MutationRate.ExpressedValue) * 0.5f,
-            0.01f,
-            0.2f);
+            t.MutationRate.Min,
+            t.MutationRate.Max);
         var child = new GeneticProfile
         {
             IsInitialized = true,
             MutationRate = DiploidLocus.Inherit(first.MutationRate, second.MutationRate,
-                inheritedMutationRate, 0.01f, 0.2f, 0.03f, random),
+                inheritedMutationRate, t.MutationRate.Min, t.MutationRate.Max, t.MutationRate.Step, random),
             Speed = DiploidLocus.Inherit(first.Speed, second.Speed,
-                inheritedMutationRate, 0.5f, 2f, 0.3f, random),
+                inheritedMutationRate, t.Speed.Min, t.Speed.Max, t.Speed.Step, random),
             Size = DiploidLocus.Inherit(first.Size, second.Size,
-                inheritedMutationRate, 0.5f, 2f, 0.3f, random),
+                inheritedMutationRate, t.Size.Min, t.Size.Max, t.Size.Step, random),
             Metabolism = DiploidLocus.Inherit(first.Metabolism, second.Metabolism,
-                inheritedMutationRate, 0.5f, 2f, 0.3f, random),
+                inheritedMutationRate, t.Metabolism.Min, t.Metabolism.Max, t.Metabolism.Step, random),
             VisionRange = DiploidLocus.Inherit(first.VisionRange, second.VisionRange,
-                inheritedMutationRate, 1f, 10f, 1f, random),
+                inheritedMutationRate, t.VisionRange.Min, t.VisionRange.Max, t.VisionRange.Step, random),
             DesertAdaptation = DiploidLocus.Inherit(first.DesertAdaptation, second.DesertAdaptation,
-                inheritedMutationRate, 0f, 1f, 0.2f, random),
+                inheritedMutationRate, t.Adaptation.Min, t.Adaptation.Max, t.Adaptation.Step, random),
             ColdAdaptation = DiploidLocus.Inherit(first.ColdAdaptation, second.ColdAdaptation,
-                inheritedMutationRate, 0f, 1f, 0.2f, random),
+                inheritedMutationRate, t.Adaptation.Min, t.Adaptation.Max, t.Adaptation.Step, random),
             ForestAdaptation = DiploidLocus.Inherit(first.ForestAdaptation, second.ForestAdaptation,
-                inheritedMutationRate, 0f, 1f, 0.2f, random),
+                inheritedMutationRate, t.Adaptation.Min, t.Adaptation.Max, t.Adaptation.Step, random),
             WaterAdaptation = DiploidLocus.Inherit(first.WaterAdaptation, second.WaterAdaptation,
-                inheritedMutationRate, 0f, 1f, 0.2f, random),
+                inheritedMutationRate, t.Adaptation.Min, t.Adaptation.Max, t.Adaptation.Step, random),
             ColorR = DiploidLocus.Inherit(first.ColorR, second.ColorR,
-                inheritedMutationRate, 40f, 255f, 30f, random),
+                inheritedMutationRate, t.Color.Min, t.Color.Max, t.Color.Step, random),
             ColorG = DiploidLocus.Inherit(first.ColorG, second.ColorG,
-                inheritedMutationRate, 40f, 255f, 30f, random),
+                inheritedMutationRate, t.Color.Min, t.Color.Max, t.Color.Step, random),
             ColorB = DiploidLocus.Inherit(first.ColorB, second.ColorB,
-                inheritedMutationRate, 40f, 255f, 30f, random),
+                inheritedMutationRate, t.Color.Min, t.Color.Max, t.Color.Step, random),
             MarkerHaplotypeA = MutateMarkers(CreateGamete(first, random), inheritedMutationRate, random),
             MarkerHaplotypeB = MutateMarkers(CreateGamete(second, random), inheritedMutationRate, random)
         };
@@ -177,19 +185,20 @@ public struct GeneticProfile
 
     public void ApplyPhenotype(ref Genome genome)
     {
+        var t = GeneticsConfig.Data.Traits;
         genome.Speed = Speed.ExpressedValue;
         genome.Size = Size.ExpressedValue;
         genome.Metabolism = Metabolism.ExpressedValue;
         genome.VisionRange = VisionRange.ExpressedValue;
-        genome.MutationRate = MathHelper.Clamp(MutationRate.ExpressedValue, 0.01f, 0.2f);
-        genome.DesertAdaptation = MathHelper.Clamp(DesertAdaptation.ExpressedValue, 0f, 1f);
-        genome.ColdAdaptation = MathHelper.Clamp(ColdAdaptation.ExpressedValue, 0f, 1f);
-        genome.ForestAdaptation = MathHelper.Clamp(ForestAdaptation.ExpressedValue, 0f, 1f);
-        genome.WaterAdaptation = MathHelper.Clamp(WaterAdaptation.ExpressedValue, 0f, 1f);
+        genome.MutationRate = MathHelper.Clamp(MutationRate.ExpressedValue, t.MutationRate.Min, t.MutationRate.Max);
+        genome.DesertAdaptation = MathHelper.Clamp(DesertAdaptation.ExpressedValue, t.Adaptation.Min, t.Adaptation.Max);
+        genome.ColdAdaptation = MathHelper.Clamp(ColdAdaptation.ExpressedValue, t.Adaptation.Min, t.Adaptation.Max);
+        genome.ForestAdaptation = MathHelper.Clamp(ForestAdaptation.ExpressedValue, t.Adaptation.Min, t.Adaptation.Max);
+        genome.WaterAdaptation = MathHelper.Clamp(WaterAdaptation.ExpressedValue, t.Adaptation.Min, t.Adaptation.Max);
         genome.Color = new Color(
-            (byte)Math.Clamp((int)MathF.Round(ColorR.ExpressedValue), 40, 255),
-            (byte)Math.Clamp((int)MathF.Round(ColorG.ExpressedValue), 40, 255),
-            (byte)Math.Clamp((int)MathF.Round(ColorB.ExpressedValue), 40, 255));
+            (byte)Math.Clamp((int)MathF.Round(ColorR.ExpressedValue), (int)t.Color.Min, (int)t.Color.Max),
+            (byte)Math.Clamp((int)MathF.Round(ColorG.ExpressedValue), (int)t.Color.Min, (int)t.Color.Max),
+            (byte)Math.Clamp((int)MathF.Round(ColorB.ExpressedValue), (int)t.Color.Min, (int)t.Color.Max));
         genome.Genetics = this;
     }
 

@@ -36,6 +36,7 @@ public class Game1 : Game
     private readonly SpeciesCatalogRuntime _speciesCatalogRuntime = new();
     private readonly SpeciesEditorPanel _speciesEditor;
     private readonly SpeciesCyclopedia _cyclopedia = new();
+    private readonly System.Text.StringBuilder _sb = new();
     private float _currentFPS;
     private float _frametimeMS;
     private int _frameCount;
@@ -57,6 +58,8 @@ public class Game1 : Game
     private Creature? _selectedCreature;
     private MouseState _prevMouse;
     private KeyboardState _prevKbd;
+    private MouseState _currentMouse;
+    private KeyboardState _currentKbd;
     private int _cataSelectedFrame;
     private string? _prevPanelCata;
     private string? _prevSpawnCata;
@@ -160,6 +163,9 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        _currentKbd = Keyboard.GetState();
+        _currentMouse = Mouse.GetState();
+
         var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (_showLoadingTimer > 0)
         {
@@ -172,14 +178,14 @@ public class Game1 : Game
                 _paused = false;
                 _controller.SetPause(false);
             }
-            _prevKbd = Keyboard.GetState();
-            _prevMouse = Mouse.GetState();
+            _prevKbd = _currentKbd;
+            _prevMouse = _currentMouse;
             base.Update(gameTime);
             return;
         }
         UpdateFPS(gameTime);
-        var kbd = Keyboard.GetState();
-        var mouse = Mouse.GetState();
+        var kbd = _currentKbd;
+        var mouse = _currentMouse;
         var escapePressed = kbd.IsKeyDown(Keys.Escape) && _prevKbd.IsKeyUp(Keys.Escape);
         var gamepadBack = GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed;
 
@@ -765,6 +771,11 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
+        // Re-use states captured in Update if desired, but typical MonoGame games might poll again.
+        // However, to eliminate multiple GetState() calls per frame, we just use the cached fields.
+        _currentKbd = Keyboard.GetState();
+        _currentMouse = Mouse.GetState();
+
         GraphicsDevice.Clear(Color.Black);
 
         if (_screen == GameScreen.Playing)
@@ -815,7 +826,7 @@ public class Game1 : Game
             _spriteBatch,
             _uiPixel,
             _font,
-            Mouse.GetState(),
+            _currentMouse,
             _selectedCreature,
             _displayPlants,
             _displayHerbivores,
@@ -830,13 +841,13 @@ public class Game1 : Game
         _camera.ViewportWidth = GraphicsDevice.Viewport.Width;
         _camera.ViewportHeight = GraphicsDevice.Viewport.Height;
         _minimap.Draw(_spriteBatch, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-        _spawnPanel.Draw(_spriteBatch, _uiPixel, _font, Mouse.GetState());
-        _cataclysmPanel.Draw(_spriteBatch, _uiPixel, _font, Mouse.GetState());
+        _spawnPanel.Draw(_spriteBatch, _uiPixel, _font, _currentMouse);
+        _cataclysmPanel.Draw(_spriteBatch, _uiPixel, _font, _currentMouse);
         _speciesEditor.Draw(
             _spriteBatch,
             _uiPixel,
             _font,
-            Mouse.GetState(),
+            _currentMouse,
             GraphicsDevice.Viewport.Width,
             GraphicsDevice.Viewport.Height);
         _cyclopedia.Draw(_spriteBatch, _uiPixel, _font);
@@ -919,18 +930,43 @@ public class Game1 : Game
 
     private void DrawHUD(SpriteBatch sb, SpriteFont font)
     {
-        var speed = _paused ? I18n.T("hud.paused") : $"{_controller.CurrentSpeed}x";
+        _sb.Clear();
         var years = _displayTime / 480f + 1;
-        var hud = $"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | {speed}";
-        sb.DrawString(font, hud, new Vector2(10, 10), Color.White);
+        _sb.Append($"Year {years:F1} | P:{_displayPlants} H:{_displayHerbivores} C:{_displayCarnivores} O:{_displayOmnivores} | ");
+        if (_paused) _sb.Append(I18n.T("hud.paused"));
+        else _sb.Append($"{_controller.CurrentSpeed}x");
+        sb.DrawString(font, _sb, new Vector2(10, 10), Color.White);
+
         sb.DrawString(font, I18n.T("hud.controls"),
             new Vector2(10, 32), new Color(160, 160, 160));
-        var phaseLabel = I18n.T($"dayphase.{_dayNight.Phase.ToString().ToLowerInvariant()}");
-        sb.DrawString(font, phaseLabel, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
-        var seasonLabel = I18n.T($"season.{_ecosystem.Climate.CurrentSeason}");
-        sb.DrawString(font, seasonLabel, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
-        var seedLabel = $"Seed: {_ecosystem.Seed}";
-        sb.DrawString(font, seedLabel, new Vector2(10, 76), UiTheme.WarmParchment);
+        
+        _sb.Clear();
+        var phaseKey = _dayNight.Phase switch
+        {
+            DayPhase.Dawn => "dayphase.dawn",
+            DayPhase.Day => "dayphase.day",
+            DayPhase.Dusk => "dayphase.dusk",
+            DayPhase.Night => "dayphase.night",
+            _ => "dayphase.day"
+        };
+        _sb.Append(I18n.T(phaseKey));
+        sb.DrawString(font, _sb, new Vector2(10, 54), GetPhaseColor(_dayNight.Phase));
+        
+        _sb.Clear();
+        var seasonKey = _ecosystem.Climate.CurrentSeason switch
+        {
+            Season.Spring => "season.Spring",
+            Season.Summer => "season.Summer",
+            Season.Autumn => "season.Autumn",
+            Season.Winter => "season.Winter",
+            _ => "season.Spring"
+        };
+        _sb.Append(I18n.T(seasonKey));
+        sb.DrawString(font, _sb, new Vector2(120, 54), GetSeasonColor(_ecosystem.Climate.CurrentSeason));
+        
+        _sb.Clear();
+        _sb.Append($"Seed: {_ecosystem.Seed}");
+        sb.DrawString(font, _sb, new Vector2(10, 76), UiTheme.WarmParchment);
     }
 
     private void LoadSettings()
@@ -970,8 +1006,14 @@ public class Game1 : Game
         if (!_contentLoaded)
             return;
 
-        var customAssets = AssetRegistry.SpeciesTextures
-            .Where(asset => _speciesCatalogRuntime.CustomKeys.Contains(asset.Species));
+        var customAssets = new List<SpeciesAsset>();
+        foreach (var asset in AssetRegistry.SpeciesTextures)
+        {
+            if (_speciesCatalogRuntime.CustomKeys.Contains(asset.Species))
+            {
+                customAssets.Add(asset);
+            }
+        }
         _creatureRenderer.LoadFromRegistry(GraphicsDevice, customAssets);
     }
 
@@ -998,32 +1040,40 @@ public class Game1 : Game
 
         if (_ecosystem.Disease.HasOutbreak)
         {
-            sb.DrawString(font, $"Disease: {_ecosystem.Disease.ActiveDiseaseName}",
-                new Vector2(x, y), new Color(220, 60, 60));
+            _sb.Clear();
+            _sb.Append($"Disease: {_ecosystem.Disease.ActiveDiseaseName}");
+            sb.DrawString(font, _sb, new Vector2(x, y), new Color(220, 60, 60));
             y += lineH;
         }
         if (_ecosystem.Cataclysms.IsActive)
         {
-            sb.DrawString(font, $"{_ecosystem.Cataclysms.ActiveEvent} ({_ecosystem.Cataclysms.Timer:F0}s)",
-                new Vector2(x, y), new Color(255, 140, 0));
+            _sb.Clear();
+            _sb.Append($"{_ecosystem.Cataclysms.ActiveEvent} ({_ecosystem.Cataclysms.Timer:F0}s)");
+            sb.DrawString(font, _sb, new Vector2(x, y), new Color(255, 140, 0));
             y += lineH;
         }
 
         if (!_showDebugOverlay) return;
 
-        sb.DrawString(font, $"FPS:{_currentFPS:F0} B:{m.TotalBirths} D:{m.TotalDeaths} Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}",
-            new Vector2(x, y), UiTheme.MutedStone);
+        _sb.Clear();
+        _sb.Append($"FPS:{_currentFPS:F0} B:{m.TotalBirths} D:{m.TotalDeaths} Starve:{m.StarvationDeaths} Old:{m.OldAgeDeaths} Pred:{m.PredationDeaths} Comb:{m.CombatDeaths}");
+        sb.DrawString(font, _sb, new Vector2(x, y), UiTheme.MutedStone);
         y += lineH;
-        sb.DrawString(font, $"Sp:{m.SpeciesCount} Het:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2} Sub:{m.TotalSubspecies} Trophic:L1={m.TrophicLevel1}/L2={m.TrophicLevel2}/L3+={m.TrophicLevel3Plus}",
-            new Vector2(x, y), UiTheme.MutedStone);
+        
+        _sb.Clear();
+        _sb.Append($"Sp:{m.SpeciesCount} Het:{m.MeanHeterozygosity:F2} Inb:{m.MeanInbreeding:F2} Sub:{m.TotalSubspecies} Trophic:L1={m.TrophicLevel1}/L2={m.TrophicLevel2}/L3+={m.TrophicLevel3Plus}");
+        sb.DrawString(font, _sb, new Vector2(x, y), UiTheme.MutedStone);
         y += lineH;
-        sb.DrawString(font, $"O2:{_ecosystem.Atmosphere.Oxygen:F0}% CO2:{_ecosystem.Atmosphere.CO2:F0}%",
-            new Vector2(x, y), UiTheme.MutedStone);
+        
+        _sb.Clear();
+        _sb.Append($"O2:{_ecosystem.Atmosphere.Oxygen:F0}% CO2:{_ecosystem.Atmosphere.CO2:F0}%");
+        sb.DrawString(font, _sb, new Vector2(x, y), UiTheme.MutedStone);
         if (m.LastDeathSpecies.Length > 0)
         {
             y += lineH;
-            sb.DrawString(font, $"{m.LastDeathSpecies}: {m.LastDeathCause}",
-                new Vector2(x, y), new Color(180, 120, 100));
+            _sb.Clear();
+            _sb.Append($"{m.LastDeathSpecies}: {m.LastDeathCause}");
+            sb.DrawString(font, _sb, new Vector2(x, y), new Color(180, 120, 100));
         }
     }
 

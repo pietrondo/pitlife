@@ -19,7 +19,7 @@ public sealed class CataclysmSystem : ISimulationSystem
     public float AnimTimer { get; private set; }
     public float AnimDuration { get; private set; } = 1.5f;
 
-    private float _cooldownTimer = 120f;
+    private float _cooldownTimer = CataclysmConfig.Data.Chances.RandomCooldownMin;
 
     public void Tick(Ecosystem eco, GameTime gameTime)
     {
@@ -71,7 +71,7 @@ public sealed class CataclysmSystem : ISimulationSystem
         _cooldownTimer -= dt;
         if (_cooldownTimer > 0) return;
 
-        _cooldownTimer = 180f + (float)rng.NextDouble() * 420f;
+        _cooldownTimer = CataclysmConfig.Data.Chances.RandomCooldownMin + (float)rng.NextDouble() * CataclysmConfig.Data.Chances.RandomCooldownSpread;
 
         if (rng.NextDouble() < CataclysmConfig.Data.Chances.RandomTriggerChance)
         {
@@ -245,30 +245,13 @@ public sealed class CataclysmSystem : ISimulationSystem
 
     private void TriggerRandom(Ecosystem ecosystem, Random rng)
     {
-        var type = rng.Next(4);
-        switch (type)
-        {
-            case 0:
-                ActiveEvent = "Drought";
-                GrassMultiplier = 0.1f;
-                Timer = 30f + (float)rng.NextDouble() * 30f;
-                break;
-            case 1:
-                ActiveEvent = "Flood";
-                GrassMultiplier = 2.5f;
-                Timer = 15f + (float)rng.NextDouble() * 15f;
-                break;
-            case 2:
-                ActiveEvent = "Firestorm";
-                GrassMultiplier = 0f;
-                Timer = 10f + (float)rng.NextDouble() * 10f;
-                break;
-            case 3:
-                ActiveEvent = "Bloom";
-                GrassMultiplier = 3f;
-                Timer = 20f + (float)rng.NextDouble() * 20f;
-                break;
-        }
+        var events = CataclysmConfig.Data.Chances.RandomEvents;
+        if (events == null || events.Count == 0) return;
+        var ev = events[rng.Next(events.Count)];
+
+        ActiveEvent = ev.Name;
+        GrassMultiplier = ev.GrassMultiplier;
+        Timer = ev.BaseDuration + (float)rng.NextDouble() * ev.DurationSpread;
         IsActive = true;
         Logger.Event("CATACLYSM", $"{ActiveEvent} started at T={ecosystem.TotalTime:F1}s, duration={Timer:F1}s");
     }

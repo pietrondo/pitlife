@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "traits": {
+    "speed": { "min": 0.5, "max": 2.0, "step": 0.3 },
+    "size": { "min": 0.5, "max": 2.0, "step": 0.3 },
+    "metabolism": { "min": 0.5, "max": 2.0, "step": 0.3 },
+    "visionRange": { "min": 1.0, "max": 10.0, "step": 1.0 },
+    "mutationRate": { "min": 0.01, "max": 0.2, "step": 0.03, "default": 0.05 },
+    "adaptation": { "min": 0.0, "max": 1.0, "step": 0.2 },
+    "color": { "min": 40.0, "max": 255.0, "step": 30.0 }
+  },
+  "alleles": {
+    "mutationChanceMultiplier": 0.25,
+    "dominanceMutationStep": 0.2,
+    "dominanceMin": 0.05,
+    "dominanceMax": 1.0,
+    "randomDominanceMin": 0.2,
+    "randomDominanceSpread": 0.8
+  }
+}

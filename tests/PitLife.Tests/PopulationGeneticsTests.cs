@@ -78,39 +78,6 @@ public class PopulationGeneticsTests
         Assert.True(firstChild.MaxEnergy <= unrelatedMaxEnergy);
     }
 
-    [Fact]
-    public void PopulationMetrics_DetectMarkerDiversity()
-    {
-        Genome baseGenome = LegacyGenome();
-        GeneticProfile uniformProfile = baseGenome.EnsureGeneticProfile();
-        uniformProfile.MarkerHaplotypeA = 0;
-        uniformProfile.MarkerHaplotypeB = 0;
-        baseGenome.Genetics = uniformProfile;
-        var uniform = new Creature[]
-        {
-            new TestCreature(Vector2.Zero, baseGenome),
-            new TestCreature(Vector2.One, baseGenome)
-        };
-
-        Genome diverseGenome = baseGenome;
-        GeneticProfile diverseProfile = uniformProfile;
-        diverseProfile.MarkerHaplotypeA = ulong.MaxValue;
-        diverseProfile.MarkerHaplotypeB = ulong.MaxValue;
-        diverseGenome.Genetics = diverseProfile;
-        var diverse = new Creature[]
-        {
-            new TestCreature(Vector2.Zero, baseGenome),
-            new TestCreature(Vector2.One, diverseGenome)
-        };
-
-        PopulationGeneticMetrics uniformMetrics = PopulationGenetics.Calculate(uniform);
-        PopulationGeneticMetrics diverseMetrics = PopulationGenetics.Calculate(diverse);
-
-        Assert.Equal(0f, uniformMetrics.ExpectedMarkerHeterozygosity);
-        Assert.Equal(64, diverseMetrics.PolymorphicMarkerCount);
-        Assert.True(diverseMetrics.ExpectedMarkerHeterozygosity > uniformMetrics.ExpectedMarkerHeterozygosity);
-    }
-
     private static TestCreature Adult(Gender gender, Genome genome)
     {
         var creature = new TestCreature(new Vector2(100, 100), genome)

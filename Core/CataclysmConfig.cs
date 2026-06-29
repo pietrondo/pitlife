@@ -59,7 +59,16 @@ public static class CataclysmConfig
         {
             RandomTriggerChance = 0.3f,
             MassExtinctionChance = 0.05f,
-            MassExtinctionMinTime = 120f
+            MassExtinctionMinTime = 120f,
+            RandomCooldownMin = 180f,
+            RandomCooldownSpread = 420f,
+            RandomEvents = new List<RandomEventDef>
+            {
+                new RandomEventDef { Name = "Drought", GrassMultiplier = 0.1f, BaseDuration = 30f, DurationSpread = 30f },
+                new RandomEventDef { Name = "Flood", GrassMultiplier = 2.5f, BaseDuration = 15f, DurationSpread = 15f },
+                new RandomEventDef { Name = "Firestorm", GrassMultiplier = 0f, BaseDuration = 10f, DurationSpread = 10f },
+                new RandomEventDef { Name = "Bloom", GrassMultiplier = 3f, BaseDuration = 20f, DurationSpread = 20f }
+            }
         }
     );
 
@@ -110,6 +119,9 @@ public static class CataclysmConfig
         public float RandomTriggerChance { get; init; }
         public float MassExtinctionChance { get; init; }
         public float MassExtinctionMinTime { get; init; }
+        public float RandomCooldownMin { get; init; }
+        public float RandomCooldownSpread { get; init; }
+        public List<RandomEventDef> RandomEvents { get; init; } = new();
     }
 
     public sealed record ColorDef
@@ -120,5 +132,13 @@ public static class CataclysmConfig
         public int A { get; init; }
 
         public Color ToColor() => new Color(R, G, B, A);
+    }
+
+    public sealed record RandomEventDef
+    {
+        public string Name { get; init; } = "";
+        public float GrassMultiplier { get; init; }
+        public float BaseDuration { get; init; }
+        public float DurationSpread { get; init; }
     }
 }
