@@ -44,6 +44,40 @@ public class Ecosystem
     private CreatureSpawner _spawner = null!;
     private ulong _nextIndividualId = 1;
 
+    // GROUP SPAWN_
+    private const int SPAWN_AQUATIC_DIVISOR = 4;
+    private const int MAX_POSITION_ATTEMPTS = 100;
+    private const float PROXIMITY_SQ_DIST = 3600f;
+    private const int MAX_NEARBY = 3;
+
+    // GROUP SPREAD_
+    private const float WIND_BIAS_THRESHOLD = 0.3f;
+    private const float WIND_BIAS_LOCAL_WEIGHT = 0.3f;
+    private const float WIND_BIAS_WIND_WEIGHT = 0.7f;
+    private const float SPREAD_MIN_DIST = 30f;
+    private const float SPREAD_RANGE = 40f;
+    private const float NEIGHBOR_RADIUS = 80f;
+    private const int MAX_SAME_SPECIES_NEARBY = 4;
+    private const float CHILD_ENERGY_RATIO = 0.5f;
+    private const float REPRODUCTION_ENERGY_COST_RATIO = 0.2f;
+
+    // GROUP DECAY_
+    private const double DECOMPOSE_RATE = 0.02;
+    private const float DECAY_GRASS_BOOST = 0.3f;
+    private const float SOIL_MAX = 2f;
+    private const float SOIL_BOOST = 0.1f;
+
+    // GROUP PRESSURE_
+    private const float SOFT_CAP_RATIO = 0.7f;
+    private const float PRESSURE_RANGE_RATIO = 0.3f;
+    private const float MAX_PRESSURE_MULTIPLIER = 1.5f;
+
+    // GROUP STAGGER_
+    private const float MAX_STAGGER_SECONDS = 120f;
+
+    // GROUP LOG_
+    private const int STATS_LOG_INTERVAL = 60;
+
     private static readonly string[] PlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant)];
     private static readonly string[] AquaticPlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant).Where(s =>
     {
@@ -97,7 +131,7 @@ public class Ecosystem
     public void Initialize(int h, int c, int o, int p)
     {
         for (var i = 0; i < p; i++) SpawnSpecies<Plant>(PlantSpecies, "Clover");
-        for (var i = 0; i < p / 4; i++) SpawnSpecies<Plant>(AquaticPlantSpecies, "Seaweed");
+        for (var i = 0; i < p / SPAWN_AQUATIC_DIVISOR; i++) SpawnSpecies<Plant>(AquaticPlantSpecies, "Seaweed");
         SpawnSubset<Herbivore>(HerbivoreSpecies, h, "Gazelle");
         SpawnSubset<Carnivore>(CarnivoreSpecies, c, "Wolf");
         SpawnSubset<Omnivore>(OmnivoreSpecies, o, "Bear");
@@ -110,16 +144,23 @@ public class Ecosystem
     private void SpawnSubset<T>(string[] species, int count, string fallback) where T : Creature
     {
         var maxSpecies = Math.Max(2, count / 5);
-        var selected = species.OrderBy(_ => Random.Next()).Take(Math.Min(maxSpecies, species.Length)).ToArray();
+        var take = Math.Min(maxSpecies, species.Length);
+        var selected = species.ToArray();
+        for (int i = selected.Length - 1; i > 0; i--)
+        {
+            int j = Random.Next(i + 1);
+            (selected[i], selected[j]) = (selected[j], selected[i]);
+        }
+        selected = selected[..take];
         for (var i = 0; i < count; i++)
         {
             var name = selected[Random.Next(selected.Length)];
             var pos = RandomPassablePosition(name);
             var nearby = 0;
             foreach (var c in Creatures)
-                if (c.Species == name && Vector2.DistanceSquared(c.Position, pos) < 3600f)
+                if (c.Species == name && Vector2.DistanceSquared(c.Position, pos) < PROXIMITY_SQ_DIST)
                     nearby++;
-            if (nearby >= 3)
+            if (nearby >= MAX_NEARBY)
             {
                 Logger.Warn($"Spawn: skipping {name} at ({pos.X:F0},{pos.Y:F0}) - {nearby} nearby");
                 continue;
@@ -134,7 +175,7 @@ public class Ecosystem
         foreach (var c in Creatures)
         {
             if (c is Plant && c.IsAlive)
-                c.GrowFor((float)Random.NextDouble() * 120f);
+                c.GrowFor((float)Random.NextDouble() * MAX_STAGGER_SECONDS);
         }
     }
 
@@ -207,7 +248,7 @@ public class Ecosystem
         var def = SpeciesRegistry.Get(species);
         var isAquatic = def?.IsAquatic ?? false;
 
-        for (var attempt = 0; attempt < 100; attempt++)
+        for (var attempt = 0; attempt < MAX_POSITION_ATTEMPTS; attempt++)
         {
             var x = (float)(Random.NextDouble() * Math.Max(1, World.PixelWidth - 1));
             var y = (float)(Random.NextDouble() * Math.Max(1, World.PixelHeight - 1));
@@ -280,7 +321,7 @@ public class Ecosystem
 
     private void ProcessDeaths(float dt)
     {
-        var decomposeChance = 1.0 - Math.Exp(-0.02 * dt);
+        var decomposeChance = 1.0 - Math.Exp(-DECOMPOSE_RATE * dt);
         for (var i = Creatures.Count - 1; i >= 0; i--)
         {
             var c = Creatures[i];
@@ -290,8 +331,8 @@ public class Ecosystem
                 {
                     var tile = World.GetTileAtPosition(c.Position.X, c.Position.Y);
                     if (tile.GrassAmount < tile.MaxGrass)
-                        tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + 0.3f);
-                    tile.SoilNutrients = Math.Min(2f, tile.SoilNutrients + 0.1f);
+                        tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + DECAY_GRASS_BOOST);
+                    tile.SoilNutrients = Math.Min(SOIL_MAX, tile.SoilNutrients + SOIL_BOOST);
                     Spatial.Remove(c);
                     Pool.Return(c);
                     Creatures.RemoveAt(i);
@@ -336,14 +377,14 @@ public class Ecosystem
         foreach (var species in Metrics.SpeciesPopulations.Keys)
             _knownSpecies.Add(species);
 
-        var softCap = MaxCreatures * 0.7f;
+        var softCap = MaxCreatures * SOFT_CAP_RATIO;
         var aliveCount = plants + herbivores + carnivores + omnivores;
         PopulationPressure = aliveCount > softCap
-            ? 1f + (aliveCount - softCap) / (MaxCreatures * 0.3f) * 1.5f
+            ? 1f + (aliveCount - softCap) / (MaxCreatures * PRESSURE_RANGE_RATIO) * MAX_PRESSURE_MULTIPLIER
             : 1f;
 
         _logCounter++;
-        if (_logCounter % 60 == 0) // Log every ~1 second at 60 FPS
+        if (_logCounter % STATS_LOG_INTERVAL == 0) // Log every ~1 second at 60 FPS
         {
             Logger.Event("STATS", $"T={TotalTime:F1}s P={plants} H={herbivores} C={carnivores} O={omnivores} Total={Creatures.Count}");
         }
@@ -365,9 +406,9 @@ public class Ecosystem
 
         var angle = (float)(Random.NextDouble() * Math.PI * 2);
         var windBias = Climate.WindDirection;
-        if (plant.Genome.ForestAdaptation > 0.3f)
-            angle = (angle * 0.3f + windBias * 0.7f + (float)Math.PI * 0.5f) % ((float)Math.PI * 2);
-        var dist = 30f + (float)Random.NextDouble() * 40f;
+        if (plant.Genome.ForestAdaptation > WIND_BIAS_THRESHOLD)
+            angle = (angle * WIND_BIAS_LOCAL_WEIGHT + windBias * WIND_BIAS_WIND_WEIGHT + (float)Math.PI * 0.5f) % ((float)Math.PI * 2);
+        var dist = SPREAD_MIN_DIST + (float)Random.NextDouble() * SPREAD_RANGE;
         Vector2 newPos = plant.Position + new Vector2((float)Math.Cos(angle) * dist, (float)Math.Sin(angle) * dist);
 
         newPos.X = Math.Clamp(newPos.X, 0, World.PixelWidth - 1);
@@ -384,16 +425,16 @@ public class Ecosystem
                 return;
         }
 
-        var sameSpeciesNearby = FindNeighbors(plant, 80f, c => c is Plant p && p.Species == plant.Species);
-        if (sameSpeciesNearby.Count >= 4)
+        var sameSpeciesNearby = FindNeighbors(plant, NEIGHBOR_RADIUS, c => c is Plant p && p.Species == plant.Species);
+        if (sameSpeciesNearby.Count >= MAX_SAME_SPECIES_NEARBY)
             return;
 
         Genome childGenome = Genome.Reproduce(plant.Genome, plant.Genome, Random);
         var child = new Plant(newPos, childGenome, plant.Species);
         child.InheritAsexualLineage(plant);
-        child.Energy = child.MaxEnergy * 0.5f;
+        child.Energy = child.MaxEnergy * CHILD_ENERGY_RATIO;
         AddCreature(child);
-        plant.Energy -= plant.MaxEnergy * 0.2f;
+        plant.Energy -= plant.MaxEnergy * REPRODUCTION_ENERGY_COST_RATIO;
     }
 
     private int CountPendingPlants()
