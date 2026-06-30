@@ -93,7 +93,7 @@ public class SimulationOrchestratorTests : IDisposable
         var mockCamera = new Mock<Camera>(800, 600) { CallBase = true };
         game._camera = mockCamera.Object;
 
-        var mockSpawnPanel = new Mock<SpawnPanel>(mockEcosystem.Object, mockCamera.Object) { CallBase = true };
+        var mockSpawnPanel = new Mock<SpawnPanel>() { CallBase = true };
         SetReadonlyField(game, "_spawnPanel", mockSpawnPanel.Object);
 
         var mockInGameUi = new Mock<InGameUi>() { CallBase = true };

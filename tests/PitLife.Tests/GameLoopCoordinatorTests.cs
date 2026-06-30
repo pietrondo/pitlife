@@ -27,6 +27,7 @@ public class GameLoopCoordinatorTests
         var coordinator = new GameLoopCoordinator(game);
 
         game._showLoadingTimer = 1.5f;
+        game._camera = new Moq.Mock<PitLife.Rendering.Camera>(800, 600) { CallBase = true }.Object;
         game._pendingWorldGen = true;
         game._pendingSeed = 12345;
 
@@ -52,6 +53,7 @@ public class GameLoopCoordinatorTests
         var coordinator = new GameLoopCoordinator(game);
 
         game._showLoadingTimer = 0.9f;
+        game._camera = new Moq.Mock<PitLife.Rendering.Camera>(800, 600) { CallBase = true }.Object;
         game._pendingWorldGen = true;
         game._pendingSeed = 12345;
 
@@ -83,17 +85,18 @@ public class GameLoopCoordinatorTests
 
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
+        game._showLoadingTimer = 0f;
+        game._camera = new Moq.Mock<PitLife.Rendering.Camera>(800, 600) { CallBase = true }.Object;
 
         var mockInput = new Mock<InputManager>();
         game._inputManager = mockInput.Object;
 
-        var mockMainMenu = new Mock<MainMenu>();
-        mockMainMenu.Setup(m => m.Update(It.IsAny<MouseState>(), It.IsAny<MouseState>(), It.IsAny<KeyboardState>(), It.IsAny<KeyboardState>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
-            .Returns(MenuAction.StartGame);
-        SetReadonlyField(game, "_mainMenu", mockMainMenu.Object);
+        SetReadonlyField(game, "_mainMenu", new TestMainMenuStart());
 
-        var mockController = new Mock<SimulationController>(new Mock<Ecosystem>(20, 20, 1).Object, new Mock<DayNightCycle>().Object);
+        var mockController = new Mock<SimulationController>(new Mock<Ecosystem>(20, 20, 1).Object, new Mock<PitLife.Rendering.DayNightCycle>().Object);
         game._controller = mockController.Object;
+        game._ecosystem = new Mock<Ecosystem>(20, 20, 1).Object;
+        SetReadonlyField(game, "_dayNight", new Mock<PitLife.Rendering.DayNightCycle>().Object);
 
         var gameTime = new GameTime(TimeSpan.FromSeconds(0.016), TimeSpan.FromSeconds(0.016));
         coordinator.Update(gameTime);
@@ -110,14 +113,15 @@ public class GameLoopCoordinatorTests
 
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
+        game._showLoadingTimer = 0f;
+        game._camera = new Moq.Mock<PitLife.Rendering.Camera>(800, 600) { CallBase = true }.Object;
 
         var mockInput = new Mock<InputManager>();
         game._inputManager = mockInput.Object;
 
-        var mockMainMenu = new Mock<MainMenu>();
-        mockMainMenu.Setup(m => m.Update(It.IsAny<MouseState>(), It.IsAny<MouseState>(), It.IsAny<KeyboardState>(), It.IsAny<KeyboardState>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
-            .Returns(MenuAction.NewWorld);
-        SetReadonlyField(game, "_mainMenu", mockMainMenu.Object);
+        SetReadonlyField(game, "_mainMenu", new TestMainMenuNewWorld());
+        game._ecosystem = new Mock<Ecosystem>(20, 20, 1).Object;
+        SetReadonlyField(game, "_dayNight", new Mock<PitLife.Rendering.DayNightCycle>().Object);
 
         var gameTime = new GameTime(TimeSpan.FromSeconds(0.016), TimeSpan.FromSeconds(0.016));
         coordinator.Update(gameTime);
@@ -128,3 +132,21 @@ public class GameLoopCoordinatorTests
     }
 }
 
+
+public class TestMainMenuStart : MainMenu
+{
+    public override bool IsWorldGenPanelOpen { get => false; set { } }
+    public override MenuAction Update(Microsoft.Xna.Framework.Input.MouseState mouse, Microsoft.Xna.Framework.Input.MouseState previousMouse, Microsoft.Xna.Framework.Input.KeyboardState keyboard, Microsoft.Xna.Framework.Input.KeyboardState previousKeyboard, int viewportWidth, int viewportHeight, bool isFullscreen)
+    {
+        return MenuAction.StartGame;
+    }
+}
+
+public class TestMainMenuNewWorld : MainMenu
+{
+    public override bool IsWorldGenPanelOpen { get => false; set { } }
+    public override MenuAction Update(Microsoft.Xna.Framework.Input.MouseState mouse, Microsoft.Xna.Framework.Input.MouseState previousMouse, Microsoft.Xna.Framework.Input.KeyboardState keyboard, Microsoft.Xna.Framework.Input.KeyboardState previousKeyboard, int viewportWidth, int viewportHeight, bool isFullscreen)
+    {
+        return MenuAction.NewWorld;
+    }
+}

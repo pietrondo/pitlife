@@ -44,7 +44,7 @@ public class SimulationOrchestrator
         catch (Exception ex) { Logger.Error($"Failed to save settings: {ex.Message}"); }
     }
 
-    public void GenerateNewWorld(int? seedOverride, WorldGenOptions? worldGenOptions = null)
+    public virtual void GenerateNewWorld(int? seedOverride, WorldGenOptions? worldGenOptions = null)
     {
         var seed = seedOverride ?? new Random().Next();
         var wgOpts = worldGenOptions ?? WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };

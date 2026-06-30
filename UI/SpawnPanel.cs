@@ -10,7 +10,7 @@ using PitLife.Simulation;
 
 namespace PitLife.UI;
 
-public sealed class SpawnPanel
+public class SpawnPanel
 {
     private readonly StringBuilder _sb = new StringBuilder(64);
     public bool IsOpen => _state.IsOpen;

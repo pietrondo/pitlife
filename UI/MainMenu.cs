@@ -21,7 +21,7 @@ public enum MenuAction
     LoadGame
 }
 
-public sealed class MainMenu
+public class MainMenu
 {
     private readonly StringBuilder _sb = new StringBuilder(64);
     private readonly UiWindow _window = new(I18n.T("menu.mainTitle"));
@@ -73,7 +73,7 @@ public sealed class MainMenu
     ];
 
     public int? Seed => _seedInput.Text.Length > 0 ? _seedInput.GetNumericValue() : null;
-    public bool IsWorldGenPanelOpen => _showWorldGenPanel;
+    public virtual bool IsWorldGenPanelOpen { get => _showWorldGenPanel; set => _showWorldGenPanel = value; }
 
     public WorldGenOptions CurrentOptions => new(
         (WorldGenPreset)_presetIndex,
@@ -101,7 +101,7 @@ public sealed class MainMenu
         return int.TryParse(text, out int val) ? val : fallback;
     }
 
-    public MenuAction Update(
+    public virtual MenuAction Update(
         MouseState mouse,
         MouseState previousMouse,
         KeyboardState keyboard,

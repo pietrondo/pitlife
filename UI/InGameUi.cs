@@ -16,7 +16,7 @@ public struct PopSnapshot
     public PopSnapshot(int p, int h, int c, int o) { Plants = p; Herbivores = h; Carnivores = c; Omnivores = o; }
 }
 
-public sealed class InGameUi
+public class InGameUi
 {
     public const string StatisticsWindowId = "statistics";
     public const string CreatureWindowId = "creature";
