@@ -41,13 +41,31 @@ public class UiWindow
 
     public void Draw(SpriteBatch spriteBatch, Texture2D pixel, SpriteFont font, bool isActive = true, Point mousePosition = default)
     {
+        var c = isActive ? UiTheme.MossSignal : UiTheme.BarkEdge;
+
         // Draw shadow
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 8, Bounds.Y + 8, Bounds.Width, Bounds.Height), UiTheme.Shadow);
         // Draw window surface
         UiPrimitives.Fill(spriteBatch, pixel, Bounds, UiTheme.ForestNight);
 
+        // Top highlight band
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(Bounds.X + 3, Bounds.Y + 3, Bounds.Width - 6, 4), Color.Lerp(UiTheme.DeepGrove, UiTheme.MossSignal, 0.07f));
+
         // Draw border: active/focused windows get a bright Moss Signal border, inactive ones get a Bark Edge border
-        UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, isActive ? UiTheme.MossSignal : UiTheme.BarkEdge);
+        UiPrimitives.Border(spriteBatch, pixel, Bounds, 3, c);
+
+        // Corner decorations (small L-shapes inside each corner)
+        var d = 6;
+        var tl = new Point(Bounds.X + 3, Bounds.Y + 3);
+        var br = new Point(Bounds.Right - 4, Bounds.Bottom - 4);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(tl.X, tl.Y, 1, d), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(tl.X, tl.Y, d, 1), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(br.X, tl.Y, 1, d), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(br.X - d + 1, tl.Y, d, 1), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(tl.X, br.Y - d + 1, 1, d), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(tl.X, br.Y, d, 1), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(br.X, br.Y - d + 1, 1, d), c);
+        UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(br.X - d + 1, br.Y, d, 1), c);
 
         Rectangle titleBar = TitleBarBounds;
         UiPrimitives.Fill(spriteBatch, pixel, titleBar, UiTheme.DeepGrove);

@@ -95,7 +95,13 @@ public sealed class CataclysmPanel
         var panelY = _toggleBounds.Y + ToggleSize + 4;
         _panelBounds = new Rectangle(Margin, panelY, PanelW, PanelH);
         UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(30, 15, 10, 235));
-        UiPrimitives.Border(sb, pixel, _panelBounds, 2, UiTheme.DangerClay);
+        var c = UiTheme.DangerClay;
+        UiPrimitives.Fill(sb, pixel, new Rectangle(_panelBounds.X + 2, _panelBounds.Y + 2, _panelBounds.Width - 4, 3), new Color(60, 25, 18, 220));
+        UiPrimitives.Border(sb, pixel, _panelBounds, 2, c);
+        // Corner decorations
+        var p = new Point(_panelBounds.X + 2, _panelBounds.Y + 2);
+        UiPrimitives.Fill(sb, pixel, new Rectangle(p.X, p.Y, 1, 5), c);
+        UiPrimitives.Fill(sb, pixel, new Rectangle(p.X, p.Y, 5, 1), c);
 
         sb.DrawString(font, I18n.T("toolbar.cataclysm"), new Vector2(_panelBounds.X + 8, _panelBounds.Y + 6), UiTheme.DangerClay);
 

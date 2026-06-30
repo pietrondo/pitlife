@@ -187,7 +187,13 @@ public sealed class SpawnPanel
     private void DrawPanelBackground(SpriteBatch sb, Texture2D pixel, SpriteFont font)
     {
         UiPrimitives.Fill(sb, pixel, _panelBounds, new Color(11, 23, 18, 235));
-        UiPrimitives.Border(sb, pixel, _panelBounds, 2, new Color(107, 81, 55));
+        var c = new Color(107, 81, 55);
+        UiPrimitives.Fill(sb, pixel, new Rectangle(_panelBounds.X + 2, _panelBounds.Y + 2, _panelBounds.Width - 4, 3), new Color(20, 40, 30, 220));
+        UiPrimitives.Border(sb, pixel, _panelBounds, 2, c);
+        // Corner decorations
+        var p = new Point(_panelBounds.X + 2, _panelBounds.Y + 2);
+        UiPrimitives.Fill(sb, pixel, new Rectangle(p.X, p.Y, 1, 5), c);
+        UiPrimitives.Fill(sb, pixel, new Rectangle(p.X, p.Y, 5, 1), c);
 
         sb.DrawString(font, I18n.T("spawn.title"),
             new Vector2(_panelBounds.X + 10, _panelBounds.Y + 6), UiTheme.MossSignal);
