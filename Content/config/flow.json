@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "initialLevels": {
+    "deepOceanWater": 1.0,
+    "shallowWaterWater": 0.7,
+    "riverWater": 0.5,
+    "volcanoLava": 0.4
+  },
+  "flowRates": {
+    "tickAccumulatorThreshold": 1.0,
+    "waterFlowRateBase": 0.1,
+    "waterFlowRateMax": 0.25,
+    "lavaFlowRateMultiplier": 0.3,
+    "lavaFlowRateMax": 0.1,
+    "evaporationBaseRate": 0.01,
+    "evaporationTempDivisor": 40.0,
+    "volcanoLavaRegen": 0.1,
+    "riverWaterRegen": 0.05
+  },
+  "temperature": {
+    "desertTemp": 38.0,
+    "desertLatMod": 15.0,
+    "savannaTemp": 32.0,
+    "volcanoTemp": 45.0,
+    "snowTemp": -10.0,
+    "snowLatMod": 10.0,
+    "tundraTemp": 5.0,
+    "deepOceanTemp": 15.0,
+    "defaultTemp": 20.0,
+    "defaultLatMod": 5.0
+  },
+  "visuals": {
+    "overlayScaleNumerator": 16,
+    "overlayScaleDenominator": 4,
+    "lavaRedMultiplier": 200,
+    "waterBlueMultiplier": 160,
+    "waterAlphaMultiplier": 100,
+    "lavaAlphaMultiplier": 180,
+    "riverAnimPhaseMultiplier": 40.0,
+    "riverAnimScaleMultiplier": 2.0,
+    "riverAlphaBoost": 70,
+    "riverBlueBoost": 40
+  }
+}
