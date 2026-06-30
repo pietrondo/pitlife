@@ -10,5 +10,15 @@
   "carnivoreAttackCost": 3,
   "omnivoreAttackCost": 4,
   "plantDigestionRate": 4,
-  "maxFruitEatRange": 60
+  "maxFruitEatRange": 60,
+  "herbivoreConsumeRate": 10,
+  "omnivoreConsumeRate": 8,
+  "omnivorePlantDigestion": 1.5,
+  "grazeRate": 3,
+  "scavengeEatRate": 8,
+  "scavengeEnergyGain": 1.2,
+  "poisonFruitDamageMultiplier": 2,
+  "poisonPlantDamageMultiplier": 3,
+  "omnivoreHuntThreshold": 0.4,
+  "defenseDivisor": 25
 }

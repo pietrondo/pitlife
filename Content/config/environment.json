@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "altitudeThreshold": 0.6,
+  "altitudeFactor": 3.0,
+  "lotkaPressureWeight": 0.5,
+  "o2FactorWeight": 0.3,
+  "tickDivisor": 60.0,
+  "temperaturePenaltyThreshold": 15.0,
+  "temperaturePenaltyFactor": 0.02,
+  "invalidBiomePenalty": 4.0,
+  "invalidTemperaturePenalty": 2.0,
+  "aquaticSpeedMultiplier": 1.0,
+  "aquaticEnergyMultiplier": 1.0,
+  "strandedSpeedMultiplier": 0.3,
+  "strandedEnergyMultiplier": 2.5
+}

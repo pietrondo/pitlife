@@ -20,7 +20,8 @@ public struct EnvironmentResponse
         float pressureFactor = ecosystem.PopulationPressure;
         float o2Factor = 2f - ecosystem.Atmosphere.OxygenModifier;
         float altitude = ecosystem.World.GetElevation(position.X, position.Y);
-        float altitudeFactor = altitude > 0.6f ? (altitude - 0.6f) * 3f : 0f;
+        var envCfg = PitLife.Core.EnvironmentConfig.Data;
+        float altitudeFactor = altitude > envCfg.AltitudeThreshold ? (altitude - envCfg.AltitudeThreshold) * envCfg.AltitudeFactor : 0f;
 
         // Lotka-Volterra trophic dynamics: adjust death rate based on predator-prey balance
         float trophicDeathMultiplier = type switch
@@ -30,8 +31,8 @@ public struct EnvironmentResponse
             _ => 1f
         };
 
-        float combinedFactor = seasonalFactor - 1f + (pressureFactor - 1f) * 0.5f + o2Factor * 0.3f + altitudeFactor;
-        energy -= energyConsumption * combinedFactor * trophicDeathMultiplier * (1f / 60f);
+        float combinedFactor = seasonalFactor - 1f + (pressureFactor - 1f) * envCfg.LotkaPressureWeight + o2Factor * envCfg.O2FactorWeight + altitudeFactor;
+        energy -= energyConsumption * combinedFactor * trophicDeathMultiplier * (1f / envCfg.TickDivisor);
     }
 
     public void ApplyWindDrift(ref Vector2 position, CreatureType type, bool isAquatic, float windDir, float windSpeed, float dt, World world)
@@ -47,6 +48,7 @@ public struct EnvironmentResponse
 
     public void UpdateEnvironmentalMultipliers(ref float currentSpeedMultiplier, ref float currentEnergyMultiplier, CreatureType type, string species, Genome genome, Vector2 position, float temperaturePreference, bool isAquatic, World world, Ecosystem ecosystem)
     {
+        var envCfg = PitLife.Core.EnvironmentConfig.Data;
         var tile = world.GetTileAtPosition(position.X, position.Y);
         if (tile == null)
         {
@@ -66,8 +68,8 @@ public struct EnvironmentResponse
         int tileY = (int)(position.Y / ecosystem.World.TileSize);
         float tileTemp = ecosystem.Climate.GetTileTemperature(tile, tileY, ecosystem.World.Height);
         float tempDiff = Math.Abs(tileTemp - temperaturePreference);
-        if (tempDiff > 15f && type != CreatureType.Plant)
-            currentEnergyMultiplier += tempDiff * 0.02f;
+        if (tempDiff > envCfg.TemperaturePenaltyThreshold && type != CreatureType.Plant)
+            currentEnergyMultiplier += tempDiff * envCfg.TemperaturePenaltyFactor;
 
         if (type != CreatureType.Plant)
         {
@@ -75,25 +77,26 @@ public struct EnvironmentResponse
             if (def != null)
             {
                 if (!def.IsValidBiome(tile.Biome))
-                    currentEnergyMultiplier += 4.0f;
+                    currentEnergyMultiplier += envCfg.InvalidBiomePenalty;
                 if (!def.IsValidTemperature(tileTemp))
-                    currentEnergyMultiplier += 2.0f;
+                    currentEnergyMultiplier += envCfg.InvalidTemperaturePenalty;
             }
         }
     }
 
     private void UpdateAquaticMultipliers(ref float currentSpeedMultiplier, ref float currentEnergyMultiplier, Tile tile)
     {
+        var envCfg = PitLife.Core.EnvironmentConfig.Data;
         bool inWater = tile.Biome is BiomeType.DeepOcean or BiomeType.ShallowWater or BiomeType.CoralReef;
         if (inWater)
         {
-            currentSpeedMultiplier = 1.0f;
-            currentEnergyMultiplier = 1.0f;
+            currentSpeedMultiplier = envCfg.AquaticSpeedMultiplier;
+            currentEnergyMultiplier = envCfg.AquaticEnergyMultiplier;
         }
         else
         {
-            currentSpeedMultiplier = 0.3f;
-            currentEnergyMultiplier = 2.5f;
+            currentSpeedMultiplier = envCfg.StrandedSpeedMultiplier;
+            currentEnergyMultiplier = envCfg.StrandedEnergyMultiplier;
         }
     }
 
