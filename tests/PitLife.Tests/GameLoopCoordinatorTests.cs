@@ -30,6 +30,8 @@ public class GameLoopCoordinatorTests
         game._pendingWorldGen = true;
         game._pendingSeed = 12345;
 
+        game._inputManager = new InputManager();
+
         var mockOrchestrator = new Mock<SimulationOrchestrator>(game);
         game._orchestrator = mockOrchestrator.Object;
 
@@ -50,6 +52,8 @@ public class GameLoopCoordinatorTests
         game._showLoadingTimer = 0.9f;
         game._pendingWorldGen = true;
         game._pendingSeed = 12345;
+
+        game._inputManager = new InputManager();
 
         var mockOrchestrator = new Mock<SimulationOrchestrator>(game);
         game._orchestrator = mockOrchestrator.Object;
@@ -74,6 +78,7 @@ public class GameLoopCoordinatorTests
         using var game = new Game1();
         var coordinator = new GameLoopCoordinator(game);
 
+        game._showLoadingTimer = 0f;
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
 
@@ -102,6 +107,7 @@ public class GameLoopCoordinatorTests
         using var game = new Game1();
         var coordinator = new GameLoopCoordinator(game);
 
+        game._showLoadingTimer = 0f;
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
 
