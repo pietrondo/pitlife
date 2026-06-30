@@ -21,7 +21,7 @@ public enum MenuAction
     LoadGame
 }
 
-public class MainMenu
+public sealed class MainMenu
 {
     private readonly StringBuilder _sb = new StringBuilder(64);
     private readonly UiWindow _window = new(I18n.T("menu.mainTitle"));
@@ -101,7 +101,7 @@ public class MainMenu
         return int.TryParse(text, out int val) ? val : fallback;
     }
 
-    public virtual MenuAction Update(
+    public MenuAction Update(
         MouseState mouse,
         MouseState previousMouse,
         KeyboardState keyboard,
