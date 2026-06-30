@@ -82,6 +82,7 @@ public class GameLoopCoordinatorTests
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
         game._camera = new Camera(1280, 800);
+        game._ecosystem = new Ecosystem(20, 20, 1);
 
         var mockInput = new Mock<InputManager>();
         game._inputManager = mockInput.Object;
@@ -112,6 +113,7 @@ public class GameLoopCoordinatorTests
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
         game._camera = new Camera(1280, 800);
+        game._ecosystem = new Ecosystem(20, 20, 1);
 
         var mockInput = new Mock<InputManager>();
         game._inputManager = mockInput.Object;
