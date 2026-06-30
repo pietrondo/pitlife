@@ -81,6 +81,7 @@ public class GameLoopCoordinatorTests
         game._showLoadingTimer = 0f;
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
+        game._camera = new Camera(1280, 800);
 
         var mockInput = new Mock<InputManager>();
         game._inputManager = mockInput.Object;
@@ -110,6 +111,7 @@ public class GameLoopCoordinatorTests
         game._showLoadingTimer = 0f;
         game._screen = Game1.GameScreen.MainMenu;
         game._menuInputCooldown = 0f;
+        game._camera = new Camera(1280, 800);
 
         var mockInput = new Mock<InputManager>();
         game._inputManager = mockInput.Object;
