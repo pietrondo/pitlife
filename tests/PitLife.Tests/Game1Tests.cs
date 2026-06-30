@@ -56,6 +56,29 @@ public class Game1Tests
     }
     
     [Fact]
+    public void Game1_InitializeUI_DoesNotThrow()
+    {
+        using var game = new Game1();
+        game._ecosystem = new Ecosystem(20, 20, 1);
+        game._inGameUi.World = game._ecosystem.World;
+
+        var ex = Record.Exception(() => game.InitializeUI());
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public void Game1_OnSpeciesCatalogChanged_RefreshesSpawnPanel()
+    {
+        using var game = new Game1();
+
+        var prop = typeof(Game1).GetMethod("OnSpeciesCatalogChanged",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        prop!.Invoke(game, null);
+
+        Assert.False(game._spawnPanel.IsOpen);
+    }
+
+    [Fact]
     public void Game1_SaveLanguagePref_WritesSettingsJson()
     {
         var path = "settings.json";
