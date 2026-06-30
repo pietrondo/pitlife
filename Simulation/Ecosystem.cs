@@ -58,8 +58,8 @@ public class Ecosystem
     private const float SPREAD_RANGE = 40f;
     private const float NEIGHBOR_RADIUS = 80f;
     private const int MAX_SAME_SPECIES_NEARBY = 4;
-    private const float CHILD_ENERGY_RATIO = 0.5f;
-    private const float REPRODUCTION_ENERGY_COST_RATIO = 0.2f;
+
+
 
     // GROUP DECAY_
     private const double DECOMPOSE_RATE = 0.02;
@@ -432,9 +432,9 @@ public class Ecosystem
         Genome childGenome = Genome.Reproduce(plant.Genome, plant.Genome, Random);
         var child = new Plant(newPos, childGenome, plant.Species);
         child.InheritAsexualLineage(plant);
-        child.Energy = child.MaxEnergy * CHILD_ENERGY_RATIO;
+        child.Energy = child.MaxEnergy * Core.CreatureConfig.Data.ChildEnergyRatio;
         AddCreature(child);
-        plant.Energy -= plant.MaxEnergy * REPRODUCTION_ENERGY_COST_RATIO;
+        plant.Energy -= plant.MaxEnergy * Core.CreatureConfig.Data.ReproductionEnergyCostRatio;
     }
 
     private int CountPendingPlants()

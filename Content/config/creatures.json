@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "reproduceEnergyCostRatio": 0.3,
+  "childOffsetRadius": 30.0,
+  "childInitialEnergyRatio": 0.5,
+  "geneticDriftChance": 0.0001,
+  "scarcityGrassThreshold": 0.2,
+  "scarcityPenaltyFactor": 5.0,
+  "coldPrefTemp": 10.0,
+  "hotPrefTemp": 35.0,
+  "neutralPrefTemp": 22.0,
+  "initialReproductionOffset": -60.0,
+  "childEnergyRatio": 0.5,
+  "reproductionEnergyCostRatio": 0.2
+}
