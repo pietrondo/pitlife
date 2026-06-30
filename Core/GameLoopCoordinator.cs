@@ -285,6 +285,8 @@ public class GameLoopCoordinator
         }
 
         _game._menuInputCooldown = Math.Max(0f, _game._menuInputCooldown - dt);
+        var vw = _game.GraphicsDevice?.Viewport.Width ?? 1280;
+        var vh = _game.GraphicsDevice?.Viewport.Height ?? 800;
         MenuAction action = _game._menuInputCooldown > 0f
             ? MenuAction.None
             : _game._mainMenu.Update(
@@ -292,8 +294,8 @@ public class GameLoopCoordinator
                 input.PrevMouse,
                 kbd,
                 input.PrevKbd,
-                _game.GraphicsDevice.Viewport.Width,
-                _game.GraphicsDevice.Viewport.Height,
+                vw,
+                vh,
                 _game._graphics.IsFullScreen);
 
         switch (action)
