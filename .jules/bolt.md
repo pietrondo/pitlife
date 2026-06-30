@@ -9,3 +9,7 @@
 ## 2024-05-19 - Texture Swapping in Grid Rendering
 **Learning:** Interleaving different `Texture2D` instances (like a biome base sprite and a 1x1 pixel texture for borders) inside a single spatial loop destroys `SpriteBatch` batching when using `SpriteSortMode.Deferred`. This causes MonoGame to issue potentially thousands of GPU texture swaps per frame, causing massive CPU overhead in the rendering thread.
 **Action:** When drawing layered grids, always group `SpriteBatch.Draw` calls by texture across multiple passes (e.g., Pass 1: Base textures, Pass 2: Borders) to drastically reduce state changes and improve GPU utilization.
+
+## 2024-05-19 - Culling Full-Screen Overlays
+**Learning:** Drawing full-world sized rectangles (`Rectangle(0, 0, World.PixelWidth, World.PixelHeight)`) when a camera transform is active destroys GPU fill rate because MonoGame attempts to rasterize massive areas far outside the screen bounds.
+**Action:** Always intersect transparent overlays (like season tints or temperature blends) with `Camera.VisibleArea` instead of the full world size.
