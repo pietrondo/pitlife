@@ -82,5 +82,29 @@ public class SimulationOrchestratorTests : IDisposable
         Assert.Equal("en", doc.RootElement.GetProperty("language").GetString());
     }
 
-    }
+    [Fact]
+    public void ResetWorldSessionState_ConfiguresGameProperties()
+    {
+        using var game = new Game1();
 
+        var ecosystem = new Ecosystem(20, 20, 42);
+        game._ecosystem = ecosystem;
+
+        var camera = new Camera(800, 600);
+        camera.WorldWidth = ecosystem.World.PixelWidth;
+        camera.WorldHeight = ecosystem.World.PixelHeight;
+        game._camera = camera;
+
+        SetReadonlyField(game, "_spawnPanel", new SpawnPanel());
+        SetReadonlyField(game, "_inGameUi", new InGameUi());
+        SetReadonlyField(game, "_dayNight", new DayNightCycle());
+
+        var orchestrator = new SimulationOrchestrator(game);
+        orchestrator.ResetWorldSessionState();
+
+        Assert.Equal(1f, game._camera.Zoom);
+        Assert.Null(game._selectedCreature);
+        Assert.False(game._spawnPanel.IsOpen);
+        Assert.Equal(game._ecosystem.PlantCount, game._displayPlants);
+    }
+}

@@ -5,7 +5,7 @@ using PitLife.Simulation;
 
 namespace PitLife;
 
-public sealed class SimulationController
+public class SimulationController
 {
     private readonly Ecosystem _ecosystem;
     private readonly DayNightCycle _dayNight;
