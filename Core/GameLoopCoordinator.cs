@@ -569,8 +569,8 @@ public class GameLoopCoordinator
         };
         var tempAlpha = Math.Clamp((_game._ecosystem.Climate.TemperatureModifier + 0.15f) / 0.3f, 0f, 1f);
         Color tempBlend = Color.Lerp(new Color(40, 80, 200, 4), new Color(200, 80, 40, 6), tempAlpha);
-        _game._spriteBatch.Draw(_game._uiPixel, new Rectangle(0, 0, _game._ecosystem.World.PixelWidth, _game._ecosystem.World.PixelHeight), seasonTint);
-        _game._spriteBatch.Draw(_game._uiPixel, new Rectangle(0, 0, _game._ecosystem.World.PixelWidth, _game._ecosystem.World.PixelHeight), tempBlend);
+        _game._spriteBatch.Draw(_game._uiPixel, _game._camera.VisibleArea, seasonTint);
+        _game._spriteBatch.Draw(_game._uiPixel, _game._camera.VisibleArea, tempBlend);
         _game._spriteBatch.End();
 
         var isSnow = _game._ecosystem.Climate.CurrentSeason == Season.Winter || _game._ecosystem.Climate.TemperatureModifier < -0.05f;
