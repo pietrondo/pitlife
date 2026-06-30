@@ -88,6 +88,18 @@ public class Game1 : Game
         _orchestrator = new SimulationOrchestrator(this);
         _coordinator = new GameLoopCoordinator(this);
 
+        InitializeServices();
+        InitializeGraphics();
+        InitializeEcosystem();
+        InitializeUI();
+
+        Exiting += (_, _) => Logger.Flush();
+
+        base.Initialize();
+    }
+
+    internal void InitializeServices()
+    {
         _orchestrator.LoadSettings();
         _speciesCatalogRuntime.CatalogChanged += OnSpeciesCatalogChanged;
         var bundledCatalog = Path.Combine(Content.RootDirectory, "species.json");
@@ -102,11 +114,17 @@ public class Game1 : Game
             Directory.GetCurrentDirectory());
         foreach (SpeciesCatalogValidationError error in catalogErrors)
             Logger.Warn($"Species catalog [{error.EntryIndex}:{error.Field}] {error.Message}");
+    }
 
+    internal void InitializeGraphics()
+    {
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 800;
         _graphics.ApplyChanges();
+    }
 
+    internal void InitializeEcosystem()
+    {
         _ecosystem = new Ecosystem(200, 150, 42);
         _ecosystem.Initialize(30, 8, 5, 100);
         _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
@@ -120,6 +138,10 @@ public class Game1 : Game
         _minimap = new Minimap(_ecosystem, _camera);
         _controller = new SimulationController(_ecosystem, _dayNight);
         _waterEffect = new WaterEffect();
+    }
+
+    internal void InitializeUI()
+    {
         _inGameUi.World = _ecosystem.World;
         _inGameUi.Climate = _ecosystem.Climate;
         _inGameUi.ToolbarButtonClicked += () =>
@@ -128,10 +150,6 @@ public class Game1 : Game
             if (_spawnPanel.IsOpen) _spawnPanel.Close();
             if (_speciesEditor.IsOpen) _speciesEditor.Close();
         };
-
-        Exiting += (_, _) => Logger.Flush();
-
-        base.Initialize();
     }
 
     protected override void LoadContent()

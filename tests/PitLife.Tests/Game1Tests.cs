@@ -26,6 +26,18 @@ public class Game1Tests
     }
     
     [Fact]
+    public void Game1_InitializeServices_LoadsCatalogWithoutThrowing()
+    {
+        using var game = new Game1();
+        game._orchestrator = new Mock<SimulationOrchestrator>(game).Object;
+
+        I18n.SetLanguage("en");
+        var ex = Record.Exception(() => game.InitializeServices());
+
+        Assert.Null(ex);
+    }
+
+    [Fact]
     public void Game1_Initialize_UsesMocksForDependencies()
     {
         using var game = new Game1();
@@ -43,6 +55,26 @@ public class Game1Tests
         Assert.NotNull(game._camera);
     }
     
+    [Fact]
+    public void Game1_SaveLanguagePref_WritesSettingsJson()
+    {
+        var path = "settings.json";
+        try
+        {
+            if (File.Exists(path)) File.Delete(path);
+            I18n.SetLanguage("en");
+            Game1.SaveLanguagePref();
+            Assert.True(File.Exists(path));
+            var json = File.ReadAllText(path);
+            var doc = System.Text.Json.JsonDocument.Parse(json);
+            Assert.Equal("en", doc.RootElement.GetProperty("language").GetString());
+        }
+        finally
+        {
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
     [Fact]
     public void Game1_FindClosestCreature_ReturnsNullForEmptyList()
     {
