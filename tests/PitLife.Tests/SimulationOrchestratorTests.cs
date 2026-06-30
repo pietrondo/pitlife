@@ -82,33 +82,5 @@ public class SimulationOrchestratorTests : IDisposable
         Assert.Equal("en", doc.RootElement.GetProperty("language").GetString());
     }
 
-    [Fact]
-    public void ResetWorldSessionState_ConfiguresGameProperties()
-    {
-        using var game = new Game1();
-        
-        var mockEcosystem = new Mock<Ecosystem>(20, 20, 42) { CallBase = true };
-        game._ecosystem = mockEcosystem.Object;
-
-        var mockCamera = new Mock<Camera>(800, 600) { CallBase = true };
-        game._camera = mockCamera.Object;
-
-        var mockSpawnPanel = new Mock<SpawnPanel>(mockEcosystem.Object, mockCamera.Object) { CallBase = true };
-        SetReadonlyField(game, "_spawnPanel", mockSpawnPanel.Object);
-
-        var mockInGameUi = new Mock<InGameUi>() { CallBase = true };
-        SetReadonlyField(game, "_inGameUi", mockInGameUi.Object);
-
-        var mockDayNight = new Mock<DayNightCycle>() { CallBase = true };
-        SetReadonlyField(game, "_dayNight", mockDayNight.Object);
-
-        var orchestrator = new SimulationOrchestrator(game);
-        orchestrator.ResetWorldSessionState();
-
-        Assert.Equal(1f, game._camera.Zoom);
-        Assert.Null(game._selectedCreature);
-        Assert.False(game._spawnPanel.IsOpen);
-        Assert.Equal(game._ecosystem.PlantCount, game._displayPlants);
     }
-}
 

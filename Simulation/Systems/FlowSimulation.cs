@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PitLife.Core;
 
 namespace PitLife.Simulation;
 
@@ -18,7 +19,7 @@ public sealed class FlowSimulation : IDisposable
     public FlowSimulation(World world)
     {
         _world = world;
-        _overlayScale = Math.Max(1, 16 / 4);
+        _overlayScale = Math.Max(1, FlowConfig.Data.Visuals.OverlayScaleNumerator / FlowConfig.Data.Visuals.OverlayScaleDenominator);
         int w = world.Width, h = world.Height;
         _water = new float[w, h];
         _lava = new float[w, h];
@@ -28,10 +29,10 @@ public sealed class FlowSimulation : IDisposable
             for (int x = 0; x < w; x++)
             {
                 var b = world.Tiles[x, y].Biome;
-                if (b == BiomeType.DeepOcean) _water[x, y] = 1f;
-                else if (b == BiomeType.ShallowWater || b == BiomeType.CoralReef) _water[x, y] = 0.7f;
-                else if (world.RiverMask[y * w + x]) _water[x, y] = 0.5f;
-                if (b == BiomeType.Volcano) _lava[x, y] = 0.4f;
+                if (b == BiomeType.DeepOcean) _water[x, y] = FlowConfig.Data.InitialLevels.DeepOceanWater;
+                else if (b == BiomeType.ShallowWater || b == BiomeType.CoralReef) _water[x, y] = FlowConfig.Data.InitialLevels.ShallowWaterWater;
+                else if (world.RiverMask[y * w + x]) _water[x, y] = FlowConfig.Data.InitialLevels.RiverWater;
+                if (b == BiomeType.Volcano) _lava[x, y] = FlowConfig.Data.InitialLevels.VolcanoLava;
             }
     }
 
@@ -45,7 +46,7 @@ public sealed class FlowSimulation : IDisposable
     public void Update(float dt, Random rng)
     {
         _timeAccum += dt;
-        if (_timeAccum < 1f) return;
+        if (_timeAccum < FlowConfig.Data.FlowRates.TickAccumulatorThreshold) return;
         _timeAccum = 0f;
 
         int w = _world.Width, h = _world.Height;
@@ -75,22 +76,22 @@ public sealed class FlowSimulation : IDisposable
                             float diff = myElev - ne;
                             if (diff <= 0) continue;
                             if (diff > bestDiff) { bestDiff = diff; bestDir = new Vector2(dx, dy); }
-                            float rate = diff * 0.1f;
-                            float wf = Math.Min(w0 * rate, w0 * 0.25f);
+                            float rate = diff * FlowConfig.Data.FlowRates.WaterFlowRateBase;
+                            float wf = Math.Min(w0 * rate, w0 * FlowConfig.Data.FlowRates.WaterFlowRateMax);
                             nw[y * w + x] -= wf; nw[(y + dy) * w + (x + dx)] += wf;
-                            float lf = Math.Min(l0 * rate * 0.3f, l0 * 0.1f);
+                            float lf = Math.Min(l0 * rate * FlowConfig.Data.FlowRates.LavaFlowRateMultiplier, l0 * FlowConfig.Data.FlowRates.LavaFlowRateMax);
                             nl[y * w + x] -= lf; nl[(y + dy) * w + (x + dx)] += lf;
                         }
 
                     _flowDir[x, y] = bestDir;
 
                     float temp = TileTemperature(x, y, _world.Tiles[x, y].Biome);
-                    nw[y * w + x] = Math.Max(0, nw[y * w + x] - w0 * 0.01f * (1f + temp / 40f));
+                    nw[y * w + x] = Math.Max(0, nw[y * w + x] - w0 * FlowConfig.Data.FlowRates.EvaporationBaseRate * (1f + temp / FlowConfig.Data.FlowRates.EvaporationTempDivisor));
 
                     if (_world.Tiles[x, y].Biome == BiomeType.Volcano)
-                        nl[y * w + x] = Math.Min(1f, nl[y * w + x] + 0.1f);
+                        nl[y * w + x] = Math.Min(1f, nl[y * w + x] + FlowConfig.Data.FlowRates.VolcanoLavaRegen);
                     if (_world.RiverMask[y * w + x])
-                        nw[y * w + x] = Math.Min(1f, nw[y * w + x] + 0.05f);
+                        nw[y * w + x] = Math.Min(1f, nw[y * w + x] + FlowConfig.Data.FlowRates.RiverWaterRegen);
                 }
 
             for (int y = 0; y < h; y++)
@@ -114,13 +115,13 @@ public sealed class FlowSimulation : IDisposable
         float latFactor = Math.Abs(y / 100f - 0.5f) * 2f;
         return biome switch
         {
-            BiomeType.Desert => 38f - latFactor * 15f,
-            BiomeType.Savanna => 32f,
-            BiomeType.Volcano => 45f,
-            BiomeType.Snow => -10f - latFactor * 10f,
-            BiomeType.Tundra => 5f,
-            BiomeType.DeepOcean => 15f,
-            _ => 20f - latFactor * 5f
+            BiomeType.Desert => FlowConfig.Data.Temperature.DesertTemp - latFactor * FlowConfig.Data.Temperature.DesertLatMod,
+            BiomeType.Savanna => FlowConfig.Data.Temperature.SavannaTemp,
+            BiomeType.Volcano => FlowConfig.Data.Temperature.VolcanoTemp,
+            BiomeType.Snow => FlowConfig.Data.Temperature.SnowTemp - latFactor * FlowConfig.Data.Temperature.SnowLatMod,
+            BiomeType.Tundra => FlowConfig.Data.Temperature.TundraTemp,
+            BiomeType.DeepOcean => FlowConfig.Data.Temperature.DeepOceanTemp,
+            _ => FlowConfig.Data.Temperature.DefaultTemp - latFactor * FlowConfig.Data.Temperature.DefaultLatMod
         };
     }
 
@@ -149,16 +150,16 @@ public sealed class FlowSimulation : IDisposable
                     float w = _water[tx, ty];
                     float l = _lava[tx, ty];
 
-                    byte r = (byte)(l * 200);
+                    byte r = (byte)(l * FlowConfig.Data.Visuals.LavaRedMultiplier);
                     byte g = 0;
-                    byte b = (byte)(w * 160);
-                    byte a = (byte)((w * 100 + l * 180));
+                    byte b = (byte)(w * FlowConfig.Data.Visuals.WaterBlueMultiplier);
+                    byte a = (byte)((w * FlowConfig.Data.Visuals.WaterAlphaMultiplier + l * FlowConfig.Data.Visuals.LavaAlphaMultiplier));
 
                     if (w > 0.1f && _world.RiverMask[ty * _world.Width + tx])
                     {
-                        float phase = (x + y + _animTime * 40f) % (_overlayScale * 2f);
+                        float phase = (x + y + _animTime * FlowConfig.Data.Visuals.RiverAnimPhaseMultiplier) % (_overlayScale * FlowConfig.Data.Visuals.RiverAnimScaleMultiplier);
                         if (phase < _overlayScale)
-                        { a = (byte)Math.Min(255, a + 70); b = (byte)Math.Min(255, b + 40); }
+                        { a = (byte)Math.Min(255, a + FlowConfig.Data.Visuals.RiverAlphaBoost); b = (byte)Math.Min(255, b + FlowConfig.Data.Visuals.RiverBlueBoost); }
                     }
 
                     _pixels[y * tw + x] = new Color(r, g, b, a);
