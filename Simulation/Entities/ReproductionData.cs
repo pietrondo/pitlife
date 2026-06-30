@@ -8,7 +8,7 @@ public struct ReproductionData
 
     public void Reset()
     {
-        LastReproductionTime = -60f;
+        LastReproductionTime = Core.CreatureConfig.Data.InitialReproductionOffset;
     }
 
     public int GetLitterSize(Genome genome)
