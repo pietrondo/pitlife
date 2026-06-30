@@ -50,8 +50,11 @@ public class GameLoopCoordinator
         var escapePressed = input.IsKeyJustPressed(Keys.Escape);
         var gamepadBack = input.IsGamepadBackPressed();
 
-        _game._camera.ViewportWidth = _game.GraphicsDevice.Viewport.Width;
-        _game._camera.ViewportHeight = _game.GraphicsDevice.Viewport.Height;
+        if (_game.GraphicsDevice != null)
+        {
+            _game._camera.ViewportWidth = _game.GraphicsDevice.Viewport.Width;
+            _game._camera.ViewportHeight = _game.GraphicsDevice.Viewport.Height;
+        }
 
         if (UpdateMainMenu(gameTime, dt, kbd, mouse, gamepadBack)) return;
 
