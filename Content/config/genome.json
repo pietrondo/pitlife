@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "traitDriftAmplitude": 0.02,
+  "traitMin": 0.5,
+  "traitMax": 2.0,
+  "adaptationDriftAmplitude": 0.01,
+  "adaptationMin": 0.0,
+  "adaptationMax": 1.0
+}
