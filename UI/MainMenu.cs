@@ -39,11 +39,11 @@ public class MainMenu
     [
         new(I18n.Format("menu.fullscreen", I18n.T("common.no"))),
         new("EN / IT"),
-        new(I18n.T("common.back"))
+        new(I18n.T("common.back")) { ShortcutHint = "ESC" }
     ];
     private readonly UiButton[] _worldGenButtons =
     [
-        new(I18n.T("menu.generate"))
+        new(I18n.T("menu.generate")) { ShortcutHint = "ENTER" }
     ];
 
     private readonly UiTextInput _seedInput = new();
@@ -266,7 +266,7 @@ public class MainMenu
         if (_planetButton.WasClicked(mouse, previousMouse))
             CyclePlanet();
 
-        if (_worldGenButtons[0].WasClicked(mouse, previousMouse))
+        if (_worldGenButtons[0].WasClicked(mouse, previousMouse) || Pressed(keyboard, previousKeyboard, Keys.Enter))
         {
             return Seed.HasValue ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld;
         }
