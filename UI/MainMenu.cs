@@ -266,7 +266,7 @@ public class MainMenu
         if (_planetButton.WasClicked(mouse, previousMouse))
             CyclePlanet();
 
-        if (_worldGenButtons[0].WasClicked(mouse, previousMouse))
+        if (_worldGenButtons[0].WasClicked(mouse, previousMouse) || Pressed(keyboard, previousKeyboard, Keys.Enter))
         {
             return Seed.HasValue ? MenuAction.NewWorldWithSeed : MenuAction.NewWorld;
         }
