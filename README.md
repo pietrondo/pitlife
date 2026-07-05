@@ -70,6 +70,7 @@
 
 ### UI
 - **Tema foresta**: palette verde/marrone con finestre draggable e hover state per gli indicatori di collasso
+- **Shortcut hints**: indicazioni visive sui bottoni per i tasti rapidi (es. ESC)
 - **Minimap**: angolo in basso a destra con biomi e creature
 - **Toolbar**: statistiche, creature, velocità, cataclismi, clima, menu
 - **Dashboard clima**: dati orbitali, temperatura per-tile, emisferi
@@ -83,10 +84,10 @@
 - **Multi-thread**: world generation parallela, object pooling
 - **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, e ricerca spaziale)
 - **Architettura**: pipeline di simulazione modulare, decomposizione di `Game1` e `InGameUi` in finestre e collaboratori specializzati
-- **Rendering**: grid culling rigoroso, culling matematico per effetti (es. cataclismi) e tile rendering a due passaggi per minimizzare i texture swap
+- **Rendering**: grid culling rigoroso, culling matematico per effetti (es. cataclismi) e culling degli overlay ambientali, tile rendering a due passaggi per minimizzare i texture swap
 - **Data-driven**: tutte le logiche (specie, bilanciamento, clima, malattie, comportamenti) in JSON esterno
 - **Benchmark**: suite BenchmarkDotNet per regressioni di performance
-- **255+ test**: unit test, property-based test, benchmark
+- **255+ test**: unit test (con supporto headless per CI), property-based test, benchmark
 
 ---
 
