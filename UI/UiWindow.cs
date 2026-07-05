@@ -100,7 +100,7 @@ public class UiWindow
             UiPrimitives.Fill(spriteBatch, pixel, close, closeColor);
             UiPrimitives.Border(spriteBatch, pixel, close, 2, UiTheme.WarmParchment);
             Vector2 closeSize = font.MeasureString("X");
-            spriteBatch.DrawString(font, "X", new Vector2(close.Center.X - closeSize.X / 2f, close.Center.Y - closeSize.Y / 2f), UiTheme.WarmParchment);
+            spriteBatch.DrawString(font, "X", new Vector2(close.Center.X - closeSize.X / 2f, close.Center.Y - closeSize.Y / 2f), isHovered ? Color.White : UiTheme.WarmParchment);
         }
     }
 }

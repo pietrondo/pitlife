@@ -33,7 +33,7 @@ public class MainMenu
         new(I18n.T("menu.loadGame")),
         new(I18n.T("menu.options")),
         new(I18n.T("menu.help")),
-        new(I18n.T("menu.exit")) { IsDestructive = true }
+        new(I18n.T("menu.exit")) { IsDestructive = true, ShortcutHint = "ESC" }
     ];
     private readonly UiButton[] _optionButtons =
     [
