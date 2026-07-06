@@ -34,6 +34,9 @@ public sealed class EcosystemMetrics
     public Dictionary<string, float> SpeciesFirstAppearance { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, int> SpeciesMaxPopulation { get; } = new(StringComparer.Ordinal);
 
+    private readonly List<KeyValuePair<string, int>> _speciesBuffer = new();
+    private readonly List<KeyValuePair<string, int>> _subspeciesBuffer = new();
+
     public void RecordBirth()
     {
         TotalBirths++;
@@ -63,41 +66,122 @@ public sealed class EcosystemMetrics
     public void Update(Ecosystem ecosystem)
     {
         TotalTime = ecosystem.TotalTime;
-        var alive = ecosystem.Creatures.Where(c => c != null && c.IsAlive).ToList();
 
-        TotalCreatures = alive.Count;
-        Plants = alive.Count(c => c.CreatureType == CreatureType.Plant);
-        Herbivores = alive.Count(c => c.CreatureType == CreatureType.Herbivore);
-        Carnivores = alive.Count(c => c.CreatureType == CreatureType.Carnivore);
-        Omnivores = alive.Count(c => c.CreatureType == CreatureType.Omnivore);
+        TotalCreatures = 0;
+        Plants = 0;
+        Herbivores = 0;
+        Carnivores = 0;
+        Omnivores = 0;
 
-        var pops = alive.GroupBy(c => c.Species).ToDictionary(g => g.Key, g => g.Count());
+        TrophicLevel1 = 0;
+        TrophicLevel2 = 0;
+        TrophicLevel3Plus = 0;
+
+        float totalHeterozygosity = 0f;
+        float totalInbreeding = 0f;
+        int animalCount = 0;
+
         SpeciesPopulations.Clear();
-        foreach (var kvp in pops.OrderByDescending(x => x.Value)) SpeciesPopulations[kvp.Key] = kvp.Value;
-
-        var subs = alive.Where(c => !string.IsNullOrEmpty(c.Subspecies))
-                        .GroupBy(c => $"{c.Species}/{c.Subspecies}")
-                        .ToDictionary(g => g.Key, g => g.Count());
         SubspeciesCounts.Clear();
-        foreach (var kvp in subs.OrderByDescending(x => x.Value)) SubspeciesCounts[kvp.Key] = kvp.Value;
+
+        var creatures = ecosystem.Creatures;
+        for (int i = 0; i < creatures.Count; i++)
+        {
+            var c = creatures[i];
+            if (c == null || !c.IsAlive) continue;
+
+            TotalCreatures++;
+
+            switch (c.CreatureType)
+            {
+                case CreatureType.Plant:
+                    Plants++;
+                    break;
+                case CreatureType.Herbivore:
+                    Herbivores++;
+                    break;
+                case CreatureType.Carnivore:
+                    Carnivores++;
+                    break;
+                case CreatureType.Omnivore:
+                    Omnivores++;
+                    break;
+            }
+
+            // Trophic Levels
+            int trophic = FoodWeb.TrophicLevel(c.CreatureType);
+            if (trophic == 1) TrophicLevel1++;
+            else if (trophic == 2) TrophicLevel2++;
+            else if (trophic >= 3) TrophicLevel3Plus++;
+
+            // Animals stats
+            if (c.CreatureType != CreatureType.Plant)
+            {
+                animalCount++;
+                totalHeterozygosity += c.Genome.Heterozygosity;
+                totalInbreeding += (float)c.InbreedingCoefficient;
+            }
+
+            // Species population
+            var species = c.Species;
+            if (species != null)
+            {
+                SpeciesPopulations.TryGetValue(species, out int pop);
+                SpeciesPopulations[species] = pop + 1;
+            }
+
+            // Subspecies
+            var sub = c.Subspecies;
+            if (!string.IsNullOrEmpty(sub) && species != null)
+            {
+                string key = species + "/" + sub;
+                SubspeciesCounts.TryGetValue(key, out int count);
+                SubspeciesCounts[key] = count + 1;
+            }
+        }
+
+        // Sort dictionaries - we need to rebuild them sorted
+        // Buffer populations
+        _speciesBuffer.Clear();
+        foreach (var kvp in SpeciesPopulations)
+            _speciesBuffer.Add(kvp);
+
+        _speciesBuffer.Sort((a, b) => b.Value.CompareTo(a.Value));
+
+        SpeciesPopulations.Clear();
+        for (int i = 0; i < _speciesBuffer.Count; i++)
+        {
+            var kvp = _speciesBuffer[i];
+            SpeciesPopulations[kvp.Key] = kvp.Value;
+
+            // Max Population / First appearance update
+            if (!SpeciesFirstAppearance.ContainsKey(kvp.Key)) SpeciesFirstAppearance[kvp.Key] = TotalTime;
+
+            SpeciesMaxPopulation.TryGetValue(kvp.Key, out int maxPop);
+            if (kvp.Value > maxPop) SpeciesMaxPopulation[kvp.Key] = kvp.Value;
+        }
+
+        // Buffer subspecies
+        _subspeciesBuffer.Clear();
+        foreach (var kvp in SubspeciesCounts)
+            _subspeciesBuffer.Add(kvp);
+
+        _subspeciesBuffer.Sort((a, b) => b.Value.CompareTo(a.Value));
+
+        SubspeciesCounts.Clear();
+        for (int i = 0; i < _subspeciesBuffer.Count; i++)
+        {
+            var kvp = _subspeciesBuffer[i];
+            SubspeciesCounts[kvp.Key] = kvp.Value;
+        }
 
         SpeciesCount = SpeciesPopulations.Count;
         TotalSubspecies = SubspeciesCounts.Count;
 
-        foreach (var kvp in SpeciesPopulations)
-        {
-            if (!SpeciesFirstAppearance.ContainsKey(kvp.Key)) SpeciesFirstAppearance[kvp.Key] = TotalTime;
-            if (kvp.Value > SpeciesMaxPopulation.GetValueOrDefault(kvp.Key, 0)) SpeciesMaxPopulation[kvp.Key] = kvp.Value;
-        }
-
-        TrophicLevel1 = alive.Count(c => FoodWeb.TrophicLevel(c.CreatureType) == 1);
-        TrophicLevel2 = alive.Count(c => FoodWeb.TrophicLevel(c.CreatureType) == 2);
-        TrophicLevel3Plus = alive.Count(c => FoodWeb.TrophicLevel(c.CreatureType) >= 3);
-
-        var animals = alive.Where(c => c.CreatureType != CreatureType.Plant).ToList();
-        MeanHeterozygosity = animals.Count > 0 ? animals.Average(c => c.Genome.Heterozygosity) : 0f;
-        MeanInbreeding = animals.Count > 0 ? animals.Average(c => (float)c.InbreedingCoefficient) : 0f;
+        MeanHeterozygosity = animalCount > 0 ? totalHeterozygosity / animalCount : 0f;
+        MeanInbreeding = animalCount > 0 ? totalInbreeding / animalCount : 0f;
     }
+
 
     public void ResetCounters()
     {
