@@ -53,7 +53,7 @@ public sealed class UiButton
         if (hovered && mouse.LeftButton == ButtonState.Pressed)
             position.Y += 2f;
 
-        Color textColor = IsDisabled ? UiTheme.MutedStone : UiTheme.WarmParchment;
+        Color textColor = IsDisabled ? UiTheme.MutedStone : (hovered ? Color.White : UiTheme.WarmParchment);
         spriteBatch.DrawString(font, Text, position, textColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
 
         if (!string.IsNullOrEmpty(ShortcutHint))
@@ -63,7 +63,7 @@ public sealed class UiButton
             Vector2 hintPos = new(
                 Bounds.Center.X - hintSize.X / 2f,
                 Bounds.Bottom - hintSize.Y - 2);
-            spriteBatch.DrawString(font, ShortcutHint, hintPos, UiTheme.MutedStone, 0f, Vector2.Zero, hintScale, SpriteEffects.None, 0f);
+            spriteBatch.DrawString(font, ShortcutHint, hintPos, IsDisabled ? UiTheme.MutedStone : (hovered ? UiTheme.WarmParchment : UiTheme.MutedStone), 0f, Vector2.Zero, hintScale, SpriteEffects.None, 0f);
         }
     }
 }
