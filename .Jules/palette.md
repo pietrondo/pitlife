@@ -15,3 +15,6 @@
 ## 2024-11-20 - Contextual Button Shortcut Hints vs Global Text Hints
 **Learning:** While global text hints at the bottom of the screen (e.g., "ENTER: select ESC: back") are useful, users might not immediately associate them with specific actions in deep menus like options or world generation panels.
 **Action:** Always add inline `ShortcutHint` properties directly on the specific `UiButton` elements corresponding to the actions (like "Back" or "Generate") to clearly map the keyboard shortcut to the specific interaction right where the user's focus is.
+## 2024-07-06 - Button Text Hover Affordances
+**Learning:** In MonoGame UIs without standard HTML hover states, users rely entirely on color changes to understand interactivity. If a button's background changes but the text color remains static, the visual affordance feels incomplete.
+**Action:** When implementing hover states for custom MonoGame UI components, ensure that both the background elements and the foreground text/icons react dynamically to the `isHovered` state (e.g., brightening the text color to white) to provide a complete and satisfying visual cue.
