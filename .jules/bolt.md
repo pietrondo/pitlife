@@ -13,3 +13,6 @@
 ## 2024-05-19 - Culling Full-Screen Overlays
 **Learning:** Drawing full-world sized rectangles (`Rectangle(0, 0, World.PixelWidth, World.PixelHeight)`) when a camera transform is active destroys GPU fill rate because MonoGame attempts to rasterize massive areas far outside the screen bounds.
 **Action:** Always intersect transparent overlays (like season tints or temperature blends) with `Camera.VisibleArea` instead of the full world size.
+## 2026-07-06 - Terrain Generation (Biome Placement) Optimization
+**Learning:** In C#, repeated checks of `HashSet<T>.Contains(item)` within a hot, nested spatial loop (e.g., world array iteration) incur significant unnecessary overhead due to repeated hashing and memory lookups. If the only purpose of the set check is to avoid duplicate placements and short-circuit the loop once an element is placed, introducing a simple boolean flag (`bool placed = false`) allows for immediate loop termination via `break` or `!placed` in the continuation condition. This achieves O(1) loop exit speed, entirely bypassing the HashSet.
+**Action:** Replaced `!present.Contains(biome)` in the `y` and `x` loop conditions of `TerrainRefiner.EnsureAllBiomesPresent` with a `!placed` flag, drastically reducing HashSet overhead during fallback biome placement.
