@@ -27,7 +27,6 @@ public sealed class CataclysmSystem
         UpdateVolcanoes(eco, dt, eco.Random);
     }
 
-    public void Initialize(World world) { }
     public void Reset() { IsActive = false; ActiveEvent = ""; GrassMultiplier = 1f; _cooldownTimer = 0; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)

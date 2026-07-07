@@ -59,7 +59,6 @@ public sealed class EcosystemMetrics
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco);
 
-    public void Initialize(World world) { }
 
     public void Reset() { ResetCounters(); SpeciesPopulations.Clear(); SubspeciesCounts.Clear(); SpeciesFirstAppearance.Clear(); SpeciesMaxPopulation.Clear(); }
 
