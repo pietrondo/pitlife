@@ -1,83 +1,96 @@
 using System;
 using Microsoft.Xna.Framework;
-using Moq;
 using PitLife.Simulation;
 using Xunit;
 
 namespace PitLife.Tests.Systems;
 
-// Dummy class to test non-overridable Species property
-public class DummyCreature : Creature
-{
-    public DummyCreature(Vector2 position, Genome genome, string species)
-        : base(position, genome, CreatureType.Herbivore)
-    {
-        Species = species;
-    }
-
-    protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
-    {
-        return new DummyCreature(position, genome, Species);
-    }
-}
-
 public class CreaturePoolTests
 {
     [Fact]
-    public void Return_WithNullCreature_DoesNotThrow()
+    public void Rent_UnknownSpecies_ReturnsNull()
     {
         var pool = new CreaturePool();
-        var ex = Record.Exception(() => pool.Return(null!));
-        Assert.Null(ex);
+        var creature = pool.Rent("UnknownSpecies", Vector2.Zero, Genome.Random(new Random(42)));
+        Assert.Null(creature);
     }
 
     [Fact]
-    public void Return_WithUnknownSpecies_DoesNotThrow()
+    public void Rent_NewCreature_IsCreatedCorrectly()
     {
         var pool = new CreaturePool();
-        var creature = new DummyCreature(Vector2.Zero, new Genome(), "UnknownSpecies");
-        var ex = Record.Exception(() => pool.Return(creature));
-        Assert.Null(ex);
+        var genome = Genome.Random(new Random(42));
+        var pos = new Vector2(100, 100);
+
+        var creature = pool.Rent("Rabbit", pos, genome);
+
+        Assert.NotNull(creature);
+        Assert.Equal("Rabbit", creature.Species);
+        Assert.Equal(pos, creature.Position);
+        Assert.Equal(genome, creature.Genome);
+        Assert.True(creature.IsAlive);
+        Assert.IsType<Herbivore>(creature);
     }
 
     [Fact]
-    public void Rent_WhenPoolEmpty_CreatesNewInstance()
+    public void Return_And_Rent_ReusesCreature()
     {
         var pool = new CreaturePool();
+        var rng = new Random(42);
 
-        // Use a species known to the game
-        var rented = pool.Rent("Rabbit", Vector2.Zero, new Genome());
+        var firstGenome = Genome.Random(rng);
+        var firstPos = new Vector2(50, 50);
+        var creature1 = pool.Rent("Rabbit", firstPos, firstGenome);
 
-        Assert.NotNull(rented);
-        Assert.Equal("Rabbit", rented.Species);
-    }
+        Assert.NotNull(creature1);
 
-    [Fact]
-    public void Rent_WhenPoolHasItems_ReturnsReusedInstance()
-    {
-        var pool = new CreaturePool();
-
-        // Initial creation
-        var initialCreature = pool.Rent("Rabbit", Vector2.Zero, new Genome());
-        Assert.NotNull(initialCreature);
+        // Mutate the creature to simulate game tick
+        creature1.Die(DeathCause.Starvation);
 
         // Return to pool
-        pool.Return(initialCreature);
+        pool.Return(creature1);
 
         // Rent again
-        var reusedCreature = pool.Rent("Rabbit", Vector2.Zero, new Genome());
+        var secondGenome = Genome.Random(rng);
+        var secondPos = new Vector2(150, 150);
+        var creature2 = pool.Rent("Rabbit", secondPos, secondGenome);
 
-        Assert.NotNull(reusedCreature);
-        Assert.Equal(initialCreature, reusedCreature); // Should be the exact same instance
+        Assert.NotNull(creature2);
+
+        // Same reference because it was pooled
+        Assert.Same(creature1, creature2);
+
+        // But properties are reset
+        Assert.Equal(secondPos, creature2.Position);
+        Assert.Equal(secondGenome, creature2.Genome);
+        Assert.Equal(0, creature2.Age);
+        Assert.True(creature2.IsAlive);
+        Assert.Equal(DeathCause.Unknown, creature2.DeathCause);
     }
 
     [Fact]
-    public void Rent_WithUnknownSpecies_ReturnsNull()
+    public void Return_NullCreature_IsIgnored()
     {
         var pool = new CreaturePool();
+        var exception = Record.Exception(() => pool.Return(null!));
+        Assert.Null(exception);
+    }
 
-        var result = pool.Rent("DefinitelyNotARealSpecies", Vector2.Zero, new Genome());
+    [Fact]
+    public void Pools_AreSegregatedBySpecies()
+    {
+        var pool = new CreaturePool();
+        var rng = new Random(42);
 
-        Assert.Null(result);
+        var rabbit = pool.Rent("Rabbit", Vector2.Zero, Genome.Random(rng));
+        var wolf = pool.Rent("Wolf", Vector2.Zero, Genome.Random(rng));
+
+        pool.Return(rabbit!);
+        pool.Return(wolf!);
+
+        var newWolf = pool.Rent("Wolf", Vector2.Zero, Genome.Random(rng));
+
+        Assert.Same(wolf, newWolf);
+        Assert.NotSame(rabbit, newWolf);
     }
 }

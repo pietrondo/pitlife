@@ -27,7 +27,6 @@ public sealed class TrophicDynamics
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed);
 
-    public void Initialize(World world) { }
 
     public void Reset()
     {

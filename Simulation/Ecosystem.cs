@@ -120,7 +120,6 @@ public class Ecosystem
         Flow = new FlowSimulation(World);
         Climate.Initialize(World);
         Atmosphere.Initialize(World);
-        Trophic.Initialize(World);
         Disease.Initialize(World);
         Cataclysms.Initialize(World);
         Flow.Initialize(World);
