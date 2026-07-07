@@ -32,16 +32,8 @@ public class CreaturePoolTests
         var pool = new CreaturePool();
         var genome = Genome.Random(new Random(1));
         var position = Vector2.Zero;
-        var testSpecies = "TestDummy";
+        var testSpecies = "Rabbit";
 
-        SpeciesRegistry.Register(new SpeciesDefinition(
-            species: testSpecies,
-            creatureType: typeof(DummyCreature),
-            kind: CreatureType.Herbivore,
-            isAquatic: false,
-            socialBehavior: SocialBehavior.None,
-            validBiomes: new[] { BiomeType.Grassland }
-        ));
 
         var creature = new DummyCreature(position, genome, testSpecies);
 
@@ -52,7 +44,7 @@ public class CreaturePoolTests
         SpeciesRegistry.Unregister(testSpecies);
         var poolsField = typeof(CreaturePool).GetField("_pools", BindingFlags.NonPublic | BindingFlags.Instance);
         var poolsDict = (Dictionary<string, Stack<Creature>>)poolsField!.GetValue(pool)!;
-        var key = $"{typeof(DummyCreature).Name}:{testSpecies}";
+        var key = $"{SpeciesRegistry.Get(testSpecies).CreatureType.Name}:{testSpecies}";
 
         Assert.True(poolsDict.ContainsKey(key));
         Assert.Single(poolsDict[key]);
