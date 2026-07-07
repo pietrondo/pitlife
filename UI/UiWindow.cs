@@ -68,7 +68,8 @@ public class UiWindow
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(br.X - d + 1, br.Y, d, 1), c);
 
         Rectangle titleBar = TitleBarBounds;
-        UiPrimitives.Fill(spriteBatch, pixel, titleBar, UiTheme.DeepGrove);
+        bool isTitleHovered = titleBar.Contains(mousePosition) && IsDraggable;
+        UiPrimitives.Fill(spriteBatch, pixel, titleBar, isTitleHovered ? UiTheme.ForestNight : UiTheme.DeepGrove);
 
         // Only draw the separator line between title and content if the window is NOT collapsed
         if (!IsCollapsed)
@@ -83,7 +84,7 @@ public class UiWindow
 
         if (IsDraggable)
         {
-            var isHovered = titleBar.Contains(mousePosition);
+            var isHovered = isTitleHovered;
             var collapseIcon = IsCollapsed ? "[+]" : "[-]";
             Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
             Color iconColor = isHovered ? UiTheme.WarmParchment : UiTheme.MutedStone;

@@ -18,3 +18,6 @@
 ## 2024-07-06 - Button Text Hover Affordances
 **Learning:** In MonoGame UIs without standard HTML hover states, users rely entirely on color changes to understand interactivity. If a button's background changes but the text color remains static, the visual affordance feels incomplete.
 **Action:** When implementing hover states for custom MonoGame UI components, ensure that both the background elements and the foreground text/icons react dynamically to the `isHovered` state (e.g., brightening the text color to white) to provide a complete and satisfying visual cue.
+## 2025-02-12 - Added Titlebar Hover Feedback
+**Learning:** In MonoGame/PitLife's immediate-mode UI, elements that are interactive but lack traditional button shapes (like draggable window titlebars) require explicit hover feedback (e.g., color tinting from `DeepGrove` to `ForestNight`) to afford interactivity. Re-using the hover boolean for both background shape and foreground icons ensures complete visual affordance.
+**Action:** Always verify that interactive custom UI elements (like titlebars or headers) provide immediate visual feedback via `UiTheme` color shifts when hovered, matching the interaction pattern established for standard buttons.
