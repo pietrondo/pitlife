@@ -32,7 +32,7 @@ public class CreaturePoolTests
         var pool = new CreaturePool();
         var genome = Genome.Random(new Random(1));
         var position = Vector2.Zero;
-        var testSpecies = "TestDummy";
+        var testSpecies = "TestDummyPool";
 
         SpeciesRegistry.Register(new SpeciesDefinition(
             species: testSpecies,
