@@ -128,15 +128,17 @@ internal sealed class TerrainRefiner
         foreach (var biome in allFifteen)
         {
             if (present.Contains(biome)) continue;
-            for (var y = 0; y < _world.Height && !present.Contains(biome); y++)
+            var placed = false;
+            for (var y = 0; y < _world.Height && !placed; y++)
             {
-                for (var x = 0; x < _world.Width && !present.Contains(biome); x++)
+                for (var x = 0; x < _world.Width && !placed; x++)
                 {
                     var i = y * _world.Width + x;
                     if (_world.RiverMask[i]) continue;
                     if (_world.Tiles[x, y].Biome != BiomeType.Grassland) continue;
                     _world.Tiles[x, y] = new Tile(biome);
                     present.Add(biome);
+                    placed = true;
                 }
             }
         }

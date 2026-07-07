@@ -125,10 +125,11 @@ public sealed class FruitSystem
 
     public Fruit? TryEatFruit(Vector2 position, float eatDistance)
     {
+        var eatDistanceSquared = eatDistance * eatDistance;
         for (var i = 0; i < _fruitCount; i++)
         {
             if (!_fruits[i].IsAlive) continue;
-            if (Vector2.Distance(position, _fruits[i].Position) <= eatDistance)
+            if (Vector2.DistanceSquared(position, _fruits[i].Position) <= eatDistanceSquared)
             {
                 var fruit = _fruits[i];
                 // Remove fruit by swapping with last
