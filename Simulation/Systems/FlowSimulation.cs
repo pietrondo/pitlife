@@ -40,7 +40,6 @@ public sealed class FlowSimulation : IDisposable
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update((float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed, eco.Random);
 
-    public void Initialize(World world) { }
     public void Reset() { Invalidate(); _timeAccum = 0; }
 
     public void Update(float dt, Random rng)

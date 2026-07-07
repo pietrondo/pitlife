@@ -12,7 +12,6 @@ public sealed class AtmosphereSystem
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco.PlantCount, eco.HerbivoreCount + eco.CarnivoreCount + eco.OmnivoreCount, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed);
 
-    public void Initialize(World world) { }
     public void Reset() { Oxygen = AtmosphereConfig.Data.InitialOxygen; CO2 = AtmosphereConfig.Data.InitialCO2; }
 
     public void Update(int plantCount, int animalCount, float dt)
