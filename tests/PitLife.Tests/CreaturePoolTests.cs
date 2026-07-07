@@ -34,7 +34,6 @@ public class CreaturePoolTests
         var position = Vector2.Zero;
         var testSpecies = "Rabbit";
 
-
         var creature = new DummyCreature(position, genome, testSpecies);
 
         // Act
