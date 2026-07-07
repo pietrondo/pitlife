@@ -76,7 +76,7 @@
 - **Dashboard clima**: dati orbitali, temperatura per-tile, emisferi
 - **HistoryWindow**: grafici per popolazioni e temperature nel tempo
 - **SpeciesCyclopedia**: enciclopedia in-game di tutte le specie
-- **I18n**: italiano/inglese con toggle nel menu
+- **I18n**: Italiano/Inglese con toggle nel menu
 - **Persistenza**: salvataggio/caricamento mondo, preferenze lingua
 - **Loading screen**: barra di caricamento animata
 
@@ -171,7 +171,7 @@ dotnet run
 | `Rendering/` | PixelWorldRenderer, CreatureRenderer, Minimap, DayNightCycle, Camera |
 | `UI/` | MainMenu, SpawnPanel, InGameUi, CataclysmPanel, SpeciesEditor, UiWindow |
 | `Core/` | Logger, AssetRegistry, SpeciesCatalog, Config |
-| `Localization/` | I18n italiano/inglese |
+| `Localization/` | I18n Italiano/Inglese |
 | `Content/` | Assets, sprite, font, config JSON |
 | `tests/` | 500+ test (xUnit, property-based, benchmark) |
 
