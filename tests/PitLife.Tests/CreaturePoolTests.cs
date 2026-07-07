@@ -49,6 +49,7 @@ public class CreaturePoolTests
         pool.Return(creature);
 
         // Assert
+        SpeciesRegistry.Unregister(testSpecies);
         var poolsField = typeof(CreaturePool).GetField("_pools", BindingFlags.NonPublic | BindingFlags.Instance);
         var poolsDict = (Dictionary<string, Stack<Creature>>)poolsField!.GetValue(pool)!;
         var key = $"{typeof(DummyCreature).Name}:{testSpecies}";
