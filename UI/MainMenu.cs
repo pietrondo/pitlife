@@ -33,17 +33,17 @@ public class MainMenu
         new(I18n.T("menu.loadGame")),
         new(I18n.T("menu.options")),
         new(I18n.T("menu.help")),
-        new(I18n.T("menu.exit")) { IsDestructive = true }
+        new(I18n.T("menu.exit")) { IsDestructive = true, ShortcutHint = "ESC" }
     ];
     private readonly UiButton[] _optionButtons =
     [
         new(I18n.Format("menu.fullscreen", I18n.T("common.no"))),
         new("EN / IT"),
-        new(I18n.T("common.back"))
+        new(I18n.T("common.back")) { ShortcutHint = "ESC" }
     ];
     private readonly UiButton[] _worldGenButtons =
     [
-        new(I18n.T("menu.generate"))
+        new(I18n.T("menu.generate")) { ShortcutHint = "ENTER" }
     ];
 
     private readonly UiTextInput _seedInput = new();

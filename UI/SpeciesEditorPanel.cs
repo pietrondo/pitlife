@@ -52,7 +52,7 @@ public sealed class SpeciesEditorPanel
     private readonly UiButton _reproduction = new("");
     private readonly UiButton _load = new("LOAD");
     private readonly UiButton _clone = new("CLONE");
-    private readonly UiButton _save = new("SAVE");
+    private readonly UiButton _save = new("SAVE") { ShortcutHint = "ENTER" };
     private readonly UiButton _clear = new("CLEAR");
 
     private int _kindIndex;

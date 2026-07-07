@@ -83,10 +83,21 @@ public class UiWindow
 
         if (IsDraggable)
         {
-            var isHovered = titleBar.Contains(mousePosition);
+            var iconRect = new Rectangle(titleBar.X + 8, titleBar.Center.Y - 10, 20, 20); // Approximate bounds
+            var isHovered = iconRect.Contains(mousePosition);
+            var isTitleHovered = titleBar.Contains(mousePosition);
             var collapseIcon = IsCollapsed ? "[+]" : "[-]";
             Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
-            Color iconColor = isHovered ? UiTheme.WarmParchment : UiTheme.MutedStone;
+
+            // Apply a color transition/hover state bridging the gap between static text and interactive element
+            Color iconColor;
+            if (isHovered)
+                iconColor = Color.White;
+            else if (isTitleHovered)
+                iconColor = UiTheme.WarmParchment;
+            else
+                iconColor = UiTheme.MutedStone;
+
             spriteBatch.DrawString(font, collapseIcon, new Vector2(titleBar.X + 8, titleBar.Center.Y - iconSize.Y / 2f), iconColor, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
 
