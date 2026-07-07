@@ -36,6 +36,7 @@ public sealed class ClimateSystem
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco.TotalTime, eco.Random);
 
+
     public void Reset()
     {
         _extremeEventTimer = 0;

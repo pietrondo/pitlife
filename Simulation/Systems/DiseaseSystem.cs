@@ -46,6 +46,7 @@ public sealed class DiseaseSystem
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco, (float)gameTime.ElapsedGameTime.TotalSeconds * eco.SimulationSpeed, eco.Random);
 
+
     public void Reset() { _hasOutbreak = false; _outbreakTimer = DiseaseConfig.Outbreak.InitialTimerSeconds; }
 
     public void Update(Ecosystem ecosystem, float dt, Random rng)

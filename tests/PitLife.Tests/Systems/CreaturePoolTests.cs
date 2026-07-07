@@ -8,11 +8,73 @@ namespace PitLife.Tests.Systems;
 public class CreaturePoolTests
 {
     [Fact]
+    public void Rent_WhenEmpty_CreatesNewInstance()
+    {
+        var pool = new CreaturePool();
+        var genome = Genome.Random(new Random(42));
+        var pos = new Vector2(10, 10);
+
+        var creature = pool.Rent("Deer", pos, genome);
+
+        Assert.NotNull(creature);
+        Assert.Equal("Deer", creature!.Species);
+        Assert.Equal(pos, creature.Position);
+        Assert.Equal(genome, creature.Genome);
+    }
+
+    [Fact]
+    public void Rent_WhenPoolHasInstance_PopsAndResets()
+    {
+        var pool = new CreaturePool();
+        var genome = Genome.Random(new Random(42));
+        var genome2 = Genome.Random(new Random(43));
+        var pos1 = new Vector2(10, 10);
+        var pos2 = new Vector2(20, 20);
+
+        var creature1 = pool.Rent("Deer", pos1, genome);
+        Assert.NotNull(creature1);
+        creature1!.Energy = 50f;
+
+        pool.Return(creature1);
+
+        var creature2 = pool.Rent("Deer", pos2, genome2);
+
+        Assert.NotNull(creature2);
+        Assert.Same(creature1, creature2);
+        Assert.Equal(pos2, creature2!.Position);
+        Assert.Equal(genome2, creature2.Genome);
+        Assert.Equal(0, creature2.Age);
+    }
+
+    [Fact]
+    public void Rent_WithInvalidSpecies_ReturnsNull()
+    {
+        var pool = new CreaturePool();
+        var genome = Genome.Random(new Random(42));
+
+        var creature = pool.Rent("NonExistentSpecies", Vector2.Zero, genome);
+
+        Assert.Null(creature);
+    }
+
+    [Fact]
     public void Rent_UnknownSpecies_ReturnsNull()
     {
         var pool = new CreaturePool();
         var creature = pool.Rent("UnknownSpecies", Vector2.Zero, Genome.Random(new Random(42)));
         Assert.Null(creature);
+    }
+
+    [Fact]
+    public void Return_NullOrInvalid_DoesNotThrow()
+    {
+        var pool = new CreaturePool();
+
+        pool.Return(null!);
+
+        var genome = Genome.Random(new Random(42));
+        var invalidCreature = new Herbivore(Vector2.Zero, genome, "InvalidSpeciesForReturn");
+        pool.Return(invalidCreature);
     }
 
     [Fact]
@@ -44,23 +106,18 @@ public class CreaturePoolTests
 
         Assert.NotNull(creature1);
 
-        // Mutate the creature to simulate game tick
         creature1.Die(DeathCause.Starvation);
 
-        // Return to pool
         pool.Return(creature1);
 
-        // Rent again
         var secondGenome = Genome.Random(rng);
         var secondPos = new Vector2(150, 150);
         var creature2 = pool.Rent("Rabbit", secondPos, secondGenome);
 
         Assert.NotNull(creature2);
 
-        // Same reference because it was pooled
         Assert.Same(creature1, creature2);
 
-        // But properties are reset
         Assert.Equal(secondPos, creature2.Position);
         Assert.Equal(secondGenome, creature2.Genome);
         Assert.Equal(0, creature2.Age);
