@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -23,7 +24,10 @@ public static class ClimateConfig
                 if (parsed != null) Data = parsed;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to load climate.json: {ex.Message}");
+        }
     }
 }
 
