@@ -42,7 +42,7 @@ public static class I18n
                 loaded = true;
             }
         }
-        catch { }
+        catch (Exception ex) { PitLife.Core.Logger.Error($"Failed to load i18n.json: {ex.Message}"); }
 
         if (!loaded)
         {
