@@ -55,6 +55,9 @@ public class CreaturePoolTests
 
         Assert.True(poolsDict.ContainsKey(key));
         Assert.Single(poolsDict[key]);
+
+        // Cleanup
+        typeof(SpeciesRegistry).GetMethod("Unregister", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.Invoke(null, new object[] { testSpecies });
     }
 
     [Fact]
