@@ -187,6 +187,11 @@ public sealed class CataclysmSystem
         Enum.TryParse<BiomeType>(ev.InnerBiome, out var innerBiome);
         Enum.TryParse<BiomeType>(ev.OuterBiome, out var outerBiome);
 
+        var r04 = radius * 0.4f;
+        var r04Sq = r04 * r04;
+        var r08 = radius * 0.8f;
+        var r08Sq = r08 * r08;
+
         for (var dy = -radius; dy <= radius; dy++)
             for (var dx = -radius; dx <= radius; dx++)
             {
@@ -197,12 +202,12 @@ public sealed class CataclysmSystem
                 BiomeType previousBiome = tile.Biome;
 
                 // Visible terrain changes (set Biome first - it resets grass)
-                var dist = MathF.Sqrt(dx * dx + dy * dy);
-                if (dist < radius * 0.4f && ev.InnerBiome != "None")
+                var distSq = dx * dx + dy * dy;
+                if (distSq < r04Sq && ev.InnerBiome != "None")
                 {
                     tile.Biome = innerBiome;
                 }
-                else if (dist < radius * 0.8f && ev.OuterBiome != "None")
+                else if (distSq < r08Sq && ev.OuterBiome != "None")
                 {
                     tile.Biome = outerBiome;
                 }
@@ -445,11 +450,11 @@ public sealed class CataclysmSystem
     private static void DrawFireball(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, byte alpha, Rectangle visibleArea)
     {
         var color = new Color(c.R, c.G, c.B, alpha);
-        int rInt = (int)r;
-        int minX = Math.Max(-rInt, visibleArea.X - (int)pos.X);
-        int maxX = Math.Min(rInt, visibleArea.Right - (int)pos.X);
-        int minY = Math.Max(-rInt, visibleArea.Y - (int)pos.Y);
-        int maxY = Math.Min(rInt, visibleArea.Bottom - (int)pos.Y);
+        var rInt = (int)r;
+        var minX = Math.Max(-rInt, visibleArea.X - (int)pos.X);
+        var maxX = Math.Min(rInt, visibleArea.Right - (int)pos.X);
+        var minY = Math.Max(-rInt, visibleArea.Y - (int)pos.Y);
+        var maxY = Math.Min(rInt, visibleArea.Bottom - (int)pos.Y);
 
         for (var dy = minY; dy <= maxY; dy++)
             for (var dx = minX; dx <= maxX; dx++)
@@ -461,17 +466,22 @@ public sealed class CataclysmSystem
 
     private static void DrawRing(SpriteBatch sb, Texture2D p, Vector2 pos, float r, Color c, int thickness, Rectangle visibleArea)
     {
-        int rInt = (int)r + thickness;
-        int minX = Math.Max(-rInt, visibleArea.X - (int)pos.X);
-        int maxX = Math.Min(rInt, visibleArea.Right - (int)pos.X);
-        int minY = Math.Max(-rInt, visibleArea.Y - (int)pos.Y);
-        int maxY = Math.Min(rInt, visibleArea.Bottom - (int)pos.Y);
+        var rInt = (int)r + thickness;
+        var minX = Math.Max(-rInt, visibleArea.X - (int)pos.X);
+        var maxX = Math.Min(rInt, visibleArea.Right - (int)pos.X);
+        var minY = Math.Max(-rInt, visibleArea.Y - (int)pos.Y);
+        var maxY = Math.Min(rInt, visibleArea.Bottom - (int)pos.Y);
+
+        var rSq = r * r;
+        var rInner = r - thickness;
+        var rInnerSq = rInner * rInner;
 
         for (var dy = minY; dy <= maxY; dy++)
             for (var dx = minX; dx <= maxX; dx++)
             {
-                var d = MathF.Sqrt(dx * dx + dy * dy);
-                if (d >= r - thickness && d <= r)
+                var distSq = dx * dx + dy * dy;
+                var withinInner = rInner < 0 || distSq >= rInnerSq;
+                if (withinInner && distSq <= rSq)
                     sb.Draw(p, new Rectangle((int)pos.X + dx, (int)pos.Y + dy, 1, 1), c);
             }
     }
