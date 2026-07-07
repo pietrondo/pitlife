@@ -165,7 +165,4 @@ internal sealed class RiverSystem
         }
     }
 
-    public void Initialize(World world) { }
-    public void Tick(Ecosystem eco, GameTime gameTime) { }
-    public void Reset() { }
 }
