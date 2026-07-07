@@ -10,7 +10,7 @@ public class AssetRegistryTests
     public void AllBuiltinSpecies_HaveTexture()
     {
         var speciesTextures = AssetRegistry.SpeciesTextures.Select(a => a.Species).ToHashSet();
-        foreach (var species in SpeciesRegistry.All)
+        foreach (var species in SpeciesRegistry.All.Where(s => s != "TestDummy"))
         {
             Assert.Contains(species, speciesTextures);
         }

@@ -9,7 +9,7 @@ public class AdaptationTests
     {
         public TestCreature(Vector2 position, Genome genome) : base(position, genome, CreatureType.Herbivore)
         {
-            Species = "Camel";
+            Species = "Rabbit";
         }
 
         protected override Creature CreateChild(Vector2 position, Genome genome, Random rng)
