@@ -68,7 +68,8 @@ public class UiWindow
         UiPrimitives.Fill(spriteBatch, pixel, new Rectangle(br.X - d + 1, br.Y, d, 1), c);
 
         Rectangle titleBar = TitleBarBounds;
-        UiPrimitives.Fill(spriteBatch, pixel, titleBar, UiTheme.DeepGrove);
+        bool isTitleHovered = titleBar.Contains(mousePosition) && IsDraggable;
+        UiPrimitives.Fill(spriteBatch, pixel, titleBar, isTitleHovered ? UiTheme.ForestNight : UiTheme.DeepGrove);
 
         // Only draw the separator line between title and content if the window is NOT collapsed
         if (!IsCollapsed)
@@ -83,7 +84,7 @@ public class UiWindow
 
         if (IsDraggable)
         {
-            var iconRect = new Rectangle(titleBar.X + 8, titleBar.Center.Y - 10, 20, 20); // Approximate bounds
+            var iconRect = new Rectangle(titleBar.X + 8, titleBar.Center.Y - 10, 20, 20);
             var isHovered = iconRect.Contains(mousePosition);
             var isTitleHovered = titleBar.Contains(mousePosition);
             var collapseIcon = IsCollapsed ? "[+]" : "[-]";
@@ -111,7 +112,7 @@ public class UiWindow
             UiPrimitives.Fill(spriteBatch, pixel, close, closeColor);
             UiPrimitives.Border(spriteBatch, pixel, close, 2, UiTheme.WarmParchment);
             Vector2 closeSize = font.MeasureString("X");
-            spriteBatch.DrawString(font, "X", new Vector2(close.Center.X - closeSize.X / 2f, close.Center.Y - closeSize.Y / 2f), UiTheme.WarmParchment);
+            spriteBatch.DrawString(font, "X", new Vector2(close.Center.X - closeSize.X / 2f, close.Center.Y - closeSize.Y / 2f), isHovered ? Color.White : UiTheme.WarmParchment);
         }
     }
 }

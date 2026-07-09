@@ -70,23 +70,25 @@
 
 ### UI
 - **Tema foresta**: palette verde/marrone con finestre draggable e hover state per gli indicatori di collasso
+- **Shortcut hints**: indicazioni visive sui bottoni per i tasti rapidi (es. ESC) con colori dinamici on-hover
 - **Minimap**: angolo in basso a destra con biomi e creature
 - **Toolbar**: statistiche, creature, velocità, cataclismi, clima, menu
 - **Dashboard clima**: dati orbitali, temperatura per-tile, emisferi
 - **HistoryWindow**: grafici per popolazioni e temperature nel tempo
 - **SpeciesCyclopedia**: enciclopedia in-game di tutte le specie
-- **I18n**: italiano/inglese con toggle nel menu
+- **I18n**: Italiano/Inglese con toggle nel menu
 - **Persistenza**: salvataggio/caricamento mondo, preferenze lingua
 - **Loading screen**: barra di caricamento animata
 
 ### Performance e Architettura
 - **Multi-thread**: world generation parallela, object pooling
-- **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, e ricerca spaziale)
+- **Ottimizzazioni algoritmiche**: rimozione list O(N^2) tramite swap-with-last O(1) (es. `ProcessDeaths`), culling ottimale dei loop e sostituzione radici quadrate con distanze al quadrato (`CataclysmSystem`, `FruitSystem`)
+- **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, ricerca spaziale e `EcosystemMetrics`)
 - **Architettura**: pipeline di simulazione modulare, decomposizione di `Game1` e `InGameUi` in finestre e collaboratori specializzati
-- **Rendering**: grid culling rigoroso, culling matematico per effetti (es. cataclismi) e tile rendering a due passaggi per minimizzare i texture swap
+- **Rendering**: grid culling rigoroso, culling matematico per effetti (es. cataclismi) e culling degli overlay ambientali, tile rendering a due passaggi per minimizzare i texture swap
 - **Data-driven**: tutte le logiche (specie, bilanciamento, clima, malattie, comportamenti) in JSON esterno
 - **Benchmark**: suite BenchmarkDotNet per regressioni di performance
-- **255+ test**: unit test, property-based test, benchmark
+- **500+ test**: unit test (con supporto headless per CI), property-based test, benchmark
 
 ---
 
@@ -169,9 +171,9 @@ dotnet run
 | `Rendering/` | PixelWorldRenderer, CreatureRenderer, Minimap, DayNightCycle, Camera |
 | `UI/` | MainMenu, SpawnPanel, InGameUi, CataclysmPanel, SpeciesEditor, UiWindow |
 | `Core/` | Logger, AssetRegistry, SpeciesCatalog, Config |
-| `Localization/` | I18n italiano/inglese |
+| `Localization/` | I18n Italiano/Inglese |
 | `Content/` | Assets, sprite, font, config JSON |
-| `tests/` | 255+ test (xUnit, property-based, benchmark) |
+| `tests/` | 500+ test (xUnit, property-based, benchmark) |
 
 ---
 

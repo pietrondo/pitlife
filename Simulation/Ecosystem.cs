@@ -118,14 +118,7 @@ public class Ecosystem
     private void InitSystems()
     {
         Flow = new FlowSimulation(World);
-        Climate.Initialize(World);
-        Atmosphere.Initialize(World);
-        Trophic.Initialize(World);
-        Disease.Initialize(World);
-        Cataclysms.Initialize(World);
-        Flow.Initialize(World);
         Fruits.Initialize(World);
-        Metrics.Initialize(World);
     }
 
     public void Initialize(int h, int c, int o, int p)
@@ -335,7 +328,9 @@ public class Ecosystem
                     tile.SoilNutrients = Math.Min(SOIL_MAX, tile.SoilNutrients + SOIL_BOOST);
                     Spatial.Remove(c);
                     Pool.Return(c);
-                    Creatures.RemoveAt(i);
+                    var last = Creatures.Count - 1;
+                    Creatures[i] = Creatures[last];
+                    Creatures.RemoveAt(last);
                 }
             }
         }

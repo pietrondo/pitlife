@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.Json;
 
@@ -22,7 +23,10 @@ public static class AtmosphereConfig
                 if (parsed != null) Data = parsed;
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to load atmosphere.json: {ex.Message}");
+        }
     }
 }
 
