@@ -40,12 +40,13 @@ public sealed class AudioSystem : IDisposable
         var sampleRate = 44100;
         var samples = 800; // ~18ms click
         var buffer = new byte[samples * 2];
+        var random = new Random();
 
         for (var i = 0; i < samples; i++)
         {
             var t = (float)i / sampleRate;
             var envelope = MathF.Exp(-t * 200f);
-            var noise = (float)new Random((int)(t * 1000000)).NextDouble() * 2f - 1f;
+            var noise = (float)random.NextDouble() * 2f - 1f;
             var value = (short)(noise * envelope * volume * 32767f);
             buffer[i * 2] = (byte)(value & 0xFF);
             buffer[i * 2 + 1] = (byte)((value >> 8) & 0xFF);
