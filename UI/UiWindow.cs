@@ -86,7 +86,6 @@ public class UiWindow
         {
             var iconRect = new Rectangle(titleBar.X + 8, titleBar.Center.Y - 10, 20, 20);
             var isHovered = iconRect.Contains(mousePosition);
-            var isTitleHovered = titleBar.Contains(mousePosition);
             var collapseIcon = IsCollapsed ? "[+]" : "[-]";
             Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
 

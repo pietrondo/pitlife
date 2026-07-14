@@ -10,10 +10,10 @@ public sealed class EcosystemMetrics
     public float TotalTime { get; private set; }
     public float FPS { get; set; }
     public int TotalCreatures { get; private set; }
-    public int Plants { get; private set; }
-    public int Herbivores { get; private set; }
-    public int Carnivores { get; private set; }
-    public int Omnivores { get; private set; }
+    public int Plants => _typeCounts.GetValueOrDefault(CreatureType.Plant);
+    public int Herbivores => _typeCounts.GetValueOrDefault(CreatureType.Herbivore);
+    public int Carnivores => _typeCounts.GetValueOrDefault(CreatureType.Carnivore);
+    public int Omnivores => _typeCounts.GetValueOrDefault(CreatureType.Omnivore);
     public int SpeciesCount { get; private set; }
     public int TotalBirths { get; private set; }
     public int TotalDeaths { get; private set; }
@@ -26,14 +26,16 @@ public sealed class EcosystemMetrics
     public Dictionary<string, int> SpeciesPopulations { get; } = new(StringComparer.Ordinal);
     public DeathCause LastDeathCause { get; private set; }
     public string LastDeathSpecies { get; private set; } = "";
-    public int TrophicLevel1 { get; private set; }
-    public int TrophicLevel2 { get; private set; }
-    public int TrophicLevel3Plus { get; private set; }
+    public int TrophicLevel1 => _trophicCounts.GetValueOrDefault(1);
+    public int TrophicLevel2 => _trophicCounts.GetValueOrDefault(2);
+    public int TrophicLevel3Plus => _trophicCounts.Where(kvp => kvp.Key >= 3).Sum(kvp => kvp.Value);
     public Dictionary<string, int> SubspeciesCounts { get; } = new(StringComparer.Ordinal);
     public int TotalSubspecies { get; private set; }
     public Dictionary<string, float> SpeciesFirstAppearance { get; } = new(StringComparer.Ordinal);
     public Dictionary<string, int> SpeciesMaxPopulation { get; } = new(StringComparer.Ordinal);
 
+    private readonly Dictionary<CreatureType, int> _typeCounts = new();
+    private readonly Dictionary<int, int> _trophicCounts = new();
     private readonly List<KeyValuePair<string, int>> _speciesBuffer = new();
     private readonly List<KeyValuePair<string, int>> _subspeciesBuffer = new();
 
@@ -59,23 +61,21 @@ public sealed class EcosystemMetrics
 
     public void Tick(Ecosystem eco, GameTime gameTime) => Update(eco);
 
-
-
-    public void Reset() { ResetCounters(); SpeciesPopulations.Clear(); SubspeciesCounts.Clear(); SpeciesFirstAppearance.Clear(); SpeciesMaxPopulation.Clear(); }
+    public void Reset()
+    {
+        ResetCounters();
+        SpeciesPopulations.Clear();
+        SubspeciesCounts.Clear();
+        SpeciesFirstAppearance.Clear();
+        SpeciesMaxPopulation.Clear();
+    }
 
     public void Update(Ecosystem ecosystem)
     {
         TotalTime = ecosystem.TotalTime;
-
         TotalCreatures = 0;
-        Plants = 0;
-        Herbivores = 0;
-        Carnivores = 0;
-        Omnivores = 0;
-
-        TrophicLevel1 = 0;
-        TrophicLevel2 = 0;
-        TrophicLevel3Plus = 0;
+        _typeCounts.Clear();
+        _trophicCounts.Clear();
 
         float totalHeterozygosity = 0f;
         float totalInbreeding = 0f;
@@ -91,30 +91,11 @@ public sealed class EcosystemMetrics
             if (c == null || !c.IsAlive) continue;
 
             TotalCreatures++;
+            _typeCounts[c.CreatureType] = _typeCounts.GetValueOrDefault(c.CreatureType) + 1;
 
-            switch (c.CreatureType)
-            {
-                case CreatureType.Plant:
-                    Plants++;
-                    break;
-                case CreatureType.Herbivore:
-                    Herbivores++;
-                    break;
-                case CreatureType.Carnivore:
-                    Carnivores++;
-                    break;
-                case CreatureType.Omnivore:
-                    Omnivores++;
-                    break;
-            }
-
-            // Trophic Levels
             int trophic = FoodWeb.TrophicLevel(c.CreatureType);
-            if (trophic == 1) TrophicLevel1++;
-            else if (trophic == 2) TrophicLevel2++;
-            else if (trophic >= 3) TrophicLevel3Plus++;
+            _trophicCounts[trophic] = _trophicCounts.GetValueOrDefault(trophic) + 1;
 
-            // Animals stats
             if (c.CreatureType != CreatureType.Plant)
             {
                 animalCount++;
@@ -122,58 +103,30 @@ public sealed class EcosystemMetrics
                 totalInbreeding += (float)c.InbreedingCoefficient;
             }
 
-            // Species population
             var species = c.Species;
             if (species != null)
             {
-                SpeciesPopulations.TryGetValue(species, out int pop);
-                SpeciesPopulations[species] = pop + 1;
+                SpeciesPopulations[species] = SpeciesPopulations.GetValueOrDefault(species) + 1;
             }
 
-            // Subspecies
             var sub = c.Subspecies;
             if (!string.IsNullOrEmpty(sub) && species != null)
             {
                 string key = species + "/" + sub;
-                SubspeciesCounts.TryGetValue(key, out int count);
-                SubspeciesCounts[key] = count + 1;
+                SubspeciesCounts[key] = SubspeciesCounts.GetValueOrDefault(key) + 1;
             }
         }
 
-        // Sort dictionaries - we need to rebuild them sorted
-        // Buffer populations
-        _speciesBuffer.Clear();
+        RebuildSortedDictionary(SpeciesPopulations, _speciesBuffer);
         foreach (var kvp in SpeciesPopulations)
-            _speciesBuffer.Add(kvp);
-
-        _speciesBuffer.Sort((a, b) => b.Value.CompareTo(a.Value));
-
-        SpeciesPopulations.Clear();
-        for (int i = 0; i < _speciesBuffer.Count; i++)
         {
-            var kvp = _speciesBuffer[i];
-            SpeciesPopulations[kvp.Key] = kvp.Value;
+            if (!SpeciesFirstAppearance.ContainsKey(kvp.Key))
+                SpeciesFirstAppearance[kvp.Key] = TotalTime;
 
-            // Max Population / First appearance update
-            if (!SpeciesFirstAppearance.ContainsKey(kvp.Key)) SpeciesFirstAppearance[kvp.Key] = TotalTime;
-
-            SpeciesMaxPopulation.TryGetValue(kvp.Key, out int maxPop);
-            if (kvp.Value > maxPop) SpeciesMaxPopulation[kvp.Key] = kvp.Value;
+            SpeciesMaxPopulation[kvp.Key] = Math.Max(SpeciesMaxPopulation.GetValueOrDefault(kvp.Key), kvp.Value);
         }
 
-        // Buffer subspecies
-        _subspeciesBuffer.Clear();
-        foreach (var kvp in SubspeciesCounts)
-            _subspeciesBuffer.Add(kvp);
-
-        _subspeciesBuffer.Sort((a, b) => b.Value.CompareTo(a.Value));
-
-        SubspeciesCounts.Clear();
-        for (int i = 0; i < _subspeciesBuffer.Count; i++)
-        {
-            var kvp = _subspeciesBuffer[i];
-            SubspeciesCounts[kvp.Key] = kvp.Value;
-        }
+        RebuildSortedDictionary(SubspeciesCounts, _subspeciesBuffer);
 
         SpeciesCount = SpeciesPopulations.Count;
         TotalSubspecies = SubspeciesCounts.Count;
@@ -182,6 +135,19 @@ public sealed class EcosystemMetrics
         MeanInbreeding = animalCount > 0 ? totalInbreeding / animalCount : 0f;
     }
 
+    private static void RebuildSortedDictionary(Dictionary<string, int> source, List<KeyValuePair<string, int>> buffer)
+    {
+        buffer.Clear();
+        buffer.AddRange(source);
+        buffer.Sort((a, b) => b.Value.CompareTo(a.Value));
+
+        source.Clear();
+        for (int i = 0; i < buffer.Count; i++)
+        {
+            var kvp = buffer[i];
+            source[kvp.Key] = kvp.Value;
+        }
+    }
 
     public void ResetCounters()
     {

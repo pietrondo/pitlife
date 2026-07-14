@@ -40,16 +40,14 @@ public class CreaturePoolTests
         pool.Return(creature);
 
         // Assert
-        SpeciesRegistry.Unregister(testSpecies);
         var poolsField = typeof(CreaturePool).GetField("_pools", BindingFlags.NonPublic | BindingFlags.Instance);
         var poolsDict = (Dictionary<string, Stack<Creature>>)poolsField!.GetValue(pool)!;
-        var key = $"{SpeciesRegistry.Get(testSpecies).CreatureType.Name}:{testSpecies}";
+        var def = SpeciesRegistry.Get(testSpecies);
+        Assert.NotNull(def);
+        var key = $"{def.CreatureType.Name}:{testSpecies}";
 
         Assert.True(poolsDict.ContainsKey(key));
         Assert.Single(poolsDict[key]);
-
-        // Cleanup
-        typeof(SpeciesRegistry).GetMethod("Unregister", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.Invoke(null, new object[] { testSpecies });
     }
 
     [Fact]
