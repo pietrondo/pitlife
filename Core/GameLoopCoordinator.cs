@@ -52,8 +52,8 @@ public class GameLoopCoordinator
 
         if (_game.GraphicsDevice != null)
         {
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+            _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 0;
+            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 0;
         }
 
         if (UpdateMainMenu(gameTime, dt, kbd, mouse, gamepadBack)) return;
@@ -66,8 +66,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
                 _game._speciesEditor.Close();
             else
                 _game._speciesEditor.Update(mouse, prevMouse, kbd, prevKbd,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                    _game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0);
 
             return;
         }
@@ -91,8 +90,8 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             prevMouse,
             kbd,
             prevKbd,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+            _game.GraphicsDevice?.Viewport.Width ?? 0,
+            _game.GraphicsDevice?.Viewport.Height ?? 0);
 
         var worldMouse = _game._camera.ScreenToWorld(mouse.X, mouse.Y);
         var hx = (int)(worldMouse.X / _game._ecosystem.World.TileSize);
@@ -102,8 +101,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             Math.Clamp(hy, 0, _game._ecosystem.World.Height - 1));
 
         if (mouse.LeftButton == ButtonState.Pressed &&
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+            _game._minimap.HandleClick(mouse, _game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0))
         {
             return;
         }
@@ -118,8 +116,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             return;
         }
 
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+        _game._spawnPanel.SetViewportHeight(_game.GraphicsDevice?.Viewport.Height ?? 0);
         var cataWasOpen = _game._cataclysmPanel.IsOpen;
         var spawnWasOpen = _game._spawnPanel.IsOpen;
         var spawnPanelConsumed = _game._spawnPanel.Update(mouse, prevMouse, kbd, prevKbd);
@@ -137,7 +134,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             _game._speciesEditor.Close();
         }
 
-        // ── Mutual exclusion: only one mode active ────────────
+        // ÔöÇÔöÇ Mutual exclusion: only one mode active ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
         var spawnJustSelected = _game._spawnPanel.SelectedCataclysm != null && _game._spawnPanel.SelectedCataclysm != _game._prevSpawnCata;
         var speciesJustSelected = _game._spawnPanel.SelectedSpeciesKey != null && _game._spawnPanel.SelectedSpeciesKey != _game._prevSpawnSpecies;
         var panelJustSelected = _game._cataclysmPanel.SelectedType != null && _game._cataclysmPanel.SelectedType != _game._prevPanelCata;
@@ -184,7 +181,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
 
     public void Draw(GameTime gameTime)
     {
-        _game.GraphicsDevice?.Clear(Color.Black);
+        _game.GraphicsDevice.Clear(Color.Black);
 
         if (_game._screen == Game1.GameScreen.Playing)
         {
@@ -205,14 +202,14 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
                 _game._uiPixel,
                 _game._font,
                 _game._logo,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                _game.GraphicsDevice?.Viewport.Width ?? 0,
+                _game.GraphicsDevice?.Viewport.Height ?? 0);
             _game._helpScreen.Draw(
                 _game._spriteBatch,
                 _game._uiPixel,
                 _game._font,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                _game.GraphicsDevice?.Viewport.Width ?? 0,
+                _game.GraphicsDevice?.Viewport.Height ?? 0);
             _game._spriteBatch.End();
             return;
         }
@@ -224,8 +221,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
         {
             const int logoSize = 96;
             _game._spriteBatch.Draw(_game._logo,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                new Rectangle(_game.GraphicsDevice?.Viewport.Width ?? 0 - logoSize - 10, 10, logoSize, logoSize),
                 Color.White);
         }
 
@@ -242,8 +238,12 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             _game._displayTime,
             _game._paused,
             _game._controller.CurrentSpeed,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+            _game.GraphicsDevice?.Viewport.Height ?? 0,
+            _game._ecosystem.Metrics);
+
+        _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 0;
+        _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 0;
+        _game._minimap.Draw(_game._spriteBatch, _game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0);
         _game._spawnPanel.Draw(_game._spriteBatch, _game._uiPixel, _game._font, _game._inputManager.CurrentMouse);
         _game._cataclysmPanel.Draw(_game._spriteBatch, _game._uiPixel, _game._font, _game._inputManager.CurrentMouse);
         _game._speciesEditor.Draw(
@@ -251,8 +251,8 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             _game._uiPixel,
             _game._font,
             _game._inputManager.CurrentMouse,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+            _game.GraphicsDevice?.Viewport.Width ?? 0,
+            _game.GraphicsDevice?.Viewport.Height ?? 0);
         _game._cyclopedia.Draw(_game._spriteBatch, _game._uiPixel, _game._font);
         _game._spriteBatch.End();
     }
@@ -277,8 +277,8 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
                 input.PrevMouse,
                 kbd,
                 input.PrevKbd,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                _game.GraphicsDevice?.Viewport.Width ?? 0,
+                _game.GraphicsDevice?.Viewport.Height ?? 0);
             if (gamepadBack)
                 _game._helpScreen.Hide();
             return true;
@@ -371,8 +371,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
 
         // Species Cyclopedia
         if (input.IsKeyJustPressed(Keys.G))
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+            _game._cyclopedia.Toggle(_game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0);
 
         // Manual Cataclysm
         if (input.IsKeyJustPressed(Keys.F7))
@@ -388,8 +387,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
                     _game._cyclopedia.Close();
                 else
                     _game._cyclopedia.Update(mouse, input.PrevMouse, kbd, input.PrevKbd,
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                        _game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0);
 
                 return true;
             }
@@ -526,8 +524,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
             _game._selectedCreature = Game1.FindClosestCreature(_game._ecosystem.Creatures, worldPos);
             if (_game._selectedCreature != null)
             {
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                _game._inGameUi.OpenCreatureWindow(_game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0);
             }
             else
             {
@@ -536,8 +533,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
                 tileX = Math.Clamp(tileX, 0, _game._ecosystem.World.Width - 1);
                 tileY = Math.Clamp(tileY, 0, _game._ecosystem.World.Height - 1);
                 _game._inGameUi.SelectedTile = new Point(tileX, tileY);
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+                _game._inGameUi.OpenTerrainWindow(_game.GraphicsDevice?.Viewport.Width ?? 0, _game.GraphicsDevice?.Viewport.Height ?? 0);
             }
         }
     }
@@ -687,8 +683,7 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
     {
         var m = _game._ecosystem.Metrics;
         m.FPS = _game._currentFPS;
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+        var y = _game.GraphicsDevice?.Viewport.Height ?? 0 - 100;
         var x = 8;
         var lineH = 14;
 
@@ -733,8 +728,8 @@ _game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
 
     private void DrawLoadingScreen(SpriteBatch sb)
     {
-_game._camera.ViewportWidth = _game.GraphicsDevice?.Viewport.Width ?? 800;
-            _game._camera.ViewportHeight = _game.GraphicsDevice?.Viewport.Height ?? 600;
+        var vw = _game.GraphicsDevice?.Viewport.Width ?? 0;
+        var vh = _game.GraphicsDevice?.Viewport.Height ?? 0;
         _game.GraphicsDevice?.Clear(new Color(11, 23, 18));
 
         var text = "LOADING...";

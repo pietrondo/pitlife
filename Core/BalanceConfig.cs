@@ -39,6 +39,7 @@ public class BalanceConfigData
     public MovementBalance Movement { get; set; } = new();
     public InbreedingBalance Inbreeding { get; set; } = new();
     public TrophicBalance Trophic { get; set; } = new();
+    public EcosystemBalance Ecosystem { get; set; } = new();
 }
 
 public class CreatureBalance
@@ -132,4 +133,33 @@ public class TrophicBalance
     public float MaxBirthBonus { get; set; } = 2f;
     public float MinDeathPenalty { get; set; } = 0.3f;
     public float MaxDeathPenalty { get; set; } = 3f;
+}
+
+public class EcosystemBalance
+{
+    public int SpawnAquaticDivisor { get; set; } = 4;
+    public int MaxPositionAttempts { get; set; } = 100;
+    public float ProximitySqDist { get; set; } = 3600f;
+    public int MaxNearby { get; set; } = 3;
+
+    public float WindBiasThreshold { get; set; } = 0.3f;
+    public float WindBiasLocalWeight { get; set; } = 0.3f;
+    public float WindBiasWindWeight { get; set; } = 0.7f;
+    public float SpreadMinDist { get; set; } = 30f;
+    public float SpreadRange { get; set; } = 40f;
+    public float NeighborRadius { get; set; } = 80f;
+    public int MaxSameSpeciesNearby { get; set; } = 4;
+
+    public double DecomposeRate { get; set; } = 0.02;
+    public float DecayGrassBoost { get; set; } = 0.3f;
+    public float SoilMax { get; set; } = 2f;
+    public float SoilBoost { get; set; } = 0.1f;
+
+    public float SoftCapRatio { get; set; } = 0.7f;
+    public float PressureRangeRatio { get; set; } = 0.3f;
+    public float MaxPressureMultiplier { get; set; } = 1.5f;
+
+    public float MaxStaggerSeconds { get; set; } = 120f;
+
+    public int StatsLogInterval { get; set; } = 60;
 }

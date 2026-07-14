@@ -49,6 +49,28 @@
     "coefficientImpact": 0.5,
     "minFitness": 0.5
   },
+  "ecosystem": {
+    "spawnAquaticDivisor": 4,
+    "maxPositionAttempts": 100,
+    "proximitySqDist": 3600,
+    "maxNearby": 3,
+    "windBiasThreshold": 0.3,
+    "windBiasLocalWeight": 0.3,
+    "windBiasWindWeight": 0.7,
+    "spreadMinDist": 30,
+    "spreadRange": 40,
+    "neighborRadius": 80,
+    "maxSameSpeciesNearby": 4,
+    "decomposeRate": 0.02,
+    "decayGrassBoost": 0.3,
+    "soilMax": 2,
+    "soilBoost": 0.1,
+    "softCapRatio": 0.7,
+    "pressureRangeRatio": 0.3,
+    "maxPressureMultiplier": 1.5,
+    "maxStaggerSeconds": 120,
+    "statsLogInterval": 60
+  },
   "trophic": {
     "sampleInterval": 5.0,
     "lotkaVolterraDefaultRatio": 10.0,

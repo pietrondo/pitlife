@@ -44,39 +44,8 @@ public class Ecosystem
     private CreatureSpawner _spawner = null!;
     private ulong _nextIndividualId = 1;
 
-    // GROUP SPAWN_
-    private const int SPAWN_AQUATIC_DIVISOR = 4;
-    private const int MAX_POSITION_ATTEMPTS = 100;
-    private const float PROXIMITY_SQ_DIST = 3600f;
-    private const int MAX_NEARBY = 3;
-
-    // GROUP SPREAD_
-    private const float WIND_BIAS_THRESHOLD = 0.3f;
-    private const float WIND_BIAS_LOCAL_WEIGHT = 0.3f;
-    private const float WIND_BIAS_WIND_WEIGHT = 0.7f;
-    private const float SPREAD_MIN_DIST = 30f;
-    private const float SPREAD_RANGE = 40f;
-    private const float NEIGHBOR_RADIUS = 80f;
-    private const int MAX_SAME_SPECIES_NEARBY = 4;
-    
-    
-
-    // GROUP DECAY_
-    private const double DECOMPOSE_RATE = 0.02;
-    private const float DECAY_GRASS_BOOST = 0.3f;
-    private const float SOIL_MAX = 2f;
-    private const float SOIL_BOOST = 0.1f;
-
-    // GROUP PRESSURE_
-    private const float SOFT_CAP_RATIO = 0.7f;
-    private const float PRESSURE_RANGE_RATIO = 0.3f;
-    private const float MAX_PRESSURE_MULTIPLIER = 1.5f;
-
-    // GROUP STAGGER_
-    private const float MAX_STAGGER_SECONDS = 120f;
-
-    // GROUP LOG_
-    private const int STATS_LOG_INTERVAL = 60;
+    // Groups: SPAWN_, SPREAD_, DECAY_, PRESSURE_, STAGGER_, LOG_
+    // All values configurable via Content/config/balance.json → ecosystem
 
     private static readonly string[] PlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant)];
     private static readonly string[] AquaticPlantSpecies = [.. SpeciesRegistry.OfType(CreatureType.Plant).Where(s =>
