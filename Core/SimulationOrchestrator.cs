@@ -19,13 +19,23 @@ public class SimulationOrchestrator
         _game = game;
     }
 
+    private static string SettingsFilePath
+    {
+        get
+        {
+            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PitLife");
+            Directory.CreateDirectory(folder);
+            return Path.Combine(folder, "settings.json");
+        }
+    }
+
     public void LoadSettings()
     {
         try
         {
-            if (File.Exists("settings.json"))
+            if (File.Exists(SettingsFilePath))
             {
-                var json = File.ReadAllText("settings.json");
+                var json = File.ReadAllText(SettingsFilePath);
                 var doc = JsonDocument.Parse(json);
                 if (doc.RootElement.TryGetProperty("language", out var lang))
                     I18n.SetLanguage(lang.GetString() ?? "it");
@@ -39,7 +49,7 @@ public class SimulationOrchestrator
         try
         {
             var settings = new { language = I18n.CurrentLanguage, fullscreen = _game._graphics.IsFullScreen };
-            File.WriteAllText("settings.json", JsonSerializer.Serialize(settings));
+            File.WriteAllText(SettingsFilePath, JsonSerializer.Serialize(settings));
         }
         catch (Exception ex) { Logger.Error($"Failed to save settings: {ex.Message}"); }
     }
