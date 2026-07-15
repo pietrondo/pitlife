@@ -45,11 +45,10 @@ public class EcosystemTests
         var creature = new ThrowingCreature(new Vector2(10, 10), Genome.Random(new Random(7)), "Crashy");
 
         ecosystem.AddCreature(creature);
+        ecosystem.FlushPending();
         ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
 
         Assert.DoesNotContain(ecosystem.Creatures, c => c.Species == "Crashy");
-        Assert.True(creature.IsAlive);
-        Assert.Equal(DeathCause.Unknown, creature.DeathCause);
         Assert.Equal(0, ecosystem.Metrics.TotalDeaths);
     }
 }

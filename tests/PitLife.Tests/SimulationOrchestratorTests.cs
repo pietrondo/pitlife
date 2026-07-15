@@ -16,12 +16,21 @@ namespace PitLife.Tests;
 
 public class SimulationOrchestratorTests : IDisposable
 {
-    private readonly string _settingsPath = "settings.json";
-    private readonly string _backupPath = "settings.json.bak";
+    private readonly string _settingsPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "PitLife",
+        "settings.json");
+    private readonly string _backupPath;
     private bool _hadBackup = false;
 
     public SimulationOrchestratorTests()
     {
+        _backupPath = _settingsPath + ".bak";
+
+        var dir = Path.GetDirectoryName(_settingsPath);
+        if (dir != null && !Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+
         // Backup existing settings.json
         if (File.Exists(_settingsPath))
         {
