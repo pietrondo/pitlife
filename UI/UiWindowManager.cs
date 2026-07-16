@@ -184,7 +184,7 @@ public sealed class UiWindowManager
 
         if (window.IsDraggable && window.TitleBarBounds.Contains(mouse.Position))
         {
-            if (isDoubleClick)
+            if (isDoubleClick || window.CollapseButtonBounds.Contains(mouse.Position))
             {
                 window.ToggleCollapse();
                 _draggedWindow = null;
