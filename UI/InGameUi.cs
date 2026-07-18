@@ -318,7 +318,7 @@ public sealed class InGameUi
 
             if (window is StatisticsWindow statsWin)
             {
-                statsWin.DrawContent(spriteBatch, pixel, font, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics);
+                statsWin.DrawContent(spriteBatch, pixel, font, new StatisticsData(plantCount, herbivoreCount, carnivoreCount, omnivoreCount, totalTime, paused, speed, metrics));
             }
             else if (window is CreatureDetailsWindow creatureWin)
             {
