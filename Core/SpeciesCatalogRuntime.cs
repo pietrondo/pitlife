@@ -20,16 +20,18 @@ public sealed class SpeciesCatalogRuntime
         "PitLife",
         "species.json");
 
-    public IReadOnlyList<SpeciesCatalogValidationError> LoadAndApply(string path, string repositoryRoot)
+    public IReadOnlyList<SpeciesCatalogValidationError> LoadAndApply(string path, string baseDirectory, string repositoryRoot)
     {
         ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(baseDirectory);
         ArgumentNullException.ThrowIfNull(repositoryRoot);
-        if (!File.Exists(path))
+        var fullPath = Path.GetFullPath(Path.Combine(baseDirectory, path));
+        if (!File.Exists(fullPath))
             return Array.Empty<SpeciesCatalogValidationError>();
 
         try
         {
-            return Apply(SpeciesCatalogStore.Load(path), repositoryRoot);
+            return Apply(SpeciesCatalogStore.Load(path, baseDirectory), repositoryRoot);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or
             InvalidDataException or System.Text.Json.JsonException)
@@ -79,10 +81,12 @@ public sealed class SpeciesCatalogRuntime
     public IReadOnlyList<SpeciesCatalogValidationError> SaveAndApply(
         SpeciesCatalogDocument document,
         string path,
+        string baseDirectory,
         string repositoryRoot)
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(baseDirectory);
         ArgumentNullException.ThrowIfNull(repositoryRoot);
         IReadOnlyList<SpeciesCatalogValidationError> errors = Validate(document, repositoryRoot);
         if (errors.Count > 0)
@@ -90,7 +94,7 @@ public sealed class SpeciesCatalogRuntime
 
         try
         {
-            SpeciesCatalogStore.Save(path, document, Path.GetDirectoryName(path)!);
+            SpeciesCatalogStore.Save(path, document, baseDirectory);
             return Apply(document, repositoryRoot);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)

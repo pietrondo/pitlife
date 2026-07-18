@@ -14,14 +14,14 @@ public class SpeciesEditorServiceTests
         var runtime = new SpeciesCatalogRuntime();
         try
         {
-            var editor = new SpeciesEditorService(runtime, root, path);
+            var editor = new SpeciesEditorService(runtime, root, "species.json", directory);
 
             IReadOnlyList<SpeciesCatalogValidationError> errors = editor.Add(ValidEntry());
 
             Assert.Empty(errors);
             Assert.True(File.Exists(path));
             Assert.True(SpeciesRegistry.Contains("EditorBadger"));
-            Assert.Equal("EditorBadger", Assert.Single(SpeciesCatalogStore.Load(path).Species).Key);
+            Assert.Equal("EditorBadger", Assert.Single(SpeciesCatalogStore.Load("species.json", directory).Species).Key);
         }
         finally
         {
@@ -40,7 +40,7 @@ public class SpeciesEditorServiceTests
         var runtime = new SpeciesCatalogRuntime();
         try
         {
-            var editor = new SpeciesEditorService(runtime, root, path);
+            var editor = new SpeciesEditorService(runtime, root, "species.json", directory);
             Assert.Empty(editor.Add(ValidEntry()));
             var original = File.ReadAllText(path);
 
@@ -48,7 +48,7 @@ public class SpeciesEditorServiceTests
 
             Assert.Contains(errors, error => error.Message.Contains("Duplicate", StringComparison.Ordinal));
             Assert.Equal(original, File.ReadAllText(path));
-            Assert.Single(SpeciesCatalogStore.Load(path).Species);
+            Assert.Single(SpeciesCatalogStore.Load("species.json", directory).Species);
         }
         finally
         {
@@ -67,7 +67,7 @@ public class SpeciesEditorServiceTests
         var runtime = new SpeciesCatalogRuntime();
         try
         {
-            var editor = new SpeciesEditorService(runtime, root, path);
+            var editor = new SpeciesEditorService(runtime, root, "species.json", directory);
             SpeciesCatalogEntry entry = ValidEntry();
             Assert.Empty(editor.Add(entry));
             entry.ItalianName = "Tasso modificato";
@@ -75,7 +75,7 @@ public class SpeciesEditorServiceTests
             IReadOnlyList<SpeciesCatalogValidationError> errors = editor.Upsert(entry);
 
             Assert.Empty(errors);
-            SpeciesCatalogEntry saved = Assert.Single(SpeciesCatalogStore.Load(path).Species);
+            SpeciesCatalogEntry saved = Assert.Single(SpeciesCatalogStore.Load("species.json", directory).Species);
             Assert.Equal("Tasso modificato", saved.ItalianName);
         }
         finally

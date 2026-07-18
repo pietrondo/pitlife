@@ -228,12 +228,20 @@ public static class SpeciesCatalogStore
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static SpeciesCatalogDocument Load(string path)
+    public static SpeciesCatalogDocument Load(string path, string baseDirectory)
     {
         if (path.Contains("..", StringComparison.Ordinal))
             throw new ArgumentException("Path traversal is not allowed.", nameof(path));
 
-        var json = File.ReadAllText(path);
+        var fullBaseDir = Path.GetFullPath(baseDirectory);
+        if (!fullBaseDir.EndsWith(Path.DirectorySeparatorChar))
+            fullBaseDir += Path.DirectorySeparatorChar;
+
+        var fullPath = Path.GetFullPath(Path.Combine(baseDirectory, path));
+        if (!fullPath.StartsWith(fullBaseDir, StringComparison.OrdinalIgnoreCase))
+            throw new UnauthorizedAccessException("Path traversal is not allowed.");
+
+        var json = File.ReadAllText(fullPath);
         return JsonSerializer.Deserialize<SpeciesCatalogDocument>(json, Options)
             ?? throw new InvalidDataException("Species catalog is empty.");
     }

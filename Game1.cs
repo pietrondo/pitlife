@@ -77,7 +77,8 @@ public class Game1 : Game
         _speciesEditor = new SpeciesEditorPanel(new SpeciesEditorService(
             _speciesCatalogRuntime,
             Directory.GetCurrentDirectory(),
-            SpeciesCatalogRuntime.DefaultCatalogPath));
+            "species.json",
+            Path.GetDirectoryName(SpeciesCatalogRuntime.DefaultCatalogPath)!));
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
@@ -105,12 +106,13 @@ public class Game1 : Game
         var bundledCatalog = Path.Combine(Content.RootDirectory, "species.json");
         if (File.Exists(bundledCatalog))
         {
-            var bundledErrors = _speciesCatalogRuntime.LoadAndApply(bundledCatalog, Directory.GetCurrentDirectory());
+            var bundledErrors = _speciesCatalogRuntime.LoadAndApply("species.json", Content.RootDirectory, Directory.GetCurrentDirectory());
             if (bundledErrors.Count > 0)
                 Logger.Warn($"Bundled species catalog: {bundledErrors.Count} validation error(s)");
         }
         IReadOnlyList<SpeciesCatalogValidationError> catalogErrors = _speciesCatalogRuntime.LoadAndApply(
-            SpeciesCatalogRuntime.DefaultCatalogPath,
+            "species.json",
+            Path.GetDirectoryName(SpeciesCatalogRuntime.DefaultCatalogPath)!,
             Directory.GetCurrentDirectory());
         foreach (SpeciesCatalogValidationError error in catalogErrors)
             Logger.Warn($"Species catalog [{error.EntryIndex}:{error.Field}] {error.Message}");
