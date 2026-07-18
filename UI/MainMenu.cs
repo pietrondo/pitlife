@@ -184,13 +184,21 @@ public class MainMenu
         {
             if (Pressed(keyboard, previousKeyboard, Keys.Right))
             {
-                if (_focusedIndex == 3) _focusedIndex = 4; // Save -> Load
-                else if (_focusedIndex == 5) _focusedIndex = 6; // Options -> Help
+                _focusedIndex = _focusedIndex switch
+                {
+                    3 => 4, // Save -> Load
+                    5 => 6, // Options -> Help
+                    _ => _focusedIndex
+                };
             }
-            if (Pressed(keyboard, previousKeyboard, Keys.Left))
+            else if (Pressed(keyboard, previousKeyboard, Keys.Left))
             {
-                if (_focusedIndex == 4) _focusedIndex = 3; // Load -> Save
-                else if (_focusedIndex == 6) _focusedIndex = 5; // Help -> Options
+                _focusedIndex = _focusedIndex switch
+                {
+                    4 => 3, // Load -> Save
+                    6 => 5, // Help -> Options
+                    _ => _focusedIndex
+                };
             }
         }
     }
