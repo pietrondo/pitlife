@@ -17,6 +17,7 @@ public class UiWindow
     public Rectangle TitleBarBounds => new(Bounds.X + 3, Bounds.Y + 3, Bounds.Width - 6, 40);
     public Rectangle ContentBounds => new(Bounds.X + 16, Bounds.Y + 56, Bounds.Width - 32, Bounds.Height - 72);
     public Rectangle CloseButtonBounds => new(Bounds.Right - 39, Bounds.Y + 8, 30, 30);
+    public Rectangle CollapseButtonBounds => new(TitleBarBounds.X + 8, TitleBarBounds.Center.Y - 10, 20, 20);
 
     public UiWindow(string title, string? id = null)
     {
@@ -84,7 +85,7 @@ public class UiWindow
 
         if (IsDraggable)
         {
-            var iconRect = new Rectangle(titleBar.X + 8, titleBar.Center.Y - 10, 20, 20);
+            var iconRect = CollapseButtonBounds;
             var isHovered = iconRect.Contains(mousePosition);
             var collapseIcon = IsCollapsed ? "[+]" : "[-]";
             Vector2 iconSize = font.MeasureString(collapseIcon) * scale;
