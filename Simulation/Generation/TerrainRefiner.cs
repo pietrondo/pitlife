@@ -103,42 +103,55 @@ internal sealed class TerrainRefiner
         if (!present.Contains(BiomeType.Grassland))
         {
             var placed = false;
-            for (var y = 0; y < _world.Height && !placed; y++)
-                for (var x = 0; x < _world.Width && !placed; x++)
-                {
-                    var i = y * _world.Width + x;
-                    if (_world.RiverMask[i]) continue;
-                    var b = _world.Tiles[x, y].Biome;
-                    if (b == BiomeType.DeepOcean || b == BiomeType.ShallowWater) continue;
-                    _world.Tiles[x, y] = new Tile(BiomeType.Grassland);
-                    present.Add(BiomeType.Grassland);
-                    placed = true;
-                }
-            if (!placed)
-                for (var y = 0; y < _world.Height && !placed; y++)
-                    for (var x = 0; x < _world.Width && !placed; x++)
-                    {
-                        if (_world.RiverMask[y * _world.Width + x]) continue;
-                        _world.Tiles[x, y] = new Tile(BiomeType.Grassland);
-                        present.Add(BiomeType.Grassland);
-                        placed = true;
-                    }
-        }
-
-        foreach (var biome in allFifteen)
-        {
-            if (present.Contains(biome)) continue;
-            var placed = false;
+            int fallbackX = -1, fallbackY = -1;
             for (var y = 0; y < _world.Height && !placed; y++)
             {
                 for (var x = 0; x < _world.Width && !placed; x++)
                 {
                     var i = y * _world.Width + x;
                     if (_world.RiverMask[i]) continue;
-                    if (_world.Tiles[x, y].Biome != BiomeType.Grassland) continue;
-                    _world.Tiles[x, y] = new Tile(biome);
-                    present.Add(biome);
+
+                    if (fallbackX == -1)
+                    {
+                        fallbackX = x;
+                        fallbackY = y;
+                    }
+
+                    var b = _world.Tiles[x, y].Biome;
+                    if (b == BiomeType.DeepOcean || b == BiomeType.ShallowWater) continue;
+
+                    _world.Tiles[x, y] = new Tile(BiomeType.Grassland);
+                    present.Add(BiomeType.Grassland);
                     placed = true;
+                }
+            }
+            if (!placed && fallbackX != -1)
+            {
+                _world.Tiles[fallbackX, fallbackY] = new Tile(BiomeType.Grassland);
+                present.Add(BiomeType.Grassland);
+            }
+        }
+
+        var missing = new List<BiomeType>();
+        foreach (var biome in allFifteen)
+        {
+            if (!present.Contains(biome)) missing.Add(biome);
+        }
+
+        if (missing.Count > 0)
+        {
+            int mIdx = 0;
+            for (var y = 0; y < _world.Height && mIdx < missing.Count; y++)
+            {
+                for (var x = 0; x < _world.Width && mIdx < missing.Count; x++)
+                {
+                    var i = y * _world.Width + x;
+                    if (_world.RiverMask[i]) continue;
+                    if (_world.Tiles[x, y].Biome != BiomeType.Grassland) continue;
+
+                    _world.Tiles[x, y] = new Tile(missing[mIdx]);
+                    present.Add(missing[mIdx]);
+                    mIdx++;
                 }
             }
         }
