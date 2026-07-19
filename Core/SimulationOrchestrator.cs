@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
@@ -54,7 +55,7 @@ public class SimulationOrchestrator
 
     public virtual void GenerateNewWorld(int? seedOverride, WorldGenOptions? worldGenOptions = null)
     {
-        var seed = seedOverride ?? new Random().Next();
+        var seed = seedOverride ?? RandomNumberGenerator.GetInt32(int.MaxValue);
         var wgOpts = worldGenOptions ?? WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
         _game._ecosystem = new Ecosystem(wgOpts, seed);
         _game._ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
