@@ -254,6 +254,15 @@ public sealed class SpeciesCyclopedia
     {
         var contentY = _panelY + TitleHeight + 30 + PanelPadding - _scrollOffset;
         var contentH = _viewportH - contentY + _scrollOffset - 60;
+
+        if (_filteredSpecies.Length == 0)
+        {
+            var msg = "Nessuna specie trovata.";
+            var msgSize = font.MeasureString(msg);
+            var centerPos = new Vector2(_panelX + panelRect().Width / 2f - msgSize.X / 2f, _panelY + TitleHeight + 100);
+            sb.DrawString(font, msg, centerPos, UiTheme.MutedStone);
+        }
+
         var cols = Math.Max(1, (panelRect().Width - PanelPadding * 2) / (CardWidth + Gap));
 
         for (var i = 0; i < _filteredSpecies.Length; i++)

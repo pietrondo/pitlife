@@ -1,3 +1,7 @@
-## 2024-05-24 - Window Collapse Affordance
-**Learning:** In MonoGame/custom UI frameworks, drawing a `[+]`/`[-]` icon in a title bar creates an immediate visual affordance that the icon itself is a clickable button. If the interaction relies entirely on double-clicking the title bar (a hidden affordance), users will experience friction when single-clicking the icon does nothing.
-**Action:** When adding text or icons that look like buttons within larger draggable areas (like title bars), always ensure their specific bounds are calculated and exposed for single-click hit-testing, rather than relying exclusively on hidden double-click behaviors.
+## 2024-07-18 - Empty States in MonoGame UI
+**Learning:** MonoGame UI doesn't have native DOM elements, so empty states (like empty search results) must be explicitly rendered to avoid showing blank panels which look like bugs or hanging states.
+**Action:** Always implement a zero-result drawing block in custom UI panels handling filtered arrays.
+
+## 2024-07-18 - Empty States in MonoGame UI
+**Learning:** MonoGame UI doesn't have native DOM elements, so empty states (like empty search results) must be explicitly rendered to avoid showing blank panels which look like bugs or hanging states.
+**Action:** Always implement a zero-result drawing block in custom UI panels handling filtered arrays.
