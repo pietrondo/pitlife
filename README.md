@@ -82,6 +82,7 @@
 
 ### Performance e Architettura
 - **Multi-thread**: world generation parallela, object pooling
+- **Resilienza**: isolamento (quarantine) degli aggiornamenti falliti per singola creatura, evitando crash dell'intera simulazione
 - **Ottimizzazioni algoritmiche**: rimozione list O(N^2) tramite swap-with-last O(1) (es. `ProcessDeaths`), culling ottimale dei loop e sostituzione radici quadrate con distanze al quadrato (`CataclysmSystem`, `FruitSystem`)
 - **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, ricerca spaziale e `EcosystemMetrics`)
 - **Architettura**: pipeline di simulazione modulare, decomposizione di `Game1` e `InGameUi` in finestre e collaboratori specializzati
