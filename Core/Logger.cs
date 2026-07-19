@@ -31,8 +31,9 @@ public static class Logger
     {
         try
         {
-            var files = Directory.GetFiles(LogDir, "pitlife_*.log")
-                .OrderByDescending(f => f).ToArray();
+            var files = Directory.GetFiles(LogDir, "pitlife_*.log");
+            Array.Sort(files, StringComparer.Ordinal);
+            Array.Reverse(files);
             for (var i = 5; i < files.Length; i++)
                 File.Delete(files[i]);
         }
