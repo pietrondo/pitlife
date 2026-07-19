@@ -7,6 +7,17 @@ using PitLife.Simulation;
 
 namespace PitLife.UI.Windows;
 
+public readonly record struct StatisticsData(
+    int Plants,
+    int Herbivores,
+    int Carnivores,
+    int Omnivores,
+    float Time,
+    bool Paused,
+    float Speed,
+    EcosystemMetrics? Metrics
+);
+
 public class StatisticsWindow : UiWindow
 {
     private readonly StringBuilder _speciesSb = new(64);
@@ -20,18 +31,10 @@ public class StatisticsWindow : UiWindow
         SpriteBatch spriteBatch,
         Texture2D pixel,
         SpriteFont font,
-        int plants,
-        int herbivores,
-        int carnivores,
-        int omnivores,
-        float time,
-        bool paused,
-        float speed,
-        EcosystemMetrics? metrics)
+        in StatisticsData data)
     {
         var content = ContentBounds;
-        var needed = DrawStatistics(spriteBatch, pixel, font, content,
-            plants, herbivores, carnivores, omnivores, time, paused, speed, metrics);
+        var needed = DrawStatistics(spriteBatch, pixel, font, content, in data);
         var totalH = needed + 72;
         if (totalH != Bounds.Height)
         {
@@ -44,42 +47,35 @@ public class StatisticsWindow : UiWindow
         Texture2D pixel,
         SpriteFont font,
         Rectangle content,
-        int plants,
-        int herbivores,
-        int carnivores,
-        int omnivores,
-        float time,
-        bool paused,
-        float speed,
-        EcosystemMetrics? metrics)
+        in StatisticsData data)
     {
-        var total = plants + herbivores + carnivores + omnivores;
+        var total = data.Plants + data.Herbivores + data.Carnivores + data.Omnivores;
         var y = content.Y;
-        DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.time", time), UiTheme.WarmParchment);
+        DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.time", data.Time), UiTheme.WarmParchment);
         y += 18;
         DrawLine(spriteBatch, font, content.X, y,
-            paused ? I18n.T("stats.paused") : I18n.Format("stats.speed", speed),
-            paused ? UiTheme.DangerClay : UiTheme.MossSignal);
+            data.Paused ? I18n.T("stats.paused") : I18n.Format("stats.speed", data.Speed),
+            data.Paused ? UiTheme.DangerClay : UiTheme.MossSignal);
         y += 18;
         DrawLine(spriteBatch, font, content.X, y, I18n.Format("stats.total", total), UiTheme.WarmParchment);
         y += 22;
 
-        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "P", plants, total, UiTheme.MossSignal);
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "P", data.Plants, total, UiTheme.MossSignal);
         y += 16;
-        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "H", herbivores, total, UiTheme.LakeBlue);
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "H", data.Herbivores, total, UiTheme.LakeBlue);
         y += 16;
-        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "C", carnivores, total, UiTheme.DangerClay);
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "C", data.Carnivores, total, UiTheme.DangerClay);
         y += 16;
-        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "O", omnivores, total, UiTheme.WarmParchment);
+        DrawInlineBar(spriteBatch, pixel, font, content.X, y, "O", data.Omnivores, total, UiTheme.WarmParchment);
 
-        if (metrics != null && metrics.SpeciesPopulations.Count > 0)
+        if (data.Metrics != null && data.Metrics.SpeciesPopulations.Count > 0)
         {
             y += 22;
             spriteBatch.DrawString(font, I18n.T("stats.speciesList"),
                 new Vector2(content.X, y), UiTheme.MossSignal);
             y += 14;
             var shown = 0;
-            foreach (var kvp in metrics.SpeciesPopulations)
+            foreach (var kvp in data.Metrics.SpeciesPopulations)
             {
                 if (shown >= 14) break;
                 Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
