@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -75,7 +74,7 @@ public class StatisticsWindow : UiWindow
                 new Vector2(content.X, y), UiTheme.MossSignal);
             y += 14;
             var shown = 0;
-            foreach (var kvp in data.Metrics.SpeciesPopulations)
+            foreach (var kvp in data.Metrics.GetSortedSpeciesPopulations())
             {
                 if (shown >= 14) break;
                 Color col = kvp.Value > 0 ? UiTheme.WarmParchment : UiTheme.MutedStone;
