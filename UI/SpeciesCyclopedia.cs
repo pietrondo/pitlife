@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Text;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Simulation;
+using PitLife.Localization;
 
 namespace PitLife.UI;
 
@@ -240,9 +241,17 @@ public sealed class SpeciesCyclopedia
         {
             DrawDetailView(sb, pixel, font);
         }
-        else
+        else if (_filteredSpecies.Length > 0)
         {
             DrawCardList(sb, pixel, font);
+        }
+        else
+        {
+            var msg = I18n.T("cyclopedia.empty");
+            var size = font.MeasureString(msg);
+            var px = _panelX + PanelPadding + 440;
+            var py = _panelY + TitleHeight + 30 + PanelPadding;
+            DrawText(sb, font, px, py, msg, UiTheme.MutedStone);
         }
 
         // Close hint
