@@ -106,6 +106,32 @@ public class SpeciesCatalogTests
             new SpeciesCatalogDocument { Species = [entry] }, root));
     }
 
+
+    [Fact]
+    public void Validator_RejectsInvalidMaturityAge()
+    {
+        var root = FindRepositoryRoot();
+
+        var tooYoung = ValidAnimal();
+        tooYoung.Key = "TooYoung";
+        tooYoung.MaturityAge = 0.5f;
+
+        var tooOld = ValidAnimal();
+        tooOld.Key = "TooOld";
+        tooOld.MaturityAge = 2000f;
+
+        var nanAge = ValidAnimal();
+        nanAge.Key = "NanAge";
+        nanAge.MaturityAge = float.NaN;
+
+        var errors = SpeciesCatalogValidator.Validate(
+            new SpeciesCatalogDocument { Species = [tooYoung, tooOld, nanAge] }, root);
+
+        Assert.Equal(3, errors.Count(e => e.Field == "MaturityAge"));
+        Assert.All(errors.Where(e => e.Field == "MaturityAge"), error =>
+            Assert.Contains("Maturity age must be between 1 and 1000 seconds.", error.Message, StringComparison.Ordinal));
+    }
+
     [Fact]
     public void Store_RejectsUnknownJsonFields()
     {
