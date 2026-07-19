@@ -27,8 +27,8 @@ public class SpeciesCatalogTests
         {
             var document = new SpeciesCatalogDocument { Species = [ValidAnimal()] };
 
-            SpeciesCatalogStore.Save(path, document, directory);
-            SpeciesCatalogDocument loaded = SpeciesCatalogStore.Load(path);
+            SpeciesCatalogStore.Save("species.json", document, directory);
+            SpeciesCatalogDocument loaded = SpeciesCatalogStore.Load("species.json", directory);
 
             SpeciesCatalogEntry entry = Assert.Single(loaded.Species);
             Assert.Equal(SpeciesCatalogDocument.CurrentSchemaVersion, loaded.SchemaVersion);
@@ -115,7 +115,7 @@ public class SpeciesCatalogTests
         try
         {
             File.WriteAllText(path, "{\"schemaVersion\":1,\"species\":[],\"unexpected\":true}");
-            Assert.Throws<JsonException>(() => SpeciesCatalogStore.Load(path));
+            Assert.Throws<JsonException>(() => SpeciesCatalogStore.Load("species.json", directory));
         }
         finally
         {
@@ -132,7 +132,7 @@ public class SpeciesCatalogTests
         try
         {
             File.WriteAllText(path, "{\"schemaVersion\":1,\"species\":null}");
-            Assert.Throws<JsonException>(() => SpeciesCatalogStore.Load(path));
+            Assert.Throws<JsonException>(() => SpeciesCatalogStore.Load("species.json", directory));
         }
         finally
         {

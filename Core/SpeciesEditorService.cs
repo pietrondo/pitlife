@@ -11,24 +11,29 @@ public sealed class SpeciesEditorService
     private readonly SpeciesCatalogRuntime _runtime;
     private readonly string _repositoryRoot;
     private readonly string _catalogPath;
+    private readonly string _baseDirectory;
 
     public SpeciesEditorService(
         SpeciesCatalogRuntime runtime,
         string repositoryRoot,
-        string catalogPath)
+        string catalogPath,
+        string baseDirectory)
     {
         ArgumentNullException.ThrowIfNull(runtime);
         ArgumentNullException.ThrowIfNull(repositoryRoot);
         ArgumentNullException.ThrowIfNull(catalogPath);
+        ArgumentNullException.ThrowIfNull(baseDirectory);
         _runtime = runtime;
         _repositoryRoot = repositoryRoot;
         _catalogPath = catalogPath;
+        _baseDirectory = baseDirectory;
     }
 
     public SpeciesCatalogDocument LoadDocument()
     {
-        return File.Exists(_catalogPath)
-            ? SpeciesCatalogStore.Load(_catalogPath)
+        var fullPath = Path.GetFullPath(Path.Combine(_baseDirectory, _catalogPath));
+        return File.Exists(fullPath)
+            ? SpeciesCatalogStore.Load(_catalogPath, _baseDirectory)
             : new SpeciesCatalogDocument();
     }
 
@@ -68,6 +73,6 @@ public sealed class SpeciesEditorService
             document.Species[existingIndex] = entry;
         else
             document.Species.Add(entry);
-        return _runtime.SaveAndApply(document, _catalogPath, _repositoryRoot);
+        return _runtime.SaveAndApply(document, _catalogPath, _baseDirectory, _repositoryRoot);
     }
 }

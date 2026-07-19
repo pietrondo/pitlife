@@ -7,7 +7,7 @@ public class SpeciesCatalogTraversalTests
     [Fact]
     public void Load_ThrowsOnPathTraversal()
     {
-        Assert.Throws<ArgumentException>(() => SpeciesCatalogStore.Load("../secret.json"));
+        Assert.Throws<ArgumentException>(() => SpeciesCatalogStore.Load("../secret.json", "some_directory"));
     }
 
     [Fact]
@@ -15,4 +15,14 @@ public class SpeciesCatalogTraversalTests
     {
         Assert.Throws<ArgumentException>(() => SpeciesCatalogStore.Save("../secret.json", new SpeciesCatalogDocument(), "some_directory"));
     }
+
+
+    [Fact]
+    public void Load_ThrowsOnAbsolutePathTraversal()
+    {
+        var absPath = Path.GetFullPath("/etc/passwd");
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT) absPath = @"C:\Windows\System32\config\SAM";
+        Assert.Throws<UnauthorizedAccessException>(() => SpeciesCatalogStore.Load(absPath, "some_directory"));
+    }
+
 }
