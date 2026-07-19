@@ -69,13 +69,13 @@
 - **Fuga per bassa energia**: istinto di sopravvivenza dinamico
 
 ### UI
-- **Tema foresta**: palette verde/marrone con finestre draggable e hover state per gli indicatori di collasso
+- **Tema foresta**: palette verde/marrone con finestre draggable, icone di collasso cliccabili e hover state
 - **Shortcut hints**: indicazioni visive sui bottoni per i tasti rapidi (es. ESC) con colori dinamici on-hover
 - **Minimap**: angolo in basso a destra con biomi e creature
 - **Toolbar**: statistiche, creature, velocità, cataclismi, clima, menu
 - **Dashboard clima**: dati orbitali, temperatura per-tile, emisferi
 - **HistoryWindow**: grafici per popolazioni e temperature nel tempo
-- **SpeciesCyclopedia**: enciclopedia in-game di tutte le specie
+- **SpeciesCyclopedia**: enciclopedia in-game di tutte le specie con hover state e gestione degli empty state
 - **I18n**: Italiano/Inglese con toggle nel menu
 - **Persistenza**: salvataggio/caricamento mondo, preferenze lingua
 - **Loading screen**: barra di caricamento animata
@@ -84,8 +84,8 @@
 - **Multi-thread**: world generation parallela, object pooling
 - **Ottimizzazioni algoritmiche**: rimozione list O(N^2) tramite swap-with-last O(1) (es. `ProcessDeaths`), culling ottimale dei loop e sostituzione radici quadrate con distanze al quadrato (`CataclysmSystem`, `FruitSystem`)
 - **Zero-allocation**: ottimizzazioni estese per azzerare le allocazioni (es. Social, Flow, ricerca spaziale e `EcosystemMetrics`)
-- **Architettura**: pipeline di simulazione modulare, decomposizione di `Game1` e `InGameUi` in finestre e collaboratori specializzati
-- **Stabilità e Sicurezza**: quarantena fault-tolerant per gli errori di simulazione delle creature, PRNG sicuri per l'audio procedurale e salvataggi in percorsi di sistema sicuri (`LocalApplicationData`)
+- **Architettura**: pipeline di simulazione modulare, decomposizione di `Game1` e `InGameUi` in finestre e collaboratori specializzati, e navigazione `MainMenu` ottimizzata con switch expressions
+- **Stabilità e Sicurezza**: quarantena fault-tolerant per gli errori di simulazione delle creature, PRNG sicuri (es. seed del mondo e audio procedurale), salvataggi in percorsi di sistema sicuri (`LocalApplicationData`) e fix per le vulnerabilità di path traversal
 - **Rendering**: grid culling rigoroso, culling matematico per effetti (es. cataclismi) e culling degli overlay ambientali, tile rendering a due passaggi per minimizzare i texture swap
 - **Data-driven**: tutte le logiche (specie, bilanciamento, clima, malattie, comportamenti) in JSON esterno
 - **Benchmark**: suite BenchmarkDotNet per regressioni di performance
