@@ -285,7 +285,8 @@
     "help.tipsTitle": "TIPS",
     "help.tips.balance": "Keep producers, prey and predators in balance.",
     "help.tips.seed": "Reuse a seed to generate the same world again.",
-    "help.tips.observe": "Click creatures and terrain to inspect their details."
+    "help.tips.observe": "Click creatures and terrain to inspect their details.",
+    "cyclopedia.empty": "No species found."
   },
   "it": {
     "common.yes": "SÌ",
@@ -567,6 +568,7 @@
     "help.tipsTitle": "CONSIGLI",
     "help.tips.balance": "Mantieni in equilibrio produttori, prede e predatori.",
     "help.tips.seed": "Riusa un seed per generare nuovamente lo stesso mondo.",
-    "help.tips.observe": "Clicca creature e terreno per esaminarne i dettagli."
+    "help.tips.observe": "Clicca creature e terreno per esaminarne i dettagli.",
+    "cyclopedia.empty": "Nessuna specie trovata."
   }
 }
