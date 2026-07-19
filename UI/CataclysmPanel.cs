@@ -87,8 +87,8 @@ public sealed class CataclysmPanel
         UiPrimitives.Fill(sb, pixel, _toggleBounds, bg);
         UiPrimitives.Border(sb, pixel, _toggleBounds, 2, IsOpen ? UiTheme.DangerClay : UiTheme.BarkEdge);
         var ts = font.MeasureString("C");
-        sb.DrawString(font, "C", new Vector2(_toggleBounds.Center.X - ts.X / 2, _toggleBounds.Center.Y - ts.Y / 2),
-            IsOpen ? Color.White : UiTheme.DangerClay);
+        sb.DrawString(font, "C", new Vector2(_toggleBounds.Center.X - ts.X / 2f, _toggleBounds.Center.Y - ts.Y / 2f),
+            IsOpen || hover ? Color.White : UiTheme.DangerClay);
 
         if (!IsOpen) return;
 

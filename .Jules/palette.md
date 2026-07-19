@@ -21,3 +21,6 @@
 ## 2025-02-12 - Added Titlebar Hover Feedback
 **Learning:** In MonoGame/PitLife's immediate-mode UI, elements that are interactive but lack traditional button shapes (like draggable window titlebars) require explicit hover feedback (e.g., color tinting from `DeepGrove` to `ForestNight`) to afford interactivity. Re-using the hover boolean for both background shape and foreground icons ensures complete visual affordance.
 **Action:** Always verify that interactive custom UI elements (like titlebars or headers) provide immediate visual feedback via `UiTheme` color shifts when hovered, matching the interaction pattern established for standard buttons.
+## 2026-07-20 - Custom Toggle Button UX Parity
+**Learning:** In PitLife's UI framework, custom interactive elements (like the toggle buttons in `SpawnPanel` and `CataclysmPanel`) do not inherit from `UiButton`. Consequently, standard UX features such as visual hover states (changing foreground text/icon color to white) and keyboard shortcut hints must be manually implemented in their custom drawing routines to maintain UX parity across the application.
+**Action:** When working with custom UI panels, always manually add `hover` boolean checks to text color interpolation and render explicit `hintText` below the buttons to match the established `UiButton` accessibility patterns.
