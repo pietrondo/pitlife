@@ -1,36 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 
 namespace PitLife.Core;
 
 public static class MaturationConfig
 {
-    public static MaturationConfigData Data { get; private set; } = new();
-
-    static MaturationConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "maturation.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<MaturationConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load maturation.json: {ex.Message}");
-        }
-    }
+    public static MaturationConfigData Data { get; private set; } = 
+        ConfigLoader.Load<MaturationConfigData>("maturation.json");
 }
 
 public class MaturationConfigData

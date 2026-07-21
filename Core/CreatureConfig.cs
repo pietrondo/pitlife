@@ -1,35 +1,9 @@
-using System;
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class CreatureConfig
 {
-    public static CreatureConfigData Data { get; private set; } = new();
-
-    static CreatureConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "creatures.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<CreatureConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load creatures.json: {ex.Message}");
-        }
-    }
+    public static CreatureConfigData Data { get; private set; } = 
+        ConfigLoader.Load<CreatureConfigData>("creatures.json");
 }
 
 public class CreatureConfigData

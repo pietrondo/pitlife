@@ -1,5 +1,3 @@
-using System.IO;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Xna.Framework;
 
@@ -7,30 +5,8 @@ namespace PitLife.Core;
 
 public static class SimulationConfig
 {
-    public static SimulationConfigData Data { get; private set; } = new();
-
-    static SimulationConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "simulation.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<SimulationConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Logger.Error($"Failed to load simulation.json: {ex.Message}");
-        }
-    }
+    public static SimulationConfigData Data { get; private set; } = 
+        ConfigLoader.Load<SimulationConfigData>("simulation.json");
 }
 
 public class SimulationConfigData

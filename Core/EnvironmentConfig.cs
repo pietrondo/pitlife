@@ -1,35 +1,9 @@
-using System;
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class EnvironmentConfig
 {
-    public static EnvironmentConfigData Data { get; private set; } = new();
-
-    static EnvironmentConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "environment.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<EnvironmentConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load environment.json: {ex.Message}");
-        }
-    }
+    public static EnvironmentConfigData Data { get; private set; } = 
+        ConfigLoader.Load<EnvironmentConfigData>("environment.json");
 }
 
 public class EnvironmentConfigData

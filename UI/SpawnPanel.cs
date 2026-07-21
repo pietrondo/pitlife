@@ -13,13 +13,56 @@ namespace PitLife.UI;
 public sealed class SpawnPanel
 {
     private readonly StringBuilder _sb = new StringBuilder(64);
+
+    private sealed class State
+    {
+        public bool IsOpen { get; set; }
+        public string? SelectedSpeciesKey { get; set; }
+        public string? SelectedCategory { get; set; }
+        public string? SelectedCataclysm { get; set; }
+        public bool ShowCataclysms { get; set; }
+        public int ScrollOffset { get; set; }
+        public int MaxScroll { get; set; }
+
+        public static IReadOnlyList<string> SpeciesForCategory(string category) =>
+            SpeciesCatalogModel.Build().TryGetValue(category, out var species) ? species : Array.Empty<string>();
+
+        public static string[] CategoryOrder { get; } = ["Plants", "AquaticPlants", "Herbivores", "Carnivores", "Omnivores"];
+
+        public void Toggle() => IsOpen = !IsOpen;
+        public void Open() => IsOpen = true;
+        public void Close()
+        {
+            IsOpen = false;
+            SelectedSpeciesKey = null;
+            SelectedCategory = null;
+            ScrollOffset = 0;
+        }
+        public void DeselectSpecies() => SelectedSpeciesKey = null;
+
+        public bool SelectCategory(string? clickedKey)
+        {
+            var newCategory = clickedKey == SelectedCategory ? null : clickedKey;
+            if (newCategory == SelectedCategory) return false;
+            SelectedCategory = newCategory;
+            SelectedSpeciesKey = null;
+            ScrollOffset = 0;
+            return true;
+        }
+
+        public void SelectSpecies(string? key)
+        {
+            SelectedSpeciesKey = key;
+        }
+    }
+
     public bool IsOpen => _state.IsOpen;
     public string? SelectedSpeciesKey => _state.SelectedSpeciesKey;
     public string? SelectedCategory => _state.SelectedCategory;
     public string? SelectedCataclysm { get => _state.SelectedCataclysm; set => _state.SelectedCataclysm = value; }
     public bool ShowCataclysms { get => _state.ShowCataclysms; set => _state.ShowCataclysms = value; }
 
-    private readonly SpawnPanelState _state = new();
+    private readonly State _state = new();
     private Dictionary<string, string[]> _speciesByCategory = SpeciesCatalogModel.Build();
 
     public const int PanelWidth = 200;
@@ -46,7 +89,7 @@ public sealed class SpawnPanel
     public SpawnPanel() { RebuildCategoryButtons(); }
 
     internal static IReadOnlyList<string> SpeciesForCategory(string category) =>
-        SpawnPanelState.SpeciesForCategory(category);
+        State.SpeciesForCategory(category);
 
     public void RefreshSpeciesCatalog()
     {
@@ -357,7 +400,7 @@ public sealed class SpawnPanel
     {
         _categoryButtons.Clear();
         var y = 0 + HeaderHeight;
-        foreach (var category in SpawnPanelState.CategoryOrder)
+        foreach (var category in State.CategoryOrder)
         {
             _categoryButtons.Add(new UiButton(I18n.T($"spawn.{category.ToLowerInvariant()}"))
             {

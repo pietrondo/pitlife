@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class FeedingConfig
@@ -10,25 +6,7 @@ public static class FeedingConfig
 
     public static void Load()
     {
-        try
-        {
-            string path = Path.Combine("Content", "config", "feeding.json");
-            if (File.Exists(path))
-            {
-                string json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<FeedingConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Instance = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load feeding.json: {ex.Message}");
-        }
+        Instance = ConfigLoader.Load("feeding.json", Instance);
     }
 }
 

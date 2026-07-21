@@ -1,31 +1,9 @@
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class SocialConfig
 {
-    public static SocialConfigData Data { get; private set; } = new();
-
-    static SocialConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "social.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<SocialConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch { /* use defaults */ }
-    }
+    public static SocialConfigData Data { get; private set; } = 
+        ConfigLoader.Load<SocialConfigData>("social.json");
 }
 
 public class SocialConfigData

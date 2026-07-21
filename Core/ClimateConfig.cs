@@ -1,34 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 
 namespace PitLife.Core;
 
 public static class ClimateConfig
 {
-    public static ClimateConfigData Data { get; private set; } = new();
-
-    static ClimateConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "climate.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<ClimateConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load climate.json: {ex.Message}");
-        }
-    }
+    public static ClimateConfigData Data { get; private set; } = 
+        ConfigLoader.Load<ClimateConfigData>("climate.json");
 }
 
 public class ClimateConfigData

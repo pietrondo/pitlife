@@ -1,32 +1,11 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 using Microsoft.Xna.Framework;
 
 namespace PitLife.Core;
 
 public static class CataclysmConfig
 {
-    public static CataclysmConfigDoc Data { get; } = LoadConfig();
-
-    private static CataclysmConfigDoc LoadConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "cataclysms.json");
-            if (!File.Exists(path)) return Fallback;
-
-            var json = File.ReadAllText(path);
-            var doc = JsonSerializer.Deserialize<CataclysmConfigDoc>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            });
-            return doc ?? Fallback;
-        }
-        catch { return Fallback; }
-    }
+    public static CataclysmConfigDoc Data { get; } = ConfigLoader.Load("cataclysms.json", Fallback);
 
     private static readonly CataclysmConfigDoc Fallback = new CataclysmConfigDoc(
         Version: 1,

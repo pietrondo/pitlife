@@ -1,35 +1,9 @@
-using System;
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class FruitConfig
 {
-    public static FruitConfigData Data { get; private set; } = new();
-
-    static FruitConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "fruit.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<FruitConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load fruit.json: {ex.Message}");
-        }
-    }
+    public static FruitConfigData Data { get; private set; } = 
+        ConfigLoader.Load<FruitConfigData>("fruit.json");
 }
 
 public class FruitConfigData

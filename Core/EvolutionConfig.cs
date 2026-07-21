@@ -1,31 +1,9 @@
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class EvolutionConfig
 {
-    public static EvolutionConfigData Data { get; private set; } = new();
-
-    static EvolutionConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "evolution.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<EvolutionConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch { /* use defaults */ }
-    }
+    public static EvolutionConfigData Data { get; private set; } = 
+        ConfigLoader.Load<EvolutionConfigData>("evolution.json");
 }
 
 public class EvolutionConfigData

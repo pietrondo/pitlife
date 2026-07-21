@@ -1,33 +1,9 @@
-using System;
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class AtmosphereConfig
 {
-    public static AtmosphereConfigData Data { get; private set; } = new();
-
-    static AtmosphereConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "atmosphere.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<AtmosphereConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load atmosphere.json: {ex.Message}");
-        }
-    }
+    public static AtmosphereConfigData Data { get; private set; } = 
+        ConfigLoader.Load<AtmosphereConfigData>("atmosphere.json");
 }
 
 public class AtmosphereConfigData

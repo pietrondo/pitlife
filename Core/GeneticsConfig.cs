@@ -1,30 +1,8 @@
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class GeneticsConfig
 {
-    public static GeneticsConfigDoc Data { get; } = LoadConfig();
-
-    private static GeneticsConfigDoc LoadConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "genetics.json");
-            if (!File.Exists(path)) return Fallback;
-
-            var json = File.ReadAllText(path);
-            var doc = JsonSerializer.Deserialize<GeneticsConfigDoc>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            });
-            return doc ?? Fallback;
-        }
-        catch { return Fallback; }
-    }
+    public static GeneticsConfigDoc Data { get; } = ConfigLoader.Load("genetics.json", Fallback);
 
     private static readonly GeneticsConfigDoc Fallback = new GeneticsConfigDoc(
         Version: 1,

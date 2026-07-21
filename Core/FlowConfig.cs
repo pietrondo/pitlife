@@ -1,36 +1,11 @@
-using System;
-using System.IO;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PitLife.Core;
 
 public static class FlowConfig
 {
-    public static FlowConfigData Data { get; private set; } = new();
-
-    static FlowConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "flow.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<FlowConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"Failed to load flow.json: {ex.Message}");
-        }
-    }
+    public static FlowConfigData Data { get; private set; } = 
+        ConfigLoader.Load<FlowConfigData>("flow.json");
 }
 
 public class FlowConfigData

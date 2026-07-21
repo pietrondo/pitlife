@@ -1,31 +1,9 @@
-using System.IO;
-using System.Text.Json;
-
 namespace PitLife.Core;
 
 public static class BalanceConfig
 {
-    public static BalanceConfigData Data { get; private set; } = new();
-
-    static BalanceConfig()
-    {
-        try
-        {
-            var path = Path.Combine("Content", "config", "balance.json");
-            if (File.Exists(path))
-            {
-                var json = File.ReadAllText(path);
-                var parsed = JsonSerializer.Deserialize<BalanceConfigData>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                });
-                if (parsed != null) Data = parsed;
-            }
-        }
-        catch { /* use defaults */ }
-    }
+    public static BalanceConfigData Data { get; private set; } = 
+        ConfigLoader.Load<BalanceConfigData>("balance.json");
 }
 
 public class BalanceConfigData
