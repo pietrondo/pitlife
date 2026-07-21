@@ -109,27 +109,38 @@ public class ClimateWindow : UiWindow
         DrawExtremeEventData(sb, font, content, climate, ref y);
     }
 
+    private static bool TryParseFormatToken(string format, int startIndex, out int endIndex, out int tokenIndex)
+    {
+        endIndex = format.IndexOf('}', startIndex);
+        if (endIndex > startIndex)
+        {
+            var token = format.AsSpan(startIndex + 1, endIndex - startIndex - 1);
+            var colon = token.IndexOf(':');
+            var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
+            if (!int.TryParse(indexSpan, out tokenIndex))
+            {
+                tokenIndex = -1;
+            }
+            return true;
+        }
+        tokenIndex = -1;
+        return false;
+    }
+
     private static void AppendFormattedLocal(StringBuilder sb, string format, int lx, int ly, string biomeName, int localTemp)
     {
-        int p = 0;
+        var p = 0;
         while (p < format.Length)
         {
-            int next = format.IndexOf('{', p);
+            var next = format.IndexOf('{', p);
             if (next < 0) { sb.Append(format.AsSpan(p)); break; }
             sb.Append(format.AsSpan(p, next - p));
-            int end = format.IndexOf('}', next);
-            if (end > next)
+            if (TryParseFormatToken(format, next, out var end, out var index))
             {
-                var token = format.AsSpan(next + 1, end - next - 1);
-                var colon = token.IndexOf(':');
-                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
-                if (int.TryParse(indexSpan, out int index))
-                {
-                    if (index == 0) sb.Append(lx);
-                    else if (index == 1) sb.Append(ly);
-                    else if (index == 2) sb.Append(biomeName);
-                    else if (index == 3) sb.Append(localTemp);
-                }
+                if (index == 0) sb.Append(lx);
+                else if (index == 1) sb.Append(ly);
+                else if (index == 2) sb.Append(biomeName);
+                else if (index == 3) sb.Append(localTemp);
                 p = end + 1;
             }
             else
@@ -142,22 +153,15 @@ public class ClimateWindow : UiWindow
 
     private static void AppendFormattedSeason(StringBuilder sb, string format, string localSeasonName)
     {
-        int p = 0;
+        var p = 0;
         while (p < format.Length)
         {
-            int next = format.IndexOf('{', p);
+            var next = format.IndexOf('{', p);
             if (next < 0) { sb.Append(format.AsSpan(p)); break; }
             sb.Append(format.AsSpan(p, next - p));
-            int end = format.IndexOf('}', next);
-            if (end > next)
+            if (TryParseFormatToken(format, next, out var end, out var index))
             {
-                var token = format.AsSpan(next + 1, end - next - 1);
-                var colon = token.IndexOf(':');
-                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
-                if (int.TryParse(indexSpan, out int index))
-                {
-                    if (index == 0) sb.Append(localSeasonName);
-                }
+                if (index == 0) sb.Append(localSeasonName);
                 p = end + 1;
             }
             else
@@ -170,24 +174,17 @@ public class ClimateWindow : UiWindow
 
     private static void AppendFormattedOrbit(StringBuilder sb, string format, float dist, float angle, float speed)
     {
-        int p = 0;
+        var p = 0;
         while (p < format.Length)
         {
-            int next = format.IndexOf('{', p);
+            var next = format.IndexOf('{', p);
             if (next < 0) { sb.Append(format.AsSpan(p)); break; }
             sb.Append(format.AsSpan(p, next - p));
-            int end = format.IndexOf('}', next);
-            if (end > next)
+            if (TryParseFormatToken(format, next, out var end, out var index))
             {
-                var token = format.AsSpan(next + 1, end - next - 1);
-                var colon = token.IndexOf(':');
-                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
-                if (int.TryParse(indexSpan, out int index))
-                {
-                    if (index == 0) sb.Append($"{dist:F3}");
-                    else if (index == 1) sb.Append($"{angle:F0}");
-                    else if (index == 2) sb.Append($"{speed:F1}");
-                }
+                if (index == 0) sb.Append($"{dist:F3}");
+                else if (index == 1) sb.Append($"{angle:F0}");
+                else if (index == 2) sb.Append($"{speed:F1}");
                 p = end + 1;
             }
             else
@@ -200,23 +197,16 @@ public class ClimateWindow : UiWindow
 
     private static void AppendFormattedWind(StringBuilder sb, string format, float speed, float dir)
     {
-        int p = 0;
+        var p = 0;
         while (p < format.Length)
         {
-            int next = format.IndexOf('{', p);
+            var next = format.IndexOf('{', p);
             if (next < 0) { sb.Append(format.AsSpan(p)); break; }
             sb.Append(format.AsSpan(p, next - p));
-            int end = format.IndexOf('}', next);
-            if (end > next)
+            if (TryParseFormatToken(format, next, out var end, out var index))
             {
-                var token = format.AsSpan(next + 1, end - next - 1);
-                var colon = token.IndexOf(':');
-                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
-                if (int.TryParse(indexSpan, out int index))
-                {
-                    if (index == 0) sb.Append($"{speed:F1}");
-                    else if (index == 1) sb.Append($"{dir:F0}");
-                }
+                if (index == 0) sb.Append($"{speed:F1}");
+                else if (index == 1) sb.Append($"{dir:F0}");
                 p = end + 1;
             }
             else
@@ -229,22 +219,15 @@ public class ClimateWindow : UiWindow
 
     private static void AppendFormattedExtreme(StringBuilder sb, string format, string extremeName)
     {
-        int p = 0;
+        var p = 0;
         while (p < format.Length)
         {
-            int next = format.IndexOf('{', p);
+            var next = format.IndexOf('{', p);
             if (next < 0) { sb.Append(format.AsSpan(p)); break; }
             sb.Append(format.AsSpan(p, next - p));
-            int end = format.IndexOf('}', next);
-            if (end > next)
+            if (TryParseFormatToken(format, next, out var end, out var index))
             {
-                var token = format.AsSpan(next + 1, end - next - 1);
-                var colon = token.IndexOf(':');
-                var indexSpan = colon >= 0 ? token.Slice(0, colon) : token;
-                if (int.TryParse(indexSpan, out int index))
-                {
-                    if (index == 0) sb.Append(extremeName);
-                }
+                if (index == 0) sb.Append(extremeName);
                 p = end + 1;
             }
             else
@@ -352,7 +335,7 @@ public class ClimateWindow : UiWindow
         y += 20;
         var recent = Core.Logger.RecentEvents;
 
-        bool changed = recent.Count != _lastEventCount;
+        var changed = recent.Count != _lastEventCount;
         if (recent.Count > 0 && !changed)
         {
             if (recent[0] != _lastFirstEvent || recent[^1] != _lastLastEvent)
