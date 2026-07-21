@@ -77,15 +77,15 @@ public sealed class EcosystemMetrics
         _typeCounts.Clear();
         _trophicCounts.Clear();
 
-        float totalHeterozygosity = 0f;
-        float totalInbreeding = 0f;
-        int animalCount = 0;
+        var totalHeterozygosity = 0f;
+        var totalInbreeding = 0f;
+        var animalCount = 0;
 
         SpeciesPopulations.Clear();
         SubspeciesCounts.Clear();
 
         var creatures = ecosystem.Creatures;
-        for (int i = 0; i < creatures.Count; i++)
+        for (var i = 0; i < creatures.Count; i++)
         {
             var c = creatures[i];
             if (c == null || !c.IsAlive) continue;
@@ -93,7 +93,7 @@ public sealed class EcosystemMetrics
             TotalCreatures++;
             _typeCounts[c.CreatureType] = _typeCounts.GetValueOrDefault(c.CreatureType) + 1;
 
-            int trophic = FoodWeb.TrophicLevel(c.CreatureType);
+            var trophic = FoodWeb.TrophicLevel(c.CreatureType);
             _trophicCounts[trophic] = _trophicCounts.GetValueOrDefault(trophic) + 1;
 
             if (c.CreatureType != CreatureType.Plant)
@@ -112,12 +112,11 @@ public sealed class EcosystemMetrics
             var sub = c.Subspecies;
             if (!string.IsNullOrEmpty(sub) && species != null)
             {
-                string key = species + "/" + sub;
+                var key = species + "/" + sub;
                 SubspeciesCounts[key] = SubspeciesCounts.GetValueOrDefault(key) + 1;
             }
         }
 
-        RebuildSortedDictionary(SpeciesPopulations, _speciesBuffer);
         foreach (var kvp in SpeciesPopulations)
         {
             if (!SpeciesFirstAppearance.ContainsKey(kvp.Key))
@@ -126,8 +125,6 @@ public sealed class EcosystemMetrics
             SpeciesMaxPopulation[kvp.Key] = Math.Max(SpeciesMaxPopulation.GetValueOrDefault(kvp.Key), kvp.Value);
         }
 
-        RebuildSortedDictionary(SubspeciesCounts, _subspeciesBuffer);
-
         SpeciesCount = SpeciesPopulations.Count;
         TotalSubspecies = SubspeciesCounts.Count;
 
@@ -135,18 +132,14 @@ public sealed class EcosystemMetrics
         MeanInbreeding = animalCount > 0 ? totalInbreeding / animalCount : 0f;
     }
 
-    private static void RebuildSortedDictionary(Dictionary<string, int> source, List<KeyValuePair<string, int>> buffer)
+    public IReadOnlyList<KeyValuePair<string, int>> GetSortedSpeciesPopulations()
     {
-        buffer.Clear();
-        buffer.AddRange(source);
-        buffer.Sort((a, b) => b.Value.CompareTo(a.Value));
+        _speciesBuffer.Clear();
+        foreach (var kvp in SpeciesPopulations)
+            _speciesBuffer.Add(kvp);
 
-        source.Clear();
-        for (int i = 0; i < buffer.Count; i++)
-        {
-            var kvp = buffer[i];
-            source[kvp.Key] = kvp.Value;
-        }
+        _speciesBuffer.Sort((a, b) => b.Value.CompareTo(a.Value));
+        return _speciesBuffer;
     }
 
     public void ResetCounters()
