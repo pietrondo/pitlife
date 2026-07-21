@@ -335,7 +335,7 @@ public sealed class InGameUi
             }
             else if (window is ClimateWindow climateWin)
             {
-                climateWin.DrawContent(spriteBatch, pixel, font, Climate, World, HoverTile, SelectedTile, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, _popHistory, _popHistoryCount, _tempHistory, _tempHistoryCount);
+                climateWin.DrawContent(spriteBatch, pixel, font, new ClimateData(Climate, World, HoverTile, SelectedTile, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, _popHistory, _popHistoryCount, _tempHistory, _tempHistoryCount));
             }
             else if (window is HistoryWindow historyWin)
             {

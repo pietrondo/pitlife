@@ -7,6 +7,21 @@ using PitLife.Simulation;
 
 namespace PitLife.UI.Windows;
 
+public readonly record struct ClimateData(
+    ClimateSystem? Climate,
+    World? World,
+    Point? HoverTile,
+    Point? SelectedTile,
+    int PlantCount,
+    int HerbivoreCount,
+    int CarnivoreCount,
+    int OmnivoreCount,
+    PopSnapshot[] PopHistory,
+    int PopHistoryCount,
+    float[] TempHistory,
+    int TempHistoryCount
+);
+
 public class ClimateWindow : UiWindow
 {
     private readonly StringBuilder _tempSb = new(32);
@@ -24,22 +39,11 @@ public class ClimateWindow : UiWindow
         SpriteBatch sb,
         Texture2D pixel,
         SpriteFont font,
-        ClimateSystem? climate,
-        World? world,
-        Point? hoverTile,
-        Point? selectedTile,
-        int plantCount,
-        int herbivoreCount,
-        int carnivoreCount,
-        int omnivoreCount,
-        PopSnapshot[] popHistory,
-        int popHistoryCount,
-        float[] tempHistory,
-        int tempHistoryCount)
+        in ClimateData data)
     {
         var content = ContentBounds;
 
-        if (climate == null || world == null)
+        if (data.Climate == null || data.World == null)
         {
             DrawLine(sb, font, content.X, content.Y, "Climate data unavailable", UiTheme.MutedStone);
             return;
@@ -47,9 +51,9 @@ public class ClimateWindow : UiWindow
 
         var y = content.Y;
 
-        DrawClimateGlobalData(sb, pixel, font, content, climate, tempHistory, tempHistoryCount, ref y);
-        DrawClimateLocalData(sb, font, content, climate, world, hoverTile, selectedTile, ref y);
-        DrawClimatePopulationData(sb, pixel, font, content, plantCount, herbivoreCount, carnivoreCount, omnivoreCount, popHistory, popHistoryCount, ref y);
+        DrawClimateGlobalData(sb, pixel, font, content, data.Climate, data.TempHistory, data.TempHistoryCount, ref y);
+        DrawClimateLocalData(sb, font, content, data.Climate, data.World, data.HoverTile, data.SelectedTile, ref y);
+        DrawClimatePopulationData(sb, pixel, font, content, in data, ref y);
         DrawClimateEventsData(sb, font, content, ref y);
     }
 
@@ -314,30 +318,30 @@ public class ClimateWindow : UiWindow
         }
     }
 
-    private void DrawClimatePopulationData(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content, int plantCount, int herbivoreCount, int carnivoreCount, int omnivoreCount, PopSnapshot[] popHistory, int popHistoryCount, ref int y)
+    private void DrawClimatePopulationData(SpriteBatch sb, Texture2D pixel, SpriteFont font, Rectangle content, in ClimateData data, ref int y)
     {
         y += 6;
         DrawLine(sb, font, content.X, y, I18n.T("climate.populations"), UiTheme.MossSignal);
         y += 20;
-        var totalPop = plantCount + herbivoreCount + carnivoreCount + omnivoreCount;
-        DrawInlineBar(sb, pixel, font, content.X, y, "P", plantCount, totalPop, UiTheme.MossSignal);
+        var totalPop = data.PlantCount + data.HerbivoreCount + data.CarnivoreCount + data.OmnivoreCount;
+        DrawInlineBar(sb, pixel, font, content.X, y, "P", data.PlantCount, totalPop, UiTheme.MossSignal);
         y += 16;
-        DrawInlineBar(sb, pixel, font, content.X, y, "H", herbivoreCount, totalPop, UiTheme.LakeBlue);
+        DrawInlineBar(sb, pixel, font, content.X, y, "H", data.HerbivoreCount, totalPop, UiTheme.LakeBlue);
         y += 16;
-        DrawInlineBar(sb, pixel, font, content.X, y, "C", carnivoreCount, totalPop, UiTheme.DangerClay);
+        DrawInlineBar(sb, pixel, font, content.X, y, "C", data.CarnivoreCount, totalPop, UiTheme.DangerClay);
         y += 16;
-        DrawInlineBar(sb, pixel, font, content.X, y, "O", omnivoreCount, totalPop, UiTheme.WarmParchment);
+        DrawInlineBar(sb, pixel, font, content.X, y, "O", data.OmnivoreCount, totalPop, UiTheme.WarmParchment);
         y += 20;
 
-        if (popHistoryCount >= 3)
+        if (data.PopHistoryCount >= 3)
         {
-            DrawSparkline(sb, pixel, content.X, y, content.Width, popHistory, popHistoryCount, 0, UiTheme.MossSignal);
+            DrawSparkline(sb, pixel, content.X, y, content.Width, data.PopHistory, data.PopHistoryCount, 0, UiTheme.MossSignal);
             y += 14;
-            DrawSparkline(sb, pixel, content.X, y, content.Width, popHistory, popHistoryCount, 1, UiTheme.LakeBlue);
+            DrawSparkline(sb, pixel, content.X, y, content.Width, data.PopHistory, data.PopHistoryCount, 1, UiTheme.LakeBlue);
             y += 14;
-            DrawSparkline(sb, pixel, content.X, y, content.Width, popHistory, popHistoryCount, 2, UiTheme.DangerClay);
+            DrawSparkline(sb, pixel, content.X, y, content.Width, data.PopHistory, data.PopHistoryCount, 2, UiTheme.DangerClay);
             y += 14;
-            DrawSparkline(sb, pixel, content.X, y, content.Width, popHistory, popHistoryCount, 3, UiTheme.WarmParchment);
+            DrawSparkline(sb, pixel, content.X, y, content.Width, data.PopHistory, data.PopHistoryCount, 3, UiTheme.WarmParchment);
             y += 20;
         }
     }
