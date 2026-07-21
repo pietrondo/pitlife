@@ -299,9 +299,18 @@ public sealed class SpawnPanel
         }
         else
         {
-            sb.DrawString(font, "+", new Vector2(_toggleBounds.X + 16, _toggleBounds.Y + 12),
-                IsOpen ? Color.White : UiTheme.MossSignal);
+            var ts = font.MeasureString("+");
+            sb.DrawString(font, "+", new Vector2(_toggleBounds.Center.X - ts.X / 2f, _toggleBounds.Center.Y - ts.Y / 2f),
+                IsOpen || isHover ? Color.White : UiTheme.MossSignal);
         }
+
+        var hintScale = 0.8f;
+        var hintText = "F4";
+        var hintSize = font.MeasureString(hintText) * hintScale;
+        var hintPos = new Vector2(
+            _toggleBounds.Center.X - hintSize.X / 2f,
+            _toggleBounds.Bottom - hintSize.Y - 2);
+        sb.DrawString(font, hintText, hintPos, IsOpen || isHover ? UiTheme.WarmParchment : UiTheme.MutedStone, 0f, Vector2.Zero, hintScale, SpriteEffects.None, 0f);
     }
 
     private readonly UiButton[] _cataButtons = new[]
