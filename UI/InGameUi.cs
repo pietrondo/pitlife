@@ -296,7 +296,8 @@ public sealed class InGameUi
         if (paused) _speedSb.Append(I18n.T("hud.paused"));
         else { _speedSb.Append(Math.Round(speed, 1)); _speedSb.Append('x'); }
         var slSize = font.MeasureString(_speedSb);
-        var sx = _speedDownButton.Bounds.Right + (_speedUpButton.Bounds.X - _speedDownButton.Bounds.Right) / 2f - slSize.X / 2f;
+        var spaceBetweenButtons = _speedUpButton.Bounds.X - _speedDownButton.Bounds.Right;
+        var sx = _speedDownButton.Bounds.Right + (spaceBetweenButtons / 2f) - (slSize.X / 2f);
         var sy = _speedDownButton.Bounds.Center.Y - slSize.Y / 2;
         spriteBatch.DrawString(font, _speedSb, new Vector2(sx, sy), Color.White);
         _speedUpButton.Draw(spriteBatch, pixel, font, mouse, false);
