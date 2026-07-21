@@ -12,18 +12,64 @@ Rules:
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 
 
-## Delegation to Jules CLI
+## Jules & GitHub Integration
+
+### Jules (cloud agent delegation)
 
 Jules (`npm install -g @google/jules`) is Google's autonomous AI coding agent.
-Use `.opencode/skills/jules/SKILL.md` for the full workflow. Key points:
+Full workflow: `.opencode/skills/jules/SKILL.md`.
 
-- Delegate well-scoped tasks: `jules remote new --repo pietrondo/pitlife --session "<prompt>"`
-- Retrieve: `jules remote pull --session <id>` — always review the diff before merging.
-- **Windows (pwsh) race condition:** launching multiple `jules remote new` in parallel
-  crashes the CLI (gzip extraction collision in %TEMP%\jules_tmp). Always run them
-  **sequentially** (one at a time), or clear the cache between attempts:
-  `Remove-Item -Recurse -Force "$env:TEMP\jules_tmp" -ErrorAction SilentlyContinue`
-- Track delegated work in bd (issues have session IDs in the description).
+**Core commands:**
+```bash
+jules remote new --repo . --session "<prompt>"          # delegate
+jules remote list --session                             # list sessions
+jules remote pull --session <id>                        # retrieve diff
+```
+
+**Windows (pwsh) race condition:** launching multiple `jules remote new` in parallel
+crashes the CLI (gzip extraction collision in %TEMP%\jules_tmp). Always run them
+**sequentially**, or clear the cache:
+`Remove-Item -Recurse -Force "$env:TEMP\jules_tmp" -ErrorAction SilentlyContinue`
+
+### GitHub CI
+
+CI runs automatically on every push to `master` and every PR (`.github/workflows/ci.yml`):
+- `windows-latest` runner
+- Build: `dotnet build PitLife.sln`
+- Test: `dotnet test PitLife.sln`
+
+### PR lifecycle (Jules → CI → Merge)
+
+1. **Receive** — `jules remote pull --session <id>` pulls the diff locally
+2. **Review** — inspect diff, run tests locally
+3. **Push** — `git push -u origin <branch>` creates a PR
+4. **CI validates** — GitHub Actions runs build + tests automatically
+5. **Merge** — `gh pr merge <number> --squash` after CI passes
+6. **Cleanup** — `gh pr close <number>` for stale PRs, delete remote branch
+
+**Merge queue (batch):**
+```bash
+# Fetch all Jules PRs, review, squash-merge if CI green
+gh pr list --state open --json number,headRefName,title,statusCheckRollup
+# For each green PR:
+gh pr merge <number> --squash
+```
+
+### Branch cleanup
+
+Jules leaves remote branches after PR merge. Prune periodically:
+```bash
+git remote prune origin
+git branch -r --merged | Select-String "jules" | ForEach-Object { git push origin --delete ($_ -replace '^\s*origin/', '') }
+```
+
+### Tracking
+
+Every Jules session → bd issue:
+```bash
+bd create "Jules: <summary>" --description="Session <id>. Prompt: ..." -t task -p 2
+bd close bd-XX --reason "Jules session <id> merged via PR #N"
+```
 
 
 ## Development Rules
