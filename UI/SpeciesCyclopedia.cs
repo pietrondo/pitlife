@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text;
@@ -33,7 +34,7 @@ public sealed class SpeciesCyclopedia
     private bool _searchActive;
     private readonly UiTextInput _searchInput = new();
 
-    private string[] _filteredSpecies = [];
+    private readonly System.Collections.Generic.List<string> _filteredSpecies = new();
     private int _selectedIndex = -1;
     private SpeciesDefinition? _selectedDef;
 
@@ -133,13 +134,13 @@ public sealed class SpeciesCyclopedia
 
     private void NavigateSelection(int delta)
     {
-        if (_filteredSpecies.Length == 0) return;
-        _selectedIndex = (_selectedIndex + delta + _filteredSpecies.Length) % _filteredSpecies.Length;
+        if (_filteredSpecies.Count == 0) return;
+        _selectedIndex = (_selectedIndex + delta + _filteredSpecies.Count) % _filteredSpecies.Count;
     }
 
     private void OpenSelectedDetail()
     {
-        if (_selectedIndex >= 0 && _selectedIndex < _filteredSpecies.Length)
+        if (_selectedIndex >= 0 && _selectedIndex < _filteredSpecies.Count)
             _selectedDef = SpeciesRegistry.Get(_filteredSpecies[_selectedIndex]);
     }
 
@@ -151,7 +152,7 @@ public sealed class SpeciesCyclopedia
         var cols = (_viewportW - _panelX * 2 - PanelPadding * 2) / (CardWidth + Gap);
         if (cols < 1) cols = 1;
 
-        for (var i = 0; i < _filteredSpecies.Length; i++)
+        for (var i = 0; i < _filteredSpecies.Count; i++)
         {
             var row = i / cols;
             var col = i % cols;
@@ -172,14 +173,17 @@ public sealed class SpeciesCyclopedia
 
     private void RefreshFilteredList()
     {
-        var species = SpeciesRegistry.OfType(_activeFilter);
-        if (!string.IsNullOrEmpty(_searchText))
+        _filteredSpecies.Clear();
+        foreach (var s in SpeciesRegistry.OfType(_activeFilter))
         {
-            species = species.Where(s =>
-                s.Contains(_searchText, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(_searchText) || s.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+            {
+                _filteredSpecies.Add(s);
+            }
         }
-        _filteredSpecies = species.OrderBy(s => s).ToArray();
-        _maxScroll = Math.Max(0, (_filteredSpecies.Length / CardsPerRow + 1) * (CardHeight + Gap) - (_viewportH - _panelY - 120));
+        _filteredSpecies.Sort(StringComparer.Ordinal);
+
+        _maxScroll = Math.Max(0, (_filteredSpecies.Count / CardsPerRow + 1) * (CardHeight + Gap) - (_viewportH - _panelY - 120));
     }
 
     public void Draw(SpriteBatch sb, Texture2D pixel, SpriteFont font)
@@ -234,14 +238,14 @@ public sealed class SpeciesCyclopedia
 
         // Species count
         DrawText(sb, font, _panelX + PanelPadding + 440, tabsY + 6,
-            $"{_filteredSpecies.Length} specie", UiTheme.MutedStone);
+            $"{_filteredSpecies.Count} specie", UiTheme.MutedStone);
 
         // Draw detail or list
         if (_selectedDef != null)
         {
             DrawDetailView(sb, pixel, font);
         }
-        else if (_filteredSpecies.Length > 0)
+        else if (_filteredSpecies.Count > 0)
         {
             DrawCardList(sb, pixel, font);
         }
@@ -264,7 +268,7 @@ public sealed class SpeciesCyclopedia
         var contentY = _panelY + TitleHeight + 30 + PanelPadding - _scrollOffset;
         var contentH = _viewportH - contentY + _scrollOffset - 60;
 
-        if (_filteredSpecies.Length == 0)
+        if (_filteredSpecies.Count == 0)
         {
             var msg = "Nessuna specie trovata.";
             var msgSize = font.MeasureString(msg);
@@ -274,7 +278,7 @@ public sealed class SpeciesCyclopedia
 
         var cols = Math.Max(1, (panelRect().Width - PanelPadding * 2) / (CardWidth + Gap));
 
-        for (var i = 0; i < _filteredSpecies.Length; i++)
+        for (var i = 0; i < _filteredSpecies.Count; i++)
         {
             var row = i / cols;
             var col = i % cols;
