@@ -2,8 +2,6 @@ namespace PitLife.Core;
 
 public static class GeneticsConfig
 {
-    public static GeneticsConfigDoc Data { get; } = ConfigLoader.Load("genetics.json", Fallback);
-
     private static readonly GeneticsConfigDoc Fallback = new GeneticsConfigDoc(
         Version: 1,
         Traits: new TraitConfigDoc(
@@ -24,6 +22,8 @@ public static class GeneticsConfig
             RandomDominanceSpread: 0.8f
         )
     );
+
+    public static GeneticsConfigDoc Data { get; } = ConfigLoader.Load("genetics.json", Fallback);
 
     public sealed record GeneticsConfigDoc(
         int Version,

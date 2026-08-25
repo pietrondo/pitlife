@@ -5,8 +5,6 @@ namespace PitLife.Core;
 
 public static class CataclysmConfig
 {
-    public static CataclysmConfigDoc Data { get; } = ConfigLoader.Load("cataclysms.json", Fallback);
-
     private static readonly CataclysmConfigDoc Fallback = new CataclysmConfigDoc(
         Version: 1,
         MassExtinctions: new List<MassExtinctionDef>
@@ -50,6 +48,8 @@ public static class CataclysmConfig
             }
         }
     );
+
+    public static CataclysmConfigDoc Data { get; } = ConfigLoader.Load("cataclysms.json", Fallback);
 
     public sealed record CataclysmConfigDoc(
         int Version,
