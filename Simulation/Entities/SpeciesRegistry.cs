@@ -101,11 +101,10 @@ public static class SpeciesRegistry
 
     static SpeciesRegistry()
     {
-        BuiltinSpecies.RegisterAll();
-        TryLoadJsonOverrides();
+        LoadSpeciesFromJson();
     }
 
-    private static void TryLoadJsonOverrides()
+    private static void LoadSpeciesFromJson()
     {
         try
         {
@@ -115,7 +114,7 @@ public static class SpeciesRegistry
         }
         catch
         {
-            // JSON failure is non-fatal: keep built-in species
+            // JSON failure is non-fatal: the registry stays empty
         }
     }
 
@@ -183,7 +182,7 @@ public static class SpeciesRegistry
             return _bySpecies.TryGetValue(species, out var def) && def.IsValidBiome(biome);
     }
 
-    internal static void Reset() { /* no-op: builtins registered in static ctor */ }
+    internal static void Reset() { /* no-op: species loaded from species.json in static ctor */ }
 
     internal static bool Unregister(string species)
     {
