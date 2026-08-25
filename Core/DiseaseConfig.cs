@@ -1,52 +1,26 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 
 namespace PitLife.Core;
 
 public static class DiseaseConfig
 {
-    private static DiseaseConfigDoc? _doc;
-
-    private static DiseaseConfigDoc Doc
-    {
-        get
+    private static readonly DiseaseConfigDoc Fallback = new(
+        Version: 1,
+        Diseases: new List<DiseaseDefEntry>
         {
-            if (_doc != null) return _doc;
-            try
-            {
-                var path = Path.Combine("Content", "config", "diseases.json");
-                if (File.Exists(path))
-                {
-                    var json = File.ReadAllText(path);
-                    _doc = JsonSerializer.Deserialize<DiseaseConfigDoc>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        AllowTrailingCommas = true,
-                        ReadCommentHandling = JsonCommentHandling.Skip
-                    });
-                }
-            }
-            catch (System.Exception ex)
-            {
-                PitLife.Core.Logger.Error(ex.ToString());
-            }
-            _doc ??= new DiseaseConfigDoc(0, null, null);
-            return _doc;
-        }
-    }
+            new() { Name = "Fever", TransmissionRate = 0.15f, Lethality = 0.1f, RecoveryTime = 30f, EnergyDrain = 2f },
+            new() { Name = "Plague", TransmissionRate = 0.3f, Lethality = 0.3f, RecoveryTime = 45f, EnergyDrain = 4f },
+            new() { Name = "Parasite", TransmissionRate = 0.1f, Lethality = 0.05f, RecoveryTime = 60f, EnergyDrain = 1f }
+        },
+        Outbreak: new OutbreakDefaults()
+    );
 
-    public static IReadOnlyList<DiseaseDefEntry> Diseases => Doc.Diseases ?? FallbackDiseases;
-    public static OutbreakDefaults Outbreak => Doc.Outbreak ?? new OutbreakDefaults();
+    public static DiseaseConfigDoc Data { get; } = ConfigLoader.Load("diseases.json", Fallback);
 
-    private static readonly IReadOnlyList<DiseaseDefEntry> FallbackDiseases = new[]
-    {
-        new DiseaseDefEntry { Name = "Fever", TransmissionRate = 0.15f, Lethality = 0.1f, RecoveryTime = 30f, EnergyDrain = 2f },
-        new DiseaseDefEntry { Name = "Plague", TransmissionRate = 0.3f, Lethality = 0.3f, RecoveryTime = 45f, EnergyDrain = 4f },
-        new DiseaseDefEntry { Name = "Parasite", TransmissionRate = 0.1f, Lethality = 0.05f, RecoveryTime = 60f, EnergyDrain = 1f }
-    };
+    public static IReadOnlyList<DiseaseDefEntry> Diseases => Data.Diseases ?? Fallback.Diseases!;
+    public static OutbreakDefaults Outbreak => Data.Outbreak ?? Fallback.Outbreak!;
 
-    private sealed record DiseaseConfigDoc(int Version, List<DiseaseDefEntry>? Diseases, OutbreakDefaults? Outbreak);
+    public sealed record DiseaseConfigDoc(int Version, List<DiseaseDefEntry>? Diseases, OutbreakDefaults? Outbreak);
 
     public sealed record DiseaseDefEntry
     {

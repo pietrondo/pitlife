@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class SocialConfig
 {
-    public static SocialConfigData Data { get; private set; } = 
+    public static SocialConfigData Data { get; } = 
         ConfigLoader.Load<SocialConfigData>("social.json");
 }
 

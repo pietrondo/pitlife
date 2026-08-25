@@ -4,7 +4,7 @@ namespace PitLife.Core;
 
 public static class FlowConfig
 {
-    public static FlowConfigData Data { get; private set; } = 
+    public static FlowConfigData Data { get; } = 
         ConfigLoader.Load<FlowConfigData>("flow.json");
 }
 

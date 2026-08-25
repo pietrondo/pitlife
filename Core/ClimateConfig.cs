@@ -4,7 +4,7 @@ namespace PitLife.Core;
 
 public static class ClimateConfig
 {
-    public static ClimateConfigData Data { get; private set; } = 
+    public static ClimateConfigData Data { get; } = 
         ConfigLoader.Load<ClimateConfigData>("climate.json");
 }
 

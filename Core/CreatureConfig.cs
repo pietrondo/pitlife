@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class CreatureConfig
 {
-    public static CreatureConfigData Data { get; private set; } = 
+    public static CreatureConfigData Data { get; } = 
         ConfigLoader.Load<CreatureConfigData>("creatures.json");
 }
 

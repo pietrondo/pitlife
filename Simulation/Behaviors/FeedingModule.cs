@@ -19,8 +19,8 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         var threshold = self.CreatureType switch
         {
-            CreatureType.Carnivore => PitLife.Core.FeedingConfig.Instance.HungerThresholdCarnivore,
-            _ => PitLife.Core.FeedingConfig.Instance.HungerThresholdHerbivore
+            CreatureType.Carnivore => PitLife.Core.FeedingConfig.Data.HungerThresholdCarnivore,
+            _ => PitLife.Core.FeedingConfig.Data.HungerThresholdHerbivore
         };
         return self.Energy < self.MaxEnergy * threshold;
     }
@@ -52,18 +52,18 @@ internal sealed class FeedingModule : IBehaviorModule
             return true;
         }
 
-        ConsumePlantHerbivore(self, food, dt, PitLife.Core.FeedingConfig.Instance.HerbivoreConsumeRate);
+        ConsumePlantHerbivore(self, food, dt, PitLife.Core.FeedingConfig.Data.HerbivoreConsumeRate);
         return true;
     }
 
     private static bool TryEatNearbyFruit(Creature self, Ecosystem ecosystem)
     {
-        var fruit = ecosystem.Fruits.TryEatFruit(self.Position, PitLife.Core.FeedingConfig.Instance.MaxFruitEatRange);
+        var fruit = ecosystem.Fruits.TryEatFruit(self.Position, PitLife.Core.FeedingConfig.Data.MaxFruitEatRange);
         if (!fruit.HasValue) return false;
 
         if (fruit.Value.Poisonous && self.Genome.PlantRecognition < 0.5f)
         {
-            self.Energy -= fruit.Value.EnergyValue * PitLife.Core.FeedingConfig.Instance.PoisonFruitDamageMultiplier;
+            self.Energy -= fruit.Value.EnergyValue * PitLife.Core.FeedingConfig.Data.PoisonFruitDamageMultiplier;
             self.RememberDanger(fruit.Value.Position);
             return true;
         }
@@ -86,19 +86,19 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         if (food.IsPoisonous && self.Genome.PlantRecognition < 0.5f)
         {
-            self.Energy -= eaten * PitLife.Core.FeedingConfig.Instance.PoisonPlantDamageMultiplier;
+            self.Energy -= eaten * PitLife.Core.FeedingConfig.Data.PoisonPlantDamageMultiplier;
             self.RememberDanger(food.Position);
             return;
         }
 
-        self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Instance.PlantDigestionRate, self.MaxEnergy);
+        self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Data.PlantDigestionRate, self.MaxEnergy);
     }
 
     private static void ConsumePlantOmnivore(Creature self, Plant food, float dt, float rate)
     {
         var eaten = Math.Min(food.Energy, rate * dt);
         food.Energy -= eaten;
-        self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Instance.OmnivorePlantDigestion, self.MaxEnergy);
+        self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Data.OmnivorePlantDigestion, self.MaxEnergy);
         if (food.Energy <= 0) food.Die(DeathCause.Predation);
     }
 
@@ -123,13 +123,13 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static void AttackPrey(Creature self, Creature prey, float damage)
     {
-        var escaped = prey.Energy > 0 && prey.Speed > self.Speed * (1f + PitLife.Core.FeedingConfig.Instance.PreyEscapeThreshold);
+        var escaped = prey.Energy > 0 && prey.Speed > self.Speed * (1f + PitLife.Core.FeedingConfig.Data.PreyEscapeThreshold);
         if (escaped) return;
 
-        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / PitLife.Core.FeedingConfig.Instance.DefenseDivisor);
-        var cost = self.CreatureType == CreatureType.Carnivore ? PitLife.Core.FeedingConfig.Instance.CarnivoreAttackCost : PitLife.Core.FeedingConfig.Instance.OmnivoreAttackCost;
+        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / PitLife.Core.FeedingConfig.Data.DefenseDivisor);
+        var cost = self.CreatureType == CreatureType.Carnivore ? PitLife.Core.FeedingConfig.Data.CarnivoreAttackCost : PitLife.Core.FeedingConfig.Data.OmnivoreAttackCost;
         self.Energy -= cost;
-        self.Energy = Math.Min(self.Energy + damage * PitLife.Core.FeedingConfig.Instance.AttackEnergyGain * (1f - prey.Toxicity * PitLife.Core.FeedingConfig.Instance.ToxicityReduction), self.MaxEnergy);
+        self.Energy = Math.Min(self.Energy + damage * PitLife.Core.FeedingConfig.Data.AttackEnergyGain * (1f - prey.Toxicity * PitLife.Core.FeedingConfig.Data.ToxicityReduction), self.MaxEnergy);
         if (prey.Energy <= 0) prey.Die(DeathCause.Predation);
     }
 
@@ -147,13 +147,13 @@ internal sealed class FeedingModule : IBehaviorModule
             return true;
         }
 
-        ConsumePlantOmnivore(self, food, dt, PitLife.Core.FeedingConfig.Instance.OmnivoreConsumeRate);
+        ConsumePlantOmnivore(self, food, dt, PitLife.Core.FeedingConfig.Data.OmnivoreConsumeRate);
         return true;
     }
 
     private static bool TryHuntAsOmnivore(Creature self, Ecosystem ecosystem, float dt, World world)
     {
-        var cfg = PitLife.Core.FeedingConfig.Instance;
+        var cfg = PitLife.Core.FeedingConfig.Data;
         var seekPrey = self.Energy < self.MaxEnergy * cfg.OmnivoreHuntThreshold && ecosystem.Random.NextDouble() < cfg.OmnivoreHuntThreshold;
         if (!seekPrey) return false;
 
@@ -189,7 +189,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (food == null || self.DistanceTo(food) >= 12f)
             return TryGraze(self, world, dt);
 
-        ConsumePlantHerbivore(self, food, dt, PitLife.Core.FeedingConfig.Instance.HerbivoreConsumeRate);
+        ConsumePlantHerbivore(self, food, dt, PitLife.Core.FeedingConfig.Data.HerbivoreConsumeRate);
         return true;
     }
 
@@ -215,7 +215,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (food == null || self.DistanceTo(food) >= 12f)
             return TryScavengeCarcass(self, ecosystem, dt);
 
-        ConsumePlantOmnivore(self, food, dt, PitLife.Core.FeedingConfig.Instance.OmnivoreConsumeRate);
+        ConsumePlantOmnivore(self, food, dt, PitLife.Core.FeedingConfig.Data.OmnivoreConsumeRate);
         return true;
     }
 
@@ -224,11 +224,11 @@ internal sealed class FeedingModule : IBehaviorModule
         var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
         if (tile.GrassAmount <= 0.001f) return false;
 
-            var grazeRate = PitLife.Core.FeedingConfig.Instance.GrazeRate * dt;
+            var grazeRate = PitLife.Core.FeedingConfig.Data.GrazeRate * dt;
         var eaten = tile.EatGrass(grazeRate);
         if (eaten <= 0) return false;
 
-        self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Instance.HerbivorePlantEnergy, self.MaxEnergy);
+        self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Data.HerbivorePlantEnergy, self.MaxEnergy);
         return true;
     }
 
@@ -237,11 +237,11 @@ internal sealed class FeedingModule : IBehaviorModule
         foreach (var c in ecosystem.Creatures)
         {
             if (c == null || c.IsAlive || c.CreatureType == CreatureType.Plant) continue;
-            if (self.DistanceTo(c) >= PitLife.Core.FeedingConfig.Instance.ScavengeRange || c.Energy <= 0) continue;
+            if (self.DistanceTo(c) >= PitLife.Core.FeedingConfig.Data.ScavengeRange || c.Energy <= 0) continue;
 
-            var eaten = Math.Min(c.Energy, PitLife.Core.FeedingConfig.Instance.ScavengeEatRate * dt);
+            var eaten = Math.Min(c.Energy, PitLife.Core.FeedingConfig.Data.ScavengeEatRate * dt);
             c.Energy -= eaten;
-            self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Instance.ScavengeEnergyGain, self.MaxEnergy);
+            self.Energy = Math.Min(self.Energy + eaten * PitLife.Core.FeedingConfig.Data.ScavengeEnergyGain, self.MaxEnergy);
             return true;
         }
         return false;

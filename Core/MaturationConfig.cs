@@ -5,7 +5,7 @@ namespace PitLife.Core;
 
 public static class MaturationConfig
 {
-    public static MaturationConfigData Data { get; private set; } = 
+    public static MaturationConfigData Data { get; } = 
         ConfigLoader.Load<MaturationConfigData>("maturation.json");
 }
 

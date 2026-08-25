@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class EvolutionConfig
 {
-    public static EvolutionConfigData Data { get; private set; } = 
+    public static EvolutionConfigData Data { get; } = 
         ConfigLoader.Load<EvolutionConfigData>("evolution.json");
 }
 

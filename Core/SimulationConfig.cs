@@ -5,7 +5,7 @@ namespace PitLife.Core;
 
 public static class SimulationConfig
 {
-    public static SimulationConfigData Data { get; private set; } = 
+    public static SimulationConfigData Data { get; } = 
         ConfigLoader.Load<SimulationConfigData>("simulation.json");
 }
 

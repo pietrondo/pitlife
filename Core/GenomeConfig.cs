@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class GenomeConfig
 {
-    public static GenomeConfigData Data { get; private set; } = 
+    public static GenomeConfigData Data { get; } = 
         ConfigLoader.Load<GenomeConfigData>("genome.json");
 }
 

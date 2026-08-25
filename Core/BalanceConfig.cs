@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class BalanceConfig
 {
-    public static BalanceConfigData Data { get; private set; } = 
+    public static BalanceConfigData Data { get; } = 
         ConfigLoader.Load<BalanceConfigData>("balance.json");
 }
 

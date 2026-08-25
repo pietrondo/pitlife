@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class EnvironmentConfig
 {
-    public static EnvironmentConfigData Data { get; private set; } = 
+    public static EnvironmentConfigData Data { get; } = 
         ConfigLoader.Load<EnvironmentConfigData>("environment.json");
 }
 

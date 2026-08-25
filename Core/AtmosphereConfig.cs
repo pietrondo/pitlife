@@ -2,7 +2,7 @@ namespace PitLife.Core;
 
 public static class AtmosphereConfig
 {
-    public static AtmosphereConfigData Data { get; private set; } = 
+    public static AtmosphereConfigData Data { get; } = 
         ConfigLoader.Load<AtmosphereConfigData>("atmosphere.json");
 }
 

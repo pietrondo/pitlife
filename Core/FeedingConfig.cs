@@ -2,12 +2,9 @@ namespace PitLife.Core;
 
 public static class FeedingConfig
 {
-    public static FeedingConfigData Instance { get; private set; } = new();
+    private static readonly FeedingConfigData Fallback = new();
 
-    public static void Load()
-    {
-        Instance = ConfigLoader.Load("feeding.json", Instance);
-    }
+    public static FeedingConfigData Data { get; } = ConfigLoader.Load("feeding.json", Fallback);
 }
 
 public class FeedingConfigData
@@ -18,12 +15,12 @@ public class FeedingConfigData
     public float AttackEnergyGain { get; set; } = 1.5f;
     public float ToxicityReduction { get; set; } = 0.5f;
     public float PreyEscapeThreshold { get; set; } = 0.3f;
-    public float ScavengeRange { get; set; } = 10f; // Fix tests
+    public float ScavengeRange { get; set; } = 80f;
     public float HerbivorePlantEnergy { get; set; } = 8f;
     public float CarnivoreAttackCost { get; set; } = 3f;
     public float OmnivoreAttackCost { get; set; } = 4f;
-    public float PlantDigestionRate { get; set; } = 2f; // Fix tests
-    public float MaxFruitEatRange { get; set; } = 12f; // Fix tests
+    public float PlantDigestionRate { get; set; } = 4f;
+    public float MaxFruitEatRange { get; set; } = 60f;
     public float HerbivoreConsumeRate { get; set; } = 10f;
     public float OmnivoreConsumeRate { get; set; } = 8f;
     public float OmnivorePlantDigestion { get; set; } = 1.5f;
