@@ -10,13 +10,25 @@ internal static class SimRunner
     {
         public int Ticks = 1000;
         public int Seed = 42;
-        public int Width = 64;
-        public int Height = 48;
-        public int Herbivores = 30;
-        public int Carnivores = 10;
-        public int Omnivores = 8;
-        public int Plants = 80;
+        public int Width;
+        public int Height;
+        public int Herbivores;
+        public int Carnivores;
+        public int Omnivores;
+        public int Plants;
         public int Interval = 100;
+
+        // I default riflettono i valori reali del gioco (simulation.json).
+        public Options()
+        {
+            var cfg = PitLife.Core.SimulationConfig.Data;
+            Width = cfg.MapWidth;
+            Height = cfg.MapHeight;
+            Herbivores = cfg.InitialHerbivores;
+            Carnivores = cfg.InitialCarnivores;
+            Omnivores = cfg.InitialOmnivores;
+            Plants = cfg.InitialPlants;
+        }
     }
 
     public static int Run(string[] args)
@@ -43,6 +55,11 @@ internal static class SimRunner
             if (t < o.Ticks)
                 eco.Tick(new GameTime(dt, dt));
         }
+
+        var m = eco.Metrics;
+        Console.WriteLine($"\nDecessi: totale={m.TotalDeaths} fame={m.StarvationDeaths} " +
+            $"predazione={m.PredationDeaths} vecchiaia={m.OldAgeDeaths} combattimento={m.CombatDeaths}");
+        Console.WriteLine($"Nascite: {m.TotalBirths} · Specie presenti: {m.SpeciesCount}");
         return 0;
     }
 

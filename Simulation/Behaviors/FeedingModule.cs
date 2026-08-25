@@ -45,7 +45,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (food == null)
             return TryScavengeCarcass(self, ecosystem, dt);
 
-        if (self.DistanceTo(food) >= 12f)
+        if (self.DistanceTo(food) >= PitLife.Core.FeedingConfig.Data.PlantEatRange)
         {
             self.MoveToward(food.Position, dt, world);
             TryGraze(self, world, dt);
@@ -61,7 +61,7 @@ internal sealed class FeedingModule : IBehaviorModule
         var fruit = ecosystem.Fruits.TryEatFruit(self.Position, PitLife.Core.FeedingConfig.Data.MaxFruitEatRange);
         if (!fruit.HasValue) return false;
 
-        if (fruit.Value.Poisonous && self.Genome.PlantRecognition < 0.5f)
+        if (fruit.Value.Poisonous && self.Genome.PlantRecognition < PitLife.Core.FeedingConfig.Data.PlantRecognitionThreshold)
         {
             self.Energy -= fruit.Value.EnergyValue * PitLife.Core.FeedingConfig.Data.PoisonFruitDamageMultiplier;
             self.RememberDanger(fruit.Value.Position);
@@ -84,7 +84,7 @@ internal sealed class FeedingModule : IBehaviorModule
 
     private static void ProcessPlantDigestion(Creature self, Plant food, float eaten)
     {
-        if (food.IsPoisonous && self.Genome.PlantRecognition < 0.5f)
+        if (food.IsPoisonous && self.Genome.PlantRecognition < PitLife.Core.FeedingConfig.Data.PlantRecognitionThreshold)
         {
             self.Energy -= eaten * PitLife.Core.FeedingConfig.Data.PoisonPlantDamageMultiplier;
             self.RememberDanger(food.Position);
@@ -111,7 +111,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (prey == null || self.DistanceTo(prey) >= self.VisionPixels)
             return TryScavengeCarcass(self, ecosystem, dt);
 
-        if (self.DistanceTo(prey) >= 10f)
+        if (self.DistanceTo(prey) >= PitLife.Core.FeedingConfig.Data.AttackRange)
         {
             self.MoveToward(prey.Position, dt, world);
             return true;
@@ -126,7 +126,7 @@ internal sealed class FeedingModule : IBehaviorModule
         var escaped = prey.Energy > 0 && prey.Speed > self.Speed * (1f + PitLife.Core.FeedingConfig.Data.PreyEscapeThreshold);
         if (escaped) return;
 
-        prey.Energy -= damage * Math.Max(0.2f, 1f - prey.Defense / PitLife.Core.FeedingConfig.Data.DefenseDivisor);
+        prey.Energy -= damage * Math.Max(PitLife.Core.FeedingConfig.Data.MinAttackDamageFactor, 1f - prey.Defense / PitLife.Core.FeedingConfig.Data.DefenseDivisor);
         var cost = self.CreatureType == CreatureType.Carnivore ? PitLife.Core.FeedingConfig.Data.CarnivoreAttackCost : PitLife.Core.FeedingConfig.Data.OmnivoreAttackCost;
         self.Energy -= cost;
         self.Energy = Math.Min(self.Energy + damage * PitLife.Core.FeedingConfig.Data.AttackEnergyGain * (1f - prey.Toxicity * PitLife.Core.FeedingConfig.Data.ToxicityReduction), self.MaxEnergy);
@@ -141,7 +141,7 @@ internal sealed class FeedingModule : IBehaviorModule
         if (food == null)
             return false;
 
-        if (self.DistanceTo(food) >= 12f)
+        if (self.DistanceTo(food) >= PitLife.Core.FeedingConfig.Data.PlantEatRange)
         {
             self.MoveToward(food.Position, dt, world);
             return true;
@@ -160,13 +160,13 @@ internal sealed class FeedingModule : IBehaviorModule
         Creature? prey = ecosystem.FindNearestPrey(self);
         if (prey == null || self.DistanceTo(prey) >= self.VisionPixels) return false;
 
-        if (self.DistanceTo(prey) >= 10f)
+        if (self.DistanceTo(prey) >= PitLife.Core.FeedingConfig.Data.AttackRange)
         {
             self.MoveToward(prey.Position, dt, world);
             return true;
         }
 
-        var attackDamage = self is Omnivore om ? om.AttackDamage : 12f;
+        var attackDamage = self is Omnivore om ? om.AttackDamage : PitLife.Core.FeedingConfig.Data.FallbackAttackDamage;
         AttackPrey(self, prey, attackDamage * dt);
         return true;
     }
@@ -186,7 +186,7 @@ internal sealed class FeedingModule : IBehaviorModule
     {
         Plant? food = FindFoodPlant(self, ecosystem);
 
-        if (food == null || self.DistanceTo(food) >= 12f)
+        if (food == null || self.DistanceTo(food) >= PitLife.Core.FeedingConfig.Data.PlantEatRange)
             return TryGraze(self, world, dt);
 
         ConsumePlantHerbivore(self, food, dt, PitLife.Core.FeedingConfig.Data.HerbivoreConsumeRate);
@@ -199,7 +199,7 @@ internal sealed class FeedingModule : IBehaviorModule
             return TryScavengeCarcass(self, ecosystem, dt);
 
         Creature? prey = ecosystem.FindNearestPrey(self);
-        if (prey == null || self.DistanceTo(prey) >= 10f)
+        if (prey == null || self.DistanceTo(prey) >= PitLife.Core.FeedingConfig.Data.AttackRange)
             return TryScavengeCarcass(self, ecosystem, dt);
 
         AttackPrey(self, prey, carn.AttackDamage * dt);
@@ -212,7 +212,7 @@ internal sealed class FeedingModule : IBehaviorModule
             return true;
 
         Plant? food = ecosystem.FindNearestPlantFor(self);
-        if (food == null || self.DistanceTo(food) >= 12f)
+        if (food == null || self.DistanceTo(food) >= PitLife.Core.FeedingConfig.Data.PlantEatRange)
             return TryScavengeCarcass(self, ecosystem, dt);
 
         ConsumePlantOmnivore(self, food, dt, PitLife.Core.FeedingConfig.Data.OmnivoreConsumeRate);
@@ -222,7 +222,7 @@ internal sealed class FeedingModule : IBehaviorModule
     internal static bool TryGraze(Creature self, World world, float dt)
     {
         var tile = world.GetTileAtPosition(self.Position.X, self.Position.Y);
-        if (tile.GrassAmount <= 0.001f) return false;
+        if (tile.GrassAmount <= PitLife.Core.FeedingConfig.Data.GrassAmountThreshold) return false;
 
             var grazeRate = PitLife.Core.FeedingConfig.Data.GrazeRate * dt;
         var eaten = tile.EatGrass(grazeRate);
@@ -257,10 +257,10 @@ internal sealed class FeedingModule : IBehaviorModule
     private static bool TryAttackNearbyPrey(Creature self, Ecosystem ecosystem, float dt)
     {
         Creature? prey = ecosystem.FindNearestPrey(self);
-        if (prey == null || self.DistanceTo(prey) >= 10f)
+        if (prey == null || self.DistanceTo(prey) >= PitLife.Core.FeedingConfig.Data.AttackRange)
             return false;
 
-        var attackDamage = self is Omnivore om ? om.AttackDamage : 12f;
+        var attackDamage = self is Omnivore om ? om.AttackDamage : PitLife.Core.FeedingConfig.Data.FallbackAttackDamage;
         AttackPrey(self, prey, attackDamage * dt);
         return true;
     }

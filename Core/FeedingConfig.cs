@@ -12,9 +12,16 @@ public class FeedingConfigData
     public int Version { get; set; } = 1;
     public float HungerThresholdHerbivore { get; set; } = 0.6f;
     public float HungerThresholdCarnivore { get; set; } = 0.8f;
-    public float AttackEnergyGain { get; set; } = 1.5f;
+    public float AttackEnergyGain { get; set; } = 3.0f;
     public float ToxicityReduction { get; set; } = 0.5f;
     public float PreyEscapeThreshold { get; set; } = 0.3f;
+    public float FleeSpeedMultiplier { get; set; } = 0.7f;
+    public float AttackRange { get; set; } = 10f;
+    public float PlantEatRange { get; set; } = 12f;
+    public float FallbackAttackDamage { get; set; } = 12f;
+    public float PlantRecognitionThreshold { get; set; } = 0.5f;
+    public float GrassAmountThreshold { get; set; } = 0.001f;
+    public float MinAttackDamageFactor { get; set; } = 0.2f;
     public float ScavengeRange { get; set; } = 80f;
     public float HerbivorePlantEnergy { get; set; } = 8f;
     public float CarnivoreAttackCost { get; set; } = 3f;

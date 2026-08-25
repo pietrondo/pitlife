@@ -7,7 +7,7 @@ internal sealed class ThreatModule : IBehaviorModule
         Creature? threat = ecosystem.FindNearestPredator(self);
         if (threat != null && self.DistanceTo(threat) < self.VisionPixels * VisionScale(self))
         {
-            self.MoveAwayFrom(threat.Position, dt, world);
+            self.MoveAwayFrom(threat.Position, dt * PitLife.Core.FeedingConfig.Data.FleeSpeedMultiplier, world);
             self.RememberDanger(threat.Position);
             return true;
         }
