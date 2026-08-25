@@ -28,7 +28,7 @@ public class CreatureBalance
     public float EnergyConsumptionBaseMultiplier { get; set; } = 0.5f;
     public float SpeedBase { get; set; } = 30f;
     public float VisionRangeBase { get; set; } = 32f;
-    public float ReproductionThresholdRatio { get; set; } = 0.7f;
+    public float ReproductionThresholdRatio { get; set; } = 0.5f;
     public float LitterSizeMultiplier { get; set; } = 1.5f;
     public float ReproductionCooldownBase { get; set; } = 30f;
     public float ReproductionCooldownMetabolismFactor { get; set; } = 30f;

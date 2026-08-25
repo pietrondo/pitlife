@@ -211,9 +211,9 @@ public abstract class Creature
 
     private void TryReproduce(Ecosystem ecosystem, float dt)
     {
+        if (CreatureType == CreatureType.Plant) return;
         if (!IsAdult) return;
         if (Energy < ReproductionThreshold) return;
-        if (CreatureType == CreatureType.Plant) return;
 
         float timeSinceLastReproduction = ecosystem.TotalTime - LastReproductionTime;
         if (timeSinceLastReproduction < ReproductionCooldown) return;
@@ -239,7 +239,7 @@ public abstract class Creature
             return;
 
         var mate = ecosystem.FindNearestMate(this);
-        if (mate == null || DistanceTo(mate) >= VisionPixels * 0.5f) return;
+        if (mate == null || DistanceTo(mate) >= VisionPixels) return;
 
         if (Gender == Gender.Male)
         {

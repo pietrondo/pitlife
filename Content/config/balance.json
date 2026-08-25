@@ -7,7 +7,7 @@
     "energyConsumptionBaseMultiplier": 0.5,
     "speedBase": 30,
     "visionRangeBase": 32,
-    "reproductionThresholdRatio": 0.7,
+    "reproductionThresholdRatio": 0.5,
     "litterSizeMultiplier": 1.5,
     "reproductionCooldownBase": 30,
     "reproductionCooldownMetabolismFactor": 30,

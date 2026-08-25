@@ -114,19 +114,19 @@ public class Ecosystem
             (selected[i], selected[j]) = (selected[j], selected[i]);
         }
         selected = selected[..take];
+
+        // Raggruppa le creature della stessa specie attorno a un punto di ancoraggio
+        // (entro il raggio di visione) così da permettere il mate-finding.
+        var anchor = new Dictionary<string, Vector2>();
+        foreach (var s in selected)
+            anchor[s] = RandomPassablePosition(s);
+        var radius = MathF.Sqrt(BalanceConfig.Data.Ecosystem.ProximitySqDist);
+
         for (var i = 0; i < count; i++)
         {
             var name = selected[Random.Next(selected.Length)];
-            var pos = RandomPassablePosition(name);
-            var nearby = 0;
-            foreach (var c in Creatures)
-                if (c.Species == name && Vector2.DistanceSquared(c.Position, pos) < BalanceConfig.Data.Ecosystem.ProximitySqDist)
-                    nearby++;
-            if (nearby >= BalanceConfig.Data.Ecosystem.MaxNearby)
-            {
-                Logger.Warn($"Spawn: skipping {name} at ({pos.X:F0},{pos.Y:F0}) - {nearby} nearby");
-                continue;
-            }
+            var offset = new Vector2((float)(Random.NextDouble() * 2 - 1), (float)(Random.NextDouble() * 2 - 1)) * radius;
+            var pos = Motor.ClampToWorld(anchor[name] + offset);
             if (!_spawner.SpawnByName(name, pos))
                 Logger.Warn($"Spawn: {name} failed at ({pos.X:F0},{pos.Y:F0})");
         }
