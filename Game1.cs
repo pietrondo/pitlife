@@ -127,8 +127,9 @@ public class Game1 : Game
 
     internal void InitializeEcosystem()
     {
-        _ecosystem = new Ecosystem(200, 150, 42);
-        _ecosystem.Initialize(30, 8, 5, 100);
+        var cfg = SimulationConfig.Data;
+        _ecosystem = new Ecosystem(cfg.MapWidth, cfg.MapHeight, 42);
+        _ecosystem.Initialize(cfg.InitialHerbivores, cfg.InitialCarnivores, cfg.InitialOmnivores, cfg.InitialPlants);
         _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight)
         {
             WorldWidth = _ecosystem.World.PixelWidth,
