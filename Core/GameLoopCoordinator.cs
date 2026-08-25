@@ -221,7 +221,7 @@ public class GameLoopCoordinator
         {
             const int logoSize = 96;
             _game._spriteBatch.Draw(_game._logo,
-                new Rectangle(_game.GraphicsDevice?.Viewport.Width ?? 0 - logoSize - 10, 10, logoSize, logoSize),
+                new Rectangle((_game.GraphicsDevice?.Viewport.Width ?? 0) - logoSize - 10, 10, logoSize, logoSize),
                 Color.White);
         }
 
@@ -683,7 +683,7 @@ public class GameLoopCoordinator
     {
         var m = _game._ecosystem.Metrics;
         m.FPS = _game._currentFPS;
-        var y = _game.GraphicsDevice?.Viewport.Height ?? 0 - 100;
+        var y = (_game.GraphicsDevice?.Viewport.Height ?? 0) - 100;
         var x = 8;
         var lineH = 14;
 
