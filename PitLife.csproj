@@ -16,6 +16,7 @@
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
     <Compile Remove="tests\**\*.cs" />
+    <Compile Remove="tools\**\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico">
