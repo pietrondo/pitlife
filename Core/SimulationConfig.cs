@@ -14,6 +14,13 @@ public class SimulationConfigData
     public int Version { get; set; } = 1;
     public float TickInterval { get; set; } = 0.1f;
     public float[] SpeedLevels { get; set; } = [0f, 1f, 2f, 4f];
+    public float SecondsPerYear { get; set; } = 480f;
+    public int MapWidth { get; set; } = 400;
+    public int MapHeight { get; set; } = 300;
+    public int InitialHerbivores { get; set; } = 60;
+    public int InitialCarnivores { get; set; } = 20;
+    public int InitialOmnivores { get; set; } = 15;
+    public int InitialPlants { get; set; } = 150;
     public DayNightConfig DayNight { get; set; } = new();
 }
 

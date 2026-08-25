@@ -2,6 +2,13 @@
   "version": 1,
   "tickInterval": 0.1,
   "speedLevels": [0.0, 1.0, 2.0, 4.0],
+  "secondsPerYear": 480.0,
+  "mapWidth": 400,
+  "mapHeight": 300,
+  "initialHerbivores": 60,
+  "initialCarnivores": 20,
+  "initialOmnivores": 15,
+  "initialPlants": 150,
   "dayNight": {
     "dayLength": 120.0,
     "dawnEnd": 0.10,

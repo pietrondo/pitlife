@@ -621,7 +621,7 @@ public class GameLoopCoordinator
     private void DrawHUD(SpriteBatch sb, SpriteFont font)
     {
         _game._sb.Clear();
-        var years = _game._displayTime / 480f + 1;
+        var years = _game._displayTime / SimulationConfig.Data.SecondsPerYear + 1;
         _game._sb.Append($"Year {years:F1} | P:{_game._displayPlants} H:{_game._displayHerbivores} C:{_game._displayCarnivores} O:{_game._displayOmnivores} | ");
         if (_game._paused) _game._sb.Append(I18n.T("hud.paused"));
         else _game._sb.Append($"{_game._controller.CurrentSpeed}x");

@@ -55,11 +55,12 @@ public class SimulationOrchestrator
 
     public virtual void GenerateNewWorld(int? seedOverride, WorldGenOptions? worldGenOptions = null)
     {
+        var cfg = SimulationConfig.Data;
         var seed = seedOverride ?? RandomNumberGenerator.GetInt32(int.MaxValue);
-        var wgOpts = worldGenOptions ?? WorldGenOptions.Pangea() with { MapWidth = 400, MapHeight = 300 };
+        var wgOpts = worldGenOptions ?? WorldGenOptions.Pangea() with { MapWidth = cfg.MapWidth, MapHeight = cfg.MapHeight };
         _game._ecosystem = new Ecosystem(wgOpts, seed);
         _game._ecosystem.Climate.Configure(wgOpts.PlanetRadiusKm, wgOpts.OrbitalAU, wgOpts.Eccentricity);
-        _game._ecosystem.Initialize(60, 20, 15, 150);
+        _game._ecosystem.Initialize(cfg.InitialHerbivores, cfg.InitialCarnivores, cfg.InitialOmnivores, cfg.InitialPlants);
         InitializeRenderers();
     }
 
