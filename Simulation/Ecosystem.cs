@@ -298,6 +298,7 @@ public class Ecosystem
                     if (tile.GrassAmount < tile.MaxGrass)
                         tile.GrassAmount = Math.Min(tile.MaxGrass, tile.GrassAmount + BalanceConfig.Data.Ecosystem.DecayGrassBoost);
                     tile.SoilNutrients = Math.Min(BalanceConfig.Data.Ecosystem.SoilMax, tile.SoilNutrients + BalanceConfig.Data.Ecosystem.SoilBoost);
+                    Metrics.RecordDeath(c.Species, c.DeathCause);
                     Spatial.Remove(c);
                     Pool.Return(c);
                     var last = Creatures.Count - 1;
