@@ -60,6 +60,8 @@ public sealed class SpeciesEditorPanel
     private int _biomeIndex;
     private int _reproductionIndex;
     private int _loadedIndex = -1;
+    private SpeciesCatalogEntry? _loadedEntry;
+    private bool _biomesEdited;
     private string _status = "";
     private bool _statusIsError;
 
@@ -99,7 +101,10 @@ public sealed class SpeciesEditorPanel
         if (_social.WasClicked(mouse, previousMouse))
             _socialIndex = (_socialIndex + 1) % SocialBehaviors.Length;
         if (_biomes.WasClicked(mouse, previousMouse))
+        {
             _biomeIndex = (_biomeIndex + 1) % BiomePresets.Length;
+            _biomesEdited = true;
+        }
         if (_reproduction.WasClicked(mouse, previousMouse))
             _reproductionIndex = (_reproductionIndex + 1) % PlantReproductionModes.Length;
         if (_load.WasClicked(mouse, previousMouse))
@@ -161,14 +166,17 @@ public sealed class SpeciesEditorPanel
             : null;
         return new SpeciesCatalogEntry
         {
-            Key = _key.Text.Trim(),
-            EnglishName = _englishName.Text.Trim(),
-            ItalianName = _italianName.Text.Trim(),
+            Key = ReadText(_key, _loadedEntry?.Key),
+            EnglishName = ReadText(_englishName, _loadedEntry?.EnglishName),
+            ItalianName = ReadText(_italianName, _loadedEntry?.ItalianName),
             Kind = kind,
-            IsAquatic = BiomePresets[_biomeIndex].Name == "Water",
+            IsAquatic = _loadedEntry is not null && !_biomesEdited
+                ? _loadedEntry.IsAquatic : BiomePresets[_biomeIndex].Name == "Water",
             SocialBehavior = kind == CreatureType.Plant ? SocialBehavior.None : SocialBehaviors[_socialIndex],
-            ValidBiomes = new List<BiomeType>(BiomePresets[_biomeIndex].Biomes),
-            DefaultSize = kind switch
+            ValidBiomes = _loadedEntry is not null && !_biomesEdited
+                ? new List<BiomeType>(_loadedEntry.ValidBiomes)
+                : new List<BiomeType>(BiomePresets[_biomeIndex].Biomes),
+            DefaultSize = _loadedEntry?.DefaultSize ?? kind switch
             {
                 CreatureType.Plant => 0.8f,
                 CreatureType.Herbivore => 1f,
@@ -176,14 +184,20 @@ public sealed class SpeciesEditorPanel
                 CreatureType.Omnivore => 0.9f,
                 _ => 1f
             },
-            MaturityAge = kind == CreatureType.Plant ? 15f : 30f,
-            TexturePath = _texturePath.Text.Trim(),
+            MaturityAge = _loadedEntry?.MaturityAge ?? (kind == CreatureType.Plant ? 15f : 30f),
+            TexturePath = ReadText(_texturePath, _loadedEntry?.TexturePath),
             PlantReproduction = reproduction,
-            Pollination = reproduction == PlantReproductionMode.Seeds
+            Pollination = _loadedEntry?.Kind == kind && _loadedEntry.PlantReproduction == reproduction
+                ? _loadedEntry.Pollination
+                : reproduction == PlantReproductionMode.Seeds
                 ? PollinationMode.Insects
                 : PollinationMode.None
         };
     }
+
+    private static string ReadText(UiTextInput input, string? original) =>
+        original is not null && input.Text == original[..Math.Min(original.Length, input.MaxLength)]
+            ? original : input.Text.Trim();
 
     private void SaveDraft()
     {
@@ -223,9 +237,17 @@ public sealed class SpeciesEditorPanel
 
         _loadedIndex = (_loadedIndex + 1) % document.Species.Count;
         SpeciesCatalogEntry entry = document.Species[_loadedIndex];
-        _key.SetText(clone ? entry.Key + "Copy" : entry.Key);
-        _englishName.SetText(clone ? entry.EnglishName + " Copy" : entry.EnglishName);
-        _italianName.SetText(clone ? entry.ItalianName + " copia" : entry.ItalianName);
+        if (clone)
+        {
+            entry.Key += "Copy";
+            entry.EnglishName += " Copy";
+            entry.ItalianName += " copia";
+        }
+        _loadedEntry = entry;
+        _biomesEdited = false;
+        _key.SetText(entry.Key);
+        _englishName.SetText(entry.EnglishName);
+        _italianName.SetText(entry.ItalianName);
         _texturePath.SetText(entry.TexturePath);
         _kindIndex = Array.IndexOf(Kinds, entry.Kind);
         _socialIndex = Math.Max(0, Array.IndexOf(SocialBehaviors, entry.SocialBehavior));
@@ -249,6 +271,8 @@ public sealed class SpeciesEditorPanel
 
     private void ClearDraft()
     {
+        _loadedEntry = null;
+        _biomesEdited = false;
         _key.Clear();
         _englishName.Clear();
         _italianName.Clear();
