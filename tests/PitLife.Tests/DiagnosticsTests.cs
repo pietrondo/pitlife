@@ -1,7 +1,10 @@
+using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PitLife.Simulation;
 using PitLife.UI;
+using Xunit;
 
 namespace PitLife.Tests;
 
@@ -46,8 +49,8 @@ public class DiagnosticsTests
     public void FlowSimulation_LavaAtVolcanoes()
     {
         var world = new World(16, 12, 42);
-        for (var y = 0; y < world.Height; y++)
-            for (var x = 0; x < world.Width; x++)
+        for (int y = 0; y < world.Height; y++)
+            for (int x = 0; x < world.Width; x++)
                 world.Tiles[x, y] = new Tile(BiomeType.Volcano);
 
         var flow = new FlowSimulation(world);
@@ -81,7 +84,7 @@ public class DiagnosticsTests
     {
         var eco = new Ecosystem(32, 24, 42);
         eco.Initialize(5, 3, 2, 15);
-        for (var i = 0; i < 600; i++)
+        for (int i = 0; i < 600; i++)
         {
             eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
         }
@@ -93,7 +96,7 @@ public class DiagnosticsTests
     {
         var eco = new Ecosystem(32, 24, 42);
         eco.Initialize(0, 0, 0, 50);
-        for (var i = 0; i < 100; i++)
+        for (int i = 0; i < 100; i++)
             eco.Tick(new GameTime(TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.1)));
         Assert.True(eco.Atmosphere.Oxygen > 40, $"O2={eco.Atmosphere.Oxygen:F1}");
     }
@@ -122,10 +125,10 @@ public class DiagnosticsTests
     public void AllSpecies_CanBeSpawned()
     {
         var eco = new Ecosystem(48, 36, 42);
-        var spawned = 0;
+        int spawned = 0;
         foreach (var sp in SpeciesRegistry.All)
         {
-            for (var i = 0; i < 50; i++)
+            for (int i = 0; i < 50; i++)
             {
                 var pos = new Microsoft.Xna.Framework.Vector2(eco.Random.Next(100, 500), eco.Random.Next(100, 500));
                 if (eco.SpawnByName(sp, pos))

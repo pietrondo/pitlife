@@ -34,7 +34,7 @@ public class LifecycleBalanceTests
         var ecosystem = new Ecosystem(32, 24, 17) { MaxCreatures = 60 };
         Vector2 origin = FindLandPosition(ecosystem.World);
 
-        for (var i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             var deer = new Herbivore(origin + new Vector2(i * 2f, 0f), StableGenome(), "Deer")
             {
@@ -48,7 +48,7 @@ public class LifecycleBalanceTests
 
         Advance(ecosystem, 10f);
         Creature[] living = ecosystem.Creatures.Where(creature => creature.IsAlive).ToArray();
-        var infants = living.Count(creature => creature.LifeStage == LifeStage.Infant);
+        int infants = living.Count(creature => creature.LifeStage == LifeStage.Infant);
 
         _output.WriteLine($"Herd after 10s: living={living.Length}, infants={infants}");
         Assert.True(infants > 0, "The adult mixed-sex herd produced no offspring");
@@ -61,7 +61,7 @@ public class LifecycleBalanceTests
         var ecosystem = new Ecosystem(32, 24, 23);
         Vector2 origin = FindLandPosition(ecosystem.World);
 
-        for (var i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             var deer = new Herbivore(origin + new Vector2(i * 3f, 0f), StableGenome(), "Deer")
             {
@@ -74,7 +74,7 @@ public class LifecycleBalanceTests
 
         Advance(ecosystem, 10f);
         Creature[] herd = ecosystem.Creatures.Where(creature => creature.IsAlive).ToArray();
-        var averageNearestDistance = herd.Average(creature =>
+        double averageNearestDistance = herd.Average(creature =>
             herd.Where(other => other != creature).Min(other => (double)creature.DistanceTo(other)));
 
         _output.WriteLine($"Herd average nearest distance: {averageNearestDistance:F1}px");
@@ -89,8 +89,8 @@ public class LifecycleBalanceTests
 
         Creature[] living = ecosystem.Creatures.Where(creature => creature.IsAlive).ToArray();
         Creature[] animals = living.Where(creature => creature.CreatureType != CreatureType.Plant).ToArray();
-        var males = animals.Count(creature => creature.Gender == Gender.Male);
-        var females = animals.Count(creature => creature.Gender == Gender.Female);
+        int males = animals.Count(creature => creature.Gender == Gender.Male);
+        int females = animals.Count(creature => creature.Gender == Gender.Female);
         return new LifecycleMetrics(
             living.Length,
             living.Count(creature => creature.CreatureType == CreatureType.Plant),
@@ -105,15 +105,15 @@ public class LifecycleBalanceTests
     private static void Advance(Ecosystem ecosystem, float seconds)
     {
         const float step = 0.1f;
-        var ticks = (int)(seconds / step);
-        for (var i = 0; i < ticks; i++)
+        int ticks = (int)(seconds / step);
+        for (int i = 0; i < ticks; i++)
             ecosystem.Tick(new GameTime(TimeSpan.FromSeconds(i * step), TimeSpan.FromSeconds(step)));
     }
 
     private static Vector2 FindLandPosition(World world)
     {
-        for (var y = 1; y < world.Height - 1; y++)
-            for (var x = 1; x < world.Width - 1; x++)
+        for (int y = 1; y < world.Height - 1; y++)
+            for (int x = 1; x < world.Width - 1; x++)
             {
                 Tile tile = world.GetTile(x, y);
                 if (tile.IsPassable && tile.Biome is not (BiomeType.DeepOcean or BiomeType.ShallowWater))

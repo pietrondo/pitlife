@@ -68,8 +68,8 @@ public class SpawnTests
 
     private static Vector2 FindLandPosition(Ecosystem eco)
     {
-        for (var x = 0; x < eco.World.Width; x++)
-            for (var y = 0; y < eco.World.Height; y++)
+        for (int x = 0; x < eco.World.Width; x++)
+            for (int y = 0; y < eco.World.Height; y++)
             {
                 var tile = eco.World.GetTile(x, y);
                 if (tile.IsPassable && tile.Biome != BiomeType.DeepOcean && tile.Biome != BiomeType.ShallowWater)
@@ -80,8 +80,8 @@ public class SpawnTests
 
     private static Vector2 FindBiomePosition(Ecosystem eco, BiomeType target)
     {
-        for (var x = 0; x < eco.World.Width; x++)
-            for (var y = 0; y < eco.World.Height; y++)
+        for (int x = 0; x < eco.World.Width; x++)
+            for (int y = 0; y < eco.World.Height; y++)
             {
                 if (eco.World.GetTile(x, y).Biome == target)
                     return new Vector2((x + 0.5f) * eco.World.TileSize, (y + 0.5f) * eco.World.TileSize);

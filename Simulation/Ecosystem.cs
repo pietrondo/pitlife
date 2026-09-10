@@ -276,8 +276,6 @@ public class Ecosystem
         Fruits.Tick(this, gameTime);
         Disease.Tick(this, gameTime);
 
-        Metrics.Tick(this, gameTime);
-
         var grassFactor = Climate.GrassRegenModifier * Cataclysms.GrassMultiplier;
         World.RegenerateGrass(dt * grassFactor);
         World.ProcessRecovery(dt);
@@ -315,22 +313,10 @@ public class Ecosystem
     public void UpdateStats()
     {
         Metrics.Update(this);
-        int plants = 0, herbivores = 0, carnivores = 0, omnivores = 0;
-        foreach (var c in Creatures)
-        {
-            if (c == null || !c.IsAlive) continue;
-            switch (c.CreatureType)
-            {
-                case CreatureType.Plant: plants++; break;
-                case CreatureType.Herbivore: herbivores++; break;
-                case CreatureType.Carnivore: carnivores++; break;
-                case CreatureType.Omnivore: omnivores++; break;
-            }
-        }
-        PlantCount = plants;
-        HerbivoreCount = herbivores;
-        CarnivoreCount = carnivores;
-        OmnivoreCount = omnivores;
+        PlantCount = Metrics.Plants;
+        HerbivoreCount = Metrics.Herbivores;
+        CarnivoreCount = Metrics.Carnivores;
+        OmnivoreCount = Metrics.Omnivores;
 
         foreach (var species in _knownSpecies.ToArray())
         {
@@ -344,7 +330,7 @@ public class Ecosystem
             _knownSpecies.Add(species);
 
         var softCap = MaxCreatures * BalanceConfig.Data.Ecosystem.SoftCapRatio;
-        var aliveCount = plants + herbivores + carnivores + omnivores;
+        var aliveCount = Metrics.TotalCreatures;
         PopulationPressure = aliveCount > softCap
             ? 1f + (aliveCount - softCap) / (MaxCreatures * BalanceConfig.Data.Ecosystem.PressureRangeRatio) * BalanceConfig.Data.Ecosystem.MaxPressureMultiplier
             : 1f;
@@ -352,7 +338,7 @@ public class Ecosystem
         _logCounter++;
         if (_logCounter % BalanceConfig.Data.Ecosystem.StatsLogInterval == 0) // Log every ~1 second at 60 FPS
         {
-            Logger.Event("STATS", $"T={TotalTime:F1}s P={plants} H={herbivores} C={carnivores} O={omnivores} Total={Creatures.Count}");
+            Logger.Event("STATS", $"T={TotalTime:F1}s P={PlantCount} H={HerbivoreCount} C={CarnivoreCount} O={OmnivoreCount} Total={Creatures.Count}");
         }
     }
 

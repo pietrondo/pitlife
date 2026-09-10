@@ -1,18 +1,19 @@
-## 2024-05-19 - Memory Optimization in Render Loops
-**Learning:** `SpriteBatch.DrawString` in MonoGame has an overload taking `StringBuilder` to avoid string allocations, but custom localization wrappers like `I18n.Format` use `params object[]` and `string.Format`, forcing boxing and string allocations.
-**Action:** When performing zero-allocation optimizations, bypass or refactor custom wrappers like `I18n.Format` that implicitly allocate, and use pre-allocated StringBuilders passed directly to MonoGame's rendering API.
+## BOLT'S JOURNAL
 
-## 2024-05-19 - Culling Off-screen Rendering in Arrays
-**Learning:** Looping through arrays (like fruits) without checking visibility wastes GPU fill rate and incurs hundreds of unnecessary `SpriteBatch.Draw()` calls for off-screen entities.
-**Action:** Always implement pure mathematical camera bounds culling (`visibleArea.X`, `visibleArea.Right`, etc.) before calling `.Draw()` on entities loaded from arrays or pools.
+## 2024-05-18 - WorldRenderer Culling and Draw Calls Optimization
+**Learning:** `WorldRenderer.Draw` method creates new `Rectangle` structs inside the loop and loops over the grid, drawing multiple layers per tile (base texture, and up to 4 edges). It could be optimized to minimize state changes and reduce struct allocations in loop.
+**Action:** Replace `new Rectangle` inside loops with inline structs or precalculate. Group texture draws to minimize texture swaps and reduce draw calls.
+## 2024-05-18 - Avoid instantiating Rectangles on each Draw in loop
+**Learning:** `new Rectangle` doesn't allocate on heap (it's a struct), however `WorldRenderer.Draw` method creates new `Rectangle` objects constantly inside `sb.Draw` calls and the loop loops over a calculated bounding box. It could be cleaner with math. Also, `CreatureRenderer.Draw` doesn't fully take advantage of culling by pure mathematical grid indexing, though it uses `camera.VisibleArea`. Let's focus on `WorldRenderer.Draw` loop since that draws every tile, while `PixelWorldRenderer` caches the world. Looking closely, `PixelWorldRenderer` draws a huge chunk at once, while `WorldRenderer` iterates over individual tiles, drawing 1-5 things per tile!
 
-## 2024-05-19 - Texture Swapping in Grid Rendering
-**Learning:** Interleaving different `Texture2D` instances (like a biome base sprite and a 1x1 pixel texture for borders) inside a single spatial loop destroys `SpriteBatch` batching when using `SpriteSortMode.Deferred`. This causes MonoGame to issue potentially thousands of GPU texture swaps per frame, causing massive CPU overhead in the rendering thread.
-**Action:** When drawing layered grids, always group `SpriteBatch.Draw` calls by texture across multiple passes (e.g., Pass 1: Base textures, Pass 2: Borders) to drastically reduce state changes and improve GPU utilization.
-
-## 2024-05-19 - Culling Full-Screen Overlays
-**Learning:** Drawing full-world sized rectangles (`Rectangle(0, 0, World.PixelWidth, World.PixelHeight)`) when a camera transform is active destroys GPU fill rate because MonoGame attempts to rasterize massive areas far outside the screen bounds.
-**Action:** Always intersect transparent overlays (like season tints or temperature blends) with `Camera.VisibleArea` instead of the full world size.
-## 2026-07-06 - Terrain Generation (Biome Placement) Optimization
-**Learning:** In C#, repeated checks of `HashSet<T>.Contains(item)` within a hot, nested spatial loop (e.g., world array iteration) incur significant unnecessary overhead due to repeated hashing and memory lookups. If the only purpose of the set check is to avoid duplicate placements and short-circuit the loop once an element is placed, introducing a simple boolean flag (`bool placed = false`) allows for immediate loop termination via `break` or `!placed` in the continuation condition. This achieves O(1) loop exit speed, entirely bypassing the HashSet.
-**Action:** Replaced `!present.Contains(biome)` in the `y` and `x` loop conditions of `TerrainRefiner.EnsureAllBiomesPresent` with a `!placed` flag, drastically reducing HashSet overhead during fallback biome placement.
+Wait, Game1.cs uses `_worldRenderer = new PixelWorldRenderer(_ecosystem.World);`
+And `_spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: _camera.TransformMatrix); _worldRenderer.Draw(_spriteBatch, _camera);`
+Wait... `Game1.cs` only uses `PixelWorldRenderer`. `WorldRenderer` is unused or maybe an old version? Let's verify.
+**Learning:** `Game1.cs` only instantiates and uses `PixelWorldRenderer` for the world! `PixelWorldRenderer` renders the whole map into a giant `Texture2D` (`_worldTexture`) and then draws it using 9 loops (`dx` from -1 to 1, `dy` from -1 to 1) for tiling/wrapping, drawing the FULL texture 9 times every frame regardless of camera zoom or bounds! This is a massive draw call/fillrate issue! The texture size is `_world.Width * _renderScale` x `_world.Height * _renderScale` (e.g. 400x8 = 3200 width, 300x8 = 2400 height!). Drawing this 9 times means submitting 3200x2400 textures 9 times per frame!
+**Action:** Optimize `PixelWorldRenderer.Draw` to only draw the copies of `_worldTexture` that actually intersect with `camera.VisibleArea`.
+**Learning:** `PixelWorldRenderer` creates a single massive `Texture2D` containing the whole world scaled by `_renderScale` (which is 8). The map wraps around infinitely. Currently `PixelWorldRenderer.Draw` calls `sb.Draw` 9 times (3x3 grid) to allow infinite scrolling. It just blindly draws the whole texture 9 times, even though only 1-4 of them could possibly be visible on the screen! This is terrible for fill rate.
+**Action:** Optimize `PixelWorldRenderer.Draw` to only draw the copies of `_worldTexture` that actually intersect with `camera.VisibleArea`. Since we know `pw = _world.PixelWidth` and `ph = _world.PixelHeight`, and `camera.VisibleArea` gives us the `Rectangle` of what's currently visible. We can do simple AABB intersection `camera.VisibleArea.Intersects(...)` or calculate precisely which `dx` and `dy` indices we need to draw.
+**Learning:** `Camera.cs` uses `ClampPosition` that wraps around using `% WorldWidth`. The `VisibleArea` calculation creates a rectangle that matches exactly what is shown on screen.
+In `PixelWorldRenderer.Draw`, `pw` and `ph` represent the total scaled pixel width and height of the world map. Currently it loops 3x3 times, drawing the world from `dx=-1` to `dx=1` and `dy=-1` to `dy=1`. This is 9 `sb.Draw` calls.
+If we check whether `camera.VisibleArea.Intersects(...)` before drawing, we can cull up to 8 of those 9 draw calls, leaving only 1 to 4 draw calls at map wrap boundaries!
+This perfectly fits Bolt's philosophy: "Measure first, optimize second. If it's off-screen, it doesn't exist. Rely on pure mathematical grid coordinates for culling... minimizes Draw Calls."

@@ -1,0 +1,172 @@
+{
+  "attribution": {
+    "commit": "Generated with oh-my-agent\n\nCo-Authored-By: First Fluke \u003cour.first.fluke@gmail.com\u003e",
+    "pr": "Generated with [oh-my-agent](https://github.com/first-fluke/oh-my-agent)"
+  },
+  "effortLevel": "high",
+  "enabledPlugins": {
+    "claude-code-wakatime@wakatime": true,
+    "skill-creator@claude-plugins-official": true
+  },
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-cv-7996507538f446c69cad3f96c6637ee3",
+    "ANTHROPIC_BASE_URL": "https://api.openadapter.in",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M2.7",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "Kimi-K2.5",
+    "ANTHROPIC_MODEL": "Kimi-K2.5",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": 80,
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS": "1",
+    "CLAUDE_CODE_FILE_READ_MAX_OUTPUT_TOKENS": 100000,
+    "DISABLE_ERROR_REPORTING": "1",
+    "DISABLE_TELEMETRY": "1",
+    "ENABLE_PROMPT_CACHING_1H": "1",
+    "cleanupPeriodDays": 180
+  },
+  "extraKnownMarketplaces": {
+    "wakatime": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/wakatime/claude-code-wakatime.git"
+      }
+    }
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "timeout": 5,
+            "type": "http",
+            "url": "http://localhost:8123/hooks"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "timeout": 5,
+            "type": "http",
+            "url": "http://localhost:8123/hooks"
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "bd prime",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "bun \"$CLAUDE_PROJECT_DIR/.claude/hooks/test-filter.ts\"",
+            "name": "test-filter",
+            "timeout": 5,
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      },
+      {
+        "hooks": [
+          {
+            "timeout": 5,
+            "type": "http",
+            "url": "http://localhost:8123/hooks"
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "timeout": 5,
+            "type": "http",
+            "url": "http://localhost:8123/hooks"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "bd prime",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "bun \"$CLAUDE_PROJECT_DIR/.claude/hooks/persistent-mode.ts\"",
+            "name": "persistent-mode",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "timeout": 5,
+            "type": "http",
+            "url": "http://localhost:8123/hooks"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "bun \"$CLAUDE_PROJECT_DIR/.claude/hooks/keyword-detector.ts\"",
+            "name": "keyword-detector",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "timeout": 5,
+            "type": "http",
+            "url": "http://localhost:8123/hooks"
+          }
+        ]
+      }
+    ]
+  },
+  "model": "sonnet[1m]",
+  "permissions": {
+    "allow": [
+      "Bash(bun run:*)",
+      "Bash(bunx tsx:*)",
+      "Bash(git add:*)",
+      "mcp__serena__*"
+    ]
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "statusLine": {
+    "command": "bun \"$CLAUDE_PROJECT_DIR/.claude/hooks/hud.ts\"",
+    "type": "command"
+  }
+}
